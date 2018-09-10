@@ -2771,6 +2771,94 @@ namespace SQLBuilder.Core.Repositories
         #endregion
         #endregion
 
+        #region FindMultiple
+        #region Sync
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public List<IEnumerable<dynamic>> FindMultiple(string sql)
+        {
+            return FindMultiple(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public List<IEnumerable<dynamic>> FindMultiple(string sql, DbParameter[] dbParameter)
+        {
+            var list = new List<IEnumerable<dynamic>>();
+            if (Transaction?.Connection != null)
+            {
+                var result = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction);
+                while (result?.IsConsumed == false)
+                {
+                    list.Add(result.Read());
+                }
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var result = dbConnection.QueryMultiple(sql, dbParameter.ToDynamicParameters());
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(result.Read());
+                    }
+                }
+            }
+            return list;
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql)
+        {
+            return await FindMultipleAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, DbParameter[] dbParameter)
+        {
+            var list = new List<IEnumerable<dynamic>>();
+            if (Transaction?.Connection != null)
+            {
+                var result = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction);
+                while (result?.IsConsumed == false)
+                {
+                    list.Add(await result.ReadAsync());
+                }
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var result = await dbConnection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters());
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(await result.ReadAsync());
+                    }
+                }
+            }
+            return list;
+        }
+        #endregion
+        #endregion
+
         #region Dispose
         /// <summary>
         /// 释放资源

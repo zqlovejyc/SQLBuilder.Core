@@ -940,5 +940,41 @@ namespace SQLBuilder.Core.Repositories
         Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex);
         #endregion
         #endregion
+
+        #region FindMultiple
+        #region Sync
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        List<IEnumerable<dynamic>> FindMultiple(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        List<IEnumerable<dynamic>> FindMultiple(string sql, DbParameter[] dbParameter);
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, DbParameter[] dbParameter);
+        #endregion
+        #endregion
     }
 }

@@ -2,16 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.1.5</AssemblyVersion>
+        <AssemblyVersion>1.0.1.6</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.1.5</Version>
+        <Version>1.0.1.6</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
         <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
         <PackageIconUrl>https://zqlovejyc.gitee.io/zqutils-js/Images/SQL.png</PackageIconUrl>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>仓储新增FindMultiple、FindMultipleAsync方法；</PackageReleaseNotes>
-        <FileVersion>1.0.1.5</FileVersion>
+        <PackageReleaseNotes>更新IRepository仓储接口，重载object类型参数并实现；</PackageReleaseNotes>
+        <FileVersion>1.0.1.6</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

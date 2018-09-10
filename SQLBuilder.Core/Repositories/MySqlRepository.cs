@@ -175,6 +175,29 @@ namespace SQLBuilder.Core.Repositories
         /// 执行sql语句
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public int ExecuteBySql(string sql, object parameter)
+        {
+            var result = 0;
+            if (Transaction?.Connection != null)
+            {
+                result = Transaction.Connection.Execute(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = connection.Execute(sql, parameter);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
         public int ExecuteBySql(string sql, params DbParameter[] dbParameter)
@@ -211,6 +234,29 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     result = connection.Execute(procName, commandType: CommandType.StoredProcedure);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procName">存储过程名称</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public int ExecuteByProc(string procName, object parameter)
+        {
+            var result = 0;
+            if (Transaction?.Connection != null)
+            {
+                result = Transaction.Connection.Execute(procName, parameter, Transaction, commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = connection.Execute(procName, parameter, commandType: CommandType.StoredProcedure);
                 }
             }
             return result;
@@ -267,6 +313,29 @@ namespace SQLBuilder.Core.Repositories
         /// 执行sql语句
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public async Task<int> ExecuteBySqlAsync(string sql, object parameter)
+        {
+            var result = 0;
+            if (Transaction?.Connection != null)
+            {
+                result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = await connection.ExecuteAsync(sql, parameter);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteBySqlAsync(string sql, params DbParameter[] dbParameter)
@@ -303,6 +372,29 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     result = await connection.ExecuteAsync(procName, commandType: CommandType.StoredProcedure);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procName">存储过程名称</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public async Task<int> ExecuteByProcAsync(string procName, object parameter)
+        {
+            var result = 0;
+            if (Transaction?.Connection != null)
+            {
+                result = await Transaction.Connection.ExecuteAsync(procName, parameter, Transaction, commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = await connection.ExecuteAsync(procName, parameter, commandType: CommandType.StoredProcedure);
                 }
             }
             return result;
@@ -1037,9 +1129,30 @@ namespace SQLBuilder.Core.Repositories
         /// 查询单个对象
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public object FindObject(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.QueryFirstOrDefault<string>(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return dbConnection.QueryFirstOrDefault<string>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回查询结果对象</returns>
-        public object FindObject(string sql, DbParameter[] dbParameter)
+        public object FindObject(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -1070,9 +1183,30 @@ namespace SQLBuilder.Core.Repositories
         /// 查询单个对象
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public async Task<object> FindObjectAsync(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<string>(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return await dbConnection.QueryFirstOrDefaultAsync<string>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回查询结果对象</returns>
-        public async Task<object> FindObjectAsync(string sql, DbParameter[] dbParameter)
+        public async Task<object> FindObjectAsync(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -1207,19 +1341,41 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
-        /// <param name="parameters">对应参数</param>
+        /// <param name="parameter">对应参数</param>
         /// <returns>返回实体</returns>
-        public T FindEntityBySql<T>(string sql, DbParameter[] parameters)
+        public T FindEntityBySql<T>(string sql, object parameter)
         {
             if (Transaction?.Connection != null)
             {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameters.ToDynamicParameters(), Transaction);
+                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction);
             }
             else
             {
                 using (var dbConnection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(sql, parameters.ToDynamicParameters());
+                    return dbConnection.QueryFirstOrDefault<T>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public T FindEntityBySql<T>(string sql, params DbParameter[] dbParameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return dbConnection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters());
                 }
             }
         }
@@ -1342,19 +1498,41 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
-        /// <param name="parameters">对应参数</param>
+        /// <param name="parameter">对应参数</param>
         /// <returns>返回实体</returns>
-        public async Task<T> FindEntityBySqlAsync<T>(string sql, DbParameter[] parameters)
+        public async Task<T> FindEntityBySqlAsync<T>(string sql, object parameter)
         {
             if (Transaction?.Connection != null)
             {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameters.ToDynamicParameters(), Transaction);
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction);
             }
             else
             {
                 using (var dbConnection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, parameters.ToDynamicParameters());
+                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public async Task<T> FindEntityBySqlAsync<T>(string sql, params DbParameter[] dbParameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters());
                 }
             }
         }
@@ -1702,9 +1880,31 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public IEnumerable<T> FindList<T>(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.Query<T>(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return dbConnection.Query<T>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句进行查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回集合</returns>
-        public IEnumerable<T> FindList<T>(string sql, DbParameter[] dbParameter)
+        public IEnumerable<T> FindList<T>(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -1886,6 +2086,59 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回集合和总记录数</returns>
+        public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            var guid = Guid.NewGuid().ToString().Replace("-", "");
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter, Transaction);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var list = multiQuery?.Read<T>();
+                return (list, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = dbConnection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter);
+                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                    var list = multiQuery?.Read<T>();
+                    return (list, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句分页查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="isAsc">是否升序</param>
@@ -1927,6 +2180,59 @@ namespace SQLBuilder.Core.Repositories
                 using (var dbConnection = Connection)
                 {
                     var multiQuery = dbConnection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", dbParameter.ToDynamicParameters());
+                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                    var list = multiQuery?.Read<T>();
+                    return (list, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回集合和总记录数</returns>
+        public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = $"ORDER BY (SELECT 0)";
+            }
+            //暂未实现临时表with分页
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var list = multiQuery?.Read<T>();
+                return (list, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2138,9 +2444,31 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public async Task<IEnumerable<T>> FindListAsync<T>(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return await dbConnection.QueryAsync<T>(sql, parameter);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句进行查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回集合</returns>
-        public async Task<IEnumerable<T>> FindListAsync<T>(string sql, DbParameter[] dbParameter)
+        public async Task<IEnumerable<T>> FindListAsync<T>(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -2322,6 +2650,59 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回集合和总记录数</returns>
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            var guid = Guid.NewGuid().ToString().Replace("-", "");
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter, Transaction);
+                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                var list = await multiQuery?.ReadAsync<T>();
+                return (list, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter);
+                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                    var list = await multiQuery?.ReadAsync<T>();
+                    return (list, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句分页查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="isAsc">是否升序</param>
@@ -2363,6 +2744,59 @@ namespace SQLBuilder.Core.Repositories
                 using (var dbConnection = Connection)
                 {
                     var multiQuery = await dbConnection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", dbParameter.ToDynamicParameters());
+                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                    var list = await multiQuery?.ReadAsync<T>();
+                    return (list, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回集合和总记录数</returns>
+        public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            //暂未实现临时表with分页
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction);
+                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                var list = await multiQuery?.ReadAsync<T>();
+                return (list, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2441,9 +2875,30 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public DataTable FindTable(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.ExecuteReader(sql, parameter, Transaction).ToDataTable();
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    return dbConnection.ExecuteReader(sql, parameter).ToDataTable();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回DataTable</returns>
-        public DataTable FindTable(string sql, DbParameter[] dbParameter)
+        public DataTable FindTable(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -2470,6 +2925,58 @@ namespace SQLBuilder.Core.Repositories
         public (DataTable table, long total) FindTable(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
         {
             return FindTable(sql, null, orderField, isAsc, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            var guid = Guid.NewGuid().ToString().Replace("-", "");
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter, Transaction);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                return (table, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = dbConnection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter);
+                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    return (table, total);
+                }
+            }
         }
 
         /// <summary>
@@ -2517,6 +3024,58 @@ namespace SQLBuilder.Core.Repositories
                 using (var dbConnection = Connection)
                 {
                     var multiQuery = dbConnection.QueryMultiple($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", dbParameter.ToDynamicParameters());
+                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    return (table, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            //暂未实现临时表with分页
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                return (table, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -2592,9 +3151,32 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public async Task<DataTable> FindTableAsync(string sql, object parameter)
+        {
+            if (Transaction?.Connection != null)
+            {
+                var reader = await Transaction.Connection.ExecuteReaderAsync(sql, parameter, Transaction);
+                return reader.ToDataTable();
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var reader = await dbConnection.ExecuteReaderAsync(sql, parameter);
+                    return reader.ToDataTable();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回DataTable</returns>
-        public async Task<DataTable> FindTableAsync(string sql, DbParameter[] dbParameter)
+        public async Task<DataTable> FindTableAsync(string sql, params DbParameter[] dbParameter)
         {
             if (Transaction?.Connection != null)
             {
@@ -2623,6 +3205,60 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
         {
             return await FindTableAsync(sql, null, orderField, isAsc, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回DataTable和总记录数</returns>
+        public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            var guid = Guid.NewGuid().ToString().Replace("-", "");
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter, Transaction);
+                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                var reader = await multiQuery?.ReadAsync();
+                var table = reader?.ToList()?.ToDataTable();
+                return (table, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", parameter);
+                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                    var reader = await multiQuery?.ReadAsync();
+                    var table = reader?.ToList()?.ToDataTable();
+                    return (table, total);
+                }
+            }
         }
 
         /// <summary>
@@ -2671,6 +3307,60 @@ namespace SQLBuilder.Core.Repositories
                 using (var dbConnection = Connection)
                 {
                     var multiQuery = await dbConnection.QueryMultipleAsync($"DROP TEMPORARY TABLE IF EXISTS $Temp{guid};CREATE TEMPORARY TABLE $Temp{guid} SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $Temp{guid};SELECT * FROM $Temp{guid} AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $Temp{guid};", dbParameter.ToDynamicParameters());
+                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                    var reader = await multiQuery?.ReadAsync();
+                    var table = reader?.ToList()?.ToDataTable();
+                    return (table, total);
+                }
+            }
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        {
+            if (pageIndex == 0)
+            {
+                pageIndex = 1;
+            }
+            var orderBy = string.Empty;
+            if (!string.IsNullOrEmpty(orderField))
+            {
+                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                {
+                    orderBy = $"ORDER BY {orderField}";
+                }
+                else
+                {
+                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                }
+            }
+            else
+            {
+                orderBy = "ORDER BY (SELECT 0)";
+            }
+            //暂未实现临时表with分页
+            if (Transaction?.Connection != null)
+            {
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction);
+                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
+                var reader = await multiQuery?.ReadAsync();
+                var table = reader?.ToList()?.ToDataTable();
+                return (table, total);
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -2751,9 +3441,40 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询返回多个结果集
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public List<IEnumerable<dynamic>> FindMultiple(string sql, object parameter)
+        {
+            var list = new List<IEnumerable<dynamic>>();
+            if (Transaction?.Connection != null)
+            {
+                var result = Transaction.Connection.QueryMultiple(sql, parameter, Transaction);
+                while (result?.IsConsumed == false)
+                {
+                    list.Add(result.Read());
+                }
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var result = dbConnection.QueryMultiple(sql, parameter);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(result.Read());
+                    }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回查询结果集</returns>
-        public List<IEnumerable<dynamic>> FindMultiple(string sql, DbParameter[] dbParameter)
+        public List<IEnumerable<dynamic>> FindMultiple(string sql, params DbParameter[] dbParameter)
         {
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)
@@ -2794,9 +3515,40 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询返回多个结果集
         /// </summary>
         /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, object parameter)
+        {
+            var list = new List<IEnumerable<dynamic>>();
+            if (Transaction?.Connection != null)
+            {
+                var result = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction);
+                while (result?.IsConsumed == false)
+                {
+                    list.Add(await result.ReadAsync());
+                }
+            }
+            else
+            {
+                using (var dbConnection = Connection)
+                {
+                    var result = await dbConnection.QueryMultipleAsync(sql, parameter);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(await result.ReadAsync());
+                    }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回查询结果集</returns>
-        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, DbParameter[] dbParameter)
+        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter)
         {
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)

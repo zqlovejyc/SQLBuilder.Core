@@ -266,6 +266,29 @@ namespace SQLBuilder.Core.Repositories
         /// 执行sql存储过程
         /// </summary>
         /// <param name="procName">存储过程名称</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public IEnumerable<T> ExecuteByProc<T>(string procName, object parameter)
+        {
+            IEnumerable<T> result = null;
+            if (Transaction?.Connection != null)
+            {
+                result = Transaction.Connection.Query<T>(procName, parameter, Transaction, commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = connection.Query<T>(procName, parameter, commandType: CommandType.StoredProcedure);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procName">存储过程名称</param>
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
         public int ExecuteByProc(string procName, params DbParameter[] dbParameter)
@@ -395,6 +418,29 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     result = await connection.ExecuteAsync(procName, parameter, commandType: CommandType.StoredProcedure);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procName">存储过程名称</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        public async Task<IEnumerable<T>> ExecuteByProcAsync<T>(string procName, object parameter)
+        {
+            IEnumerable<T> result = null;
+            if (Transaction?.Connection != null)
+            {
+                result = await Transaction.Connection.QueryAsync<T>(procName, parameter, Transaction, commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    result = await connection.QueryAsync<T>(procName, parameter, commandType: CommandType.StoredProcedure);
                 }
             }
             return result;

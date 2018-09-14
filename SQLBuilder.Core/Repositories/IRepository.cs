@@ -100,6 +100,15 @@ namespace SQLBuilder.Core.Repositories
         int ExecuteByProc(string procName, object parameter);
 
         /// <summary>
+        /// 执行sql存储过程进行查询
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="procName"></param>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
+        IEnumerable<T> ExecuteByProc<T>(string procName, object parameter);
+
+        /// <summary>
         /// 执行sql存储过程
         /// </summary>
         /// <param name="procName">存储过程名称</param>
@@ -146,6 +155,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="parameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
         Task<int> ExecuteByProcAsync(string procName, object parameter);
+
+        /// <summary>
+        /// 执行sql存储过程进行查询
+        /// </summary>
+        /// <param name="procName">存储过程名称</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回受影响行数</returns>
+        Task<IEnumerable<T>> ExecuteByProcAsync<T>(string procName, object parameter);
 
         /// <summary>
         /// 执行sql存储过程

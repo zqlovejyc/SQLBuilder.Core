@@ -46,7 +46,7 @@ namespace SQLBuilder.Core.Repositories
         /// 提交事务
         /// </summary>
         /// <returns></returns>
-        int Commit();
+        void Commit();
 
         /// <summary>
         /// 回滚事务

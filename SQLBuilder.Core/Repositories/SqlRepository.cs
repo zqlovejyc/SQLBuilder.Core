@@ -106,21 +106,11 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 提交当前操作的结果
         /// </summary>
-        public int Commit()
+        public void Commit()
         {
-            try
-            {
-                Transaction.Commit();
-                return 1;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                Close();
-            }
+            Transaction.Commit();
+            Transaction.Dispose();
+            Close();
         }
 
         /// <summary>
@@ -524,7 +514,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -586,7 +576,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -673,7 +663,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -757,7 +747,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -866,7 +856,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -950,7 +940,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -1038,7 +1028,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;
@@ -1124,7 +1114,7 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch (Exception)
+                catch
                 {
                     Rollback();
                     result = 0;

@@ -63,7 +63,7 @@ namespace SQLBuilder.Core.UnitTest
         /// </summary>
         [TestMethod]
         public void Test_Delete_05()
-        {            
+        {
             var builder = SqlBuilder.Delete<UserInfo>().WithKey(2);
             Assert.AreEqual("DELETE FROM [Base_UserInfo] WHERE [Id] = @Param0", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);

@@ -352,11 +352,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件更新实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="predicate">linq条件</param>
-        /// <param name="entity">要更新的实体表达式</param>
+        /// <param name="entity">要更新的实体</param>
         /// <returns>返回受影响行数</returns>
-        int Update<T, S>(Expression<Func<T, bool>> predicate, Expression<Func<S>> entity) where T : class;
+        int Update<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class;
         #endregion
 
         #region Async
@@ -380,11 +379,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件更新实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        ///  <typeparam name="S">泛型类型</typeparam>
         /// <param name="predicate">linq条件</param>
-        /// <param name="entity">要更新的实体表达式</param>
+        /// <param name="entity">要更新的实体</param>
         /// <returns>返回受影响行数</returns>
-        Task<int> UpdateAsync<T, S>(Expression<Func<T, bool>> predicate, Expression<Func<S>> entity) where T : class;
+        Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class;
         #endregion
         #endregion
 
@@ -454,11 +452,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="KeyValue">主键值</param>
         /// <returns>返回实体</returns>
-        T FindEntity<T, S>(Expression<Func<T, S>> selector, object KeyValue) where T : class;
+        T FindEntity<T>(Expression<Func<T, object>> selector, object KeyValue) where T : class;
 
         /// <summary>
         /// 根据linq条件查询单个实体
@@ -472,11 +469,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回实体</returns>
-        T FindEntity<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
         /// 根据sql语句查询单个实体
@@ -518,11 +514,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="KeyValue">主键值</param>
         /// <returns>返回实体</returns>
-        Task<T> FindEntityAsync<T, S>(Expression<Func<T, S>> selector, object KeyValue) where T : class;
+        Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, object KeyValue) where T : class;
 
         /// <summary>
         /// 根据linq条件查询单个实体
@@ -536,11 +531,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回实体</returns>
-        Task<T> FindEntityAsync<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
         /// 根据sql语句查询单个实体
@@ -583,10 +577,9 @@ namespace SQLBuilder.Core.Repositories
         /// 查询全部
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
-        IQueryable<T> IQueryable<T, S>(Expression<Func<T, S>> selector) where T : class;
+        IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
         /// 根据linq查询
@@ -600,11 +593,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回集合</returns>
-        IQueryable<T> IQueryable<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
         #endregion
 
         #region Async
@@ -619,10 +611,9 @@ namespace SQLBuilder.Core.Repositories
         /// 查询全部
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
-        Task<IQueryable<T>> IQueryableAsync<T, S>(Expression<Func<T, S>> selector) where T : class;
+        Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
         /// 根据linq查询
@@ -636,11 +627,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回集合</returns>
-        Task<IQueryable<T>> IQueryableAsync<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
         #endregion
         #endregion
 
@@ -657,30 +647,26 @@ namespace SQLBuilder.Core.Repositories
         /// 查询全部
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
-        IEnumerable<T> FindList<T, S>(Expression<Func<T, S>> selector) where T : class;
+        IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
         /// 查询并根据条件进行排序
         /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>  
-        /// <typeparam name="S">泛型类型</typeparam>
+        /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="orderby">排序字段</param>
         /// <returns>返回集合</returns>
-        IEnumerable<T> FindList<T, S>(Func<T, S> orderby) where T : class;
+        IEnumerable<T> FindList<T>(Func<T, object> orderby) where T : class;
 
         /// <summary>
         /// 查询并根据条件进行排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
-        /// <typeparam name="F">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="orderby">排序字段</param>
         /// <returns>返回集合</returns>
-        IEnumerable<T> FindList<T, S, F>(Expression<Func<T, S>> selector, Func<T, F> orderby) where T : class;
+        IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Func<T, object> orderby) where T : class;
 
         /// <summary>
         /// 根据linq条件进行查询
@@ -694,11 +680,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件进行查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回集合</returns>
-        IEnumerable<T> FindList<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
         /// 根据sql语句进行查询
@@ -753,7 +738,6 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件进行分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <param name="orderField">排序字段</param>
@@ -761,7 +745,7 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        (IEnumerable<T> list, long total) FindList<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class;
+        (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class;
 
         /// <summary>
         /// 根据sql语句分页查询
@@ -840,30 +824,26 @@ namespace SQLBuilder.Core.Repositories
         /// 查询全部
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
-        Task<IEnumerable<T>> FindListAsync<T, S>(Expression<Func<T, S>> selector) where T : class;
+        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
         /// 查询并根据条件进行排序
         /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>     
-        /// <typeparam name="S">泛型类型</typeparam>
+        /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="orderby">排序字段</param>
         /// <returns>返回集合</returns>
-        Task<IEnumerable<T>> FindListAsync<T, S>(Func<T, S> orderby) where T : class;
+        Task<IEnumerable<T>> FindListAsync<T>(Func<T, object> orderby) where T : class;
 
         /// <summary>
         /// 查询并根据条件进行排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
-        /// <typeparam name="F">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="orderby">排序字段</param>
         /// <returns>返回集合</returns>
-        Task<IEnumerable<T>> FindListAsync<T, S, F>(Expression<Func<T, S>> selector, Func<T, F> orderby) where T : class;
+        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Func<T, object> orderby) where T : class;
 
         /// <summary>
         /// 根据linq条件进行查询
@@ -877,11 +857,10 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件进行查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <returns>返回集合</returns>
-        Task<IEnumerable<T>> FindListAsync<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
         /// 根据sql语句进行查询
@@ -936,7 +915,6 @@ namespace SQLBuilder.Core.Repositories
         /// 根据linq条件进行分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
         /// <param name="predicate">linq条件</param>
         /// <param name="orderField">排序字段</param>
@@ -944,7 +922,7 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        Task<(IEnumerable<T> list, long total)> FindListAsync<T, S>(Expression<Func<T, S>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class;
+        Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class;
 
         /// <summary>
         /// 根据sql语句分页查询

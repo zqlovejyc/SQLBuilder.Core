@@ -31,12 +31,11 @@ namespace SQLBuilder.Core
         /// Insert
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：是</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Insert<T, S>(Expression<Func<S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer, bool isEnableNullValue = true)
+        public static SqlBuilderCore<T> Insert<T>(Expression<Func<object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer, bool isEnableNullValue = true)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Insert(expression, isEnableNullValue);
@@ -62,12 +61,11 @@ namespace SQLBuilder.Core
         /// Update
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        ///  <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：是</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Update<T, S>(Expression<Func<S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer, bool isEnableNullValue = true)
+        public static SqlBuilderCore<T> Update<T>(Expression<Func<object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer, bool isEnableNullValue = true)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Update(expression, isEnableNullValue);
@@ -79,11 +77,10 @@ namespace SQLBuilder.Core
         /// Select
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, S>(Expression<Func<T, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T>(Expression<Func<T, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Select(expression);
@@ -94,11 +91,10 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <typeparam name="T2">泛型类型2</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, S>(Expression<Func<T, T2, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2>(Expression<Func<T, T2, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
         {
@@ -111,11 +107,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T">泛型类型</typeparam>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, S>(Expression<Func<T, T2, T3, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3>(Expression<Func<T, T2, T3, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -130,11 +125,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, S>(Expression<Func<T, T2, T3, T4, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -151,11 +145,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, S>(Expression<Func<T, T2, T3, T4, T5, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -174,11 +167,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, S>(Expression<Func<T, T2, T3, T4, T5, T6, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -199,11 +191,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, S>(Expression<Func<T, T2, T3, T4, T5, T6, T7, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -226,11 +217,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, S>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -255,11 +245,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9, S>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -286,11 +275,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, S>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
             where T2 : class
             where T3 : class
@@ -311,11 +299,10 @@ namespace SQLBuilder.Core
         /// Max
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Max<T, S>(Expression<Func<T, S>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Max<T>(Expression<Func<T, object>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Max(expression);
@@ -327,11 +314,10 @@ namespace SQLBuilder.Core
         /// Min
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Min<T, S>(Expression<Func<T, S>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Min<T>(Expression<Func<T, object>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Min(expression);
@@ -343,11 +329,10 @@ namespace SQLBuilder.Core
         /// Avg
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Avg<T, S>(Expression<Func<T, S>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Avg<T>(Expression<Func<T, object>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Avg(expression);
@@ -359,11 +344,10 @@ namespace SQLBuilder.Core
         /// Count
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Count<T, S>(Expression<Func<T, S>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Count<T>(Expression<Func<T, object>> expression = null, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Count(expression);
@@ -375,11 +359,10 @@ namespace SQLBuilder.Core
         /// Sum
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <typeparam name="S">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="DatabaseType">数据库类型</param>
         /// <returns>SqlBuilderCore</returns>
-        public static SqlBuilderCore<T> Sum<T, S>(Expression<Func<T, S>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
+        public static SqlBuilderCore<T> Sum<T>(Expression<Func<T, object>> expression, DatabaseType DatabaseType = DatabaseType.SQLServer)
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType).Sum(expression);

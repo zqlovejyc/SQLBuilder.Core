@@ -17,7 +17,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Update_01()
         {
-            var builder = SqlBuilder.Update<UserInfo, object>(() => new
+            var builder = SqlBuilder.Update<UserInfo>(() => new
             {
                 Name = "",
                 Sex = 1,
@@ -33,7 +33,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Update_02()
         {
-            var builder = SqlBuilder.Update<UserInfo, object>(() => new UserInfo
+            var builder = SqlBuilder.Update<UserInfo>(() => new UserInfo
             {
                 Sex = 1,
                 Email = "123456@qq.com"
@@ -53,7 +53,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张强",
                 Sex = 2
             };
-            var builder = SqlBuilder.Update<UserInfo, object>(() => userInfo).Where(u => u.Id == 1);
+            var builder = SqlBuilder.Update<UserInfo>(() => userInfo).Where(u => u.Id == 1);
             Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @Param0,[Name] = @Param1,[Email] = NULL WHERE [Id] = @Param2", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
@@ -64,7 +64,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Update_04()
         {
-            var builder = SqlBuilder.Update<UserInfo, object>(() => new
+            var builder = SqlBuilder.Update<UserInfo>(() => new
             {
                 Sex = 1,
                 Email = "123456@qq.com"
@@ -79,7 +79,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Update_05()
         {
-            var builder = SqlBuilder.Update<Class, object>(() => new
+            var builder = SqlBuilder.Update<Class>(() => new
             {
                 UserId = 1,
                 Name = "123456@qq.com"
@@ -94,7 +94,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Update_06()
         {
-            var builder = SqlBuilder.Update<Class, object>(() => new Class
+            var builder = SqlBuilder.Update<Class>(() => new Class
             {
                 UserId = 1,
                 Name = "123456@qq.com"
@@ -114,7 +114,7 @@ namespace SQLBuilder.Core.UnitTest
                 UserId = 1,
                 Name = "123456@qq.com"
             };
-            var builder = SqlBuilder.Update<Class, object>(() => data, DatabaseType.MySQL)
+            var builder = SqlBuilder.Update<Class>(() => data, DatabaseType.MySQL)
                                     .Where(u => u.CityId == 1);
             Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?Param0 WHERE `CityId` = ?Param1", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
@@ -131,7 +131,7 @@ namespace SQLBuilder.Core.UnitTest
                 Id = 2,
                 Name = "张强"
             };
-            var builder = SqlBuilder.Update<UserInfo, object>(() => data, DatabaseType.MySQL).WithKey(data);
+            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySQL).WithKey(data);
             Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?Param0,`Name` = ?Param1,`Email` = NULL WHERE `Id` = ?Param2", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
@@ -147,7 +147,7 @@ namespace SQLBuilder.Core.UnitTest
                 Id = 2,
                 Name = "张强"
             };
-            var builder = SqlBuilder.Update<UserInfo, object>(() => data, DatabaseType.MySQL, false).WithKey(2);
+            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySQL, false).WithKey(2);
             Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?Param0,`Name` = ?Param1 WHERE `Id` = ?Param2", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }

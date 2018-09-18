@@ -590,7 +590,7 @@ namespace SQLBuilder.Core
                 var typeName = typeof(T).Name;
                 var first = @this.FirstOrDefault();
                 var firstTypeName = first.GetType().Name;
-                if (typeName == "Object" && (firstTypeName == "DapperRow" || firstTypeName == "DynamicRow"))
+                if (typeName.Contains("Dictionary`2") || (typeName == "Object" && (firstTypeName == "DapperRow" || firstTypeName == "DynamicRow")))
                 {
                     var dic = first as IDictionary<string, object>;
                     dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key)).ToArray());
@@ -627,117 +627,122 @@ namespace SQLBuilder.Core
         /// <summary>
         /// IDataReader数据转为dynamic对象
         /// </summary>
-        /// <param name="this">reader数据源</param>
-        /// <param name="isDisposable">是否释放</param>
+        /// <param name="this">IDataReader数据源</param>
         /// <returns>dynamic</returns>
-        public static dynamic ToDynamic(this IDataReader @this, bool isDisposable)
+        public static dynamic ToDynamic(this IDataReader @this)
         {
-            dynamic result = null;
-            if (@this?.IsClosed == false)
-            {
-                if (!isDisposable || (isDisposable && @this.Read()))
-                {
-                    result = new ExpandoObject();
-                    for (var i = 0; i < @this.FieldCount; i++)
-                    {
-                        try
-                        {
-                            ((IDictionary<string, object>)result).Add(@this.GetName(i), @this.GetValue(i));
-                        }
-                        catch
-                        {
-                            ((IDictionary<string, object>)result).Add(@this.GetName(i), null);
-                        }
-                    }
-                }
-                if (isDisposable)
-                {
-                    @this.Close();
-                    @this.Dispose();
-                }
-            }
-            return result;
+            return @this.ToDynamics()?.FirstOrDefault();
         }
 
         /// <summary>
         /// IDataReader数据转为dynamic对象集合
         /// </summary>
-        /// <param name="this">reader数据源</param>
+        /// <param name="this">IDataReader数据源</param>
         /// <returns>dynamic集合</returns>
-        public static List<dynamic> ToDynamic(this IDataReader @this)
+        public static IEnumerable<dynamic> ToDynamics(this IDataReader @this)
         {
-            List<dynamic> list = null;
             if (@this?.IsClosed == false)
             {
-                list = new List<dynamic>();
                 using (@this)
                 {
                     while (@this.Read())
                     {
-                        list.Add(@this.ToDynamic(false));
+                        var row = new ExpandoObject() as IDictionary<string, object>;
+                        for (var i = 0; i < @this.FieldCount; i++)
+                        {
+                            row.Add(@this.GetName(i), @this.GetValue(i));
+                        }
+                        yield return row;
                     }
                 }
             }
-            return list;
         }
         #endregion
 
         #region ToDictionary
         /// <summary>
-        /// IDataReader数据转为dynamic对象
+        /// IDataReader数据转为Dictionary对象
         /// </summary>
-        /// <param name="this">reader数据源</param>
-        /// <param name="isDisposable">是否释放</param>
-        /// <returns>dynamic</returns>
-        public static Dictionary<string, object> ToDictionary(this IDataReader @this, bool isDisposable)
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>Dictionary</returns>
+        public static Dictionary<string, object> ToDictionary(this IDataReader @this)
         {
-            Dictionary<string, object> result = null;
-            if (@this?.IsClosed == false)
-            {
-                if (!isDisposable || (isDisposable && @this.Read()))
-                {
-                    result = new Dictionary<string, object>();
-                    for (var i = 0; i < @this.FieldCount; i++)
-                    {
-                        try
-                        {
-                            result.Add(@this.GetName(i), @this.GetValue(i));
-                        }
-                        catch
-                        {
-                            result.Add(@this.GetName(i), null);
-                        }
-                    }
-                }
-                if (isDisposable)
-                {
-                    @this.Close();
-                    @this.Dispose();
-                }
-            }
-            return result;
+            return @this.ToDictionaries()?.FirstOrDefault();
         }
 
         /// <summary>
-        /// IDataReader数据转为dynamic对象集合
+        /// IDataReader数据转为Dictionary对象集合
         /// </summary>
-        /// <param name="this">reader数据源</param>
-        /// <returns>dynamic集合</returns>
-        public static List<Dictionary<string, object>> ToDictionary(this IDataReader @this)
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>Dictionary集合</returns>
+        public static IEnumerable<Dictionary<string, object>> ToDictionaries(this IDataReader @this)
         {
-            List<Dictionary<string, object>> list = null;
             if (@this?.IsClosed == false)
             {
-                list = new List<Dictionary<string, object>>();
                 using (@this)
                 {
                     while (@this.Read())
                     {
-                        list.Add(@this.ToDictionary(false));
+                        var dic = new Dictionary<string, object>();
+                        for (var i = 0; i < @this.FieldCount; i++)
+                        {
+                            dic[@this.GetName(i)] = @this.GetValue(i);
+                        }
+                        yield return dic;
                     }
                 }
             }
-            return list;
+        }
+        #endregion
+
+        #region ToEntity
+        /// <summary>
+        /// IDataReader数据转为强类型实体
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>强类型实体</returns>
+        public static T ToEntity<T>(this IDataReader @this)
+        {
+            var result = @this.ToEntities<T>();
+            if (result != null)
+            {
+                return result.FirstOrDefault();
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// IDataReader数据转为强类型实体集合
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>强类型实体集合</returns>
+        public static IEnumerable<T> ToEntities<T>(this IDataReader @this)
+        {
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    var fields = new List<string>();
+                    for (int i = 0; i < @this.FieldCount; i++)
+                    {
+                        fields.Add(@this.GetName(i).ToLower());
+                    }
+                    while (@this.Read())
+                    {
+                        var instance = Activator.CreateInstance<T>();
+                        var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                        foreach (var p in props)
+                        {
+                            if (!p.CanWrite) continue;
+                            if (fields.Contains(p.Name.ToLower()) && !@this[p.Name].IsNull())
+                            {
+                                p.SetValue(instance, @this[p.Name].ToSafeValue(p.PropertyType), null);
+                            }
+                        }
+                        yield return instance;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -746,100 +751,53 @@ namespace SQLBuilder.Core
         /// IDataReader转换为T集合
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="this">reader数据源</param>
+        /// <param name="this">IDataReader数据源</param>
         /// <returns>T类型集合</returns>
         public static List<T> ToList<T>(this IDataReader @this)
         {
             List<T> list = null;
             if (@this?.IsClosed == false)
             {
-                list = new List<T>();
                 var type = typeof(T);
-                if (type == typeof(Dictionary<string, object>))
+                if (type.Name.Contains("Dictionary`2"))
                 {
-                    list = @this.ToDictionary() as List<T>;
+                    if (type.Name.Contains("IDictionary`2"))
+                    {
+                        list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
+                    }
+                    else
+                    {
+                        list = @this.ToDictionaries()?.ToList() as List<T>;
+                    }
                 }
                 else if (type.IsClass && type.Name != "Object")
                 {
-                    using (@this)
-                    {
-                        var fields = new List<string>();
-                        for (int i = 0; i < @this.FieldCount; i++)
-                        {
-                            fields.Add(@this.GetName(i).ToLower());
-                        }
-                        while (@this.Read())
-                        {
-                            var instance = Activator.CreateInstance<T>();
-                            var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-                            foreach (var p in props)
-                            {
-                                if (!p.CanWrite) continue;
-                                if (fields.Contains(p.Name.ToLower()) && !@this[p.Name].IsNull())
-                                {
-                                    p.SetValue(instance, @this[p.Name].ToSafeValue(p.PropertyType), null);
-                                }
-                            }
-                            list.Add(instance);
-                        }
-                    }
+                    list = @this.ToEntities<T>()?.ToList() as List<T>;
                 }
                 else
                 {
-                    list = @this.ToDynamic() as List<T>;
+                    list = @this.ToDynamics()?.ToList() as List<T>;
                 }
             }
             return list;
         }
         #endregion
 
-        #region ToEntity
+        #region ToFirstOrDefault
         /// <summary>
-        /// IDataReader转换为T类型实体
+        /// IDataReader转换为T类型对象
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="this">reader数据源</param>
-        /// <returns>T类型实体</returns>
-        public static T ToEntity<T>(this IDataReader @this)
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>T类型对象</returns>
+        public static T ToFirstOrDefault<T>(this IDataReader @this)
         {
-            var result = default(T);
-            if (@this?.IsClosed == false)
+            var list = @this.ToList<T>();
+            if (list != null)
             {
-                var type = typeof(T);
-                if (type == typeof(Dictionary<string, object>))
-                {
-                    result = (@this.ToDictionary() as List<T>).FirstOrDefault();
-                }
-                else if (type.IsClass && type.Name != "Object")
-                {
-                    using (@this)
-                    {
-                        var fields = new List<string>();
-                        for (int i = 0; i < @this.FieldCount; i++)
-                        {
-                            fields.Add(@this.GetName(i).ToLower());
-                        }
-                        if (@this.Read())
-                        {
-                            result = Activator.CreateInstance<T>();
-                            var props = result.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-                            foreach (var p in props)
-                            {
-                                if (!p.CanWrite) continue;
-                                if (fields.Contains(p.Name.ToLower()) && !@this[p.Name].IsNull())
-                                {
-                                    p.SetValue(result, @this[p.Name].ToSafeValue(p.PropertyType), null);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    result = (T)@this.ToDynamic(true);
-                }
+                return list.FirstOrDefault();
             }
-            return result;
+            return default(T);
         }
         #endregion
     }

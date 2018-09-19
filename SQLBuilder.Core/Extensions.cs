@@ -449,7 +449,7 @@ namespace SQLBuilder.Core
                 {
                     var parameter = command.CreateParameter();
                     parameter.ParameterName = x.Key;
-                    parameter.Value = x.Value;                    
+                    parameter.Value = x.Value;
                     return parameter;
                 }).ToArray();
             }
@@ -759,16 +759,13 @@ namespace SQLBuilder.Core
             if (@this?.IsClosed == false)
             {
                 var type = typeof(T);
-                if (type.Name.Contains("Dictionary`2"))
+                if (type.Name.Contains("IDictionary`2"))
                 {
-                    if (type.Name.Contains("IDictionary`2"))
-                    {
-                        list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
-                    }
-                    else
-                    {
-                        list = @this.ToDictionaries()?.ToList() as List<T>;
-                    }
+                    list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
+                }
+                else if (type.Name.Contains("Dictionary`2"))
+                {
+                    list = @this.ToDictionaries()?.ToList() as List<T>;
                 }
                 else if (type.IsClass && type.Name != "Object")
                 {

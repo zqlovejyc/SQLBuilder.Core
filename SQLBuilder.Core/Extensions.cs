@@ -623,6 +623,43 @@ namespace SQLBuilder.Core
         }
         #endregion
 
+        #region ToDataSet
+        /// <summary>
+        /// IDataReader转换为DataSet
+        /// </summary>
+        /// <param name="this">reader数据源</param>
+        /// <returns>DataSet</returns>
+        public static DataSet ToDataSet(this IDataReader @this)
+        {
+            var ds = new DataSet();
+            if (@this.IsClosed == false)
+            {
+                do
+                {
+                    var schemaTable = @this.GetSchemaTable();
+                    var dt = new DataTable();
+                    for (var i = 0; i < schemaTable.Rows.Count; i++)
+                    {
+                        var row = schemaTable.Rows[i];
+                        dt.Columns.Add(new DataColumn((string)row["ColumnName"], (Type)row["DataType"]));
+                    }
+                    while (@this.Read())
+                    {
+                        var dataRow = dt.NewRow();
+                        for (var i = 0; i < @this.FieldCount; i++)
+                        {
+                            dataRow[i] = @this.GetValue(i);
+                        }
+                        dt.Rows.Add(dataRow);
+                    }
+                    ds.Tables.Add(dt);
+                }
+                while (@this.NextResult());
+            }
+            return ds;
+        }
+        #endregion
+
         #region ToDynamic
         /// <summary>
         /// IDataReader数据转为dynamic对象
@@ -656,6 +693,37 @@ namespace SQLBuilder.Core
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// IDataReader数据转为List&lt;dynamic&gt;集合的集合
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>List&lt;dynamic&gt;集合的集合</returns>
+        public static List<List<dynamic>> ToListDynamics(this IDataReader @this)
+        {
+            var result = new List<List<dynamic>>();
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    do
+                    {
+                        var list = new List<dynamic>();
+                        while (@this.Read())
+                        {
+                            var row = new ExpandoObject() as IDictionary<string, object>;
+                            for (var i = 0; i < @this.FieldCount; i++)
+                            {
+                                row.Add(@this.GetName(i), @this.GetValue(i));
+                            }
+                            list.Add(row);
+                        }
+                        result.Add(list);
+                    } while (@this.NextResult());
+                }
+            }
+            return result;
         }
         #endregion
 

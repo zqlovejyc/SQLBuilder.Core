@@ -693,38 +693,7 @@ namespace SQLBuilder.Core
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// IDataReader数据转为List&lt;dynamic&gt;集合的集合
-        /// </summary>
-        /// <param name="this">IDataReader数据源</param>
-        /// <returns>List&lt;dynamic&gt;集合的集合</returns>
-        public static List<List<dynamic>> ToListDynamics(this IDataReader @this)
-        {
-            var result = new List<List<dynamic>>();
-            if (@this?.IsClosed == false)
-            {
-                using (@this)
-                {
-                    do
-                    {
-                        var list = new List<dynamic>();
-                        while (@this.Read())
-                        {
-                            var row = new ExpandoObject() as IDictionary<string, object>;
-                            for (var i = 0; i < @this.FieldCount; i++)
-                            {
-                                row.Add(@this.GetName(i), @this.GetValue(i));
-                            }
-                            list.Add(row);
-                        }
-                        result.Add(list);
-                    } while (@this.NextResult());
-                }
-            }
-            return result;
-        }
+        }        
         #endregion
 
         #region ToDictionary
@@ -845,6 +814,95 @@ namespace SQLBuilder.Core
                 }
             }
             return list;
+        }
+
+        /// <summary>
+        /// IDataReader转换为T集合的集合
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>T类型集合的集合</returns>
+        public static List<List<T>> ToLists<T>(this IDataReader @this)
+        {
+            var result = new List<List<T>>();
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    var type = typeof(T);
+                    do
+                    {
+                        #region IDictionary
+                        if (type.Name.Contains("Dictionary`2"))
+                        {
+                            var list = new List<Dictionary<string, object>>();
+                            while (@this.Read())
+                            {
+                                var dic = new Dictionary<string, object>();
+                                for (var i = 0; i < @this.FieldCount; i++)
+                                {
+                                    dic[@this.GetName(i)] = @this.GetValue(i);
+                                }
+                                list.Add(dic);
+                            }
+                            if (type.Name.Contains("IDictionary`2"))
+                            {
+                                result.Add(list.Select(o => o as IDictionary<string, object>).ToList() as List<T>);
+                            }
+                            else
+                            {
+                                result.Add(list as List<T>);
+                            }
+                        }
+                        #endregion
+
+                        #region Class T
+                        else if (type.IsClass && type.Name != "Object")
+                        {
+                            var list = new List<T>();
+                            var fields = new List<string>();
+                            for (int i = 0; i < @this.FieldCount; i++)
+                            {
+                                fields.Add(@this.GetName(i).ToLower());
+                            }
+                            while (@this.Read())
+                            {
+                                var instance = Activator.CreateInstance<T>();
+                                var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                                foreach (var p in props)
+                                {
+                                    if (!p.CanWrite) continue;
+                                    if (fields.Contains(p.Name.ToLower()) && !@this[p.Name].IsNull())
+                                    {
+                                        p.SetValue(instance, @this[p.Name].ToSafeValue(p.PropertyType), null);
+                                    }
+                                }
+                                list.Add(instance);
+                            }
+                            result.Add(list);
+                        }
+                        #endregion
+
+                        #region dynamic
+                        else
+                        {
+                            var list = new List<dynamic>();
+                            while (@this.Read())
+                            {
+                                var row = new ExpandoObject() as IDictionary<string, object>;
+                                for (var i = 0; i < @this.FieldCount; i++)
+                                {
+                                    row.Add(@this.GetName(i), @this.GetValue(i));
+                                }
+                                list.Add(row);
+                            }
+                            result.Add(list as List<T>);
+                        }
+                        #endregion
+                    } while (@this.NextResult());
+                }
+            }
+            return result;
         }
         #endregion
 

@@ -341,7 +341,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_Top_02()
         {
             var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.MySQL).Top(100);
-            Assert.AreEqual("SELECT A.Id,A.Name FROM `Base_UserInfo` AS A LIMIT 0,100", builder.Sql);
+            Assert.AreEqual("SELECT A.Id,A.Name FROM `Base_UserInfo` AS A LIMIT 100 OFFSET 0", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 

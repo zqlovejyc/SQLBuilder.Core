@@ -102,7 +102,6 @@ namespace SQLBuilder.Core
         #endregion
 
         #region Public Methods
-
         #region Clear
         /// <summary>
         /// Clear
@@ -1006,7 +1005,7 @@ namespace SQLBuilder.Core
                     this._sqlPack.Sql.Replace("SELECT", $"SELECT TOP {topNumber}", this._sqlPack.Sql.ToString().IndexOf("SELECT"), 6);
                 }
             }
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            else if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
                 if (this._sqlPack.Sql.ToString().ToUpper().Contains("WHERE"))
                 {
@@ -1017,9 +1016,9 @@ namespace SQLBuilder.Core
                     this._sqlPack.Sql.Append($" WHERE ROWNUM <= {topNumber}");
                 }
             }
-            if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            else if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite || this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
             {
-                this._sqlPack.Sql.Append($" LIMIT 0,{topNumber}");
+                this._sqlPack.Sql.Append($" LIMIT {topNumber} OFFSET 0");
             }
             return this;
         }

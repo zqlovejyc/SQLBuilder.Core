@@ -184,110 +184,70 @@ namespace SQLBuilder.Core
                     switch (@this.Type.GetCoreType().Name.ToLower())
                     {
                         case "string":
-                            obj = @this.ToLambda<Func<String>>().Compile().Invoke();
+                            obj = @this.ToLambda<Func<string>>().Compile().Invoke();
                             break;
                         case "int16":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Int16?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<short?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Int16>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<short>>().Compile().Invoke();
                             break;
                         case "int32":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Int32?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<int?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Int32>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<int>>().Compile().Invoke();
                             break;
                         case "int64":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Int64?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<long?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Int64>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<long>>().Compile().Invoke();
                             break;
                         case "decimal":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Decimal?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<decimal?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Decimal>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<decimal>>().Compile().Invoke();
                             break;
                         case "double":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Double?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<double?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Double>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<double>>().Compile().Invoke();
                             break;
                         case "datetime":
                             if (isNullable)
-                            {
                                 obj = @this.ToLambda<Func<DateTime?>>().Compile().Invoke();
-                            }
                             else
-                            {
                                 obj = @this.ToLambda<Func<DateTime>>().Compile().Invoke();
-                            }
                             break;
                         case "boolean":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Boolean?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<bool?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Boolean>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<bool>>().Compile().Invoke();
                             break;
                         case "byte":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Byte?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<byte?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Byte>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<byte>>().Compile().Invoke();
                             break;
                         case "char":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Char?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<char?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Char>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<char>>().Compile().Invoke();
                             break;
                         case "single":
                             if (isNullable)
-                            {
-                                obj = @this.ToLambda<Func<Single?>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<float?>>().Compile().Invoke();
                             else
-                            {
-                                obj = @this.ToLambda<Func<Single>>().Compile().Invoke();
-                            }
+                                obj = @this.ToLambda<Func<float>>().Compile().Invoke();
                             break;
                         default:
-                            obj = @this.ToLambda<Func<Object>>().Compile().Invoke();
+                            obj = @this.ToLambda<Func<object>>().Compile().Invoke();
                             break;
                     }
                     break;
@@ -593,7 +553,7 @@ namespace SQLBuilder.Core
                 if (typeName.Contains("Dictionary`2") || (typeName == "Object" && (firstTypeName == "DapperRow" || firstTypeName == "DynamicRow")))
                 {
                     var dic = first as IDictionary<string, object>;
-                    dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key)).ToArray());
+                    dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key, o.Value?.GetType().GetCoreType() ?? typeof(object))).ToArray());
                     var dics = @this.Select(o => o as IDictionary<string, object>);
                     foreach (var item in dics)
                     {
@@ -605,7 +565,7 @@ namespace SQLBuilder.Core
                     var props = typeName == "Object" ? first.GetType().GetProperties() : typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
                     foreach (var prop in props)
                     {
-                        dt.Columns.Add(prop.Name, prop.PropertyType.GetCoreType());
+                        dt.Columns.Add(prop.Name, prop?.PropertyType.GetCoreType() ?? typeof(object));
                     }
                     foreach (var item in @this)
                     {
@@ -693,7 +653,7 @@ namespace SQLBuilder.Core
                     }
                 }
             }
-        }        
+        }
         #endregion
 
         #region ToDictionary

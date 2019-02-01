@@ -33,7 +33,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// 数据操作仓储接口
     /// </summary>
-    public interface IRepository
+    public interface IRepository : IDisposable
     {
         #region Transaction
         /// <summary>

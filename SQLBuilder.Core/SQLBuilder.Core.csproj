@@ -14,6 +14,7 @@
 
 2.IDataReader新增扩展方法ToDataSet和ToListDynamics；</PackageReleaseNotes>
         <FileVersion>1.0.2.0</FileVersion>
+        <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

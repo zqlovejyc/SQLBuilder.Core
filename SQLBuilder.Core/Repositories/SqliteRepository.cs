@@ -37,7 +37,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// Sqlite仓储实现类
     /// </summary>
-    public class SqliteRepository : IRepository, IDisposable
+    public class SqliteRepository : IRepository
     {
         #region Constructor
         /// <summary>

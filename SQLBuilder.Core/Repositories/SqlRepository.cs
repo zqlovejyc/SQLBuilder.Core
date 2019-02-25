@@ -1990,7 +1990,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -1999,7 +1999,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2041,7 +2041,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2050,7 +2050,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2093,7 +2093,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2102,7 +2102,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2163,7 +2163,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2172,7 +2172,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2218,7 +2218,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2227,7 +2227,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2273,7 +2273,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2282,7 +2282,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2328,7 +2328,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2337,7 +2337,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2568,7 +2568,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2577,7 +2577,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2619,7 +2619,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2628,7 +2628,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2671,7 +2671,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2680,7 +2680,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", builder.DynamicParameters);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2741,7 +2741,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2750,7 +2750,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2796,7 +2796,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2805,7 +2805,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2851,7 +2851,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2860,7 +2860,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2906,7 +2906,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2915,7 +2915,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -3030,7 +3030,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3040,7 +3040,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3086,7 +3086,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3096,7 +3096,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3142,7 +3142,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3152,7 +3152,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3198,7 +3198,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3208,7 +3208,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = dbConnection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3326,7 +3326,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3337,7 +3337,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3384,7 +3384,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3395,7 +3395,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};SELECT * INTO #Temp{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #Temp{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #Temp{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3442,7 +3442,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter, Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3453,7 +3453,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", parameter);
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3500,7 +3500,7 @@ namespace SQLBuilder.Core.Repositories
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters(), Transaction);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3511,7 +3511,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var dbConnection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'tempdb..#Temp{guid}') IS NOT NULL DROP TABLE #Temp{guid};{sql} SELECT * INTO #Temp{guid} FROM T;SELECT COUNT(1) AS Total FROM #Temp{guid};WITH T AS (SELECT * FROM #Temp{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #Temp{guid};", dbParameter.ToDynamicParameters());
+                    var multiQuery = await dbConnection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters());
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();

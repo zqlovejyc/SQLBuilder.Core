@@ -452,10 +452,9 @@ namespace SQLBuilder.Core
         /// <param name="type">类型</param>
         /// <param name="isFormat">是否格式化</param>
         /// <returns>Tuple</returns>
-        public (string key, string property) GetPrimaryKey(Type type, bool isFormat = true)
+        public List<(string key, string property)> GetPrimaryKey(Type type, bool isFormat = true)
         {
-            string keyName = null;
-            string propertyName = null;
+            var result = new List<(string key, string property)>();
             var props = type.GetProperties();
             var isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(CusKeyAttribute), false).Length > 0).Count() > 0;
             if (!isHaveColumnAttribute)
@@ -464,22 +463,27 @@ namespace SQLBuilder.Core
             }
             if (isHaveColumnAttribute)
             {
-                var property = props.Where(d => d.GetCustomAttributes(typeof(CusKeyAttribute), false).Length > 0).FirstOrDefault();
-                if (property == null)
+                var properties = props.Where(d => d.GetCustomAttributes(typeof(CusKeyAttribute), false).Length > 0).ToList();
+                if (properties.Count() == 0)
                 {
-                    property = props.Where(d => d.GetCustomAttributes(typeof(SysKeyAttribute), false).Length > 0).FirstOrDefault();
+                    properties = props.Where(d => d.GetCustomAttributes(typeof(SysKeyAttribute), false).Length > 0).ToList();
                 }
-                propertyName = property?.Name;
-                if (property?.GetCustomAttributes(typeof(CusKeyAttribute), false).FirstOrDefault() is CusKeyAttribute cka)
+                foreach (var property in properties)
                 {
-                    keyName = cka.Name ?? propertyName;
-                }
-                else if (property?.GetCustomAttributes(typeof(SysKeyAttribute), false).FirstOrDefault() is SysKeyAttribute ska)
-                {
-                    keyName = propertyName;
+                    var propertyName = property?.Name;
+                    string keyName = null;
+                    if (property?.GetCustomAttributes(typeof(CusKeyAttribute), false).FirstOrDefault() is CusKeyAttribute cka)
+                    {
+                        keyName = cka.Name ?? propertyName;
+                    }
+                    else if (property?.GetCustomAttributes(typeof(SysKeyAttribute), false).FirstOrDefault() is SysKeyAttribute ska)
+                    {
+                        keyName = propertyName;
+                    }
+                    result.Add(((isFormat || this.DatabaseType == DatabaseType.PostgreSQL ? this.GetFormatColumnName(keyName) : keyName), propertyName));
                 }
             }
-            return ((isFormat || this.DatabaseType == DatabaseType.PostgreSQL ? this.GetFormatColumnName(keyName) : keyName), propertyName);
+            return result;
         }
         #endregion
 

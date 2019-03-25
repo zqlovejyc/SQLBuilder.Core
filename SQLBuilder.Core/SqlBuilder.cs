@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core
@@ -384,11 +385,11 @@ namespace SQLBuilder.Core
 
         #region GetPrimaryKey
         /// <summary>
-        /// 获取实体对应的数据库表的主键名
+        /// 获取实体对应的数据库表的主键名(多主键)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static string GetPrimaryKey<T>()
+        public static List<string> GetPrimaryKey<T>()
             where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType.SQLServer).GetPrimaryKey();

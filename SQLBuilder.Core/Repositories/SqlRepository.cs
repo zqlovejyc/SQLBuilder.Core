@@ -697,60 +697,56 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据单个主键删除实体
+        /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键值</param>
         /// <returns>返回受影响行数</returns>
-        public int Delete<T>(object keyValue) where T : class
+        public int Delete<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>().WithKey(keyValue);
-            if (Transaction?.Connection != null)
+            var keys = Sql.GetPrimaryKey<T>();
+            //多主键或者单主键
+            if (keys.Count > 1 || keyValues.Length == 1)
             {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction);
-            }
-            else
-            {
-                using (var connection = Connection)
+                var builder = Sql.Delete<T>().WithKey(keyValues);
+                if (Transaction?.Connection != null)
                 {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters);
+                    result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction);
                 }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 根据多个主键删除实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValue">主键集合</param>
-        /// <returns>返回受影响行数</returns>
-        public int Delete<T>(object[] keyValue) where T : class
-        {
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                foreach (var key in keyValue)
+                else
                 {
-                    result += Delete<T>(key);
+                    using (var connection = Connection)
+                    {
+                        result = connection.Execute(builder.Sql, builder.DynamicParameters);
+                    }
                 }
             }
             else
             {
-                try
+                if (Transaction?.Connection != null)
                 {
-                    BeginTrans();
-                    foreach (var key in keyValue)
+                    foreach (var key in keyValues)
                     {
                         result += Delete<T>(key);
                     }
-                    Commit();
                 }
-                catch
+                else
                 {
-                    Rollback();
-                    result = 0;
+                    try
+                    {
+                        BeginTrans();
+                        foreach (var key in keyValues)
+                        {
+                            result += Delete<T>(key);
+                        }
+                        Commit();
+                    }
+                    catch
+                    {
+                        Rollback();
+                        result = 0;
+                    }
                 }
             }
             return result;
@@ -890,60 +886,56 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据单个主键删除实体
+        /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键</param>
         /// <returns>返回受影响行数</returns>
-        public async Task<int> DeleteAsync<T>(object keyValue) where T : class
+        public async Task<int> DeleteAsync<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>().WithKey(keyValue);
-            if (Transaction?.Connection != null)
+            var keys = Sql.GetPrimaryKey<T>();
+            //多主键或者单主键
+            if (keys.Count > 1 || keyValues.Length == 1)
             {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction);
-            }
-            else
-            {
-                using (var connection = Connection)
+                var builder = Sql.Delete<T>().WithKey(keyValues);
+                if (Transaction?.Connection != null)
                 {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters);
+                    result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction);
                 }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 根据多个主键删除实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValue">主键集合</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> DeleteAsync<T>(object[] keyValue) where T : class
-        {
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                foreach (var key in keyValue)
+                else
                 {
-                    result += await DeleteAsync<T>(key);
+                    using (var connection = Connection)
+                    {
+                        result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters);
+                    }
                 }
             }
             else
             {
-                try
+                if (Transaction?.Connection != null)
                 {
-                    BeginTrans();
-                    foreach (var key in keyValue)
+                    foreach (var key in keyValues)
                     {
                         result += await DeleteAsync<T>(key);
                     }
-                    Commit();
                 }
-                catch
+                else
                 {
-                    Rollback();
-                    result = 0;
+                    try
+                    {
+                        BeginTrans();
+                        foreach (var key in keyValues)
+                        {
+                            result += await DeleteAsync<T>(key);
+                        }
+                        Commit();
+                    }
+                    catch
+                    {
+                        Rollback();
+                        result = 0;
+                    }
                 }
             }
             return result;
@@ -1267,11 +1259,11 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键值，多个值表示多主键</param>
         /// <returns>返回实体</returns>
-        public T FindEntity<T>(object keyValue) where T : class
+        public T FindEntity<T>(params object[] keyValues) where T : class
         {
-            var builder = Sql.Select<T>().WithKey(keyValue);
+            var builder = Sql.Select<T>().WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction);
@@ -1424,11 +1416,11 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键值，多个值表示多主键</param>
         /// <returns>返回实体</returns>
-        public async Task<T> FindEntityAsync<T>(object keyValue) where T : class
+        public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
-            var builder = Sql.Select<T>().WithKey(keyValue);
+            var builder = Sql.Select<T>().WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction);

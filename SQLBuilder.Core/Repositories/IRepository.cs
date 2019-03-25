@@ -246,20 +246,12 @@ namespace SQLBuilder.Core.Repositories
         int Delete<T>(Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
-        /// 根据单个主键删除实体
+        /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="KeyValue">主键值</param>
+        /// <param name="KeyValues">主键</param>
         /// <returns>返回受影响行数</returns>
-        int Delete<T>(object KeyValue) where T : class;
-
-        /// <summary>
-        /// 根据多个主键删除实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="KeyValue">主键集合</param>
-        /// <returns>返回受影响行数</returns>
-        int Delete<T>(object[] KeyValue) where T : class;
+        int Delete<T>(params object[] KeyValues) where T : class;
 
         /// <summary>
         /// 根据属性删除实体
@@ -304,20 +296,12 @@ namespace SQLBuilder.Core.Repositories
         Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
 
         /// <summary>
-        /// 根据单个主键删除实体
+        /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="KeyValue">主键值</param>
+        /// <param name="KeyValues">主键</param>
         /// <returns>返回受影响行数</returns>
-        Task<int> DeleteAsync<T>(object KeyValue) where T : class;
-
-        /// <summary>
-        /// 根据多个主键删除实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="KeyValue">主键集合</param>
-        /// <returns>返回受影响行数</returns>
-        Task<int> DeleteAsync<T>(object[] KeyValue) where T : class;
+        Task<int> DeleteAsync<T>(params object[] KeyValues) where T : class;
 
         /// <summary>
         /// 根据属性删除实体
@@ -444,9 +428,9 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="KeyValue">主键值</param>
+        /// <param name="KeyValues">主键值，多个值表示多主键</param>
         /// <returns>返回实体</returns>
-        T FindEntity<T>(object KeyValue) where T : class;
+        T FindEntity<T>(params object[] KeyValues) where T : class;
 
         /// <summary>
         /// 根据主键查询单个实体
@@ -506,9 +490,9 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="KeyValue">主键值</param>
+        /// <param name="KeyValues">主键值，多个值表示多主键</param>
         /// <returns>返回实体</returns>
-        Task<T> FindEntityAsync<T>(object KeyValue) where T : class;
+        Task<T> FindEntityAsync<T>(params object[] KeyValues) where T : class;
 
         /// <summary>
         /// 根据主键查询单个实体

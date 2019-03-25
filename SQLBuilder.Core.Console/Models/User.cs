@@ -15,6 +15,7 @@ namespace SQLBuilder.Core
     {
         [CusKey(name: "userId")]
         public int? Id { get; set; }
+        [CusKey]
         public int Sex { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

@@ -20,6 +20,7 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -671,18 +672,25 @@ namespace SQLBuilder.Core
             var tableName = this._sqlPack.GetTableName(typeof(T));
             var tableAlias = this._sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            var (key, property) = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
-            if (!string.IsNullOrEmpty(key) && entity != null)
+            var keys = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
+            if (keys.Count > 0 && entity != null)
             {
-                var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
-                if (keyValue != null)
+                for (int i = 0; i < keys.Count; i++)
                 {
-                    this._sqlPack += $" {(sql.Contains("WHERE") ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                    this._sqlPack.AddDbParameter(keyValue);
-                }
-                else
-                {
-                    throw new ArgumentNullException("主键值不能为空！");
+                    var (key, property) = keys[i];
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
+                        if (keyValue != null)
+                        {
+                            this._sqlPack += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                            this._sqlPack.AddDbParameter(keyValue);
+                        }
+                        else
+                        {
+                            throw new ArgumentNullException("主键值不能为空！");
+                        }
+                    }
                 }
             }
             else
@@ -697,13 +705,13 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="keyValue">主键值</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> WithKey(dynamic keyValue)
+        public SqlBuilderCore<T> WithKey(params dynamic[] keyValue)
         {
             if (keyValue == null)
             {
                 throw new ArgumentNullException("keyValue不能为空！");
             }
-            if (!(keyValue.GetType().IsValueType || keyValue.GetType() == typeof(string)))
+            if (!keyValue.Any(o => o.GetType().IsValueType || o.GetType() == typeof(string)))
             {
                 throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
             }
@@ -715,11 +723,18 @@ namespace SQLBuilder.Core
             var tableName = this._sqlPack.GetTableName(typeof(T));
             var tableAlias = this._sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            var (key, property) = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
-            if (!string.IsNullOrEmpty(key) && keyValue != null)
+            var keys = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
+            if (keys.Count > 0 && keyValue != null)
             {
-                this._sqlPack += $" {(sql.Contains("WHERE") ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                this._sqlPack.AddDbParameter(keyValue);
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    var (key, property) = keys[i];
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        this._sqlPack += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                        this._sqlPack.AddDbParameter(keyValue[i]);
+                    }
+                }
             }
             else
             {
@@ -1047,14 +1062,14 @@ namespace SQLBuilder.Core
         }
         #endregion
 
-        #region GetTableKey
+        #region GetPrimaryKey
         /// <summary>
         /// 获取实体对应表的主键名称
         /// </summary>
         /// <returns></returns>
-        public string GetPrimaryKey()
+        public List<string> GetPrimaryKey()
         {
-            return this._sqlPack.GetPrimaryKey(typeof(T), false).key;
+            return this._sqlPack.GetPrimaryKey(typeof(T), false).Select(o => o.key).ToList();
         }
         #endregion
         #endregion

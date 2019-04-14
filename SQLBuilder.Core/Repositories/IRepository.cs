@@ -35,6 +35,23 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public interface IRepository : IDisposable
     {
+        #region Property
+        /// <summary>
+        /// 超时时长，默认240s
+        /// </summary>
+        int CommandTimeout { get; set; }
+
+        /// <summary>
+        /// 数据库连接串
+        /// </summary>
+        string ConnectionString { get; set; }
+
+        /// <summary>
+        /// 事务对象
+        /// </summary>
+        DbTransaction Transaction { get; set; }
+        #endregion
+
         #region Transaction
         /// <summary>
         /// 开启事务

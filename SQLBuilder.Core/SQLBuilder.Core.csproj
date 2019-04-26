@@ -2,19 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.2.1</AssemblyVersion>
+        <AssemblyVersion>1.0.2.2</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.2.1</Version>
+        <Version>1.0.2.2</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
         <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
         <PackageIconUrl>https://zqlovejyc.gitee.io/zqutils-js/Images/SQL.png</PackageIconUrl>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.移除IDataReader扩展方法ToListDynamics，修改为ToLists；
-2.优化Top方法；
-3.更新IRepository接口及其实现类；
-4.优化ToDataTable扩展方法；</PackageReleaseNotes>
-        <FileVersion>1.0.2.1</FileVersion>
+        <PackageReleaseNotes>1.新增联合主键功能；
+2.更新仓储接口，添加CommandTimeout、ConnectionString和Transaction属性；</PackageReleaseNotes>
+        <FileVersion>1.0.2.2</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
     </PropertyGroup>
 

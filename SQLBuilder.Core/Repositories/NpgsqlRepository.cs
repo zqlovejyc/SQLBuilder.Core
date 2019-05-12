@@ -48,17 +48,11 @@ namespace SQLBuilder.Core.Repositories
         {
             //判断是链接字符串，还是链接字符串名称
             if (connString?.Contains(":") == true)
-            {
                 ConnectionString = ConfigurationManager.GetAppSettings<string>(connString);
-            }
             else
-            {
                 ConnectionString = ConfigurationManager.GetConnectionString(connString);
-            }
             if (string.IsNullOrEmpty(ConnectionString))
-            {
                 ConnectionString = connString;
-            }
         }
         #endregion
 
@@ -110,8 +104,8 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public void Commit()
         {
-            Transaction.Commit();
-            Transaction.Dispose();
+            Transaction?.Commit();
+            Transaction?.Dispose();
             Close();
         }
 
@@ -120,8 +114,8 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public void Rollback()
         {
-            Transaction.Rollback();
-            Transaction.Dispose();
+            Transaction?.Rollback();
+            Transaction?.Dispose();
             Close();
         }
 
@@ -132,10 +126,8 @@ namespace SQLBuilder.Core.Repositories
         {
             var dbConnection = Transaction?.Connection ?? Connection;
             if (dbConnection != null && dbConnection.State != ConnectionState.Closed)
-            {
                 dbConnection.Close();
-                Transaction = null;
-            }
+            Transaction = null;
         }
         #endregion
 

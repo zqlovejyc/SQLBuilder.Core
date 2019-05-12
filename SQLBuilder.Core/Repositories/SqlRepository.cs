@@ -39,21 +39,11 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public class SqlRepository : IRepository
     {
-        #region Constructor
+        #region Field
         /// <summary>
-        /// 构造函数
+        /// 私有数据库连接对象
         /// </summary>
-        /// <param name="connString">链接字符串，或者链接字符串名称</param>
-        public SqlRepository(string connString)
-        {
-            //判断是链接字符串，还是链接字符串名称
-            if (connString?.Contains(":") == true)
-                ConnectionString = ConfigurationManager.GetAppSettings<string>(connString);
-            else
-                ConnectionString = ConfigurationManager.GetConnectionString(connString);
-            if (string.IsNullOrEmpty(ConnectionString))
-                ConnectionString = connString;
-        }
+        private DbConnection _dbConnection;
         #endregion
 
         #region Property
@@ -74,9 +64,17 @@ namespace SQLBuilder.Core.Repositories
         {
             get
             {
-                var dbconnection = new SqlConnection(ConnectionString);
-                if (dbconnection.State != ConnectionState.Open) dbconnection.Open();
-                return dbconnection;
+                if (_dbConnection == null)
+                {
+                    _dbConnection = new SqlConnection(ConnectionString);
+                    if (_dbConnection.State != ConnectionState.Open)
+                        _dbConnection.Open();
+                }
+                return _dbConnection;
+            }
+            set
+            {
+                _dbConnection = value;
             }
         }
 
@@ -86,6 +84,23 @@ namespace SQLBuilder.Core.Repositories
         public DbTransaction Transaction { get; set; }
         #endregion
 
+        #region Constructor
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="connString">链接字符串，或者链接字符串名称</param>
+        public SqlRepository(string connString)
+        {
+            //判断是链接字符串，还是链接字符串名称
+            if (connString?.Contains(":") == true)
+                ConnectionString = ConfigurationManager.GetAppSettings<string>(connString);
+            else
+                ConnectionString = ConfigurationManager.GetConnectionString(connString);
+            if (string.IsNullOrEmpty(ConnectionString))
+                ConnectionString = connString;
+        }
+        #endregion
+
         #region Transaction
         /// <summary>
         /// 开启事务
@@ -93,9 +108,9 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>IRepository</returns>
         public IRepository BeginTrans()
         {
-            var dbConnection = Connection;
-            if (dbConnection.State != ConnectionState.Open) dbConnection.Open();
-            Transaction = dbConnection.BeginTransaction();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+            Transaction = Connection.BeginTransaction();
             return this;
         }
 
@@ -124,9 +139,8 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public void Close()
         {
-            var dbConnection = Transaction?.Connection ?? Connection;
-            if (dbConnection != null && dbConnection.State != ConnectionState.Closed)
-                dbConnection.Close();
+            if (Connection.State != ConnectionState.Closed)
+                Connection.Close();
             Transaction = null;
         }
         #endregion

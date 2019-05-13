@@ -42,12 +42,12 @@ namespace SQLBuilder.Core.Repositories
         int CommandTimeout { get; set; }
 
         /// <summary>
-        /// 数据库连接串
+        /// 数据库连接字符串
         /// </summary>
         string ConnectionString { get; set; }
 
         /// <summary>
-        /// 数据库链接对象
+        /// 数据库连接对象
         /// </summary>
         DbConnection Connection { get; set; }
 

@@ -53,12 +53,12 @@ namespace SQLBuilder.Core.Repositories
         public int CommandTimeout { get; set; } = 240;
 
         /// <summary>
-        /// 数据库连接串
+        /// 数据库连接字符串
         /// </summary>
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// 数据库链接对象
+        /// 数据库连接对象
         /// </summary>
         public DbConnection Connection
         {

@@ -2,17 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.2.3</AssemblyVersion>
+        <AssemblyVersion>1.0.2.4</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.2.3</Version>
+        <Version>1.0.2.4</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
         <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
         <PackageIconUrl>https://zqlovejyc.gitee.io/zqutils-js/Images/SQL.png</PackageIconUrl>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化仓储数据库连接对象；
-2.优化仓储事务关闭方法Close，修复Sqlite事务关闭时无法访问已释放对象BUG；</PackageReleaseNotes>
-        <FileVersion>1.0.2.3</FileVersion>
+        <PackageReleaseNotes>1.优化数据库连接字符串属性，修复当using使用后连接字符串被置为空无法再次使用BUG；</PackageReleaseNotes>
+        <FileVersion>1.0.2.4</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
     </PropertyGroup>
 

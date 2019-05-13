@@ -312,6 +312,30 @@ namespace SQLBuilder.Core
         }
         #endregion
 
+        #region IsNullOrEmpty
+        /// <summary>
+        /// 判断字符串是否为空
+        /// </summary>
+        /// <param name="this">待验证的字符串</param>
+        /// <returns>bool</returns>
+        public static bool IsNullOrEmpty(this string @this)
+        {
+            return string.IsNullOrEmpty(@this);
+        }
+        #endregion
+
+        #region IsNullOrWhiteSpace
+        /// <summary>
+        /// 判断字符串是否为空
+        /// </summary>
+        /// <param name="this">待验证的字符串</param>
+        /// <returns>bool</returns>
+        public static bool IsNullOrWhiteSpace(this string @this)
+        {
+            return string.IsNullOrWhiteSpace(@this);
+        }
+        #endregion
+
         #region ToSafeValue
         /// <summary>
         /// 转换为安全类型的值

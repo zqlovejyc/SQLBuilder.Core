@@ -70,6 +70,11 @@ namespace SQLBuilder.Core.Repositories
                     if (_dbConnection.State != ConnectionState.Open)
                         _dbConnection.Open();
                 }
+                //DbConnection被using后连接字符串被置为空
+                else if (_dbConnection.ConnectionString.IsNullOrEmpty())
+                {
+                    _dbConnection.ConnectionString = ConnectionString;
+                }
                 return _dbConnection;
             }
             set

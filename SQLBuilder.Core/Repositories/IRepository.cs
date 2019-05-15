@@ -47,11 +47,6 @@ namespace SQLBuilder.Core.Repositories
         string ConnectionString { get; set; }
 
         /// <summary>
-        /// 数据库连接对象
-        /// </summary>
-        DbConnection Connection { get; set; }
-
-        /// <summary>
         /// 事务对象
         /// </summary>
         DbTransaction Transaction { get; set; }

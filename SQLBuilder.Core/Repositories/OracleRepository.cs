@@ -41,7 +41,7 @@ namespace SQLBuilder.Core.Repositories
     {
         #region Field
         /// <summary>
-        /// 私有数据库连接对象
+        /// 事务数据库连接对象
         /// </summary>
         private DbConnection _dbConnection;
         #endregion
@@ -64,22 +64,10 @@ namespace SQLBuilder.Core.Repositories
         {
             get
             {
-                if (_dbConnection == null)
-                {
-                    _dbConnection = new OracleConnection(ConnectionString);
-                    if (_dbConnection.State != ConnectionState.Open)
-                        _dbConnection.Open();
-                }
-                //判断DbConnection被using后连接字符串是否被置为空
-                else if (_dbConnection.ConnectionString.IsNullOrEmpty())
-                {
-                    _dbConnection.ConnectionString = ConnectionString;
-                }
-                return _dbConnection;
-            }
-            set
-            {
-                _dbConnection = value;
+                var dbConnection = new OracleConnection(ConnectionString);
+                if (dbConnection.State != ConnectionState.Open)
+                    dbConnection.Open();
+                return dbConnection;
             }
         }
 
@@ -113,9 +101,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>IRepository</returns>
         public IRepository BeginTrans()
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
-            Transaction = Connection.BeginTransaction();
+            _dbConnection = Connection;
+            Transaction = _dbConnection.BeginTransaction();
             return this;
         }
 
@@ -144,8 +131,8 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public void Close()
         {
-            if (Connection.State != ConnectionState.Closed)
-                Connection.Close();
+            _dbConnection?.Close();
+            _dbConnection?.Dispose();
             Transaction = null;
         }
         #endregion

@@ -43,7 +43,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 事务数据库连接对象
         /// </summary>
-        private DbConnection _dbConnection;
+        private DbConnection tranConnection;
         #endregion
 
         #region Property
@@ -64,10 +64,10 @@ namespace SQLBuilder.Core.Repositories
         {
             get
             {
-                var dbConnection = new SqliteConnection(ConnectionString);
-                if (dbConnection.State != ConnectionState.Open)
-                    dbConnection.Open();
-                return dbConnection;
+                var connection = new SqliteConnection(ConnectionString);
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+                return connection;
             }
         }
 
@@ -101,8 +101,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>IRepository</returns>
         public IRepository BeginTrans()
         {
-            _dbConnection = Connection;
-            Transaction = _dbConnection.BeginTransaction();
+            tranConnection = Connection;
+            Transaction = tranConnection.BeginTransaction();
             return this;
         }
 
@@ -131,8 +131,8 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public void Close()
         {
-            _dbConnection?.Close();
-            _dbConnection?.Dispose();
+            tranConnection?.Close();
+            tranConnection?.Dispose();
             Transaction = null;
         }
         #endregion

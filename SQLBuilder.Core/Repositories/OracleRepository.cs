@@ -688,9 +688,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    result = dbConnection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -877,9 +877,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    result = await dbConnection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -1046,9 +1046,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    result = dbConnection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -1133,9 +1133,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    result = await dbConnection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -1169,9 +1169,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<string>(sql, parameter, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<string>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1190,9 +1190,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1223,9 +1223,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<string>(sql, parameter, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<string>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1244,9 +1244,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1270,9 +1270,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1293,9 +1293,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1315,9 +1315,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1338,9 +1338,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1359,9 +1359,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(sql, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1381,9 +1381,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1403,9 +1403,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1427,9 +1427,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1450,9 +1450,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1472,9 +1472,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1495,9 +1495,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1516,9 +1516,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1538,9 +1538,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1560,9 +1560,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1585,9 +1585,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
                 }
             }
         }
@@ -1607,9 +1607,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
                 }
             }
         }
@@ -1629,9 +1629,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
                 }
             }
         }
@@ -1652,9 +1652,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
                 }
             }
         }
@@ -1676,9 +1676,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var query = await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                     return query.AsQueryable();
                 }
             }
@@ -1700,9 +1700,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var query = await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                     return query.AsQueryable();
                 }
             }
@@ -1724,9 +1724,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var query = await dbConnection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     return query.AsQueryable();
                 }
             }
@@ -1749,9 +1749,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var query = await dbConnection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     return query.AsQueryable();
                 }
             }
@@ -1775,9 +1775,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1797,9 +1797,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1819,9 +1819,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1842,9 +1842,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1864,9 +1864,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1887,9 +1887,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1920,9 +1920,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
+                    return connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1942,9 +1942,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.Query<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return connection.Query<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1986,9 +1986,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2034,9 +2034,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2083,9 +2083,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2150,9 +2150,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2202,9 +2202,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2255,9 +2255,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2308,9 +2308,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2334,9 +2334,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2356,9 +2356,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2378,9 +2378,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2401,9 +2401,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2423,9 +2423,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2446,9 +2446,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2479,9 +2479,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2501,9 +2501,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return await dbConnection.QueryAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return await connection.QueryAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -2545,9 +2545,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2593,9 +2593,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2642,9 +2642,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2709,9 +2709,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2761,9 +2761,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2814,9 +2814,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2867,9 +2867,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2905,9 +2905,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.ExecuteReader(sql, parameter, commandTimeout: CommandTimeout).ToDataTable();
+                    return connection.ExecuteReader(sql, parameter, commandTimeout: CommandTimeout).ToDataTable();
                 }
             }
         }
@@ -2926,9 +2926,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    return dbConnection.ExecuteReader(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout).ToDataTable();
+                    return connection.ExecuteReader(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout).ToDataTable();
                 }
             }
         }
@@ -2989,9 +2989,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3042,9 +3042,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3096,9 +3096,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3150,9 +3150,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = dbConnection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3188,9 +3188,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var reader = await dbConnection.ExecuteReaderAsync(sql, parameter, commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync(sql, parameter, commandTimeout: CommandTimeout);
                     return reader.ToDataTable();
                 }
             }
@@ -3211,9 +3211,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var reader = await dbConnection.ExecuteReaderAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     return reader.ToDataTable();
                 }
             }
@@ -3276,9 +3276,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3331,9 +3331,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3387,9 +3387,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3443,9 +3443,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var multiQuery = await dbConnection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3488,9 +3488,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var result = dbConnection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
+                    var result = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
                     while (result?.IsConsumed == false)
                     {
                         list.Add(result.Read());
@@ -3519,9 +3519,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var result = dbConnection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var result = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     while (result?.IsConsumed == false)
                     {
                         list.Add(result.Read());
@@ -3562,9 +3562,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var result = await dbConnection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
+                    var result = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
                     while (result?.IsConsumed == false)
                     {
                         list.Add(await result.ReadAsync());
@@ -3593,9 +3593,9 @@ namespace SQLBuilder.Core.Repositories
             }
             else
             {
-                using (var dbConnection = Connection)
+                using (var connection = Connection)
                 {
-                    var result = await dbConnection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var result = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     while (result?.IsConsumed == false)
                     {
                         list.Add(await result.ReadAsync());

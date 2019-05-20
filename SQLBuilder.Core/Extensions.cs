@@ -788,13 +788,19 @@ namespace SQLBuilder.Core
                 {
                     list = @this.ToDictionaries()?.ToList() as List<T>;
                 }
-                else if (type.IsClass && type.Name != "Object")
+                else if (type.IsClass && type.Name != "Object" && type.Name != "String")
                 {
                     list = @this.ToEntities<T>()?.ToList() as List<T>;
                 }
                 else
                 {
-                    list = @this.ToDynamics()?.ToList() as List<T>;
+                    var result = @this.ToDynamics()?.ToList();
+                    list = result as List<T>;
+                    if (list == null)
+                    {
+                        //适合查询单个字段的结果集
+                        list = result.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                    }
                 }
             }
             return list;
@@ -841,7 +847,7 @@ namespace SQLBuilder.Core
                         #endregion
 
                         #region Class T
-                        else if (type.IsClass && type.Name != "Object")
+                        else if (type.IsClass && type.Name != "Object" && type.Name != "String")
                         {
                             var list = new List<T>();
                             var fields = new List<string>();
@@ -880,7 +886,13 @@ namespace SQLBuilder.Core
                                 }
                                 list.Add(row);
                             }
-                            result.Add(list as List<T>);
+                            var item = list as List<T>;
+                            if (item == null)
+                            {
+                                //适合查询单个字段的结果集
+                                item = list.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                            }
+                            result.Add(item);
                         }
                         #endregion
                     } while (@this.NextResult());

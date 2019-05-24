@@ -100,6 +100,17 @@ namespace SQLBuilder.Core
                 {
                     sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
                 }
+                else if (expression.Expressions[i] is ConstantExpression order)
+                {
+                    if (!order.Value.ToString().ToUpper().Contains("ASC") && !order.Value.ToString().ToUpper().Contains("DESC"))
+                    {
+                        sqlPack += " ASC,";
+                    }
+                    else
+                    {
+                        sqlPack += ",";
+                    }
+                }
                 else
                 {
                     sqlPack += " ASC,";

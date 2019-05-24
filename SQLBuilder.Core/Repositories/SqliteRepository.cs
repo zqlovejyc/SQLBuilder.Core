@@ -700,7 +700,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValues">主键值</param>
+        /// <param name="keyValues">主键，多个值表示联合主键或者多个主键批量删除</param>
         /// <returns>返回受影响行数</returns>
         public int Delete<T>(params object[] keyValues) where T : class
         {
@@ -889,7 +889,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValues">主键</param>
+        /// <param name="keyValues">主键，多个值表示联合主键或者多个主键批量删除</param>
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>(params object[] keyValues) where T : class
         {
@@ -1259,7 +1259,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="keyValues">主键值，多个值表示多主键</param>
+        /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
         public T FindEntity<T>(params object[] keyValues) where T : class
         {
@@ -1282,11 +1282,11 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
-        public T FindEntity<T>(Expression<Func<T, object>> selector, object keyValue) where T : class
+        public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).WithKey(keyValue);
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1416,7 +1416,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="keyValues">主键值，多个值表示多主键</param>
+        /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
@@ -1439,11 +1439,11 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
-        public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, object keyValue) where T : class
+        public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).WithKey(keyValue);
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1615,6 +1615,30 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
+        /// 查询全部
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(orderField, orderTypes);
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
+                }
+            }
+        }
+
+        /// <summary>
         /// 根据linq查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -1646,6 +1670,31 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据linq查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="predicate">linq条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1709,6 +1758,32 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
+        /// 查询全部
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(orderField, orderTypes);
+            if (Transaction?.Connection != null)
+            {
+                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
+                return query.AsQueryable();
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
+                    return query.AsQueryable();
+                }
+            }
+        }
+
+        /// <summary>
         /// 根据linq查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -1742,6 +1817,33 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
+            if (Transaction?.Connection != null)
+            {
+                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                return query.AsQueryable();
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    return query.AsQueryable();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据linq查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="predicate">linq条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1807,35 +1909,14 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 查询并根据条件进行排序
         /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="keySelector">排序字段</param>
-        /// <returns>返回集合</returns>
-        public IEnumerable<T> FindList<T>(Func<T, object> keySelector) where T : class
-        {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).OrderBy(o => keySelector(o));
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 查询并根据条件进行排序
-        /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="keySelector">排序字段</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
-        public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Func<T, object> keySelector) where T : class
+        public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(o => keySelector(o));
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1881,6 +1962,31 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据linq条件进行查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="predicate">linq条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2364,37 +2470,16 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询并根据条件进行排序
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="keySelector">排序字段</param>
-        /// <returns>返回集合</returns>
-        public async Task<IEnumerable<T>> FindListAsync<T>(Func<T, object> keySelector) where T : class
-        {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).OrderBy(o => keySelector(o));
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 查询并根据条件进行排序
+        /// 查询全部
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="keySelector">排序字段</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
-        public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Func<T, object> keySelector) where T : class
+        public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(o => keySelector(o));
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2440,6 +2525,31 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据linq条件进行查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="predicate">linq条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);

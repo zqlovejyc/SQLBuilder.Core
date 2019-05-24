@@ -309,9 +309,13 @@ namespace SQLBuilder.Core
                             {
                                 sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
                             }
-                            else
+                            else if (!array[i].ToUpper().Contains("ASC") && !array[i].ToUpper().Contains("DESC"))
                             {
                                 sqlPack += " ASC,";
+                            }
+                            else
+                            {
+                                sqlPack += ",";
                             }
                         }
                         sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
@@ -325,9 +329,13 @@ namespace SQLBuilder.Core
                             {
                                 sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
                             }
-                            else
+                            else if (!list[i].ToUpper().Contains("ASC") && !list[i].ToUpper().Contains("DESC"))
                             {
                                 sqlPack += " ASC,";
+                            }
+                            else
+                            {
+                                sqlPack += ",";
                             }
                         }
                         sqlPack.Sql.Remove(sqlPack.Length - 1, 1);

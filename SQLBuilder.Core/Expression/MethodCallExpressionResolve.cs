@@ -532,9 +532,13 @@ namespace SQLBuilder.Core
                     {
                         sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
                     }
-                    else
+                    else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
                     {
                         sqlPack += " ASC,";
+                    }
+                    else
+                    {
+                        sqlPack += ",";
                     }
                 }
                 sqlPack.Sql.Remove(sqlPack.Length - 1, 1);

@@ -109,7 +109,7 @@ namespace SQLBuilder.Core
                     SqlBuilderProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
                     if (i <= orders.Length - 1)
                     {
-                        sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
+                        sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                     }
                     else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
                     {

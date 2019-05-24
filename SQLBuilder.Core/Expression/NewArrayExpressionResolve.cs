@@ -98,7 +98,7 @@ namespace SQLBuilder.Core
                 SqlBuilderProvider.OrderBy(expression.Expressions[i], sqlPack);
                 if (i <= orders.Length - 1)
                 {
-                    sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
+                    sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                 }
                 else if (expression.Expressions[i] is ConstantExpression order)
                 {

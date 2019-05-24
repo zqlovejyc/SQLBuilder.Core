@@ -307,7 +307,7 @@ namespace SQLBuilder.Core
                             SqlBuilderProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
                             if (i <= orders.Length - 1)
                             {
-                                sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
+                                sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else if (!array[i].ToUpper().Contains("ASC") && !array[i].ToUpper().Contains("DESC"))
                             {
@@ -327,7 +327,7 @@ namespace SQLBuilder.Core
                             SqlBuilderProvider.OrderBy(Expression.Constant(list[i], list[i].GetType()), sqlPack);
                             if (i <= orders.Length - 1)
                             {
-                                sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
+                                sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else if (!list[i].ToUpper().Contains("ASC") && !list[i].ToUpper().Contains("DESC"))
                             {
@@ -348,7 +348,7 @@ namespace SQLBuilder.Core
                         {
                             if (orders.Length >= 1)
                             {
-                                sqlPack += $" { (orders[0] == OrderType.Desc ? "DESC" : "ASC")},";
+                                sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else
                             {

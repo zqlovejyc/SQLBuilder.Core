@@ -146,7 +146,7 @@ namespace SQLBuilder.Core
                 SqlBuilderProvider.OrderBy(expression.Arguments[i], sqlPack);
                 if (i <= orders.Length - 1)
                 {
-                    sqlPack += $" { (orders[i] == OrderType.Desc ? "DESC" : "ASC")},";
+                    sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                 }
                 else
                 {

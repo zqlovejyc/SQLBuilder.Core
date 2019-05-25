@@ -1593,7 +1593,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1615,7 +1615,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1639,7 +1639,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -1661,7 +1661,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1684,7 +1684,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1734,7 +1734,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1758,7 +1758,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1784,7 +1784,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -1808,7 +1808,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1833,7 +1833,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq查询
+        /// 根据linq条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1885,7 +1885,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1907,7 +1907,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询并根据条件进行排序
+        /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1931,7 +1931,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -1953,7 +1953,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -1976,7 +1976,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2001,7 +2001,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2012,7 +2012,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2034,7 +2034,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2104,7 +2104,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行分页查询
+        /// 根据linq条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -2153,7 +2153,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行分页查询
+        /// 根据linq条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2453,7 +2453,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询全部
+        /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2475,7 +2475,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询并根据条件进行排序
+        /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2499,7 +2499,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -2521,7 +2521,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2544,7 +2544,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行查询
+        /// 根据linq条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>
@@ -2569,7 +2569,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2580,7 +2580,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2602,7 +2602,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据sql语句进行查询
+        /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
@@ -2672,7 +2672,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行分页查询
+        /// 根据linq条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
         /// <param name="predicate">linq条件</param>
@@ -2721,7 +2721,7 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件进行分页查询
+        /// 根据linq条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="selector">linq选择指定列，null选择全部</param>

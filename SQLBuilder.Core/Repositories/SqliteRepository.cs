@@ -673,10 +673,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件删除实体
+        /// 根据条件删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">删除条件</param>
         /// <returns>返回受影响行数</returns>
         public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -862,10 +862,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件删除实体
+        /// 根据条件删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">删除条件</param>
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1030,10 +1030,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件更新实体
+        /// 根据条件更新实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">更新条件</param>
         /// <param name="entity">要更新的实体</param>
         /// <returns>返回受影响行数</returns>
         public int Update<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
@@ -1117,10 +1117,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件更新实体
+        /// 根据条件更新实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">更新条件</param>
         /// <param name="entity">要更新的实体</param>
         /// <returns>返回受影响行数</returns>
         public async Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
@@ -1281,7 +1281,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
@@ -1301,10 +1301,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询单个实体
+        /// 根据条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1323,11 +1323,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询单个实体
+        /// 根据条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1438,7 +1438,7 @@ namespace SQLBuilder.Core.Repositories
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="keyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
@@ -1458,10 +1458,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询单个实体
+        /// 根据条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1480,11 +1480,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询单个实体
+        /// 根据条件查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1596,7 +1596,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector) where T : class
         {
@@ -1618,7 +1618,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -1639,10 +1639,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询
+        /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1661,11 +1661,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列
+        /// 根据条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1684,11 +1684,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列并排序
+        /// 根据条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -1737,7 +1737,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
@@ -1761,7 +1761,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -1784,10 +1784,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询
+        /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1808,11 +1808,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列
+        /// 根据条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1833,11 +1833,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列并排序
+        /// 根据条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -1888,7 +1888,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class
         {
@@ -1910,7 +1910,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -1931,10 +1931,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询
+        /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1953,11 +1953,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列
+        /// 根据条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -1976,11 +1976,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列并排序
+        /// 根据条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -2060,11 +2060,11 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
             var orderBy = string.Empty;
@@ -2076,7 +2076,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2103,16 +2103,16 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件分页查询
+        /// 根据条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
             var orderBy = string.Empty;
@@ -2124,7 +2124,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2151,17 +2151,17 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件分页查询
+        /// 根据条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
             var orderBy = string.Empty;
@@ -2173,7 +2173,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2205,13 +2205,13 @@ namespace SQLBuilder.Core.Repositories
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (IEnumerable<T> list, long total) FindList<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            return FindList<T>(sql, null, orderField, isAsc, pageSize, pageIndex);
+            return FindList<T>(sql, null, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2221,11 +2221,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2240,7 +2240,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2273,11 +2273,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2292,7 +2292,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2325,11 +2325,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2344,7 +2344,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2378,11 +2378,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回集合和总记录数</returns>
-        public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2397,7 +2397,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2451,7 +2451,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
@@ -2473,7 +2473,7 @@ namespace SQLBuilder.Core.Repositories
         /// 查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -2494,10 +2494,10 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询
+        /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
@@ -2516,11 +2516,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列
+        /// 根据条件查询指定列
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
@@ -2539,11 +2539,11 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件查询指定列并排序
+        /// 根据条件查询指定列并排序
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
         /// <param name="orderTypes">排序类型，默认正序排序</param>
         /// <returns>返回集合</returns>
@@ -2623,11 +2623,11 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
             var orderBy = string.Empty;
@@ -2639,7 +2639,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2666,16 +2666,16 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件分页查询
+        /// 根据条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
-        /// <param name="predicate">linq条件</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
             var orderBy = string.Empty;
@@ -2687,7 +2687,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2714,17 +2714,17 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 根据linq条件分页查询
+        /// 根据条件分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">linq选择指定列，null选择全部</param>
-        /// <param name="predicate">linq条件</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAsc, int pageSize, int pageIndex) where T : class
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
             var orderBy = string.Empty;
@@ -2736,7 +2736,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2768,13 +2768,13 @@ namespace SQLBuilder.Core.Repositories
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            return await FindListAsync<T>(sql, null, orderField, isAsc, pageSize, pageIndex);
+            return await FindListAsync<T>(sql, null, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2784,11 +2784,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2803,7 +2803,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2836,11 +2836,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2855,7 +2855,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2888,11 +2888,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2907,7 +2907,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -2941,11 +2941,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回集合和总记录数</returns>
-        public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -2960,7 +2960,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3048,13 +3048,13 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            return FindTable(sql, null, orderField, isAsc, pageSize, pageIndex);
+            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -3063,11 +3063,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3082,7 +3082,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3114,11 +3114,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3133,7 +3133,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3165,11 +3165,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3184,7 +3184,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3217,11 +3217,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3236,7 +3236,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3326,13 +3326,13 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            return await FindTableAsync(sql, null, orderField, isAsc, pageSize, pageIndex);
+            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -3341,11 +3341,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3360,7 +3360,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3394,11 +3394,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3413,7 +3413,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3447,11 +3447,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3466,7 +3466,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
@@ -3501,11 +3501,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <param name="dbParameter">对应参数</param>
         /// <param name="orderField">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
+        /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAsc, int pageSize, int pageIndex)
+        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             if (pageIndex == 0)
             {
@@ -3520,7 +3520,7 @@ namespace SQLBuilder.Core.Repositories
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAsc ? "ASC" : "DESC")}";
+                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else

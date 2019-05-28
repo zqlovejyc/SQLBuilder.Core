@@ -2067,28 +2067,28 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>();
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2097,7 +2097,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2118,28 +2118,28 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>().Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2148,7 +2148,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2170,28 +2170,28 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2200,7 +2200,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2236,32 +2236,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2270,7 +2266,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2291,32 +2287,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2325,7 +2317,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2346,32 +2338,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2380,7 +2368,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2401,32 +2389,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2435,7 +2419,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2649,28 +2633,28 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>();
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2679,7 +2663,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2700,28 +2684,28 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>().Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2730,7 +2714,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2752,28 +2736,28 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2782,7 +2766,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2818,32 +2802,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2852,7 +2832,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2873,32 +2853,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2907,7 +2883,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2928,32 +2904,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2962,7 +2934,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2983,32 +2955,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -3017,7 +2985,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -3107,32 +3075,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3142,7 +3106,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3163,32 +3127,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3198,7 +3158,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3219,32 +3179,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3254,7 +3210,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3275,32 +3231,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND RowNumber {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
@@ -3310,7 +3262,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
@@ -3403,32 +3355,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3439,7 +3387,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3461,32 +3409,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3497,7 +3441,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3519,32 +3463,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3555,7 +3495,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3577,32 +3517,28 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
             var begin = (pageIndex - 1) * pageSize + 1;
             var end = pageIndex * pageSize;
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3613,7 +3549,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderBy}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH T AS (SELECT * FROM #TEMPORARY_{guid}),R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM T) SELECT * FROM R  WHERE RowNumber BETWEEN {begin} AND {end};DROP TABLE #TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();

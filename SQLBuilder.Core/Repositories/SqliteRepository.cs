@@ -2067,25 +2067,25 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2094,7 +2094,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2115,25 +2115,25 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2142,7 +2142,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2164,25 +2164,25 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2191,7 +2191,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2227,29 +2227,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2258,7 +2254,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2279,29 +2275,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2310,7 +2302,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2331,30 +2323,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = $"ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2363,7 +2351,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2384,30 +2372,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = $"ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2416,7 +2400,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2630,25 +2614,25 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2657,7 +2641,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2678,25 +2662,25 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2705,7 +2689,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2727,25 +2711,25 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
+            if (!orderField.IsNullOrEmpty())
             {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2754,7 +2738,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM ({builder.Sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2790,29 +2774,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2821,7 +2801,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2842,29 +2822,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2873,7 +2849,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2894,30 +2870,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2926,7 +2898,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2947,30 +2919,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2979,7 +2947,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -3069,29 +3037,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3100,7 +3064,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3120,29 +3084,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3151,7 +3111,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3171,30 +3131,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3203,7 +3159,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3223,30 +3179,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3255,7 +3207,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3347,29 +3299,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3379,7 +3327,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3400,29 +3348,25 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3432,7 +3376,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3453,30 +3397,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3486,7 +3426,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3507,30 +3447,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable和总记录数</returns>
         public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (pageIndex == 0)
+            if (!orderField.IsNullOrEmpty())
             {
-                pageIndex = 1;
-            }
-            var orderBy = string.Empty;
-            if (!string.IsNullOrEmpty(orderField))
-            {
-                if (orderField.ToUpper().IndexOf("ASC") + orderField.ToUpper().IndexOf("DESC") > 0)
+                orderField = orderField.ToUpper();
+                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
                 {
-                    orderBy = $"ORDER BY {orderField}";
+                    orderField = $"ORDER BY {orderField}";
                 }
                 else
                 {
-                    orderBy = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
                 }
             }
             else
             {
-                orderBy = "ORDER BY (SELECT 0)";
+                orderField = "ORDER BY (SELECT 0)";
             }
             //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3540,7 +3476,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();

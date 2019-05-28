@@ -779,11 +779,11 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
-        /// <param name="orderBy">排序字段</param>
+        /// <param name="orderField">排序字段</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderBy, string sql = null, Dictionary<string, object> parameters = null)
+        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
         {
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(sql))
@@ -800,17 +800,17 @@ namespace SQLBuilder.Core
                     sb.Append(sql);
                     sb.Append("SELECT COUNT(1) AS Records FROM T;");
                     sb.Append(sql);
-                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
+                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
                 }
                 else
                 {
-                    sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderBy}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
+                    sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
                 }
             }
             //MySQL、SQLite
             if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite)
             {
-                sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X ORDER BY X.{orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X ORDER BY X.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
             this._sqlPack.Sql.Clear().Append(sb);
             return this;
@@ -821,11 +821,11 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
-        /// <param name="orderBy">排序字段</param>
+        /// <param name="orderField">排序字段</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderBy, string sql = null, Dictionary<string, object> parameters = null)
+        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
         {
             var sb = new StringBuilder();
             if (!string.IsNullOrEmpty(sql))
@@ -842,11 +842,11 @@ namespace SQLBuilder.Core
                     sb.Append(sql);
                     sb.Append("SELECT COUNT(1) AS Records FROM T;");
                     sb.Append(sql);
-                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderBy}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
+                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
                 }
                 else
                 {
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}),T AS (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderBy}) AS RowNumber,X.* FROM X) SELECT * FROM T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
+                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}),T AS (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderField}) AS RowNumber,X.* FROM X) SELECT * FROM T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
                 }
             }
             //MySQL 8.0开始支持，8.0之前的版本不支持WITH语法、SQLite
@@ -857,11 +857,11 @@ namespace SQLBuilder.Core
                     sb.Append(sql);
                     sb.Append("SELECT COUNT(1) AS Records FROM T;");
                     sb.Append(sql);
-                    sb.Append($"SELECT * FROM T ORDER BY T.{orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                    sb.Append($"SELECT * FROM T ORDER BY T.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
                 }
                 else
                 {
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}) SELECT * FROM X ORDER BY X.{orderBy} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}) SELECT * FROM X ORDER BY X.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
                 }
             }
             this._sqlPack.Sql.Clear().Append(sb);

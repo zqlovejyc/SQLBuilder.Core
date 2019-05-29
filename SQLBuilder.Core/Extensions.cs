@@ -256,6 +256,89 @@ namespace SQLBuilder.Core
         }
         #endregion
 
+        #region OrderBy
+        /// <summary>
+        /// linq正序排序扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string property)
+        {
+            return source.BuildIOrderedQueryable<T>(property, "OrderBy");
+        }
+
+        /// <summary>
+        /// linq倒叙排序扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> source, string property)
+        {
+            return source.BuildIOrderedQueryable<T>(property, "OrderByDescending");
+        }
+
+        /// <summary>
+        /// linq正序多列排序扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> source, string property)
+        {
+            return source.BuildIOrderedQueryable<T>(property, "ThenBy");
+        }
+
+        /// <summary>
+        /// linq倒序多列排序扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> source, string property)
+        {
+            return source.BuildIOrderedQueryable<T>(property, "ThenByDescending");
+        }
+
+        /// <summary>
+        /// 根据属性和方法构建IOrderQueryable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <param name="methodName"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> BuildIOrderedQueryable<T>(this IQueryable<T> source, string property, string methodName)
+        {
+            var props = property.Split('.');
+            var type = typeof(T);
+            var arg = Expression.Parameter(type, "x");
+            Expression expr = arg;
+            foreach (var prop in props)
+            {
+                // use reflection (not ComponentModel) to mirror LINQ
+                var pi = type.GetProperty(prop);
+                expr = Expression.Property(expr, pi);
+                type = pi.PropertyType;
+            }
+            var delegateType = typeof(Func<,>).MakeGenericType(typeof(T), type);
+            var lambda = Expression.Lambda(delegateType, expr, arg);
+            var result = typeof(Queryable).GetMethods().Single(
+              method => method.Name == methodName
+                && method.IsGenericMethodDefinition
+                && method.GetGenericArguments().Length == 2
+                && method.GetParameters().Length == 2)
+              .MakeGenericMethod(typeof(T), type)
+              .Invoke(null, new object[] { source, lambda });
+            return (IOrderedQueryable<T>)result;
+        }
+        #endregion
+
         #region Substring
         /// <summary>
         /// 从分隔符开始向尾部截取字符串

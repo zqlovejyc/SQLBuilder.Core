@@ -2,19 +2,18 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.2.6</AssemblyVersion>
+        <AssemblyVersion>1.0.2.7</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.2.6</Version>
+        <Version>1.0.2.7</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
         <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
         <PackageIconUrl>https://zqlovejyc.gitee.io/zqutils-js/Images/SQL.png</PackageIconUrl>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化ToList、ToLists扩展方法，修复IDataReader映射到单个简单类型时异常BUG；
-2.更新仓储FindEntity方法，添加联合主键查询；
-3.重载IQueryable、FindList方法，添加排序参数；
-4.修复OrderBy语法解析过程中部分BUG</PackageReleaseNotes>
-        <FileVersion>1.0.2.6</FileVersion>
+        <PackageReleaseNotes>1.更新OrderType枚举类型名称；
+2.新增linq排序扩展方法；
+3.修复ToEntities、ToLists扩展方法赋值过程中转换bug；</PackageReleaseNotes>
+        <FileVersion>1.0.2.7</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
     </PropertyGroup>
 

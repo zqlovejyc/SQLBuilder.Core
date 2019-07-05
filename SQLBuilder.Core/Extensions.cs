@@ -16,20 +16,21 @@
 */
 #endregion
 
+using Dapper;
+using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
+using Npgsql;
+using Oracle.ManagedDataAccess.Client;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using MySql.Data.MySqlClient;
-using Oracle.ManagedDataAccess.Client;
-using Microsoft.Data.Sqlite;
-using System.Data.Common;
 using System.Reflection;
-using System.Dynamic;
-using Dapper;
-using Npgsql;
+using System.Text.RegularExpressions;
 
 namespace SQLBuilder.Core
 {
@@ -1002,6 +1003,34 @@ namespace SQLBuilder.Core
                 return list.FirstOrDefault();
             }
             return default(T);
+        }
+        #endregion
+
+        #region SqlInject
+        /// <summary>
+        /// 判断是否sql注入
+        /// </summary>
+        /// <param name="this">sql字符串</param>
+        /// <param name="pattern">正则表达式</param>
+        /// <returns></returns>
+        public static bool IsSqlInject(this string @this, string pattern = @"(?:')|(?:--)|(/\*(?:.|[\n\r])*?\*/)|(\b(select|update|union|and|or|delete|insert|trancate|char|into|substr|ascii|declare|exec|count|master|into|drop|execute)\b)")
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+            return Regex.IsMatch(@this, pattern, RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
+        /// 正则表达式替换sql
+        /// </summary>
+        /// <param name="this">sql字符串</param>
+        /// <param name="pattern">正则表达式</param>
+        /// <returns></returns>
+        public static string ReplaceSqlWithRegex(this string @this, string pattern = @"(?:')|(?:--)|(/\*(?:.|[\n\r])*?\*/)|(\b(select|update|union|and|or|delete|insert|trancate|char|into|substr|ascii|declare|exec|count|master|into|drop|execute)\b)")
+        {
+            if (@this.IsNullOrEmpty())
+                return @this;
+            return Regex.Replace(@this, pattern, "");
         }
         #endregion
     }

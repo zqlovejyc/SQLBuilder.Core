@@ -129,7 +129,11 @@ namespace SQLBuilder.Core
                 this._sqlPack.SetTableAlias(tableName);
             }
             var _tableName = this._sqlPack.GetTableName(typeof(T));
-            return "SELECT {0} FROM " + _tableName + " AS " + this._sqlPack.GetTableAlias(_tableName);
+            //Oracle表别名不支持AS关键字，列别名支持；
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+                return $"SELECT {{0}} FROM {_tableName} {this._sqlPack.GetTableAlias(_tableName)}";
+            else
+                return $"SELECT {{0}} FROM {_tableName} AS {this._sqlPack.GetTableAlias(_tableName)}";
         }
 
         /// <summary>
@@ -436,7 +440,10 @@ namespace SQLBuilder.Core
         {
             string joinTableName = this._sqlPack.GetTableName(typeof(T2));
             this._sqlPack.SetTableAlias(joinTableName);
-            this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {(joinTableName + " AS " + this._sqlPack.GetTableAlias(joinTableName))} ON ");
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+                this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            else
+                this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
             SqlBuilderProvider.Join(expression.Body, this._sqlPack);
             return this;
         }
@@ -455,7 +462,10 @@ namespace SQLBuilder.Core
         {
             string joinTableName = this._sqlPack.GetTableName(typeof(T3));
             this._sqlPack.SetTableAlias(joinTableName);
-            this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {(joinTableName + " AS " + this._sqlPack.GetTableAlias(joinTableName))} ON ");
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+                this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            else
+                this._sqlPack.Sql.Append($"{(string.IsNullOrEmpty(leftOrRightJoin) ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
             SqlBuilderProvider.Join(expression.Body, this._sqlPack);
             return this;
         }

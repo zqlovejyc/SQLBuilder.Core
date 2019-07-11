@@ -352,7 +352,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_Top_03()
         {
             var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.Oracle).Top(100);
-            Assert.AreEqual("SELECT A.Id,A.Name FROM \"Base_UserInfo\" AS A WHERE ROWNUM <= 100", builder.Sql);
+            Assert.AreEqual("SELECT A.Id,A.Name FROM \"Base_UserInfo\" A WHERE ROWNUM <= 100", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

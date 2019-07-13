@@ -26,7 +26,7 @@ namespace SQLBuilder.Core
     /// <summary>
     /// 表示访问字段或属性
     /// </summary>
-	public class MemberExpressionResolve : BaseSqlBuilder<MemberExpression>
+    public class MemberExpressionResolve : BaseSqlBuilder<MemberExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -41,28 +41,25 @@ namespace SQLBuilder.Core
             var fields = new List<string>();
             var obj = expression.ToObject();
             if (obj.GetType().IsArray)
-            {
                 objectArray.AddRange(obj as object[]);
-            }
             else if (obj.GetType().Name == "List`1")
-            {
                 objectArray.AddRange(obj as IEnumerable<object>);
-            }
             else
-            {
                 objectArray.Add(obj);
-            }
-            foreach (var item in objectArray)
+            for (var i = 0; i < objectArray.Count; i++)
             {
-                sqlPack.Sql.Append("(");
-                var properties = item?.GetType().GetProperties();
+                if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                    sqlPack.Sql.Append("(");
+                if (i > 0 && sqlPack.DatabaseType == DatabaseType.Oracle)
+                    sqlPack.Sql.Append(" UNION ALL SELECT ");
+                var properties = objectArray[i]?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
                     var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : p.DeclaringType;
                     (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, p);
                     if (isInsert)
                     {
-                        var value = p.GetValue(item, null);
+                        var value = p.GetValue(objectArray[i], null);
                         if (value != null || (sqlPack.IsEnableNullValue && value == null))
                         {
                             sqlPack.AddDbParameter(value);
@@ -74,13 +71,14 @@ namespace SQLBuilder.Core
                 if (sqlPack[sqlPack.Length - 1] == ',')
                 {
                     sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                    sqlPack.Sql.Append("),");
+                    if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                        sqlPack.Sql.Append("),");
+                    else
+                        sqlPack.Sql.Append(" FROM DUAL");
                 }
             }
             if (sqlPack[sqlPack.Length - 1] == ',')
-            {
                 sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-            }
             sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlPack;
         }

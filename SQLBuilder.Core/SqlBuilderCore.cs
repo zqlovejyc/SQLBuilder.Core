@@ -802,25 +802,45 @@ namespace SQLBuilder.Core
                 if (parameters != null) this._sqlPack.DbParams = parameters;
             }
             sql = string.IsNullOrEmpty(sql) ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
-            //SQLServer、Oracle
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer || this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            //SQLServer
+            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                {
-                    sb.Append(sql);
-                    sb.Append("SELECT COUNT(1) AS Records FROM T;");
-                    sb.Append(sql);
-                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
-                }
+                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
                 else
-                {
-                    sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
-                }
+                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;SELECT * INTO #TEMPORARY FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber, * FROM #TEMPORARY) AS N WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
             }
-            //MySQL、SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            //Oracle，注意Oracle需要分开查询总条数和分页数据
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
-                sb.Append($"SELECT COUNT(1) AS Records FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X ORDER BY X.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
+                else
+                    sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
+            }
+            //MySQL，注意8.0版本才支持WITH语法
+            if (this._sqlPack.DatabaseType == DatabaseType.MySQL)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $TEMPORARY;");
+            }
+            //PostgreSQL
+            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"DROP TABLE IF EXISTS TEMPORARY_TABLE;CREATE TEMPORARY TABLE TEMPORARY_TABLE AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_TABLE;SELECT * FROM TEMPORARY_TABLE AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_TABLE;");
+            }
+            //SQLite
+            if (this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
             this._sqlPack.Sql.Clear().Append(sb);
             return this;
@@ -844,35 +864,45 @@ namespace SQLBuilder.Core
                 if (parameters != null) this._sqlPack.DbParams = parameters;
             }
             sql = string.IsNullOrEmpty(sql) ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
-            //SQLServer、Oracle
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer || this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            //SQLServer
+            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                {
-                    sb.Append(sql);
-                    sb.Append("SELECT COUNT(1) AS Records FROM T;");
-                    sb.Append(sql);
-                    sb.Append($",R AS (SELECT ROW_NUMBER() OVER (ORDER BY T.{orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
-                }
+                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
                 else
-                {
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}),T AS (SELECT ROW_NUMBER() OVER (ORDER BY X.{orderField}) AS RowNumber,X.* FROM X) SELECT * FROM T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};");
-                }
+                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;WITH T AS ({sql}) SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
             }
-            //MySQL 8.0开始支持，8.0之前的版本不支持WITH语法、SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            //Oracle，注意Oracle需要分开查询总条数和分页数据
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                {
-                    sb.Append(sql);
-                    sb.Append("SELECT COUNT(1) AS Records FROM T;");
-                    sb.Append(sql);
-                    sb.Append($"SELECT * FROM T ORDER BY T.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                }
+                    sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
                 else
-                {
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Records FROM T;WITH X AS ({sql}) SELECT * FROM X ORDER BY X.{orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                }
+                    sb.Append($"WITH T AS ({sql}),R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
+            }
+            //MySQL，注意8.0版本才支持WITH语法
+            if (this._sqlPack.DatabaseType == DatabaseType.MySQL)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+            }
+            //PostgreSQL
+            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+            }
+            //SQLite
+            if (this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            {
+                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
+                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                else
+                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
             this._sqlPack.Sql.Clear().Append(sb);
             return this;
@@ -923,7 +953,7 @@ namespace SQLBuilder.Core
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = true;
             this._sqlPack.IsEnableNullValue = isEnableNullValue;
-            this._sqlPack += $"INSERT INTO {this._sqlPack.GetTableName(typeof(T))} ({{0}}) VALUES ";
+            this._sqlPack += $"INSERT INTO {this._sqlPack.GetTableName(typeof(T))} ({{0}}) {(this._sqlPack.DatabaseType == DatabaseType.Oracle ? "SELECT" : "VALUES")} ";
             SqlBuilderProvider.Insert(expression.Body, this._sqlPack);
             return this;
         }

@@ -2071,32 +2071,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2119,32 +2109,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2168,32 +2148,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2231,32 +2201,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2279,32 +2239,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2327,33 +2277,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2376,33 +2315,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var list = multiQuery?.Read<T>();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var list = Transaction.Connection.Query<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var list = multiQuery?.Read<T>();
+                    var total = connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var list = connection.Query<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2618,32 +2546,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2666,32 +2584,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2715,32 +2623,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({builder.Sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2778,32 +2676,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2826,32 +2714,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2874,33 +2752,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -2923,33 +2790,22 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var list = await multiQuery?.ReadAsync<T>();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var list = await Transaction.Connection.QueryAsync<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 return (list, total);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var list = await multiQuery?.ReadAsync<T>();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var list = await connection.QueryAsync<T>($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     return (list, total);
                 }
             }
@@ -3041,23 +2897,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var reader = Transaction.Connection.ExecuteReader($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3065,9 +2913,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var reader = connection.ExecuteReader($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3090,23 +2938,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var reader = Transaction.Connection.ExecuteReader($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3114,9 +2954,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    var total = connection.QueryFirstOrDefault<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var reader = connection.ExecuteReader($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3139,24 +2979,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var reader = Transaction.Connection.ExecuteReader($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3164,9 +2995,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    var total = connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var reader = connection.ExecuteReader($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3189,24 +3020,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                var total = Transaction.Connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var reader = Transaction.Connection.ExecuteReader($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3214,9 +3036,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-                    var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                    var total = connection.QueryFirstOrDefault<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var reader = connection.ExecuteReader($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3311,24 +3133,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var reader = await multiQuery?.ReadAsync();
-                var table = reader?.ToList()?.ToDataTable();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var reader = await Transaction.Connection.ExecuteReaderAsync($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3336,10 +3149,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var reader = await multiQuery?.ReadAsync();
-                    var table = reader?.ToList()?.ToDataTable();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3362,24 +3174,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var reader = await multiQuery?.ReadAsync();
-                var table = reader?.ToList()?.ToDataTable();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var reader = await Transaction.Connection.ExecuteReaderAsync($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3387,10 +3190,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,X.* FROM ({sql}) AS X) AS T WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var reader = await multiQuery?.ReadAsync();
-                    var table = reader?.ToList()?.ToDataTable();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"SELECT COUNT(1) AS Total FROM ({sql}) T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3413,25 +3215,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var reader = await multiQuery?.ReadAsync();
-                var table = reader?.ToList()?.ToDataTable();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                var reader = await Transaction.Connection.ExecuteReaderAsync($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3439,10 +3231,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", parameter, commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var reader = await multiQuery?.ReadAsync();
-                    var table = reader?.ToList()?.ToDataTable();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", parameter, Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }
@@ -3465,25 +3256,15 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                var reader = await multiQuery?.ReadAsync();
-                var table = reader?.ToList()?.ToDataTable();
+                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var reader = await Transaction.Connection.ExecuteReaderAsync($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var table = reader?.ToDataTable();
                 table?.Columns?.Remove("RowNumber");
                 return (table, total);
             }
@@ -3491,10 +3272,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,T.* FROM T) SELECT * FROM R WHERE RowNumber BETWEEN {(pageSize * (pageIndex - 1) + 1)} AND {(pageSize * pageIndex)};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
-                    var reader = await multiQuery?.ReadAsync();
-                    var table = reader?.ToList()?.ToDataTable();
+                    var total = await connection.QueryFirstOrDefaultAsync<long>($"{sql} SELECT COUNT(1) AS Total FROM T", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var reader = await connection.ExecuteReaderAsync($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                    var table = reader?.ToDataTable();
                     table?.Columns?.Remove("RowNumber");
                     return (table, total);
                 }

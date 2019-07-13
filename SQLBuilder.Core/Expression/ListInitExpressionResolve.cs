@@ -39,17 +39,20 @@ namespace SQLBuilder.Core
         {
             var fields = new List<string>();
             var array = expression.ToObject() as IEnumerable<object>;
-            foreach (var item in array)
+            for (var i = 0; i < array.Count(); i++)
             {
-                sqlPack.Sql.Append("(");
-                var properties = item?.GetType().GetProperties();
+                if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                    sqlPack.Sql.Append("(");
+                if (i > 0 && sqlPack.DatabaseType == DatabaseType.Oracle)
+                    sqlPack.Sql.Append(" UNION ALL SELECT ");
+                var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
                     var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : p.DeclaringType;
                     (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, p);
                     if (isInsert)
                     {
-                        var value = p.GetValue(item, null);
+                        var value = p.GetValue(array.ElementAt(i), null);
                         if (value != null || (sqlPack.IsEnableNullValue && value == null))
                         {
                             sqlPack.AddDbParameter(value);
@@ -61,13 +64,14 @@ namespace SQLBuilder.Core
                 if (sqlPack[sqlPack.Length - 1] == ',')
                 {
                     sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                    sqlPack.Sql.Append("),");
+                    if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                        sqlPack.Sql.Append("),");
+                    else
+                        sqlPack.Sql.Append(" FROM DUAL");
                 }
             }
             if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-            {
                 sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-            }
             sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlPack;
         }

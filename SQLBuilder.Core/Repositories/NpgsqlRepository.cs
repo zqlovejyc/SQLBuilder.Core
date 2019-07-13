@@ -2071,17 +2071,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2120,17 +2112,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2170,17 +2154,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2234,17 +2210,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2283,17 +2251,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2332,19 +2292,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
@@ -2381,19 +2332,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -2623,17 +2565,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2672,17 +2606,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2722,17 +2648,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2786,17 +2704,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2835,17 +2745,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -2884,19 +2786,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
@@ -2933,19 +2826,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -3051,17 +2935,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -3099,17 +2975,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -3147,19 +3015,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
@@ -3195,19 +3054,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -3315,17 +3165,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -3365,17 +3207,9 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
-            }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
             if (Transaction?.Connection != null)
@@ -3415,19 +3249,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
@@ -3465,19 +3290,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 orderField = orderField.ToUpper();
                 if (orderField.Contains("ASC") || orderField.Contains("DESC"))
-                {
                     orderField = $"ORDER BY {orderField}";
-                }
                 else
-                {
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-                }
             }
-            else
-            {
-                orderField = "ORDER BY (SELECT 0)";
-            }
-            //暂未实现临时表with分页
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);

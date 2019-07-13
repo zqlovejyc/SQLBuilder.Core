@@ -67,7 +67,8 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
         public override SqlPack Insert(NewExpression expression, SqlPack sqlPack)
         {
-            sqlPack.Sql.Append("(");
+            if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                sqlPack.Sql.Append("(");
             var fields = new List<string>();
             for (int i = 0; i < expression.Members?.Count; i++)
             {
@@ -88,7 +89,10 @@ namespace SQLBuilder.Core
             if (sqlPack[sqlPack.Length - 1] == ',')
             {
                 sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                sqlPack.Sql.Append(")");
+                if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                    sqlPack.Sql.Append(")");
+                else
+                    sqlPack.Sql.Append(" FROM DUAL");
             }
             sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlPack;
@@ -109,9 +113,7 @@ namespace SQLBuilder.Core
                 SqlBuilderProvider.Select(argument, sqlPack);
                 //添加字段别名
                 if ((argument as MemberExpression)?.Member.Name != member.Name)
-                {
                     sqlPack.SelectFields[sqlPack.SelectFields.Count - 1] += " AS " + member.Name;
-                }
             }
             return sqlPack;
         }
@@ -145,13 +147,9 @@ namespace SQLBuilder.Core
             {
                 SqlBuilderProvider.OrderBy(expression.Arguments[i], sqlPack);
                 if (i <= orders.Length - 1)
-                {
                     sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                }
                 else
-                {
                     sqlPack += " ASC,";
-                }
             }
             sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
             return sqlPack;

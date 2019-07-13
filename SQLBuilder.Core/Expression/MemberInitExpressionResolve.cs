@@ -36,7 +36,8 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
         public override SqlPack Insert(MemberInitExpression expression, SqlPack sqlPack)
         {
-            sqlPack.Sql.Append("(");
+            if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                sqlPack.Sql.Append("(");
             var fields = new List<string>();
             foreach (MemberAssignment m in expression.Bindings)
             {
@@ -56,7 +57,10 @@ namespace SQLBuilder.Core
             if (sqlPack[sqlPack.Length - 1] == ',')
             {
                 sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                sqlPack.Sql.Append(")");
+                if (sqlPack.DatabaseType != DatabaseType.Oracle)
+                    sqlPack.Sql.Append(")");
+                else
+                    sqlPack.Sql.Append(" FROM DUAL");
             }
             sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlPack;
@@ -86,9 +90,7 @@ namespace SQLBuilder.Core
                 }
             }
             if (sqlPack[sqlPack.Length - 1] == ',')
-            {
                 sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-            }
             return sqlPack;
         }
         #endregion

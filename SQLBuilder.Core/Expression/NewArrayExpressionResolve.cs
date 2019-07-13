@@ -41,9 +41,7 @@ namespace SQLBuilder.Core
                 sqlPack += ",";
             }
             if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-            {
                 sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-            }
             sqlPack += ")";
             return sqlPack;
         }
@@ -59,12 +57,15 @@ namespace SQLBuilder.Core
             foreach (Expression expressionItem in expression.Expressions)
             {
                 SqlBuilderProvider.Insert(expressionItem, sqlPack);
-                sqlPack += ",";
+                if (sqlPack.DatabaseType == DatabaseType.Oracle)
+                    sqlPack += " UNION ALL SELECT ";
+                else
+                    sqlPack += ",";
             }
             if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-            {
                 sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-            }
+            if (sqlPack.Sql.ToString().LastIndexOf(" UNION ALL SELECT ") > -1)
+                sqlPack.Sql.Remove(sqlPack.Sql.Length - 18, 18);
             return sqlPack;
         }
 
@@ -103,13 +104,9 @@ namespace SQLBuilder.Core
                 else if (expression.Expressions[i] is ConstantExpression order)
                 {
                     if (!order.Value.ToString().ToUpper().Contains("ASC") && !order.Value.ToString().ToUpper().Contains("DESC"))
-                    {
                         sqlPack += " ASC,";
-                    }
                     else
-                    {
                         sqlPack += ",";
-                    }
                 }
                 else
                 {

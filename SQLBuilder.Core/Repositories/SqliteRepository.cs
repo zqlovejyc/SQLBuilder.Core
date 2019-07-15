@@ -17,15 +17,16 @@
 #endregion
 
 using Dapper;
+using Microsoft.Data.Sqlite;
+using SQLBuilder.Core;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using Microsoft.Data.Sqlite;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SQLBuilder.Core;
 using Sql = SQLBuilder.Core.SqlBuilder;
 /****************************
 * [Author] 张强
@@ -2069,8 +2070,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2109,8 +2109,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2150,8 +2149,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2205,8 +2203,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2245,8 +2242,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2285,8 +2281,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2325,8 +2320,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2558,8 +2552,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2598,8 +2591,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.SQLite).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2639,8 +2631,7 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(selector, DatabaseType.SQLite).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2694,8 +2685,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2734,8 +2724,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2774,8 +2763,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2814,8 +2802,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2923,8 +2910,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -2962,8 +2948,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3001,8 +2986,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3040,8 +3024,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3151,8 +3134,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3192,8 +3174,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3233,8 +3214,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
@@ -3274,8 +3254,7 @@ namespace SQLBuilder.Core.Repositories
         {
             if (!orderField.IsNullOrEmpty())
             {
-                orderField = orderField.ToUpper();
-                if (orderField.Contains("ASC") || orderField.Contains("DESC"))
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";

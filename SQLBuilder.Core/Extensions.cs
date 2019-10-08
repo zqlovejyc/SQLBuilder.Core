@@ -444,7 +444,7 @@ namespace SQLBuilder.Core
             if (@this?.Length > 0)
             {
                 var args = new DynamicParameters();
-                @this.ToList().ForEach(p => args.Add(p.ParameterName.Replace("?", "@").Replace(":", "@"), p.Value, p.DbType, p.Direction, p.Size));
+                @this.ToList().ForEach(p => args.Add(p.ParameterName, p.Value, p.DbType, p.Direction, p.Size));
                 return args;
             }
             return null;
@@ -460,7 +460,7 @@ namespace SQLBuilder.Core
             if (@this?.Count > 0)
             {
                 var args = new DynamicParameters();
-                @this.ForEach(p => args.Add(p.ParameterName.Replace("?", "@").Replace(":", "@"), p.Value, p.DbType, p.Direction, p.Size));
+                @this.ForEach(p => args.Add(p.ParameterName, p.Value, p.DbType, p.Direction, p.Size));
                 return args;
             }
             return null;
@@ -476,7 +476,7 @@ namespace SQLBuilder.Core
             if (@this != null)
             {
                 var args = new DynamicParameters();
-                args.Add(@this.ParameterName.Replace("?", "@").Replace(":", "@"), @this.Value, @this.DbType, @this.Direction, @this.Size);
+                args.Add(@this.ParameterName, @this.Value, @this.DbType, @this.Direction, @this.Size);
                 return args;
             }
             return null;
@@ -494,7 +494,7 @@ namespace SQLBuilder.Core
                 var args = new DynamicParameters();
                 foreach (var item in @this)
                 {
-                    args.Add(item.Key.Replace("?", "@").Replace(":", "@"), item.Value);
+                    args.Add(item.Key, item.Value);
                 }
                 return args;
             }

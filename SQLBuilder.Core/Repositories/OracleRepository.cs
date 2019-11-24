@@ -1263,6 +1263,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(params object[] keyValues) where T : class
         {
+            if (keyValues == null) return default(T);
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.Oracle).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
@@ -1286,6 +1287,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
+            if (keyValues == null) return default(T);
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
@@ -1420,6 +1422,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
+            if (keyValues == null) return await Task.FromResult(default(T));
             var builder = Sql.Select<T>(DatabaseType: DatabaseType.Oracle).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
@@ -1443,6 +1446,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
+            if (keyValues == null) return await Task.FromResult(default(T));
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {

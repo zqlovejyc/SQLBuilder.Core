@@ -144,21 +144,52 @@ namespace SQLBuilder.Core
             );
 
             Print(
+              SqlBuilder.Select<UserInfo>(u => u.Name)
+                        .Where(u => !"a,b,c".Split(new[] { ',' }).Contains(u.Name)),
+              "查询单表，带where contains条件，写法一"
+            );
+
+            Print(
+                SqlBuilder.Select<UserInfo>(u => u.Name)
+                          .Where(u => new string[] { "a", "b" }.Contains(u.Name)),
+                "查询单表，带where contains条件，写法二"
+            );
+
+            Print(
+                SqlBuilder.Select<UserInfo>(u => u.Name)
+                          .Where(u => !new string[] { "a", "b" }.Contains(u.Name)),
+                "查询单表，带where contains条件，写法三"
+            );
+
+            int[] arrayId = { 1, 2, 3 };
+            Print(
+               SqlBuilder.Select<UserInfo>(u => u.Name)
+                         .Where(u => arrayId.Contains(u.Id.Value)),
+               "查询单表，带where contains条件，写法四"
+            );
+
+            var user = new UserInfo { Name = "a,b,c" };
+            Print(
+              SqlBuilder.Select<UserInfo>(u => u.Name)
+                        .Where(u => user.Name.Split(new[] { ',' }).Contains(u.Name)),
+              "查询单表，带where contains条件，写法五"
+            );
+
+            Print(
                 SqlBuilder.Select<UserInfo>(u => u.Name)
                           .Where(u => u.Id.In(1, 2, 3)),
                 "查询单表，带where in条件，写法一"
             );
 
-            int[] aryId = { 1, 2, 3 };
             Print(
                 SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Id.In(aryId)),
+                          .Where(u => u.Id.In(arrayId)),
                 "查询单表，带where in条件，写法二"
             );
 
             Print(
                 SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Name.In(new string[] { "a", "b" })),
+                          .Where(u => !u.Name.In(new string[] { "a", "b" })),
                 "查询单表，带where in条件，写法三"
             );
 

@@ -161,20 +161,27 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
 		public override SqlPack Where(MemberExpression expression, SqlPack sqlPack)
         {
-            if (expression.Expression.NodeType == ExpressionType.Parameter)
+            if (expression.Expression.NodeType == ExpressionType.MemberAccess)
             {
-                var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                           expression.Expression.Type :
-                           expression.Member.DeclaringType;
-                var tableName = sqlPack.GetTableName(type);
-                sqlPack.SetTableAlias(tableName);
-                var tableAlias = sqlPack.GetTableAlias(tableName);
-                if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName;
+                expression = expression.Expression as MemberExpression;
             }
-            else
+            if (expression != null)
             {
-                sqlPack.AddDbParameter(expression.ToObject());
+                if (expression.Expression.NodeType == ExpressionType.Parameter)
+                {
+                    var type = expression.Expression.Type != expression.Member.DeclaringType ?
+                               expression.Expression.Type :
+                               expression.Member.DeclaringType;
+                    var tableName = sqlPack.GetTableName(type);
+                    sqlPack.SetTableAlias(tableName);
+                    var tableAlias = sqlPack.GetTableAlias(tableName);
+                    if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+                    sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName;
+                }
+                else
+                {
+                    sqlPack.AddDbParameter(expression.ToObject());
+                }
             }
             return sqlPack;
         }

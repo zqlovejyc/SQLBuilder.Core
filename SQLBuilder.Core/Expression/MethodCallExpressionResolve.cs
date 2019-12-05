@@ -1,6 +1,6 @@
 ﻿#region License
 /***
- * Copyright © 20188, 张强 (943620963@qq.com).
+ * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -31,15 +32,15 @@ namespace SQLBuilder.Core
     {
         #region Private Static Methods
         /// <summary>
-        /// _Methods
+        /// methods
         /// </summary>
-        private static Dictionary<string, Action<MethodCallExpression, SqlPack>> _Methods = new Dictionary<string, Action<MethodCallExpression, SqlPack>>
+        private static readonly Dictionary<string, Action<MethodCallExpression, SqlPack>> methods = new Dictionary<string, Action<MethodCallExpression, SqlPack>>
         {
             ["Like"] = Like,
             ["LikeLeft"] = LikeLeft,
             ["LikeRight"] = LikeRight,
             ["NotLike"] = NotLike,
-            ["In"] = In,
+            ["In"] = IN,
             ["NotIn"] = NotIn,
             ["Contains"] = Contains,
             ["IsNullOrEmpty"] = IsNullOrEmpty,
@@ -52,11 +53,11 @@ namespace SQLBuilder.Core
         };
 
         /// <summary>
-        /// In
+        /// IN
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
-        private static new void In(MethodCallExpression expression, SqlPack sqlPack)
+        private static void IN(MethodCallExpression expression, SqlPack sqlPack)
         {
             SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
             sqlPack += " IN ";
@@ -263,40 +264,55 @@ namespace SQLBuilder.Core
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                if (expression.Arguments[0].NodeType == ExpressionType.MemberAccess)
+                {
+                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
+                    sqlPack += " IN ";
+                    SqlBuilderProvider.In(expression.Object, sqlPack);
+                }
+                else
+                {
+                    SqlBuilderProvider.Where(expression.Object, sqlPack);
+                    switch (sqlPack.DatabaseType)
+                    {
+                        case DatabaseType.SQLServer:
+                            sqlPack += " LIKE '%' + ";
+                            break;
+                        case DatabaseType.MySQL:
+                        case DatabaseType.PostgreSQL:
+                            sqlPack += " LIKE CONCAT('%',";
+                            break;
+                        case DatabaseType.Oracle:
+                        case DatabaseType.SQLite:
+                            sqlPack += " LIKE '%' || ";
+                            break;
+                        default:
+                            break;
+                    }
+                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
+                    switch (sqlPack.DatabaseType)
+                    {
+                        case DatabaseType.SQLServer:
+                            sqlPack += " + '%'";
+                            break;
+                        case DatabaseType.MySQL:
+                        case DatabaseType.PostgreSQL:
+                            sqlPack += ",'%')";
+                            break;
+                        case DatabaseType.Oracle:
+                        case DatabaseType.SQLite:
+                            sqlPack += " || '%'";
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
-            switch (sqlPack.DatabaseType)
+            else if (expression.Arguments.Count > 1 && expression.Arguments[1] is MemberExpression memberExpression)
             {
-                case DatabaseType.SQLServer:
-                    sqlPack += " LIKE '%' + ";
-                    break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
-                    sqlPack += " LIKE CONCAT('%',";
-                    break;
-                case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
-                    sqlPack += " LIKE '%' || ";
-                    break;
-                default:
-                    break;
-            }
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            switch (sqlPack.DatabaseType)
-            {
-                case DatabaseType.SQLServer:
-                    sqlPack += " + '%'";
-                    break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
-                    sqlPack += ",'%')";
-                    break;
-                case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
-                    sqlPack += " || '%'";
-                    break;
-                default:
-                    break;
+                SqlBuilderProvider.Where(memberExpression, sqlPack);
+                sqlPack += " IN ";
+                SqlBuilderProvider.In(expression.Arguments[0], sqlPack);
             }
         }
 
@@ -430,6 +446,41 @@ namespace SQLBuilder.Core
 
         #region Override Base Class Methods
         /// <summary>
+        /// In
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlPack">sql打包对象</param>
+        /// <returns>SqlPack</returns>
+        public override SqlPack In(MethodCallExpression expression, SqlPack sqlPack)
+        {
+            var val = expression?.ToObject();
+            if (val != null)
+            {
+                sqlPack += "(";
+                if (val.GetType().IsArray || typeof(IList).IsAssignableFrom(val.GetType()))
+                {
+                    var list = val as IList;
+                    if (list?.Count > 0)
+                    {
+                        foreach (var item in list)
+                        {
+                            SqlBuilderProvider.In(Expression.Constant(item, item.GetType()), sqlPack);
+                            sqlPack += ",";
+                        }
+                    }
+                }
+                else
+                {
+                    SqlBuilderProvider.In(Expression.Constant(val, val.GetType()), sqlPack);
+                }
+                if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
+                    sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
+                sqlPack += ")";
+            }
+            return sqlPack;
+        }
+
+        /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
@@ -440,7 +491,7 @@ namespace SQLBuilder.Core
             var key = expression.Method;
             if (key.IsGenericMethod)
                 key = key.GetGenericMethodDefinition();
-            if (_Methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlPack> action))
+            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlPack> action))
             {
                 action(expression, sqlPack);
                 return sqlPack;

@@ -8,7 +8,6 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
         <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
-        <PackageIconUrl>https://zqlovejyc.gitee.io/zqutils-js/Images/SQL.png</PackageIconUrl>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
         <PackageReleaseNotes>1.修复ToDynamicParameters扩展方法把参数名前缀全部替换成@的BUG；
 2.更新nuget引用包为最新稳定版本；</PackageReleaseNotes>

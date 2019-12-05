@@ -994,6 +994,76 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT A.Id,A.City_Name,A.Age,A.Address FROM \"Base_City3\" AS A WHERE TRIM(A.City_Name) LIKE '%' || TRIM(@Param0) || '%'", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询49
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_49()
+        {
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => new[] { "a", "b", "c" }.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询50
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_50()
+        {
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => !new[] { "a", "b", "c" }.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name NOT IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询51
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_51()
+        {
+            var array = new[] { "a", "b", "c" };
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => !array.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name NOT IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询52
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_52()
+        {
+            var array = new[] { "a", "b", "c" };
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => !x.Name.In(array));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name NOT IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询53
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_53()
+        {
+            var array = new[] { "a", "b", "c" };
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => !x.Name.NotIn(array));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询54
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_54()
+        {
+            var array = new[] { "a", "b", "c" };
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => !!array.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

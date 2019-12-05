@@ -436,7 +436,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => new { o.Id, o.Name })
                                     .Where(u => u.Name == entity.name);
             Assert.AreEqual("SELECT A.Id,A.Name FROM [Base_UserInfo] AS A WHERE A.Name = @Param0", builder.Sql);
-            Assert.AreEqual(1, builder.Parameters.Count);
+            Assert.AreEqual("新用户", builder.Parameters.First().Value);
         }
 
         /// <summary>

@@ -161,7 +161,8 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
 		public override SqlPack Where(MemberExpression expression, SqlPack sqlPack)
         {
-            if (expression.Expression.NodeType == ExpressionType.MemberAccess)
+            //此处判断expression的Member是否是可空值类型
+            if (expression.Expression.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType.IsNullable())
             {
                 expression = expression.Expression as MemberExpression;
             }

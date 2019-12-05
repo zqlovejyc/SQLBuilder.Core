@@ -2,16 +2,18 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.3.0</AssemblyVersion>
+        <AssemblyVersion>1.0.3.1</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.3.0</Version>
+        <Version>1.0.3.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL</Description>
-        <Copyright>Copyright © 2018 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.修复ToDynamicParameters扩展方法把参数名前缀全部替换成@的BUG；
-2.更新nuget引用包为最新稳定版本；</PackageReleaseNotes>
-        <FileVersion>1.0.3.0</FileVersion>
+        <PackageReleaseNotes>1.修复FindEntity主键值为null抛出异常bug；
+2.修复Lambda表达式中部分Contains方法sql解析错误bug；
+3.修复IN和NOT IN取非语法解析错误bug；
+4.nuget引用包更新至最新版本；</PackageReleaseNotes>
+        <FileVersion>1.0.3.1</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
     </PropertyGroup>
 
@@ -26,17 +28,17 @@
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.0.30" />
-        <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="3.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
-        <PackageReference Include="MySql.Data" Version="8.0.17" />
-        <PackageReference Include="Npgsql" Version="4.1.1" />
-        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.31" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.0" />
+        <PackageReference Include="MySql.Data" Version="8.0.18" />
+        <PackageReference Include="Npgsql" Version="4.1.2" />
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.50" />
+        <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
         <PackageReference Include="System.Data.Common" Version="4.3.0" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+        <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
     </ItemGroup>
 
 </Project>

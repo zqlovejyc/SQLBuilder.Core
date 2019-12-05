@@ -191,6 +191,30 @@ namespace SQLBuilder.Core
                             if (index != -1) sqlPack.Sql.Replace("LIKE", "NOT LIKE", index, 4);
                         }
 
+                        //NOT IN、IN
+                        if (subString.Contains("NOT IN"))
+                        {
+                            var index = sqlPack.ToString().LastIndexOf("NOT IN");
+                            if (index != -1) sqlPack.Sql.Replace("NOT IN", "IN", index, 6);
+                        }
+                        if (subString.Contains("IN") && subString.LastIndexOf("IN") != (subString.LastIndexOf("NOT IN") + 4))
+                        {
+                            var index = sqlPack.ToString().LastIndexOf("IN");
+                            if (index != -1) sqlPack.Sql.Replace("IN", "NOT IN", index, 2);
+                        }
+
+                        //AND、OR
+                        if (subString.Contains("AND"))
+                        {
+                            var index = sqlPack.ToString().LastIndexOf("AND");
+                            if (index != -1) sqlPack.Sql.Replace("AND", "OR", index, 3);
+                        }
+                        if (subString.Contains("OR"))
+                        {
+                            var index = sqlPack.ToString().LastIndexOf("OR");
+                            if (index != -1) sqlPack.Sql.Replace("OR", "AND", index, 2);
+                        }
+
                         //=、<>
                         if (subString.Contains(" = "))
                         {
@@ -225,18 +249,6 @@ namespace SQLBuilder.Core
                         {
                             var index = sqlPack.ToString().LastIndexOf(" <= ");
                             if (index != -1) sqlPack.Sql.Replace(" <= ", " > ", index, 4);
-                        }
-
-                        //AND、OR
-                        if (subString.Contains("AND"))
-                        {
-                            var index = sqlPack.ToString().LastIndexOf("AND");
-                            if (index != -1) sqlPack.Sql.Replace("AND", "OR", index, 3);
-                        }
-                        if (subString.Contains("OR"))
-                        {
-                            var index = sqlPack.ToString().LastIndexOf("OR");
-                            if (index != -1) sqlPack.Sql.Replace("OR", "AND", index, 2);
                         }
                     }
                 }

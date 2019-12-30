@@ -304,6 +304,8 @@ namespace SQLBuilder.Core
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, false).columnName;
+                if (orders?.Length > 0)
+                    sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {

@@ -92,6 +92,8 @@ namespace SQLBuilder.Core
             var tableAlias = sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
             sqlPack += tableAlias + expression.Value.ToString();
+            if (orders?.Length > 0)
+                sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             return sqlPack;
         }
         #endregion

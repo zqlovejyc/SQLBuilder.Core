@@ -161,7 +161,11 @@ namespace SQLBuilder.Core
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
                 //若表达式右侧为bool类型，且为false时，条件取非
-                if (expression.Right.NodeType == ExpressionType.Constant && expression.Right.ToObject() is bool r)
+                if ((expression.Right.NodeType == ExpressionType.Constant
+                    || (expression.Right.NodeType == ExpressionType.Convert
+                    && expression.Right is UnaryExpression unary
+                    && unary.Operand.NodeType == ExpressionType.Constant))
+                    && expression.Right.ToObject() is bool r)
                 {
                     if (!r)
                     {

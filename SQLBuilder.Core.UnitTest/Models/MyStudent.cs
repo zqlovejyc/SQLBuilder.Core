@@ -14,5 +14,7 @@ namespace SQLBuilder.Core.UnitTest
         public string Name { get; set; }
         public string Subject { get; set; }
         public decimal? Score { get; set; }
+        public bool? IsEffective { get; set; }
+        public bool IsOnLine { get; set; }
     }
 }

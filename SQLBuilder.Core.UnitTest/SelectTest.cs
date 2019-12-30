@@ -1064,6 +1064,83 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.Name IN (@Param0,@Param1,@Param2)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询55
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_55()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => x.IsEffective.Value);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective = 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询56
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_56()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => x.IsEffective == true);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective = 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询57
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_57()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => x.IsEffective == false);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective <> 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询58
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_58()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => x.IsEffective == true && x.IsOnLine);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective = 1 AND A.IsOnLine = 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询59
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_59()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => x.IsEffective == true && x.IsOnLine == true);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective = 1 AND A.IsOnLine = 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询60
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_60()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => !x.IsEffective.Value && !x.IsOnLine);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective <> 1 AND A.IsOnLine <> 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询61
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_61()
+        {
+            var builder = SqlBuilder.Select<MyStudent>().Where(x => !x.IsEffective == true && !x.IsOnLine == true);
+            Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.IsEffective <> 1 AND A.IsOnLine <> 1", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

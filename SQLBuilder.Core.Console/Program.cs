@@ -110,6 +110,21 @@ namespace SQLBuilder.Core
                 "查询单表多个字段 起别名"
             );
 
+            Print(
+               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective.Value && x.IsOnLine),
+               "查询单表，带where bool类型字段"
+            );
+
+            Print(
+               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => !x.IsEffective.Value && !x.IsOnLine),
+               "查询单表，带where bool类型字段"
+            );
+
+            Print(
+               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective == true && x.IsOnLine == false),
+               "查询单表，带where bool类型字段"
+            );
+
             var entity = new { name = "新用户" };
             Print(
                 SqlBuilder.Select<UserInfo>(o => new { o.Id, o.Name })

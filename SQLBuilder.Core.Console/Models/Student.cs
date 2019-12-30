@@ -15,5 +15,6 @@ namespace SQLBuilder.Core
         public int? Age { get; set; }
         public DateTime? CreateTime { get; set; } = DateTime.Now;
         public bool? IsEffective { get; set; } = true;
+        public bool IsOnLine { get; set; }
     }
 }

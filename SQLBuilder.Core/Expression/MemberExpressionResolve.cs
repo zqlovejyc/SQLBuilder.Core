@@ -178,6 +178,11 @@ namespace SQLBuilder.Core
                     var tableAlias = sqlPack.GetTableAlias(tableName);
                     if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
                     sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName;
+                    //字段是bool类型
+                    if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
+                    {
+                        sqlPack += " = 1";
+                    }
                 }
                 else
                 {

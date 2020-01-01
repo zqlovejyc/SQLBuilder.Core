@@ -320,6 +320,67 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id DESC,A.Email DESC", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 排序12
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_12()
+        {
+            var orderField = "Id";
+            var builder = SqlBuilder.Select<UserInfo>()
+                                    .OrderBy(u => orderField, OrderType.Descending);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id DESC", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序13
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_13()
+        {
+            var builder = SqlBuilder.Select<UserInfo>()
+                                    .OrderBy(u => u.Id, OrderType.Descending);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id DESC", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序14
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_14()
+        {
+            var builder = SqlBuilder.Select<UserInfo>()
+                                    .OrderBy(u => u.Id, OrderType.Ascending);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id ASC", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序15
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_15()
+        {
+            var builder = SqlBuilder.Select<UserInfo>()
+                                    .OrderBy(u => u.Id);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序16
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_16()
+        {
+            var builder = SqlBuilder.Select<UserInfo>()
+                                    .OrderBy(u => "Id DESC");
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A ORDER BY A.Id DESC", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Top

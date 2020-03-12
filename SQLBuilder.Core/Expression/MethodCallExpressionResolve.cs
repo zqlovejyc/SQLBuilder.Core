@@ -264,48 +264,39 @@ namespace SQLBuilder.Core
         {
             if (expression.Object != null)
             {
-                if (expression.Arguments[0].NodeType == ExpressionType.MemberAccess)
+                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                switch (sqlPack.DatabaseType)
                 {
-                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-                    sqlPack += " IN ";
-                    SqlBuilderProvider.In(expression.Object, sqlPack);
+                    case DatabaseType.SQLServer:
+                        sqlPack += " LIKE '%' + ";
+                        break;
+                    case DatabaseType.MySQL:
+                    case DatabaseType.PostgreSQL:
+                        sqlPack += " LIKE CONCAT('%',";
+                        break;
+                    case DatabaseType.Oracle:
+                    case DatabaseType.SQLite:
+                        sqlPack += " LIKE '%' || ";
+                        break;
+                    default:
+                        break;
                 }
-                else
+                SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
+                switch (sqlPack.DatabaseType)
                 {
-                    SqlBuilderProvider.Where(expression.Object, sqlPack);
-                    switch (sqlPack.DatabaseType)
-                    {
-                        case DatabaseType.SQLServer:
-                            sqlPack += " LIKE '%' + ";
-                            break;
-                        case DatabaseType.MySQL:
-                        case DatabaseType.PostgreSQL:
-                            sqlPack += " LIKE CONCAT('%',";
-                            break;
-                        case DatabaseType.Oracle:
-                        case DatabaseType.SQLite:
-                            sqlPack += " LIKE '%' || ";
-                            break;
-                        default:
-                            break;
-                    }
-                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-                    switch (sqlPack.DatabaseType)
-                    {
-                        case DatabaseType.SQLServer:
-                            sqlPack += " + '%'";
-                            break;
-                        case DatabaseType.MySQL:
-                        case DatabaseType.PostgreSQL:
-                            sqlPack += ",'%')";
-                            break;
-                        case DatabaseType.Oracle:
-                        case DatabaseType.SQLite:
-                            sqlPack += " || '%'";
-                            break;
-                        default:
-                            break;
-                    }
+                    case DatabaseType.SQLServer:
+                        sqlPack += " + '%'";
+                        break;
+                    case DatabaseType.MySQL:
+                    case DatabaseType.PostgreSQL:
+                        sqlPack += ",'%')";
+                        break;
+                    case DatabaseType.Oracle:
+                    case DatabaseType.SQLite:
+                        sqlPack += " || '%'";
+                        break;
+                    default:
+                        break;
                 }
             }
             else if (expression.Arguments.Count > 1 && expression.Arguments[1] is MemberExpression memberExpression)

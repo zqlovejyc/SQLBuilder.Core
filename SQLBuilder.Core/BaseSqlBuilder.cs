@@ -34,7 +34,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Update(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Update方法");
+        public virtual SqlPack Update(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Update方法");
 
         /// <summary>
         /// Insert
@@ -42,7 +42,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Insert(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Insert方法");
+        public virtual SqlPack Insert(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Insert方法");
 
         /// <summary>
         /// Select
@@ -50,7 +50,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Select(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Select方法");
+        public virtual SqlPack Select(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Select方法");
 
         /// <summary>
         /// Join
@@ -58,7 +58,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Join(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Join方法");
+        public virtual SqlPack Join(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Join方法");
 
         /// <summary>
         /// Where
@@ -66,7 +66,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Where(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Where方法");
+        public virtual SqlPack Where(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Where方法");
 
         /// <summary>
         /// In
@@ -74,7 +74,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack In(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.In方法");
+        public virtual SqlPack In(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.In方法");
 
         /// <summary>
         /// GroupBy
@@ -82,7 +82,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack GroupBy(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.GroupBy方法");
+        public virtual SqlPack GroupBy(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.GroupBy方法");
 
         /// <summary>
         /// OrderBy
@@ -91,7 +91,7 @@ namespace SQLBuilder.Core
         /// <param name="sqlPack">sql打包对象</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack OrderBy(T expression, SqlPack sqlPack, params OrderType[] orders) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.OrderBy方法");
+        public virtual SqlPack OrderBy(T expression, SqlPack sqlPack, params OrderType[] orders) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.OrderBy方法");
 
         /// <summary>
         /// Max
@@ -99,7 +99,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Max(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Max方法");
+        public virtual SqlPack Max(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Max方法");
 
         /// <summary>
         /// Min
@@ -107,7 +107,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Min(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Min方法");
+        public virtual SqlPack Min(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Min方法");
 
         /// <summary>
         /// Avg
@@ -115,7 +115,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Avg(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Avg方法");
+        public virtual SqlPack Avg(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Avg方法");
 
         /// <summary>
         /// Count
@@ -123,7 +123,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Count(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Count方法");
+        public virtual SqlPack Count(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Count方法");
 
         /// <summary>
         /// Sum
@@ -131,7 +131,7 @@ namespace SQLBuilder.Core
         /// <param name="expression">表达式树</param>
         /// <param name="sqlPack">sql打包对象</param>
         /// <returns>SqlPack</returns>
-        public virtual SqlPack Sum(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ToSql.Sum方法");
+        public virtual SqlPack Sum(T expression, SqlPack sqlPack) => throw new NotImplementedException("未实现" + typeof(T).Name + "ISqlBuilder.Sum方法");
         #endregion
 
         #region Implementation ISqlBuilder Interface

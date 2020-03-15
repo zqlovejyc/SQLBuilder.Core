@@ -1047,5 +1047,51 @@ namespace SQLBuilder.Core
             return Regex.IsMatch(@this, value, options);
         }
         #endregion
+
+        #region Attribute
+        /// <summary>
+        /// 获取首个指定特性
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T GetAttribute<T>(this MemberInfo @this) where T : Attribute
+        {
+            return @this.GetFirstOrDefaultAttribute<T>() as T;
+        }
+
+        /// <summary>
+        /// 获取指定特性集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static object[] GetAttributes<T>(this MemberInfo @this) where T : Attribute
+        {
+            return @this?.GetCustomAttributes(typeof(T), false);
+        }
+
+        /// <summary>
+        /// 获取首个指定特性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static object GetFirstOrDefaultAttribute<T>(this MemberInfo @this) where T : Attribute
+        {
+            return @this.GetAttributes<T>()?.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 是否包含指定特性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool ContainsAttribute<T>(this MemberInfo @this) where T : Attribute
+        {
+            return @this.GetAttributes<T>()?.Length > 0;
+        }
+        #endregion
     }
 }

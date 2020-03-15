@@ -23,13 +23,15 @@ using System.Reflection;
 using System.Text;
 
 #region Refrence Alias
-/******************TableAttribute*******************/
+//Table
 using CusTableAttribute = SQLBuilder.Core.TableAttribute;
 using SysTableAttribute = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
-/******************ColumnAttribute*******************/
+
+//Column
 using CusColumnAttribute = SQLBuilder.Core.ColumnAttribute;
 using SysColumnAttribute = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
-/******************KeyAttribute*******************/
+
+//Key
 using CusKeyAttribute = SQLBuilder.Core.KeyAttribute;
 using SysKeyAttribute = System.ComponentModel.DataAnnotations.KeyAttribute;
 #endregion
@@ -339,33 +341,33 @@ namespace SQLBuilder.Core
             var isInsert = true;
             var isUpdate = true;
             var props = type.GetProperties();
-            var isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(CusColumnAttribute), false).Length > 0).Count() > 0;
+            var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
             if (!isHaveColumnAttribute)
             {
-                isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(SysColumnAttribute), false).Length > 0).Count() > 0;
+                isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
             }
             if (isHaveColumnAttribute)
             {
-                if (member?.GetCustomAttributes(typeof(CusColumnAttribute), false).FirstOrDefault() is CusColumnAttribute cca)
+                if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
                 {
                     columnName = cca.Name;
                     isInsert = cca.Insert;
                     isUpdate = cca.Update;
                 }
-                else if (member?.GetCustomAttributes(typeof(SysColumnAttribute), false).FirstOrDefault() is SysColumnAttribute sca)
+                else if (member?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
                 {
                     columnName = sca.Name;
                 }
                 else
                 {
-                    var p = props.Where(o => o.Name == member?.Name).FirstOrDefault();
-                    if (p?.GetCustomAttributes(typeof(CusColumnAttribute), false).FirstOrDefault() is CusColumnAttribute cus)
+                    var p = props.Where(x => x.Name == member?.Name).FirstOrDefault();
+                    if (p?.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
                     {
                         columnName = cus.Name;
                         isInsert = cus.Insert;
                         isUpdate = cus.Update;
                     }
-                    else if (p?.GetCustomAttributes(typeof(SysColumnAttribute), false).FirstOrDefault() is SysColumnAttribute sys)
+                    else if (p?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
                     {
                         columnName = sys.Name;
                     }
@@ -373,71 +375,13 @@ namespace SQLBuilder.Core
             }
             columnName = columnName ?? member?.Name;
             //判断列是否是Key
-            if (member?.GetCustomAttributes(typeof(CusKeyAttribute), false).FirstOrDefault() is CusKeyAttribute cka)
+            if (member?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
             {
                 isUpdate = false;
-                if (!string.IsNullOrEmpty(cka.Name) && cka.Name != columnName) columnName = cka.Name;
+                if (!cka.Name.IsNullOrEmpty() && cka.Name != columnName)
+                    columnName = cka.Name;
             }
-            else if (member?.GetCustomAttributes(typeof(SysKeyAttribute), false).FirstOrDefault() is SysKeyAttribute ska)
-            {
-                isUpdate = false;
-            }
-            return ((isFormat || this.DatabaseType == DatabaseType.PostgreSQL ? this.GetFormatColumnName(columnName) : columnName), isInsert, isUpdate);
-        }
-
-        /// <summary>
-        /// GetColumnInfo
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <param name="property">属性</param>
-        /// <param name="isFormat">是否格式化</param>
-        /// <returns>Tuple</returns>
-        public (string columnName, bool isInsert, bool isUpdate) GetColumnInfo(Type type, PropertyInfo property, bool isFormat = true)
-        {
-            string columnName = null;
-            var isInsert = true;
-            var isUpdate = true;
-            var props = type.GetProperties();
-            var isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(CusColumnAttribute), false).Length > 0).Count() > 0;
-            if (!isHaveColumnAttribute)
-            {
-                isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(SysColumnAttribute), false).Length > 0).Count() > 0;
-            }
-            if (isHaveColumnAttribute)
-            {
-                if (property?.GetCustomAttributes(typeof(CusColumnAttribute), false).FirstOrDefault() is CusColumnAttribute cca)
-                {
-                    columnName = cca.Name;
-                    isInsert = cca.Insert;
-                    isUpdate = cca.Update;
-                }
-                else if (property?.GetCustomAttributes(typeof(SysColumnAttribute), false).FirstOrDefault() is SysColumnAttribute sca)
-                {
-                    columnName = sca.Name;
-                }
-                else
-                {
-                    var p = props.Where(o => o.Name == property?.Name).FirstOrDefault();
-                    if (p?.GetCustomAttributes(typeof(CusColumnAttribute), false).FirstOrDefault() is CusColumnAttribute cus)
-                    {
-                        columnName = cus.Name;
-                        isInsert = cus.Insert;
-                        isUpdate = cus.Update;
-                    }
-                    else if (p?.GetCustomAttributes(typeof(SysColumnAttribute), false).FirstOrDefault() is SysColumnAttribute sys)
-                    {
-                        columnName = sys.Name;
-                    }
-                }
-            }
-            columnName = columnName ?? property?.Name;
-            //判断列是否是Key
-            if (property?.GetCustomAttributes(typeof(CusKeyAttribute), false).FirstOrDefault() is CusKeyAttribute cka)
-            {
-                isUpdate = false;
-                if (!string.IsNullOrEmpty(cka.Name) && cka.Name != columnName) columnName = cka.Name;
-            }
-            else if (property?.GetCustomAttributes(typeof(SysKeyAttribute), false).FirstOrDefault() is SysKeyAttribute ska)
+            else if (member?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
             {
                 isUpdate = false;
             }
@@ -456,27 +400,27 @@ namespace SQLBuilder.Core
         {
             var result = new List<(string key, string property)>();
             var props = type.GetProperties();
-            var isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(CusKeyAttribute), false).Length > 0).Count() > 0;
+            var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
             if (!isHaveColumnAttribute)
             {
-                isHaveColumnAttribute = props.Where(d => d.GetCustomAttributes(typeof(SysKeyAttribute), false).Length > 0).Count() > 0;
+                isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
             }
             if (isHaveColumnAttribute)
             {
-                var properties = props.Where(d => d.GetCustomAttributes(typeof(CusKeyAttribute), false).Length > 0).ToList();
+                var properties = props.Where(x => x.ContainsAttribute<CusKeyAttribute>()).ToList();
                 if (properties.Count() == 0)
                 {
-                    properties = props.Where(d => d.GetCustomAttributes(typeof(SysKeyAttribute), false).Length > 0).ToList();
+                    properties = props.Where(x => x.ContainsAttribute<SysKeyAttribute>()).ToList();
                 }
                 foreach (var property in properties)
                 {
                     var propertyName = property?.Name;
                     string keyName = null;
-                    if (property?.GetCustomAttributes(typeof(CusKeyAttribute), false).FirstOrDefault() is CusKeyAttribute cka)
+                    if (property?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
                     {
                         keyName = cka.Name ?? propertyName;
                     }
-                    else if (property?.GetCustomAttributes(typeof(SysKeyAttribute), false).FirstOrDefault() is SysKeyAttribute ska)
+                    else if (property?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
                     {
                         keyName = propertyName;
                     }

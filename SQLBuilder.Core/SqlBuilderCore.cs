@@ -796,6 +796,8 @@ namespace SQLBuilder.Core
         public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
         {
             var sb = new StringBuilder();
+            if (!orderField.ToUpper().Contains(" ASC") && !orderField.ToUpper().Contains(" DESC"))
+                orderField = this._sqlPack.GetColumnName(orderField);
             if (!string.IsNullOrEmpty(sql))
             {
                 this._sqlPack.DbParams.Clear();
@@ -858,6 +860,8 @@ namespace SQLBuilder.Core
         public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
         {
             var sb = new StringBuilder();
+            if (!orderField.ToUpper().Contains(" ASC") && !orderField.ToUpper().Contains(" DESC"))
+                orderField = this._sqlPack.GetColumnName(orderField);
             if (!string.IsNullOrEmpty(sql))
             {
                 this._sqlPack.DbParams.Clear();

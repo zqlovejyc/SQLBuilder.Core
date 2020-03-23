@@ -130,7 +130,7 @@ namespace SQLBuilder.Core
             sqlPack.SetTableAlias(tableName);
             string tableAlias = sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            sqlPack.SelectFields.Add(tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName);
+            sqlPack.SelectFields.Add(tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
             return sqlPack;
         }
 
@@ -149,7 +149,7 @@ namespace SQLBuilder.Core
             sqlPack.SetTableAlias(tableName);
             string tableAlias = sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName;
+            sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
             return sqlPack;
         }
 
@@ -177,7 +177,7 @@ namespace SQLBuilder.Core
                     sqlPack.SetTableAlias(tableName);
                     var tableAlias = sqlPack.GetTableAlias(tableName);
                     if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-                    sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, string.IsNullOrEmpty(tableAlias)).columnName;
+                    sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
                     {
@@ -243,7 +243,7 @@ namespace SQLBuilder.Core
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, false).columnName + ",";
+                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName + ",";
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
@@ -303,7 +303,7 @@ namespace SQLBuilder.Core
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member, false).columnName;
+                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                 if (orders?.Length > 0)
                     sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }

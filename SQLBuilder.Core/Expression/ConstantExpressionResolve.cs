@@ -74,7 +74,7 @@ namespace SQLBuilder.Core
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            sqlPack += tableAlias + expression.Value.ToString() + ",";
+            sqlPack += tableAlias + sqlPack.GetColumnName(expression.Value.ToString()) + ",";
             return sqlPack;
         }
 
@@ -91,7 +91,10 @@ namespace SQLBuilder.Core
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            sqlPack += tableAlias + expression.Value.ToString();
+            var field = expression.Value.ToString();
+            if (!field.ToUpper().Contains(" ASC") && !field.ToUpper().Contains(" DESC"))
+                field = sqlPack.GetColumnName(field);
+            sqlPack += tableAlias + field;
             if (orders?.Length > 0)
                 sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             return sqlPack;

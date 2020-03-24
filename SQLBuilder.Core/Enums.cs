@@ -57,7 +57,7 @@ namespace SQLBuilder.Core
     /// </summary>
     public enum OrderType
     {
-         /// <summary>
+        /// <summary>
         /// 升序
         /// </summary>
         Ascending,
@@ -66,6 +66,29 @@ namespace SQLBuilder.Core
         /// 降序
         /// </summary>
         Descending
+    }
+    #endregion
+
+    #region DependencyInjectionType
+    /// <summary>
+    /// 依赖注入类型
+    /// </summary>
+    public enum DependencyInjectionType
+    {
+        /// <summary>
+        /// 单例模式
+        /// </summary>
+        Singleton,
+
+        /// <summary>
+        /// 瞬时模式
+        /// </summary>
+        Transient,
+
+        /// <summary>
+        /// 作用域模式
+        /// </summary>
+        Scoped
     }
     #endregion
 }

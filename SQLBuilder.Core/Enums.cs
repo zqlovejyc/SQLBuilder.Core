@@ -71,7 +71,7 @@ namespace SQLBuilder.Core
 
     #region DependencyInjectionType
     /// <summary>
-    /// 依赖注入类型
+    /// 依赖注入模式
     /// </summary>
     public enum DependencyInjectionType
     {

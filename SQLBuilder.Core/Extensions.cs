@@ -1101,10 +1101,10 @@ namespace SQLBuilder.Core
         /// <summary>
         /// SQLBuilder仓储注入扩展
         /// </summary>
-        /// <param name="this">注入集合</param>
-        /// <param name="configuration">配置</param>
+        /// <param name="this">依赖注入服务集合</param>
+        /// <param name="configuration">服务配置</param>
         /// <param name="defaultName">默认数据库名称</param>
-        /// <param name="type">注入类型</param>
+        /// <param name="type">依赖注入模式，默认单例模式</param>
         /// <returns></returns>
         /// <example>
         ///     <code>

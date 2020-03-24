@@ -18,9 +18,12 @@
 
 using Dapper;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
+using SQLBuilder.Core.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -1091,6 +1094,142 @@ namespace SQLBuilder.Core
         public static bool ContainsAttribute<T>(this MemberInfo @this) where T : Attribute
         {
             return @this.GetAttributes<T>()?.Length > 0;
+        }
+        #endregion
+
+        #region AddSQLBuilder
+        /// <summary>
+        /// SQLBuilder仓储注入Singleton扩展
+        /// </summary>
+        /// <param name="this">IServiceCollection</param>
+        /// <param name="configuration">IConfiguration</param>
+        /// <param name="defaultKey">The default database name</param>
+        /// <returns></returns>
+        /// <example>
+        ///     <code>
+        ///     //appsetting.json
+        ///     {
+        ///             "Logging": {
+        ///             "LogLevel": {
+        ///                 "Default": "Information",
+        ///                 "Microsoft": "Warning",
+        ///                 "Microsoft.Hosting.Lifetime": "Information"
+        ///             }
+        ///         },
+        ///         "AllowedHosts": "*",
+        ///         //系统数据库配置
+        ///         "ConnectionStrings": {
+        ///             "Base": [ "SQLServer", "数据库连接字符串" ],
+        ///             "Sqlserver": [ "SQLServer", "数据库连接字符串" ],
+        ///             "Oracle": [ "Oracle", "数据库连接字符串" ],
+        ///             "MySql": [ "MySQL", "数据库连接字符串" ],
+        ///             "Sqlite": [ "SQLite", "数据库连接字符串" ],
+        ///             "Pgsql": [ "PostgreSQL", "数据库连接字符串" ]
+        ///         }
+        ///     }
+        ///     //Controller获取方法
+        ///     private readonly IRepository _repository;
+        ///     public WeatherForecastController(Func&lt;string, IRepository&gt; accesor)
+        ///     {
+        ///         _repository = accesor("Sqlserver");
+        ///     }
+        ///     </code>
+        /// </example>
+        public static IServiceCollection AddSingletonSQLBuilder(this IServiceCollection @this, IConfiguration configuration, string defaultKey)
+        {
+            @this.AddSingleton(factory =>
+            {
+                Func<string, IRepository> accesor = key =>
+                {
+                    key = key.IsNullOrEmpty() ? defaultKey : key;
+                    var config = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
+                    var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), config[0]);
+                    switch (databaseType)
+                    {
+                        case DatabaseType.SQLServer:
+                            return new SqlRepository(config[1]);
+                        case DatabaseType.MySQL:
+                            return new MySqlRepository(config[1]);
+                        case DatabaseType.Oracle:
+                            return new OracleRepository(config[1]);
+                        case DatabaseType.SQLite:
+                            return new SqliteRepository(config[1]);
+                        case DatabaseType.PostgreSQL:
+                            return new NpgsqlRepository(config[1]);
+                        default:
+                            throw new Exception("Error DataBase Type!");
+                    }
+                };
+                return accesor;
+            });
+            return @this;
+        }
+
+        /// <summary>
+        /// SQLBuilder仓储注入Transient扩展
+        /// </summary>
+        /// <param name="this">IServiceCollection</param>
+        /// <param name="configuration">IConfiguration</param>
+        /// <param name="defaultKey">The default database name</param>
+        /// <returns></returns>
+        /// <example>
+        ///     <code>
+        ///     //appsetting.json
+        ///     {
+        ///             "Logging": {
+        ///             "LogLevel": {
+        ///                 "Default": "Information",
+        ///                 "Microsoft": "Warning",
+        ///                 "Microsoft.Hosting.Lifetime": "Information"
+        ///             }
+        ///         },
+        ///         "AllowedHosts": "*",
+        ///         //系统数据库配置
+        ///         "ConnectionStrings": {
+        ///             "Base": [ "SQLServer", "数据库连接字符串" ],
+        ///             "Sqlserver": [ "SQLServer", "数据库连接字符串" ],
+        ///             "Oracle": [ "Oracle", "数据库连接字符串" ],
+        ///             "MySql": [ "MySQL", "数据库连接字符串" ],
+        ///             "Sqlite": [ "SQLite", "数据库连接字符串" ],
+        ///             "Pgsql": [ "PostgreSQL", "数据库连接字符串" ]
+        ///         }
+        ///     }
+        ///     //Controller获取方法
+        ///     private readonly IRepository _repository;
+        ///     public WeatherForecastController(Func&lt;string, IRepository&gt; accesor)
+        ///     {
+        ///         _repository = accesor("Sqlserver");
+        ///     }
+        ///     </code>
+        /// </example>
+        public static IServiceCollection AddTransientSQLBuilder(this IServiceCollection @this, IConfiguration configuration, string defaultKey)
+        {
+            @this.AddTransient(factory =>
+            {
+                Func<string, IRepository> accesor = key =>
+                {
+                    key = key.IsNullOrEmpty() ? defaultKey : key;
+                    var config = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
+                    var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), config[0]);
+                    switch (databaseType)
+                    {
+                        case DatabaseType.SQLServer:
+                            return new SqlRepository(config[1]);
+                        case DatabaseType.MySQL:
+                            return new MySqlRepository(config[1]);
+                        case DatabaseType.Oracle:
+                            return new OracleRepository(config[1]);
+                        case DatabaseType.SQLite:
+                            return new SqliteRepository(config[1]);
+                        case DatabaseType.PostgreSQL:
+                            return new NpgsqlRepository(config[1]);
+                        default:
+                            throw new Exception("Error DataBase Type!");
+                    }
+                };
+                return accesor;
+            });
+            return @this;
         }
         #endregion
     }

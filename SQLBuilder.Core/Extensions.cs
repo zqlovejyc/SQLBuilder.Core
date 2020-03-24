@@ -1155,7 +1155,7 @@ namespace SQLBuilder.Core
                     case DatabaseType.PostgreSQL:
                         return new NpgsqlRepository(config[1]);
                     default:
-                        throw new Exception("Error DataBase Type!");
+                        throw new ArgumentException("数据库类型配置有误！");
                 }
             };
             switch (type)
@@ -1175,5 +1175,57 @@ namespace SQLBuilder.Core
             return @this;
         }
         #endregion
+    }
+
+    /// <summary>
+    /// Oracle DynamicParameters实现，用于支持Oracle游标类型
+    /// </summary>
+    public class OracleDynamicParameters : SqlMapper.IDynamicParameters
+    {
+        private readonly DynamicParameters dynamicParameters = new DynamicParameters();
+
+        private readonly List<OracleParameter> oracleParameters = new List<OracleParameter>();
+
+        /// <summary>
+        /// Add
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="oracleDbType"></param>
+        /// <param name="direction"></param>
+        public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction)
+        {
+            var oracleParameter = new OracleParameter(name, oracleDbType, direction);
+            oracleParameters.Add(oracleParameter);
+        }
+
+        /// <summary>
+        /// Add
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="oracleDbType"></param>
+        /// <param name="direction"></param>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction, object value = null, int? size = null)
+        {
+            OracleParameter oracleParameter;
+            if (size.HasValue)
+                oracleParameter = new OracleParameter(name, oracleDbType, size.Value, value, direction);
+            else
+                oracleParameter = new OracleParameter(name, oracleDbType, value, direction);
+            oracleParameters.Add(oracleParameter);
+        }
+
+        /// <summary>
+        /// AddParameters
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="identity"></param>
+        public void AddParameters(IDbCommand command, SqlMapper.Identity identity)
+        {
+            ((SqlMapper.IDynamicParameters)dynamicParameters).AddParameters(command, identity);
+            if (command is OracleCommand oracleCommand)
+                oracleCommand.Parameters.AddRange(oracleParameters.ToArray());
+        }
     }
 }

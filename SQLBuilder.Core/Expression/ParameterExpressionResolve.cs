@@ -34,12 +34,10 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
 		public override SqlPack Select(ParameterExpression expression, SqlPack sqlPack)
         {
-            var type = expression.Type;
-            var tableName = sqlPack.GetTableName(type);
+            var tableName = sqlPack.GetTableName(expression.Type);
             sqlPack.SetTableAlias(tableName);
-            string tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            sqlPack.SelectFields.Add(tableAlias + "*");
+            var tableAlias = sqlPack.GetTableAlias(tableName);
+            sqlPack.SelectFields.Add($"{tableAlias}.*");
             return sqlPack;
         }
         #endregion

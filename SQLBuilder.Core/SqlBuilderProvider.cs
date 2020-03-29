@@ -87,13 +87,18 @@ namespace SQLBuilder.Core
             }
             //表示将委托或lambda表达式应用于参数表达式列表的表达式
             else if (expression is InvocationExpression)
-            {                
+            {
                 return new InvocationExpressionResolve();
             }
             //描述一个lambda表达式
             else if (expression is LambdaExpression)
             {
                 return new LambdaExpressionResolve();
+            }
+            //表示命名参数表达式
+            else if (expression is ParameterExpression)
+            {
+                return new ParameterExpressionResolve();
             }
             #endregion
 
@@ -133,10 +138,6 @@ namespace SQLBuilder.Core
             else if (expression is LoopExpression)
             {
                 throw new NotImplementedException("未实现的LoopExpression2Sql");
-            }
-            else if (expression is ParameterExpression)
-            {
-                throw new NotImplementedException("未实现的ParameterExpression2Sql");
             }
             else if (expression is RuntimeVariablesExpression)
             {

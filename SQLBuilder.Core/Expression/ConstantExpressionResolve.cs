@@ -27,6 +27,29 @@ namespace SQLBuilder.Core
     {
         #region Override Base Class Methods
         /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlPack">sql打包对象</param>
+        /// <returns>SqlPack</returns>
+        public override SqlPack Select(ConstantExpression expression, SqlPack sqlPack)
+        {
+            if (expression.Value == null)
+            {
+                var tableName = sqlPack.GetTableName(sqlPack.DefaultType);
+                string tableAlias = sqlPack.GetTableAlias(tableName);
+                if (!tableAlias.IsNullOrEmpty())
+                    tableAlias += ".";
+                sqlPack.SelectFields.Add($"{tableAlias}*");
+            }
+            else
+            {
+                sqlPack.SelectFields.Add(expression.Value.ToString());
+            }
+            return sqlPack;
+        }
+
+        /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>

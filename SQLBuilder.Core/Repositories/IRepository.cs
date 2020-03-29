@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Repositories
         int CommandTimeout { get; set; }
 
         /// <summary>
-        /// 数据库连接字符串
+        /// 数据库连接串
         /// </summary>
         string ConnectionString { get; set; }
 
@@ -50,6 +50,11 @@ namespace SQLBuilder.Core.Repositories
         /// 事务对象
         /// </summary>
         DbTransaction Transaction { get; set; }
+
+        /// <summary>
+        /// sql拦截委托
+        /// </summary>
+        Func<string, object, string> SqlIntercept { get; set; }
         #endregion
 
         #region Transaction

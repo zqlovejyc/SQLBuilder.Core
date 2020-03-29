@@ -42,9 +42,23 @@ namespace SQLBuilder.Core
 
         #region Public Property
         /// <summary>
+        /// SQL拦截委托
+        /// </summary>
+        public Func<string, object, string> SqlIntercept { get; set; }
+
+        /// <summary>
         /// SQL语句
         /// </summary>
-        public string Sql => this._sqlPack.ToString();
+        public string Sql
+        {
+            get
+            {
+                var sql = this._sqlPack.ToString();
+                //添加sql日志拦截
+                sql = SqlIntercept?.Invoke(sql, this._sqlPack.DbParams) ?? sql;
+                return sql;
+            }
+        }
 
         /// <summary>
         /// SQL格式化参数

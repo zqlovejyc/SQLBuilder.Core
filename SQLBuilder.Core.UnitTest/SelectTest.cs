@@ -1029,7 +1029,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_46()
         {
-            var builder = SqlBuilder.Select<City3>(DatabaseType: DatabaseType.MySQL).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => !string.IsNullOrEmpty(o.CityName) && o.CityName.Trim() == "郑州".Trim());
+            var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.MySQL).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => !string.IsNullOrEmpty(o.CityName) && o.CityName.Trim() == "郑州".Trim());
             Assert.AreEqual("SELECT A.`Id`,A.`City_Name`,A.`Age`,A.`Address` FROM `Base_City3` AS A WHERE (A.`City_Name` IS NOT NULL AND A.`City_Name` <> '') AND TRIM(A.`City_Name`) = TRIM(?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -1040,7 +1040,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_47()
         {
-            var builder = SqlBuilder.Select<City3>(DatabaseType: DatabaseType.MySQL).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
+            var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.MySQL).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
             Assert.AreEqual("SELECT A.`Id`,A.`City_Name`,A.`Age`,A.`Address` FROM `Base_City3` AS A WHERE TRIM(A.`City_Name`) LIKE CONCAT('%',TRIM(?Param0),'%')", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -1051,7 +1051,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_48()
         {
-            var builder = SqlBuilder.Select<City3>(DatabaseType: DatabaseType.SQLite).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
+            var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.SQLite).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
             Assert.AreEqual("SELECT A.\"Id\",A.\"City_Name\",A.\"Age\",A.\"Address\" FROM \"Base_City3\" AS A WHERE TRIM(A.\"City_Name\") LIKE '%' || TRIM(@Param0) || '%'", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -1202,6 +1202,100 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM [student] AS A WHERE A.[IsEffective] <> 1 AND A.[IsOnLine] <> 1", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询62
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_62()
+        {
+            var builder = SqlBuilder
+                                .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                                .Join<Account>((u, a) => u.Id == a.UserId)
+                                .LeftJoin<Account, Student>((a, s) => a.Id == s.AccountId)
+                                .RightJoin<Student, Class>((s, c) => s.Id == c.UserId)
+                                .InnerJoin<Class, City>((c, d) => c.CityId == d.Id)
+                                .FullJoin<City, Country>((c, d) => c.CountryId == d.Id)
+                                .Where(u => u.Id != null);
+            Assert.AreEqual("SELECT A.*,B.[Name],C.[Name] AS StudentName,D.[Name] AS ClassName,E.[City_Name],F.[Name] AS CountryName FROM [Base_UserInfo] AS A JOIN [Base_Account] AS B ON A.[Id] = B.[UserId] LEFT JOIN [Base_Student] AS C ON B.[Id] = C.[AccountId] RIGHT JOIN [Base_Class] AS D ON C.[Id] = D.[UserId] INNER JOIN [Base_City] AS E ON D.[CityId] = E.[Id] FULL JOIN [Base_Country] AS F ON E.[CountryId] = F.[Country_Id] WHERE A.[Id] IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询63
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_63()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(o => o, DatabaseType.MySQL)
+                                    .Where(u => 1 == 1)
+                                    .AndWhere(u => u.Name == "");
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询64
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_64()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(o => new { o }, DatabaseType.MySQL)
+                                    .Where(u => 1 == 1)
+                                    .AndWhere(u => u.Name == "");
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询65
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_65()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(o => null, DatabaseType.MySQL)
+                                    .Where(u => 1 == 1)
+                                    .AndWhere(u => u.Name == "");
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询66
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_66()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(o => "A.*", DatabaseType.MySQL)
+                                    .Where(u => 1 == 1)
+                                    .AndWhere(u => u.Name == "");
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询67
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_67()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Account>((u, a) => null)
+                                    .Join<Account>((u, a) => u.Id == a.UserId && (u.Email == "111" || u.Email == "222"));
+            Assert.AreEqual("SELECT A.* FROM [Base_UserInfo] AS A JOIN [Base_Account] AS B ON A.[Id] = B.[UserId] AND (A.[Email] = @Param0 OR A.[Email] = @Param1)", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询68
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_68()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Account>((u, a) => "B.*")
+                                    .Join<Account>((u, a) => u.Id == a.UserId && (u.Email == "111" || u.Email == "222"));
+            Assert.AreEqual("SELECT B.* FROM [Base_UserInfo] AS A JOIN [Base_Account] AS B ON A.[Id] = B.[UserId] AND (A.[Email] = @Param0 OR A.[Email] = @Param1)", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page
@@ -1211,7 +1305,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Page_01()
         {
-            var builder = SqlBuilder.Select<MyStudent>(DatabaseType: DatabaseType.MySQL)
+            var builder = SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySQL)
                                   .Where(o => o.Score != null)
                                   .AndWhere(o => o.Name == "")
                                   .OrWhere(o => o.Subject == "")
@@ -1226,7 +1320,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Page_02()
         {
-            var builder = SqlBuilder.Select<MyStudent>(DatabaseType: DatabaseType.MySQL)
+            var builder = SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySQL)
                                   .Where(o => o.Score != null)
                                   .AndWhere(o => o.Name == "")
                                   .OrWhere(o => o.Subject == "")
@@ -1289,7 +1383,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Page_07()
         {
-            var builder = SqlBuilder.Select<UserInfo>(DatabaseType: DatabaseType.MySQL).PageByWith(10, 1, "Id", "WITH T AS (SELECT * FROM `Base_UserInfo`)");
+            var builder = SqlBuilder.Select<UserInfo>(databaseType: DatabaseType.MySQL).PageByWith(10, 1, "Id", "WITH T AS (SELECT * FROM `Base_UserInfo`)");
             Assert.AreEqual(@"WITH T AS (SELECT * FROM `Base_UserInfo`) SELECT COUNT(1) AS Total FROM T;WITH T AS (SELECT * FROM `Base_UserInfo`) SELECT * FROM T ORDER BY `Id` LIMIT 10 OFFSET 0;", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }

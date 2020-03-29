@@ -76,6 +76,11 @@ namespace SQLBuilder.Core.Repositories
         /// 事务对象
         /// </summary>
         public DbTransaction Transaction { get; set; }
+
+        /// <summary>
+        /// sql拦截委托
+        /// </summary>
+        public Func<string, object, string> SqlIntercept { get; set; }
         #endregion
 
         #region Constructor
@@ -147,6 +152,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteBySql(string sql)
         {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -170,6 +176,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteBySql(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -193,6 +200,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteBySql(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -215,6 +223,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteByProc(string procName)
         {
+            procName = SqlIntercept?.Invoke(procName, null) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -238,6 +247,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteByProc(string procName, object parameter)
         {
+            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -261,6 +271,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public IEnumerable<T> ExecuteByProc<T>(string procName, object parameter)
         {
+            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
             IEnumerable<T> result = null;
             if (Transaction?.Connection != null)
             {
@@ -284,6 +295,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int ExecuteByProc(string procName, params DbParameter[] dbParameter)
         {
+            procName = SqlIntercept?.Invoke(procName, dbParameter) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -308,6 +320,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteBySqlAsync(string sql)
         {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -331,6 +344,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteBySqlAsync(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -354,6 +368,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteBySqlAsync(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -376,6 +391,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteByProcAsync(string procName)
         {
+            procName = SqlIntercept?.Invoke(procName, null) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -399,6 +415,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteByProcAsync(string procName, object parameter)
         {
+            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -422,6 +439,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<IEnumerable<T>> ExecuteByProcAsync<T>(string procName, object parameter)
         {
+            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
             IEnumerable<T> result = null;
             if (Transaction?.Connection != null)
             {
@@ -445,6 +463,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> ExecuteByProcAsync(string procName, params DbParameter[] dbParameter)
         {
+            procName = SqlIntercept?.Invoke(procName, dbParameter) ?? procName;
             var result = 0;
             if (Transaction?.Connection != null)
             {
@@ -473,7 +492,7 @@ namespace SQLBuilder.Core.Repositories
         public int Insert<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Insert<T>(() => entity, DatabaseType.PostgreSQL, false);
+            var builder = Sql.Insert<T>(() => entity, DatabaseType.PostgreSQL, false, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -535,7 +554,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> InsertAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Insert<T>(() => entity, DatabaseType.PostgreSQL, false);
+            var builder = Sql.Insert<T>(() => entity, DatabaseType.PostgreSQL, false, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -598,7 +617,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>() where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -622,7 +641,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).WithKey(entity);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -682,7 +701,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -710,7 +729,7 @@ namespace SQLBuilder.Core.Repositories
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
-                var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).WithKey(keyValues);
+                var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).WithKey(keyValues);
                 if (Transaction?.Connection != null)
                 {
                     result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -763,15 +782,18 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(string propertyName, object propertyValue) where T : class
         {
             var result = 0;
+            var sql = $"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=:PropertyValue";
+            var parameter = new { PropertyValue = propertyValue };
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                result = Transaction.Connection.Execute($"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=@PropertyValue", new { PropertyValue = propertyValue }, Transaction, commandTimeout: CommandTimeout);
+                result = Transaction.Connection.Execute(sql, parameter, Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    result = connection.Execute($"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=@PropertyValue", new { PropertyValue = propertyValue }, commandTimeout: CommandTimeout);
+                    result = connection.Execute(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -787,7 +809,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>() where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -811,7 +833,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).WithKey(entity);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -871,7 +893,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -899,7 +921,7 @@ namespace SQLBuilder.Core.Repositories
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
-                var builder = Sql.Delete<T>(DatabaseType.PostgreSQL).WithKey(keyValues);
+                var builder = Sql.Delete<T>(DatabaseType.PostgreSQL, SqlIntercept).WithKey(keyValues);
                 if (Transaction?.Connection != null)
                 {
                     result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -952,15 +974,18 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(string propertyName, object propertyValue) where T : class
         {
             var result = 0;
+            var sql = $"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=:PropertyValue";
+            var parameter = new { PropertyValue = propertyValue };
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                result = await Transaction.Connection.ExecuteAsync($"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=@PropertyValue", new { PropertyValue = propertyValue }, Transaction, commandTimeout: CommandTimeout);
+                result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    result = await connection.ExecuteAsync($"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=@PropertyValue", new { PropertyValue = propertyValue }, commandTimeout: CommandTimeout);
+                    result = await connection.ExecuteAsync(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
             return result;
@@ -979,7 +1004,7 @@ namespace SQLBuilder.Core.Repositories
         public int Update<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(() => entity, DatabaseType.PostgreSQL, false).WithKey(entity);
+            var builder = Sql.Update<T>(() => entity, DatabaseType.PostgreSQL, false, SqlIntercept).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1040,7 +1065,7 @@ namespace SQLBuilder.Core.Repositories
         public int Update<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(entity, DatabaseType: DatabaseType.PostgreSQL, isEnableNullValue: false).Where(predicate);
+            var builder = Sql.Update<T>(entity, DatabaseType.PostgreSQL, false, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1066,7 +1091,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> UpdateAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(() => entity, DatabaseType.PostgreSQL, false).WithKey(entity);
+            var builder = Sql.Update<T>(() => entity, DatabaseType.PostgreSQL, false, SqlIntercept).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1127,7 +1152,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(entity, DatabaseType: DatabaseType.PostgreSQL, isEnableNullValue: false).Where(predicate);
+            var builder = Sql.Update<T>(entity, DatabaseType.PostgreSQL, false, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1164,6 +1189,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果对象</returns>
         public object FindObject(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<string>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -1185,6 +1211,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果对象</returns>
         public object FindObject(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<string>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -1218,6 +1245,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果对象</returns>
         public async Task<object> FindObjectAsync(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<string>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -1239,6 +1267,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果对象</returns>
         public async Task<object> FindObjectAsync(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<string>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -1265,7 +1294,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(params object[] keyValues) where T : class
         {
             if (keyValues == null) return default(T);
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).WithKey(keyValues);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1289,7 +1318,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
             if (keyValues == null) return default(T);
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).WithKey(keyValues);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1311,7 +1340,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1334,7 +1363,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1356,6 +1385,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntityBySql<T>(string sql)
         {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1378,6 +1408,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntityBySql<T>(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -1400,6 +1431,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntityBySql<T>(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -1424,7 +1456,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
             if (keyValues == null) return await Task.FromResult(default(T));
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).WithKey(keyValues);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1448,7 +1480,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
             if (keyValues == null) return await Task.FromResult(default(T));
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).WithKey(keyValues);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1470,7 +1502,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1493,7 +1525,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1515,6 +1547,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityBySqlAsync<T>(string sql)
         {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1537,6 +1570,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityBySqlAsync<T>(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -1559,6 +1593,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityBySqlAsync<T>(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -1583,7 +1618,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>() where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1605,7 +1640,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1629,7 +1664,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1651,7 +1686,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1674,7 +1709,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1699,7 +1734,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1722,7 +1757,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>() where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1746,7 +1781,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1772,7 +1807,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1796,7 +1831,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1821,7 +1856,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1848,7 +1883,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1875,7 +1910,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>() where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1897,7 +1932,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1921,7 +1956,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1943,7 +1978,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1966,7 +2001,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1991,7 +2026,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2025,6 +2060,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -2047,6 +2083,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -2071,7 +2108,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2080,9 +2117,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2091,7 +2130,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2111,7 +2150,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2120,9 +2159,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2131,7 +2172,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2161,9 +2202,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2172,7 +2215,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2216,9 +2259,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2227,7 +2272,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2256,9 +2301,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2267,7 +2314,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2295,9 +2342,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2306,7 +2355,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2334,9 +2383,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var list = multiQuery?.Read<T>();
                 return (list, total);
@@ -2345,7 +2396,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var list = multiQuery?.Read<T>();
                     return (list, total);
@@ -2362,7 +2413,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>() where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2384,7 +2435,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2408,7 +2459,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2430,7 +2481,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL, sqlIntercept: SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2453,7 +2504,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2478,7 +2529,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.PostgreSQL, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2512,6 +2563,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -2534,6 +2586,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -2558,7 +2611,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2567,9 +2620,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2578,7 +2633,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2598,7 +2653,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(DatabaseType: DatabaseType.PostgreSQL).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.PostgreSQL).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2607,9 +2662,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2618,7 +2675,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2648,9 +2705,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            var sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, builder.Parameters) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2659,7 +2718,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2703,9 +2762,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2714,7 +2775,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2743,9 +2804,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2754,7 +2817,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2782,9 +2845,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2821,9 +2886,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
@@ -2832,7 +2899,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -2862,6 +2929,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable</returns>
         public DataTable FindTable(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.ExecuteReader(sql, parameter, Transaction, commandTimeout: CommandTimeout).ToDataTable();
@@ -2883,6 +2951,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable</returns>
         public DataTable FindTable(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.ExecuteReader(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout).ToDataTable();
@@ -2930,9 +2999,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -2941,7 +3012,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -2969,9 +3040,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -2980,7 +3053,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3007,9 +3080,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3018,7 +3093,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3045,9 +3120,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = Transaction.Connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                 var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3056,7 +3133,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = connection.QueryMultiple($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
                     var table = multiQuery?.Read()?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3084,6 +3161,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable</returns>
         public async Task<DataTable> FindTableAsync(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
@@ -3107,6 +3185,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回DataTable</returns>
         public async Task<DataTable> FindTableAsync(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
@@ -3156,9 +3235,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3168,7 +3249,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3197,9 +3278,11 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
+            sql = $"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3209,7 +3292,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"DROP TABLE IF EXISTS TEMPORARY_{guid};CREATE TEMPORARY TABLE TEMPORARY_{guid} AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_{guid};SELECT * FROM TEMPORARY_{guid} AS X {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_{guid};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3237,9 +3320,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3249,7 +3334,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", parameter, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3277,9 +3362,11 @@ namespace SQLBuilder.Core.Repositories
                 else
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
+            sql = $"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                var multiQuery = await Transaction.Connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
@@ -3289,7 +3376,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};", dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
@@ -3320,6 +3407,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果集</returns>
         public List<IEnumerable<dynamic>> FindMultiple(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)
             {
@@ -3351,6 +3439,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果集</returns>
         public List<IEnumerable<dynamic>> FindMultiple(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)
             {
@@ -3394,6 +3483,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果集</returns>
         public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, object parameter)
         {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)
             {
@@ -3425,6 +3515,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果集</returns>
         public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter)
         {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             var list = new List<IEnumerable<dynamic>>();
             if (Transaction?.Connection != null)
             {

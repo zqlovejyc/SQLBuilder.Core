@@ -1104,6 +1104,7 @@ namespace SQLBuilder.Core
         /// <param name="this">依赖注入服务集合</param>
         /// <param name="configuration">服务配置</param>
         /// <param name="defaultName">默认数据库名称</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="type">依赖注入模式，默认单例模式</param>
         /// <returns></returns>
         /// <example>
@@ -1135,7 +1136,12 @@ namespace SQLBuilder.Core
         ///     }
         ///     </code>
         /// </example>
-        public static IServiceCollection AddSQLBuilder(this IServiceCollection @this, IConfiguration configuration, string defaultName, DependencyInjectionType type = DependencyInjectionType.Singleton)
+        public static IServiceCollection AddSQLBuilder(
+            this IServiceCollection @this,
+            IConfiguration configuration,
+            string defaultName,
+            Func<string, object, string> sqlIntercept = null,
+            DependencyInjectionType type = DependencyInjectionType.Singleton)
         {
             Func<string, IRepository> @delegate = key =>
             {
@@ -1145,15 +1151,15 @@ namespace SQLBuilder.Core
                 switch (databaseType)
                 {
                     case DatabaseType.SQLServer:
-                        return new SqlRepository(config[1]);
+                        return new SqlRepository(config[1]) { SqlIntercept = sqlIntercept };
                     case DatabaseType.MySQL:
-                        return new MySqlRepository(config[1]);
+                        return new MySqlRepository(config[1]) { SqlIntercept = sqlIntercept };
                     case DatabaseType.Oracle:
-                        return new OracleRepository(config[1]);
+                        return new OracleRepository(config[1]) { SqlIntercept = sqlIntercept };
                     case DatabaseType.SQLite:
-                        return new SqliteRepository(config[1]);
+                        return new SqliteRepository(config[1]) { SqlIntercept = sqlIntercept };
                     case DatabaseType.PostgreSQL:
-                        return new NpgsqlRepository(config[1]);
+                        return new NpgsqlRepository(config[1]) { SqlIntercept = sqlIntercept };
                     default:
                         throw new ArgumentException("数据库类型配置有误！");
                 }

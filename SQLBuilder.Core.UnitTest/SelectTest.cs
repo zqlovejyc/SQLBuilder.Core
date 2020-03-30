@@ -1296,6 +1296,54 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT B.* FROM [Base_UserInfo] AS A JOIN [Base_Account] AS B ON A.[Id] = B.[UserId] AND (A.[Email] = @Param0 OR A.[Email] = @Param1)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询69
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_69()
+        {
+            var list = new[] { "a", "b", "c" }.ToList();
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => list.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Name] IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询70
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_70()
+        {
+            var list = new[] { "a", "b", "c" }.Distinct();
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => list.Contains(x.Name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Name] IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询71
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_71()
+        {
+            var name = "test";
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => x.Name.Contains(name));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Name] LIKE '%' + @Param0 + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询72
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_72()
+        {
+            var list = new[] { 1, 2, 3 }.ToList();
+            var builder = SqlBuilder.Select<UserInfo>().Where(x => list.Contains(x.Id.Value));
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Id] IN (@Param0,@Param1,@Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

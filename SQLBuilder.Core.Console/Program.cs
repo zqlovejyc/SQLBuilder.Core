@@ -241,44 +241,56 @@ namespace SQLBuilder.Core
 
             #region Join
             Print(
-                SqlBuilder.Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                          .Join<Account>((u, a) => u.Id == a.UserId && (u.Email == "111" || u.Email == "222")),
+                SqlBuilder
+                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                    .Join<Account>((u, a) => u.Id == a.UserId && (u.Email == "111" || u.Email == "222")),
                 "多表Join关联查询",
                 "Join"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                          .InnerJoin<Account>((u, a) => u.Id == a.UserId),
+                SqlBuilder
+                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                    .InnerJoin<Account>((u, a) => u.Id == a.UserId),
                 "多表InnerJoin关联查询"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                          .LeftJoin<Account>((u, a) => u.Id == a.UserId),
+                SqlBuilder
+                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                    .LeftJoin<Account>((u, a) => u.Id == a.UserId),
                 "多表LeftJoin关联查询"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                          .RightJoin<Account>((u, a) => u.Id == a.UserId),
+                SqlBuilder
+                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                    .RightJoin<Account>((u, a) => u.Id == a.UserId),
                 "多表RightJoin关联查询"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                          .FullJoin<Account>((u, a) => u.Id == a.UserId),
+                SqlBuilder
+                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                    .FullJoin<Account>((u, a) => u.Id == a.UserId),
                 "多表FullJoin关联查询"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => new { u.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                          .Join<Account>((u, a) => u.Id == a.UserId)
-                          .LeftJoin<Account, Student>((a, s) => a.Id == s.AccountId)
-                          .RightJoin<Student, Class>((s, c) => s.Id == c.UserId)
-                          .InnerJoin<Class, City>((c, d) => c.CityId == d.Id)
-                          .FullJoin<City, Country>((c, d) => c.CountryId == d.Id)
-                          .Where(u => u.Id != null),
+                SqlBuilder
+                    .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => 
+                        new { u.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                    .Join<Account>((u, a) => 
+                        u.Id == a.UserId)
+                    .LeftJoin<Account, Student>((a, s) => 
+                        a.Id == s.AccountId)
+                    .RightJoin<Student, Class>((s, c) => 
+                        s.Id == c.UserId)
+                    .InnerJoin<Class, City>((c, d) => 
+                        c.CityId == d.Id)
+                    .FullJoin<City, Country>((c, d) => 
+                        c.CountryId == d.Id)
+                    .Where(u => u.Id != null),
                 "多表复杂关联查询"
             );
             #endregion

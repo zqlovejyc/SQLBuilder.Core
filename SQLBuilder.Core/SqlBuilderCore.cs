@@ -648,7 +648,9 @@ namespace SQLBuilder.Core
             {
                 this._sqlPack += " WHERE ";
             }
+            this._sqlPack += "(";
             SqlBuilderProvider.Where(expression.Body, this._sqlPack);
+            this._sqlPack += ")";
             return this;
         }
         #endregion
@@ -670,7 +672,9 @@ namespace SQLBuilder.Core
             {
                 this._sqlPack += " WHERE ";
             }
+            this._sqlPack += "(";
             SqlBuilderProvider.Where(expression.Body, this._sqlPack);
+            this._sqlPack += ")";
             return this;
         }
         #endregion

@@ -695,7 +695,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => new { o.Id, o.Name }, DatabaseType.MySQL)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT A.`Id`,A.`Name` FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual("SELECT A.`Id`,A.`Name` FROM `Base_UserInfo` AS A WHERE (A.`Name` = ?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -709,7 +709,7 @@ namespace SQLBuilder.Core.UnitTest
                                     .Where(u => u.Name.Contains("11"))
                                     .AndWhere(u => !string.IsNullOrEmpty(u.Name))
                                     .AndWhere(u => string.IsNullOrEmpty(u.Email));
-            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Name] LIKE '%' + @Param0 + '%' AND (A.[Name] IS NOT NULL AND A.[Name] <> '') AND (A.[Email] IS NULL OR A.[Email] = '')", builder.Sql);
+            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Name] LIKE '%' + @Param0 + '%' AND ((A.[Name] IS NOT NULL AND A.[Name] <> '')) AND ((A.[Email] IS NULL OR A.[Email] = ''))", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -867,7 +867,7 @@ namespace SQLBuilder.Core.UnitTest
                                     .Where(u => u.Name.Contains("11"))
                                     .AndWhere(u => !string.IsNullOrEmpty(u.Name) == false)
                                     .AndWhere(u => string.IsNullOrEmpty(u.Email) == true);
-            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Name] LIKE '%' + @Param0 + '%' AND (A.[Name] IS NULL OR A.[Name] = '') AND (A.[Email] IS NULL OR A.[Email] = '')", builder.Sql);
+            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Name] LIKE '%' + @Param0 + '%' AND ((A.[Name] IS NULL OR A.[Name] = '')) AND ((A.[Email] IS NULL OR A.[Email] = ''))", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1230,7 +1230,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => o, DatabaseType.MySQL)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE (A.`Name` = ?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1243,7 +1243,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => new { o }, DatabaseType.MySQL)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE (A.`Name` = ?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1256,7 +1256,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => null, DatabaseType.MySQL)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE (A.`Name` = ?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1269,7 +1269,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => "A.*", DatabaseType.MySQL)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE A.`Name` = ?Param0", builder.Sql);
+            Assert.AreEqual("SELECT A.* FROM `Base_UserInfo` AS A WHERE (A.`Name` = ?Param0)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1409,7 +1409,7 @@ namespace SQLBuilder.Core.UnitTest
                                   .AndWhere(o => o.Name == "")
                                   .OrWhere(o => o.Subject == "")
                                   .Page(3, 2, "`Id`");
-            Assert.AreEqual(@"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM (SELECT * FROM `student` AS A WHERE A.`Score` IS NOT NULL AND A.`Name` = ?Param0 OR A.`Subject` = ?Param1) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY `Id` LIMIT 3 OFFSET 3;DROP TABLE $TEMPORARY;", builder.Sql);
+            Assert.AreEqual(@"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM (SELECT * FROM `student` AS A WHERE A.`Score` IS NOT NULL AND (A.`Name` = ?Param0) OR (A.`Subject` = ?Param1)) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY `Id` LIMIT 3 OFFSET 3;DROP TABLE $TEMPORARY;", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 

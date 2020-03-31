@@ -108,20 +108,42 @@ namespace SQLBuilder.Core
         /// <returns>SqlPack</returns>
         public override SqlPack Join(BinaryExpression expression, SqlPack sqlPack)
         {
-            SqlBuilderProvider.Join(expression.Left, sqlPack);
-            var operatorIndex = sqlPack.Sql.Length;
-            //嵌套条件
-            var flag = false;
-            if (expression.Right is BinaryExpression binaryExpression && (binaryExpression.Right as BinaryExpression) != null)
+            //左侧嵌套
+            var leftBinary = expression.Left as BinaryExpression;
+            var isBinaryLeft = leftBinary?.Left is BinaryExpression;
+            var isBoolMethodCallLeft = (leftBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var isBinaryRight = leftBinary?.Right is BinaryExpression;
+            var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+            if (leftNested)
             {
-                flag = true;
                 sqlPack += "(";
             }
-            SqlBuilderProvider.Where(expression.Right, sqlPack);
-            if (flag)
+            SqlBuilderProvider.Join(expression.Left, sqlPack);
+            if (leftNested)
             {
                 sqlPack += ")";
             }
+
+            var operatorIndex = sqlPack.Sql.Length;
+
+            //右侧嵌套
+            var rightBinary = expression.Right as BinaryExpression;
+            isBinaryLeft = rightBinary?.Left is BinaryExpression;
+            isBoolMethodCallLeft = (rightBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            isBinaryRight = rightBinary?.Right is BinaryExpression;
+            isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+            if (rightNested)
+            {
+                sqlPack += "(";
+            }
+            SqlBuilderProvider.Where(expression.Right, sqlPack);
+            if (rightNested)
+            {
+                sqlPack += ")";
+            }
+
             var sqlLength = sqlPack.Sql.Length;
             if (sqlLength - operatorIndex == 5 && sqlPack.ToString().ToUpper().EndsWith("NULL"))
             {
@@ -143,20 +165,43 @@ namespace SQLBuilder.Core
 		public override SqlPack Where(BinaryExpression expression, SqlPack sqlPack)
         {
             var startIndex = sqlPack.Length;
-            SqlBuilderProvider.Where(expression.Left, sqlPack);
-            var signIndex = sqlPack.Length;
-            //嵌套条件
-            var flag = false;
-            if (expression.Right is BinaryExpression binaryExpression && (binaryExpression.Right as BinaryExpression) != null)
+
+            //左侧嵌套
+            var leftBinary = expression.Left as BinaryExpression;
+            var isBinaryLeft = leftBinary?.Left is BinaryExpression;
+            var isBoolMethodCallLeft = (leftBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var isBinaryRight = leftBinary?.Right is BinaryExpression;
+            var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+            if (leftNested)
             {
-                flag = true;
                 sqlPack += "(";
             }
-            SqlBuilderProvider.Where(expression.Right, sqlPack);
-            if (flag)
+            SqlBuilderProvider.Where(expression.Left, sqlPack);
+            if (leftNested)
             {
                 sqlPack += ")";
             }
+
+            var signIndex = sqlPack.Length;
+
+            //右侧嵌套
+            var rightBinary = expression.Right as BinaryExpression;
+            isBinaryLeft = rightBinary?.Left is BinaryExpression;
+            isBoolMethodCallLeft = (rightBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            isBinaryRight = rightBinary?.Right is BinaryExpression;
+            isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
+            var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+            if (rightNested)
+            {
+                sqlPack += "(";
+            }
+            SqlBuilderProvider.Where(expression.Right, sqlPack);
+            if (rightNested)
+            {
+                sqlPack += ")";
+            }
+
             //表达式左侧为bool类型常量且为true时，不进行Sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
@@ -259,13 +304,9 @@ namespace SQLBuilder.Core
                 else
                 {
                     if (sqlPack.ToString().ToUpper().EndsWith("NULL"))
-                    {
                         OperatorParser(expression.NodeType, signIndex, sqlPack, true);
-                    }
                     else
-                    {
                         OperatorParser(expression.NodeType, signIndex, sqlPack);
-                    }
                 }
             }
             return sqlPack;

@@ -243,7 +243,7 @@ namespace SQLBuilder.Core
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName + ",";
+                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {

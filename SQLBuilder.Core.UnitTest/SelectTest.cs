@@ -97,7 +97,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>()
                                     .Where(o => o.Name == "张强")
                                     .GroupBy(u => u.Id);
-            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Name] = @Param0 GROUP BY A.[Id],", builder.Sql);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS A WHERE A.[Name] = @Param0 GROUP BY A.[Id]", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 

@@ -129,6 +129,7 @@ namespace SQLBuilder.Core
             foreach (Expression item in expression.Arguments)
             {
                 SqlBuilderProvider.GroupBy(item, sqlPack);
+                sqlPack += ",";
             }
             sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
             return sqlPack;

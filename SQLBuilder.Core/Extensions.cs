@@ -1105,6 +1105,7 @@ namespace SQLBuilder.Core
         /// <param name="configuration">服务配置</param>
         /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <param name="type">依赖注入模式，默认单例模式</param>
         /// <returns></returns>
         /// <example>
@@ -1141,6 +1142,7 @@ namespace SQLBuilder.Core
             IConfiguration configuration,
             string defaultName,
             Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = true,
             DependencyInjectionType type = DependencyInjectionType.Singleton)
         {
             Func<string, IRepository> @delegate = key =>
@@ -1151,15 +1153,35 @@ namespace SQLBuilder.Core
                 switch (databaseType)
                 {
                     case DatabaseType.SQLServer:
-                        return new SqlRepository(config[1]) { SqlIntercept = sqlIntercept };
+                        return new SqlRepository(config[1])
+                        {
+                            SqlIntercept = sqlIntercept,
+                            IsEnableFormat = isEnableFormat
+                        };
                     case DatabaseType.MySQL:
-                        return new MySqlRepository(config[1]) { SqlIntercept = sqlIntercept };
+                        return new MySqlRepository(config[1])
+                        {
+                            SqlIntercept = sqlIntercept,
+                            IsEnableFormat = isEnableFormat
+                        };
                     case DatabaseType.Oracle:
-                        return new OracleRepository(config[1]) { SqlIntercept = sqlIntercept };
+                        return new OracleRepository(config[1])
+                        {
+                            SqlIntercept = sqlIntercept,
+                            IsEnableFormat = isEnableFormat
+                        };
                     case DatabaseType.SQLite:
-                        return new SqliteRepository(config[1]) { SqlIntercept = sqlIntercept };
+                        return new SqliteRepository(config[1])
+                        {
+                            SqlIntercept = sqlIntercept,
+                            IsEnableFormat = isEnableFormat
+                        };
                     case DatabaseType.PostgreSQL:
-                        return new NpgsqlRepository(config[1]) { SqlIntercept = sqlIntercept };
+                        return new NpgsqlRepository(config[1])
+                        {
+                            SqlIntercept = sqlIntercept,
+                            IsEnableFormat = isEnableFormat
+                        };
                     default:
                         throw new ArgumentException("数据库类型配置有误！");
                 }

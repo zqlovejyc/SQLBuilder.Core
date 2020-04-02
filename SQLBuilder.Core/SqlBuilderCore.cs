@@ -31,7 +31,7 @@ namespace SQLBuilder.Core
     /// SqlBuilderCore
     /// </summary>
     /// <typeparam name="T">泛型类型</typeparam>
-    public class SqlBuilderCore<T> where T : class
+	public class SqlBuilderCore<T> where T : class
     {
         #region Private Field
         /// <summary>
@@ -105,13 +105,32 @@ namespace SQLBuilder.Core
         /// SqlBuilderCore
         /// </summary>
         /// <param name="dbType">数据库类型</param>
-        public SqlBuilderCore(DatabaseType dbType)
+        /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
+        public SqlBuilderCore(DatabaseType dbType, bool isEnableFormat)
         {
             this._sqlPack = new SqlPack
             {
                 DatabaseType = dbType,
-                DefaultType = typeof(T)
+                DefaultType = typeof(T),
+                IsEnableFormat = isEnableFormat
             };
+        }
+
+        /// <summary>
+        /// SqlBuilderCore
+        /// </summary>
+        /// <param name="dbType">数据库类型</param>
+        /// <param name="sqlIntercept">SQL拦截委托</param>
+        /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
+        public SqlBuilderCore(DatabaseType dbType, Func<string, object, string> sqlIntercept, bool isEnableFormat)
+        {
+            this._sqlPack = new SqlPack
+            {
+                DatabaseType = dbType,
+                DefaultType = typeof(T),
+                IsEnableFormat = isEnableFormat
+            };
+            this.SqlIntercept = sqlIntercept;
         }
         #endregion
 
@@ -699,7 +718,7 @@ namespace SQLBuilder.Core
             var tableName = this._sqlPack.GetTableName(typeof(T));
             var tableAlias = this._sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            var keys = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
+            var keys = this._sqlPack.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && entity != null)
             {
                 for (int i = 0; i < keys.Count; i++)
@@ -750,7 +769,7 @@ namespace SQLBuilder.Core
             var tableName = this._sqlPack.GetTableName(typeof(T));
             var tableAlias = this._sqlPack.GetTableAlias(tableName);
             if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
-            var keys = this._sqlPack.GetPrimaryKey(typeof(T), string.IsNullOrEmpty(tableAlias));
+            var keys = this._sqlPack.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && keyValue != null)
             {
                 for (int i = 0; i < keys.Count; i++)
@@ -1130,7 +1149,7 @@ namespace SQLBuilder.Core
         /// <returns></returns>
         public List<string> GetPrimaryKey()
         {
-            return this._sqlPack.GetPrimaryKey(typeof(T), false).Select(o => o.key).ToList();
+            return this._sqlPack.GetPrimaryKey(typeof(T)).Select(o => o.key).ToList();
         }
         #endregion
         #endregion

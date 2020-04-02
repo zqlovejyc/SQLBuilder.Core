@@ -41,7 +41,7 @@ namespace SQLBuilder.Core
     /// <summary>
     /// SqlPack
     /// </summary>
-	public class SqlPack
+    public class SqlPack
     {
         #region Private Field
         /// <summary>
@@ -62,47 +62,14 @@ namespace SQLBuilder.Core
 
         #region Public Property
         /// <summary>
-        /// DbParamPrefix
-        /// </summary>
-        public string DbParamPrefix
-        {
-            get
-            {
-                switch (this.DatabaseType)
-                {
-                    case DatabaseType.SQLite: return "@";
-                    case DatabaseType.SQLServer: return "@";
-                    case DatabaseType.MySQL: return "?";
-                    case DatabaseType.Oracle: return ":";
-                    case DatabaseType.PostgreSQL: return ":";
-                    default: return "";
-                }
-            }
-        }
-
-        /// <summary>
-        /// FormatTempl
-        /// </summary>
-        public string FormatTempl
-        {
-            get
-            {
-                switch (this.DatabaseType)
-                {
-                    case DatabaseType.SQLite: return "\"{0}\"";
-                    case DatabaseType.SQLServer: return "[{0}]";
-                    case DatabaseType.MySQL: return "`{0}`";
-                    case DatabaseType.Oracle: return "\"{0}\"";
-                    case DatabaseType.PostgreSQL: return "\"{0}\"";
-                    default: return "{0}";
-                }
-            }
-        }
-
-        /// <summary>
         /// 更新和新增时，是否对null值属性进行sql拼接操作
         /// </summary>
         public bool IsEnableNullValue { get; set; } = true;
+
+        /// <summary>
+        /// 是否启用表名和列名格式化
+        /// </summary>
+        public bool IsEnableFormat { get; set; } = true;
 
         /// <summary>
         /// 默认T类型
@@ -143,6 +110,44 @@ namespace SQLBuilder.Core
         /// DbParams
         /// </summary>
         public Dictionary<string, object> DbParams { get; set; }
+
+        /// <summary>
+        /// DbParamPrefix
+        /// </summary>
+        public string DbParamPrefix
+        {
+            get
+            {
+                switch (this.DatabaseType)
+                {
+                    case DatabaseType.SQLite: return "@";
+                    case DatabaseType.SQLServer: return "@";
+                    case DatabaseType.MySQL: return "?";
+                    case DatabaseType.Oracle: return ":";
+                    case DatabaseType.PostgreSQL: return ":";
+                    default: return "";
+                }
+            }
+        }
+
+        /// <summary>
+        /// FormatTempl
+        /// </summary>
+        public string FormatTempl
+        {
+            get
+            {
+                switch (this.DatabaseType)
+                {
+                    case DatabaseType.SQLite: return "\"{0}\"";
+                    case DatabaseType.SQLServer: return "[{0}]";
+                    case DatabaseType.MySQL: return "`{0}`";
+                    case DatabaseType.Oracle: return "\"{0}\"";
+                    case DatabaseType.PostgreSQL: return "\"{0}\"";
+                    default: return "{0}";
+                }
+            }
+        }
         #endregion
 
         #region Constructor
@@ -192,32 +197,6 @@ namespace SQLBuilder.Core
             this.DbParams.Clear();
             this.dicTableName.Clear();
             this.tableAliasQueue = new Queue<string>(tableAlias);
-        }
-        #endregion
-
-        #region GetFormatColumnName
-        /// <summary>
-        /// GetFormatColumnName
-        /// </summary>
-        /// <param name="columnName">列名</param>
-        /// <returns></returns>
-        public string GetFormatColumnName(string columnName)
-        {
-            //PostgreSQL列名在起别名的情况下也需要格式化
-            if (this.DatabaseType == DatabaseType.PostgreSQL)
-            {
-                columnName = string.Format(this.FormatTempl, columnName);
-            }
-            else
-            {
-                if ((columnName?.StartsWith("[") == false
-                || columnName?.StartsWith("`") == false)
-                && columnName?.Contains(".") == false)
-                {
-                    columnName = string.Format(this.FormatTempl, columnName);
-                }
-            }
-            return columnName;
         }
         #endregion
 
@@ -290,6 +269,7 @@ namespace SQLBuilder.Core
         public string GetFormatName(string name)
         {
             if (
+                this.IsEnableFormat == true &&
                 name?.StartsWith("[") == false &&
                 name?.StartsWith("`") == false &&
                 name?.StartsWith("\"") == false)
@@ -410,9 +390,8 @@ namespace SQLBuilder.Core
         /// GetPrimaryKey
         /// </summary>
         /// <param name="type">类型</param>
-        /// <param name="isFormat">是否格式化</param>
         /// <returns>Tuple</returns>
-        public List<(string key, string property)> GetPrimaryKey(Type type, bool isFormat = true)
+        public List<(string key, string property)> GetPrimaryKey(Type type)
         {
             var result = new List<(string key, string property)>();
             var props = type.GetProperties();

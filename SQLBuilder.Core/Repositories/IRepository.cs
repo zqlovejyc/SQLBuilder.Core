@@ -52,6 +52,11 @@ namespace SQLBuilder.Core.Repositories
         DbTransaction Transaction { get; set; }
 
         /// <summary>
+        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
+        /// </summary>
+        bool IsEnableFormat { get; set; }
+
+        /// <summary>
         /// sql拦截委托
         /// </summary>
         Func<string, object, string> SqlIntercept { get; set; }

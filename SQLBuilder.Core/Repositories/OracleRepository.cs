@@ -77,6 +77,11 @@ namespace SQLBuilder.Core.Repositories
         public DbTransaction Transaction { get; set; }
 
         /// <summary>
+        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
+        /// </summary>
+        public bool IsEnableFormat { get; set; } = true;
+
+        /// <summary>
         /// sql拦截委托
         /// </summary>
         public Func<string, object, string> SqlIntercept { get; set; }
@@ -491,7 +496,7 @@ namespace SQLBuilder.Core.Repositories
         public int Insert<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept);
+            var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -553,7 +558,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> InsertAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept);
+            var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -616,7 +621,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>() where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -640,7 +645,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).WithKey(entity);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -700,7 +705,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -724,11 +729,11 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var keys = Sql.GetPrimaryKey<T>();
+            var keys = Sql.GetPrimaryKey<T>(IsEnableFormat);
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
-                var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).WithKey(keyValues);
+                var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
                 if (Transaction?.Connection != null)
                 {
                     result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -781,7 +786,7 @@ namespace SQLBuilder.Core.Repositories
         public int Delete<T>(string propertyName, object propertyValue) where T : class
         {
             var result = 0;
-            var sql = $"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=:PropertyValue";
+            var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName}=:PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
             sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
@@ -808,7 +813,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>() where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -832,7 +837,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).WithKey(entity);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -892,7 +897,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var result = 0;
-            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -916,11 +921,11 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var keys = Sql.GetPrimaryKey<T>();
+            var keys = Sql.GetPrimaryKey<T>(IsEnableFormat);
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
-                var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept).WithKey(keyValues);
+                var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
                 if (Transaction?.Connection != null)
                 {
                     result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -973,7 +978,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> DeleteAsync<T>(string propertyName, object propertyValue) where T : class
         {
             var result = 0;
-            var sql = $"DELETE FROM {Sql.GetTableName<T>()} WHERE {propertyName}=:PropertyValue";
+            var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName}=:PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
             sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
@@ -1003,7 +1008,7 @@ namespace SQLBuilder.Core.Repositories
         public int Update<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept).WithKey(entity);
+            var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1064,7 +1069,7 @@ namespace SQLBuilder.Core.Repositories
         public int Update<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept).Where(predicate);
+            var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1090,7 +1095,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> UpdateAsync<T>(T entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept).WithKey(entity);
+            var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).WithKey(entity);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1151,7 +1156,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
             var result = 0;
-            var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept).Where(predicate);
+            var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1293,7 +1298,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(params object[] keyValues) where T : class
         {
             if (keyValues == null) return default(T);
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).WithKey(keyValues);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1317,7 +1322,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
             if (keyValues == null) return default(T);
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).WithKey(keyValues);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1339,7 +1344,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1362,7 +1367,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1455,7 +1460,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
             if (keyValues == null) return await Task.FromResult(default(T));
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).WithKey(keyValues);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1479,7 +1484,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
             if (keyValues == null) return await Task.FromResult(default(T));
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).WithKey(keyValues);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1501,7 +1506,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1524,7 +1529,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1617,7 +1622,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>() where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1639,7 +1644,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1663,7 +1668,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1685,7 +1690,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1708,7 +1713,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1733,7 +1738,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
@@ -1756,7 +1761,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>() where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1780,7 +1785,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1806,7 +1811,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1830,7 +1835,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1855,7 +1860,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1882,7 +1887,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -1909,7 +1914,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>() where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1931,7 +1936,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1955,7 +1960,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -1977,7 +1982,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2000,7 +2005,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2025,7 +2030,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2107,7 +2112,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2148,7 +2153,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2190,7 +2195,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2407,7 +2412,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>() where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2429,7 +2434,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2453,7 +2458,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
@@ -2475,7 +2480,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2498,7 +2503,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2523,7 +2528,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept).Where(predicate).OrderBy(orderField, orderTypes);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             if (Transaction?.Connection != null)
             {
                 return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
@@ -2605,7 +2610,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2646,7 +2651,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle).Where(predicate);
+            var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
@@ -2688,7 +2693,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
-            var builder = Sql.Select<T>(selector, DatabaseType.Oracle).Where(predicate);
+            var builder = Sql.Select<T>(selector, DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
             if (!orderField.IsNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))

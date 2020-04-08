@@ -1380,6 +1380,19 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询76
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_76()
+        {
+            var id = "100";
+            var builder = SqlBuilder.Select<UserInfo>(u => u.Name)
+                                    .Where(u => u.Id == int.Parse(id) || (u.Id < 10 && u.Name.Equals("张三")));
+            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

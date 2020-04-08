@@ -491,12 +491,24 @@ namespace SQLBuilder.Core
             var key = expression.Method;
             if (key.IsGenericMethod)
                 key = key.GetGenericMethodDefinition();
+            //匹配到方法
             if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlPack> action))
             {
                 action(expression, sqlPack);
                 return sqlPack;
             }
-            throw new NotImplementedException("无法解析方法" + expression.Method);
+            else
+            {
+                try
+                {
+                    sqlPack.AddDbParameter(expression.ToObject());
+                    return sqlPack;
+                }
+                catch
+                {
+                    throw new NotImplementedException("无法解析方法" + expression.Method);
+                }
+            }
         }
 
         /// <summary>

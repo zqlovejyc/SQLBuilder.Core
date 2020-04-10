@@ -2718,7 +2718,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 using (var connection = Connection)
                 {
-                    var multiQuery = await connection.QueryMultipleAsync($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};SELECT * INTO #TEMPORARY_{guid} FROM ({builder.Sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber, * FROM #TEMPORARY_{guid}) AS N WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY_{guid};", builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
                     var total = await multiQuery?.ReadFirstOrDefaultAsync<long>();
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
@@ -3162,7 +3162,7 @@ namespace SQLBuilder.Core.Repositories
                 orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
-            sql = $"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM #TEMPORARY_{guid}) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND RowNumber {(pageIndex * pageSize)};DROP TABLE #TEMPORARY_{guid};";
+            sql = $"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM #TEMPORARY_{guid}) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY_{guid};";
             sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
@@ -3209,7 +3209,7 @@ namespace SQLBuilder.Core.Repositories
                 orderField = "ORDER BY (SELECT 0)";
             }
             var guid = Guid.NewGuid().ToString().Replace("-", "").ToUpper();
-            sql = $"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM #TEMPORARY_{guid}) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND RowNumber {(pageIndex * pageSize)};DROP TABLE #TEMPORARY_{guid};";
+            sql = $"IF OBJECT_ID(N'TEMPDB..#TEMPORARY_{guid}') IS NOT NULL DROP TABLE #TEMPORARY_{guid};{sql} SELECT * INTO #TEMPORARY_{guid} FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY_{guid};WITH R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS RowNumber,* FROM #TEMPORARY_{guid}) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY_{guid};";
             sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {

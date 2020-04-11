@@ -129,7 +129,7 @@ namespace SQLBuilder.Core
             var tableName = sqlPack.GetTableName(type);
             sqlPack.SetTableAlias(tableName);
             string tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             sqlPack.SelectFields.Add(tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
             return sqlPack;
         }
@@ -148,7 +148,7 @@ namespace SQLBuilder.Core
             var tableName = sqlPack.GetTableName(type);
             sqlPack.SetTableAlias(tableName);
             string tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
             return sqlPack;
         }
@@ -162,13 +162,14 @@ namespace SQLBuilder.Core
 		public override SqlPack Where(MemberExpression expression, SqlPack sqlPack)
         {
             //此处判断expression的Member是否是可空值类型
-            if (expression.Expression.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType.IsNullable())
+            if (expression.Expression?.NodeType == ExpressionType.MemberAccess &&
+                expression.Member.DeclaringType.IsNullable())
             {
                 expression = expression.Expression as MemberExpression;
             }
             if (expression != null)
             {
-                if (expression.Expression.NodeType == ExpressionType.Parameter)
+                if (expression.Expression?.NodeType == ExpressionType.Parameter)
                 {
                     var type = expression.Expression.Type != expression.Member.DeclaringType ?
                                expression.Expression.Type :
@@ -176,10 +177,11 @@ namespace SQLBuilder.Core
                     var tableName = sqlPack.GetTableName(type);
                     sqlPack.SetTableAlias(tableName);
                     var tableAlias = sqlPack.GetTableAlias(tableName);
-                    if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+                    if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
                     sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                     //字段是bool类型
-                    if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
+                    if (expression.NodeType == ExpressionType.MemberAccess &&
+                        expression.Type.GetCoreType() == typeof(bool))
                     {
                         sqlPack += " = 1";
                     }
@@ -240,7 +242,7 @@ namespace SQLBuilder.Core
             }
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
@@ -300,7 +302,7 @@ namespace SQLBuilder.Core
             }
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;

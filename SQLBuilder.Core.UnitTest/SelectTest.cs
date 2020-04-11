@@ -1393,6 +1393,32 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询77
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_77()
+        {
+            var id = "100";
+            var builder = SqlBuilder.Select<UserInfo>(u => u.Name)
+                                    .Where(u => u.Id == int.Parse(id) || (u.Id < 10 && u.Name.Equals(Const.Name)));
+            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询78
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_78()
+        {
+            var id = "100";
+            var builder = SqlBuilder.Select<UserInfo>(u => u.Name)
+                                    .Where(u => u.Id == int.Parse(id) || (u.Id < 10 && u.Name == Const.Name));
+            Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

@@ -19,4 +19,9 @@ namespace SQLBuilder.Core.UnitTest
         public string Name { get; set; }
         public string Email { get; set; }
     }
+
+    public class Const
+    {
+        public static string Name = "张三";
+    }
 }

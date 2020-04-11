@@ -212,7 +212,7 @@ namespace SQLBuilder.Core
             {
                 this.Sql.Append("NULL");
             }
-            else if (string.IsNullOrEmpty(parameterKey))
+            else if (parameterKey.IsNullOrEmpty())
             {
                 var name = this.DbParamPrefix + "Param" + this.DbParams.Count;
                 this.DbParams.Add(name, parameterValue);
@@ -291,22 +291,22 @@ namespace SQLBuilder.Core
             var tableName = this.GetFormatName(type.Name);
             if (type.GetCustomAttributes(typeof(CusTableAttribute), false).FirstOrDefault() is CusTableAttribute cta)
             {
-                if (!string.IsNullOrEmpty(cta.Name))
+                if (!cta.Name.IsNullOrEmpty())
                 {
                     tableName = this.GetFormatName(cta.Name);
                 }
-                if (!string.IsNullOrEmpty(cta.Schema))
+                if (!cta.Schema.IsNullOrEmpty())
                 {
                     tableName = $"{this.GetFormatName(cta.Schema)}.{tableName}";
                 }
             }
             else if (type.GetCustomAttributes(typeof(SysTableAttribute), false).FirstOrDefault() is SysTableAttribute sta)
             {
-                if (!string.IsNullOrEmpty(sta.Name))
+                if (!sta.Name.IsNullOrEmpty())
                 {
                     tableName = this.GetFormatName(sta.Name);
                 }
-                if (!string.IsNullOrEmpty(sta.Schema))
+                if (!sta.Schema.IsNullOrEmpty())
                 {
                     tableName = $"{this.GetFormatName(sta.Schema)}.{tableName}";
                 }

@@ -58,7 +58,7 @@ namespace SQLBuilder.Core
         public static void SetConfigurationFile(string fileName, string basePath = null)
         {
             Configuration = new ConfigurationBuilder()
-                .SetBasePath(string.IsNullOrEmpty(basePath) ? Directory.GetCurrentDirectory() : basePath)
+                .SetBasePath(basePath.IsNullOrEmpty() ? Directory.GetCurrentDirectory() : basePath)
                 .AddJsonFile(fileName, optional: true, reloadOnChange: true)
                 .Build();
         }

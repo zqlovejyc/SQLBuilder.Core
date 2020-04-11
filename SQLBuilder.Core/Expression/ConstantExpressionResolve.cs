@@ -96,7 +96,7 @@ namespace SQLBuilder.Core
             var tableName = sqlPack.GetTableName(sqlPack.DefaultType);
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             sqlPack += tableAlias + sqlPack.GetColumnName(expression.Value.ToString()) + ",";
             return sqlPack;
         }
@@ -113,7 +113,7 @@ namespace SQLBuilder.Core
             var tableName = sqlPack.GetTableName(sqlPack.DefaultType);
             sqlPack.SetTableAlias(tableName);
             var tableAlias = sqlPack.GetTableAlias(tableName);
-            if (!string.IsNullOrEmpty(tableAlias)) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             var field = expression.Value.ToString();
             if (!field.ToUpper().Contains(" ASC") && !field.ToUpper().Contains(" DESC"))
                 field = sqlPack.GetColumnName(field);

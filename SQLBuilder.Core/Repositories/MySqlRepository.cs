@@ -100,7 +100,7 @@ namespace SQLBuilder.Core.Repositories
                 ConnectionString = ConfigurationManager.GetAppSettings<string>(connString);
             else
                 ConnectionString = ConfigurationManager.GetConnectionString(connString);
-            if (string.IsNullOrEmpty(ConnectionString))
+            if (ConnectionString.IsNullOrEmpty())
                 ConnectionString = connString;
         }
         #endregion

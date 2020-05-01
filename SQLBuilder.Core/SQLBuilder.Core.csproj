@@ -12,6 +12,9 @@
         <PackageReleaseNotes>1.修复MemberExpression解析类静态属性时异常bug；</PackageReleaseNotes>
         <FileVersion>1.0.4.5</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
+        <PackageIcon>SQL.png</PackageIcon>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -36,6 +39,13 @@
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
         <PackageReference Include="System.Data.Common" Version="4.3.0" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Icon\SQL.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
     </ItemGroup>
 
 </Project>

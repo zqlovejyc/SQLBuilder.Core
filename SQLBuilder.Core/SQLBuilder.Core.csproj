@@ -2,15 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.4.5</AssemblyVersion>
+        <AssemblyVersion>1.0.4.6</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.4.5</Version>
+        <Version>1.0.4.6</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.修复MemberExpression解析类静态属性时异常bug；</PackageReleaseNotes>
-        <FileVersion>1.0.4.5</FileVersion>
+        <PackageReleaseNotes>1.修改仓储新增、修改和删除的批量操作，允许向外抛出异常；
+2.修改仓储FindObject方法，内部由QueryFirstOrDefault改为ExecuteScalar；</PackageReleaseNotes>
+        <FileVersion>1.0.4.6</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>SQL.png</PackageIcon>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

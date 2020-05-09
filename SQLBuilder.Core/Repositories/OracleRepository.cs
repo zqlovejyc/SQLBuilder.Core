@@ -538,10 +538,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -600,10 +600,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -687,10 +687,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -766,10 +766,10 @@ namespace SQLBuilder.Core.Repositories
                         }
                         Commit();
                     }
-                    catch
+                    catch (Exception)
                     {
                         Rollback();
-                        result = 0;
+                        throw;
                     }
                 }
             }
@@ -879,10 +879,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -958,10 +958,10 @@ namespace SQLBuilder.Core.Repositories
                         }
                         Commit();
                     }
-                    catch
+                    catch (Exception)
                     {
                         Rollback();
-                        result = 0;
+                        throw;
                     }
                 }
             }
@@ -1050,10 +1050,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -1137,10 +1137,10 @@ namespace SQLBuilder.Core.Repositories
                     }
                     Commit();
                 }
-                catch
+                catch (Exception)
                 {
                     Rollback();
-                    result = 0;
+                    throw;
                 }
             }
             return result;
@@ -1196,13 +1196,13 @@ namespace SQLBuilder.Core.Repositories
             sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                return Transaction.Connection.QueryFirstOrDefault<string>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+                return Transaction.Connection.ExecuteScalar<object>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    return connection.QueryFirstOrDefault<string>(sql, parameter, commandTimeout: CommandTimeout);
+                    return connection.ExecuteScalar<object>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1218,13 +1218,13 @@ namespace SQLBuilder.Core.Repositories
             sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                return Transaction.Connection.QueryFirstOrDefault<string>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                return Transaction.Connection.ExecuteScalar<object>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    return connection.QueryFirstOrDefault<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return connection.ExecuteScalar<object>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1252,13 +1252,13 @@ namespace SQLBuilder.Core.Repositories
             sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<string>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+                return await Transaction.Connection.ExecuteScalarAsync<object>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    return await connection.QueryFirstOrDefaultAsync<string>(sql, parameter, commandTimeout: CommandTimeout);
+                    return await connection.ExecuteScalarAsync<object>(sql, parameter, commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1274,13 +1274,13 @@ namespace SQLBuilder.Core.Repositories
             sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
             if (Transaction?.Connection != null)
             {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<string>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+                return await Transaction.Connection.ExecuteScalarAsync<object>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
             }
             else
             {
                 using (var connection = Connection)
                 {
-                    return await connection.QueryFirstOrDefaultAsync<string>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                    return await connection.ExecuteScalarAsync<object>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }

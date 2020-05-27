@@ -111,6 +111,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static Expression<Func<T, bool>> True<T>() => parameter => true;
+
+        /// <summary>
+        /// True
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <returns></returns>
+        public static Expression<Func<T1, T2, bool>> True<T1, T2>() => (p1, p2) => true;
         #endregion
 
         #region False
@@ -120,6 +128,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static Expression<Func<T, bool>> False<T>() => parameter => false;
+
+        /// <summary>
+        /// False
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <returns></returns>
+        public static Expression<Func<T1, T2, bool>> False<T1, T2>() => (p1, p2) => false;
         #endregion
 
         #region Or
@@ -135,6 +151,20 @@ namespace SQLBuilder.Core
             var invokedExpr = Expression.Invoke(other, @this.Parameters.Cast<Expression>());
             return Expression.Lambda<Func<T, bool>>(Expression.OrElse(@this.Body, invokedExpr), @this.Parameters);
         }
+
+        /// <summary>
+        /// Or
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static Expression<Func<T1, T2, bool>> Or<T1, T2>(this Expression<Func<T1, T2, bool>> @this, Expression<Func<T1, T2, bool>> other)
+        {
+            var invokedExpr = Expression.Invoke(other, @this.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T1, T2, bool>>(Expression.OrElse(@this.Body, invokedExpr), @this.Parameters);
+        }
         #endregion
 
         #region And
@@ -149,6 +179,20 @@ namespace SQLBuilder.Core
         {
             var invokedExpr = Expression.Invoke(other, @this.Parameters.Cast<Expression>());
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(@this.Body, invokedExpr), @this.Parameters);
+        }
+
+        /// <summary>
+        /// And
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static Expression<Func<T1, T2, bool>> And<T1, T2>(this Expression<Func<T1, T2, bool>> @this, Expression<Func<T1, T2, bool>> other)
+        {
+            var invokedExpr = Expression.Invoke(other, @this.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T1, T2, bool>>(Expression.AndAlso(@this.Body, invokedExpr), @this.Parameters);
         }
         #endregion
 

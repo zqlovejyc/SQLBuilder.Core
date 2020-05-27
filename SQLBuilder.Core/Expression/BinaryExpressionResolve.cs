@@ -144,15 +144,16 @@ namespace SQLBuilder.Core
                 sqlPack += ")";
             }
 
-            var sqlLength = sqlPack.Sql.Length;
-            if (sqlLength - operatorIndex == 5 && sqlPack.ToString().ToUpper().EndsWith("NULL"))
+            //表达式左侧为bool类型常量且为true时，不进行sql拼接
+            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
-                OperatorParser(expression.NodeType, operatorIndex, sqlPack, true);
+                var sqlLength = sqlPack.Sql.Length;
+                if (sqlLength - operatorIndex == 5 && sqlPack.ToString().ToUpper().EndsWith("NULL"))
+                    OperatorParser(expression.NodeType, operatorIndex, sqlPack, true);
+                else
+                    OperatorParser(expression.NodeType, operatorIndex, sqlPack);
             }
-            else
-            {
-                OperatorParser(expression.NodeType, operatorIndex, sqlPack);
-            }
+
             return sqlPack;
         }
 

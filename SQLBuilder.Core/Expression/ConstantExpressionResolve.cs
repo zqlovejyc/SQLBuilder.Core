@@ -74,6 +74,28 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
+        /// Join
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlPack">sql打包对象</param>
+        /// <returns>SqlPack</returns>
+        public override SqlPack Join(ConstantExpression expression, SqlPack sqlPack)
+        {
+            //表达式左侧为bool类型常量
+            if (expression.NodeType == ExpressionType.Constant && expression.Value is bool b)
+            {
+                var sql = sqlPack.ToString().ToUpper().Trim();
+                if (!b && (sql.EndsWith("AND") || sql.EndsWith("OR")))
+                    sqlPack += " 1 = 0 ";
+            }
+            else
+            {
+                sqlPack.AddDbParameter(expression.Value);
+            }
+            return sqlPack;
+        }
+
+        /// <summary>
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>

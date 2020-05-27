@@ -1419,6 +1419,32 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT A.[Name] FROM [Base_UserInfo] AS A WHERE A.[Id] = @Param0 OR (A.[Id] < @Param1 AND A.[Name] = @Param2)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询79
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_79()
+        {
+            //Where条件拼接
+            var whereCondition = Extensions.True<UserInfo>();
+            whereCondition = whereCondition.And(x => x.Email == "123");
+
+            //Join条件拼接
+            var joinCondition = Extensions.True<UserInfo, Account>();
+            joinCondition = joinCondition.And((u, a) => !a.Name.IsNullOrEmpty() && u.Id == a.UserId);
+            joinCondition = joinCondition.And((u, a) => u.Id == 1 && !(a.UserId == 2));
+            joinCondition = joinCondition.And((u, a) => a.Id == 1);
+
+            //sql构建
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                            .InnerJoin<Account>(joinCondition)
+                            .Where(whereCondition);
+
+            Assert.AreEqual("SELECT A.[Id],B.[Name] FROM [Base_UserInfo] AS A INNER JOIN [Base_Account] AS B ON (B.[Name] IS NOT NULL AND B.[Name] <> '') AND A.[Id] = B.[UserId] AND A.[Id] = @Param0 AND B.[UserId] <> @Param1 AND B.[Id] = @Param2 WHERE A.[Email] = @Param3", builder.Sql);
+            Assert.AreEqual(4, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

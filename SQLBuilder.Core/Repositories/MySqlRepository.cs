@@ -97,7 +97,7 @@ namespace SQLBuilder.Core.Repositories
         {
             //判断是链接字符串，还是链接字符串名称
             if (connString?.Contains(":") == true)
-                ConnectionString = ConfigurationManager.GetAppSettings<string>(connString);
+                ConnectionString = ConfigurationManager.GetValue<string>(connString);
             else
                 ConnectionString = ConfigurationManager.GetConnectionString(connString);
             if (ConnectionString.IsNullOrEmpty())

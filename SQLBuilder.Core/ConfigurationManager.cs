@@ -58,20 +58,68 @@ namespace SQLBuilder.Core
         public static void SetConfigurationFile(string fileName, string basePath = null)
         {
             Configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath.IsNullOrEmpty() ? Directory.GetCurrentDirectory() : basePath)
+                .SetBasePath(string.IsNullOrEmpty(basePath) ? Directory.GetCurrentDirectory() : basePath)
                 .AddJsonFile(fileName, optional: true, reloadOnChange: true)
                 .Build();
         }
         #endregion
 
-        #region GetAppSettings
+        #region Get
+        /// <summary>
+        /// 根据key值获取Section然后转换为T类型值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static T Get<T>(string key)
+        {
+            return Configuration.GetSection(key).Get<T>();
+        }
+
+        /// <summary>
+        /// 根据key值获取Section然后转换为T类型值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
+        public static T Get<T>(string key, Action<BinderOptions> configureOptions)
+        {
+            return Configuration.GetSection(key).Get<T>(configureOptions);
+        }
+        #endregion
+
+        #region Bind
+        /// <summary>
+        /// 绑定配置到已有实例
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="instance"></param>
+        public static void Bind(string key, object instance)
+        {
+            Configuration.GetSection(key).Bind(instance);
+        }
+
+        /// <summary>
+        /// 绑定配置到已有实例
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="instance"></param>
+        /// <param name="configureOptions"></param>
+        public static void Bind(string key, object instance, Action<BinderOptions> configureOptions)
+        {
+            Configuration.GetSection(key).Bind(instance, configureOptions);
+        }
+        #endregion
+
+        #region GetValue
         /// <summary>
         /// 获取配置信息
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">配置名称</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetAppSettings<T>(string key)
+        public static T GetValue<T>(string key)
         {
             return Configuration.GetValue<T>(key);
         }
@@ -83,7 +131,7 @@ namespace SQLBuilder.Core
         /// <param name="key">配置名称</param>
         /// <param name="defaultValue">默认值</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetAppSettings<T>(string key, T defaultValue)
+        public static T GetValue<T>(string key, T defaultValue)
         {
             return Configuration.GetValue<T>(key, defaultValue);
         }
@@ -94,7 +142,7 @@ namespace SQLBuilder.Core
         /// <param name="type">配置对象类型</param>
         /// <param name="key">配置名称</param>
         /// <returns>返回object类型配置对象</returns>
-        public static object GetAppSettings(Type type, string key)
+        public static object GetValue(Type type, string key)
         {
             return Configuration.GetValue(type, key);
         }
@@ -106,7 +154,7 @@ namespace SQLBuilder.Core
         /// <param name="key">配置名称</param>
         /// <param name="defaultValue"></param>
         /// <returns>返回object类型配置对象</returns>
-        public static object GetAppSettings(Type type, string key, object defaultValue)
+        public static object GetValue(Type type, string key, object defaultValue)
         {
             return Configuration.GetValue(type, key, defaultValue);
         }
@@ -124,18 +172,19 @@ namespace SQLBuilder.Core
         }
         #endregion
 
-        #region GetOptionsAppSettings
+        #region GetOptions
         /// <summary>
         /// 获取配置并映射到实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsAppSettings<T>() where T : class, new()
+        public static T GetOptions<T>() where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration)
                 .BuildServiceProvider()
                 .GetService<IOptions<T>>();
+
             return options?.Value;
         }
 
@@ -145,28 +194,30 @@ namespace SQLBuilder.Core
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">配置名称</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsAppSettings<T>(string key) where T : class, new()
+        public static T GetOptions<T>(string key) where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration.GetSection(key))
                 .BuildServiceProvider()
                 .GetService<IOptions<T>>();
+
             return options?.Value;
         }
         #endregion
 
-        #region GetOptionsMonitorAppSettings
+        #region GetOptionsMonitor
         /// <summary>
         /// 获取配置并映射到实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>() where T : class, new()
+        public static T GetOptionsMonitor<T>() where T : class, new()
         {
             var options = new ServiceCollection()
                .Configure<T>(Configuration)
                .BuildServiceProvider()
                .GetService<IOptionsMonitor<T>>();
+
             return options?.CurrentValue;
         }
 
@@ -176,12 +227,13 @@ namespace SQLBuilder.Core
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">配置名称</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>(string key) where T : class, new()
+        public static T GetOptionsMonitor<T>(string key) where T : class, new()
         {
             var options = new ServiceCollection()
                .Configure<T>(Configuration.GetSection(key))
                .BuildServiceProvider()
                .GetService<IOptionsMonitor<T>>();
+
             return options?.CurrentValue;
         }
 
@@ -191,13 +243,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="listener">监听配置变化时的委托</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>(Action<T> listener) where T : class, new()
+        public static T GetOptionsMonitor<T>(Action<T> listener) where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration)
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
-            if (listener != null) options?.OnChange(listener);
+
+            if (listener != null)
+                options?.OnChange(listener);
+
             return options?.CurrentValue;
         }
 
@@ -207,13 +262,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="listener">监听配置变化时的委托</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>(Action<T, string> listener) where T : class, new()
+        public static T GetOptionsMonitor<T>(Action<T, string> listener) where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration)
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
-            if (listener != null) options?.OnChange(listener);
+
+            if (listener != null)
+                options?.OnChange(listener);
+
             return options?.CurrentValue;
         }
 
@@ -224,13 +282,16 @@ namespace SQLBuilder.Core
         /// <param name="key">配置名称</param>
         /// <param name="listener">监听配置变化时的委托</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>(string key, Action<T> listener) where T : class, new()
+        public static T GetOptionsMonitor<T>(string key, Action<T> listener) where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration.GetSection(key))
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
-            if (listener != null) options?.OnChange(listener);
+
+            if (listener != null)
+                options?.OnChange(listener);
+
             return options?.CurrentValue;
         }
 
@@ -241,13 +302,16 @@ namespace SQLBuilder.Core
         /// <param name="key">配置名称</param>
         /// <param name="listener">监听配置变化时的委托</param>
         /// <returns>返回T类型配置对象</returns>
-        public static T GetOptionsMonitorAppSettings<T>(string key, Action<T, string> listener) where T : class, new()
+        public static T GetOptionsMonitor<T>(string key, Action<T, string> listener) where T : class, new()
         {
             var options = new ServiceCollection()
                 .Configure<T>(Configuration.GetSection(key))
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
-            if (listener != null) options?.OnChange(listener);
+
+            if (listener != null)
+                options?.OnChange(listener);
+
             return options?.CurrentValue;
         }
         #endregion

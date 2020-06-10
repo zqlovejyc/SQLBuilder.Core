@@ -2624,7 +2624,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2633,7 +2633,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2665,7 +2665,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2674,7 +2674,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2707,7 +2707,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2716,7 +2716,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2763,7 +2763,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2772,7 +2772,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2804,7 +2804,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2813,7 +2813,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2845,7 +2845,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2854,7 +2854,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -2886,7 +2886,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var list = await multiQuery?.ReadAsync<T>();
                 return (list, total);
             }
@@ -2895,7 +2895,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var list = await multiQuery?.ReadAsync<T>();
                     return (list, total);
                 }
@@ -3232,7 +3232,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3242,7 +3242,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3274,7 +3274,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3284,7 +3284,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3316,7 +3316,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3326,7 +3326,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
                     return (table, total);
@@ -3358,7 +3358,7 @@ namespace SQLBuilder.Core.Repositories
             if (Transaction?.Connection != null)
             {
                 var multiQuery = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                 var reader = await multiQuery?.ReadAsync();
                 var table = reader?.ToList()?.ToDataTable();
                 return (table, total);
@@ -3368,7 +3368,7 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     var multiQuery = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    var total = (long)(await multiQuery?.ReadFirstOrDefaultAsync<dynamic>()).Total;
+                    var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.Total ?? 0);
                     var reader = await multiQuery?.ReadAsync();
                     var table = reader?.ToList()?.ToDataTable();
                     return (table, total);

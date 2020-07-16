@@ -196,6 +196,41 @@ namespace SQLBuilder.Core
         }
         #endregion
 
+        #region WhereIF
+        /// <summary>
+        /// WhereIF
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="condition"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static Expression<Func<T, bool>> WhereIF<T>(this Expression<Func<T, bool>> @this, bool condition, Expression<Func<T, bool>> other)
+        {
+            if (condition)
+                @this = @this.And(other);
+
+            return @this;
+        }
+
+        /// <summary>
+        /// WhereIF
+        /// </summary>
+        /// <typeparam name="T1"></typeparam>
+        /// <typeparam name="T2"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="condition"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public static Expression<Func<T1, T2, bool>> WhereIF<T1, T2>(this Expression<Func<T1, T2, bool>> @this, bool condition, Expression<Func<T1, T2, bool>> other)
+        {
+            if (condition)
+                @this = @this.And(other);
+
+            return @this;
+        }
+        #endregion
+
         #region ToLambda
         /// <summary>
         /// ToLambda

@@ -41,7 +41,7 @@ namespace SQLBuilder.Core
     /// <summary>
     /// SqlPack
     /// </summary>
-    public class SqlPack
+	public class SqlPack
     {
         #region Private Field
         /// <summary>
@@ -237,7 +237,12 @@ namespace SQLBuilder.Core
         {
             if (!this.dicTableName.Keys.Contains(tableName))
             {
-                this.dicTableName.Add(tableName, this.tableAliasQueue.Dequeue());
+                var tableAlias = this.tableAliasQueue.Dequeue();
+
+                if (this.IsEnableFormat == true)
+                    tableAlias = string.Format(this.FormatTempl, tableAlias);
+
+                this.dicTableName.Add(tableName, tableAlias);
                 return true;
             }
             return false;

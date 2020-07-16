@@ -2,17 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.4.8</AssemblyVersion>
+        <AssemblyVersion>1.0.4.9</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.4.8</Version>
+        <Version>1.0.4.9</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.修改ConfigurationManager工具类，重名GetAppSettings为GetValue，GetOptionsAppSettings为GetOptions，GetOptionsMonitorAppSettings为GetOptionsMonitor；新增Get和Bind方法；
-2.修改分页异步查询获取总条数，官方异步方法ReadFirstOrDefaultAsync&lt;long&gt;()抛异常，同步方法正常，具体原因未知；现改为ReadFirstOrDefaultAsync&lt;dynamic&gt;()，然后再强制转换为long；
-3.升级Nuget包为最新版本；</PackageReleaseNotes>
-        <FileVersion>1.0.4.8</FileVersion>
+        <PackageReleaseNotes>1.新增Linq扩展方法WhereIF；
+2.重载Where、AndWhere和OrWhere方法；
+3.新增WhereIF方法；
+4.修改表变量，添加格式化；
+5.重载Join、InnerJoin、LeftJoin、RightJoin和FullJoin方法，支持自定义Join拼接sql语句；</PackageReleaseNotes>
+        <FileVersion>1.0.4.9</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>SQL.png</PackageIcon>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

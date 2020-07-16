@@ -289,7 +289,7 @@ namespace SQLBuilder.Core
         public string GetTableName(Type type)
         {
             var tableName = this.GetFormatName(type.Name);
-            if (type.GetCustomAttributes(typeof(CusTableAttribute), false).FirstOrDefault() is CusTableAttribute cta)
+            if (type.GetFirstOrDefaultAttribute<CusTableAttribute>() is CusTableAttribute cta)
             {
                 if (!cta.Name.IsNullOrEmpty())
                 {
@@ -300,7 +300,7 @@ namespace SQLBuilder.Core
                     tableName = $"{this.GetFormatName(cta.Schema)}.{tableName}";
                 }
             }
-            else if (type.GetCustomAttributes(typeof(SysTableAttribute), false).FirstOrDefault() is SysTableAttribute sta)
+            else if (type.GetFirstOrDefaultAttribute<SysTableAttribute>() is SysTableAttribute sta)
             {
                 if (!sta.Name.IsNullOrEmpty())
                 {

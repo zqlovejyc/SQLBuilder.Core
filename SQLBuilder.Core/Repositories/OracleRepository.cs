@@ -1313,6 +1313,74 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回实体</returns>
+        public T FindEntity<T>(string sql)
+        {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.QueryFirstOrDefault<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.QueryFirstOrDefault<T>(sql, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public T FindEntity<T>(string sql, object parameter)
+        {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public T FindEntity<T>(string sql, params DbParameter[] dbParameter)
+        {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return Transaction.Connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -1380,74 +1448,6 @@ namespace SQLBuilder.Core.Repositories
                 }
             }
         }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回实体</returns>
-        public T FindEntityBySql<T>(string sql)
-        {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        public T FindEntityBySql<T>(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        public T FindEntityBySql<T>(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
-        }
         #endregion
 
         #region Async
@@ -1470,6 +1470,74 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回实体</returns>
+        public async Task<T> FindEntityAsync<T>(string sql)
+        {
+            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public async Task<T> FindEntityAsync<T>(string sql, object parameter)
+        {
+            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        public async Task<T> FindEntityAsync<T>(string sql, params DbParameter[] dbParameter)
+        {
+            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
+            if (Transaction?.Connection != null)
+            {
+                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
+            }
+            else
+            {
+                using (var connection = Connection)
+                {
+                    return await connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }
@@ -1539,74 +1607,6 @@ namespace SQLBuilder.Core.Repositories
                 using (var connection = Connection)
                 {
                     return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回实体</returns>
-        public async Task<T> FindEntityBySqlAsync<T>(string sql)
-        {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        public async Task<T> FindEntityBySqlAsync<T>(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        public async Task<T> FindEntityBySqlAsync<T>(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
                 }
             }
         }

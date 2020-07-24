@@ -460,6 +460,32 @@ namespace SQLBuilder.Core.Repositories
         T FindEntity<T>(params object[] KeyValues) where T : class;
 
         /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(string sql, params DbParameter[] dbParameter);
+
+        /// <summary>
         /// 根据主键查询单个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -484,32 +510,6 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回实体</returns>
-        T FindEntityBySql<T>(string sql);
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        T FindEntityBySql<T>(string sql, object parameter);
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        T FindEntityBySql<T>(string sql, params DbParameter[] dbParameter);
         #endregion
 
         #region Async
@@ -520,6 +520,32 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="KeyValues">主键，多个值表示联合主键</param>
         /// <returns>返回实体</returns>
         Task<T> FindEntityAsync<T>(params object[] KeyValues) where T : class;
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(string sql, params DbParameter[] dbParameter);
 
         /// <summary>
         /// 根据主键查询单个实体
@@ -546,32 +572,6 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回实体</returns>
-        Task<T> FindEntityBySqlAsync<T>(string sql);
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        Task<T> FindEntityBySqlAsync<T>(string sql, object parameter);
-
-        /// <summary>
-        /// 根据sql语句查询单个实体
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回实体</returns>
-        Task<T> FindEntityBySqlAsync<T>(string sql, params DbParameter[] dbParameter);
         #endregion
         #endregion
 

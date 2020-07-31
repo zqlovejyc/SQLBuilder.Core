@@ -151,7 +151,7 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="array">可变数量参数</param>
         /// <returns>string</returns>
-        private string SelectParser(params Type[] array)
+        private string Select(params Type[] array)
         {
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = false;
@@ -176,9 +176,29 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Select(Expression expression = null)
+        {
+            var sql = this.Select(typeof(T));
+            if (expression == null)
+            {
+                this._sqlPack.Sql.AppendFormat(sql, "*");
+            }
+            else
+            {
+                SqlBuilderProvider.Select(expression, this._sqlPack);
+                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Select(Expression<Func<T, object>> expression = null)
         {
-            var sql = SelectParser(typeof(T));
+            var sql = this.Select(typeof(T));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -200,7 +220,7 @@ namespace SQLBuilder.Core
         public SqlBuilderCore<T> Select<T2>(Expression<Func<T, T2, object>> expression = null)
             where T2 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2));
+            var sql = this.Select(typeof(T), typeof(T2));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -224,7 +244,7 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -250,7 +270,7 @@ namespace SQLBuilder.Core
             where T3 : class
             where T4 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -278,7 +298,7 @@ namespace SQLBuilder.Core
             where T4 : class
             where T5 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -308,7 +328,7 @@ namespace SQLBuilder.Core
             where T5 : class
             where T6 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -340,7 +360,7 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -374,7 +394,7 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -410,7 +430,7 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -448,7 +468,7 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            var sql = SelectParser(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
+            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
             if (expression == null)
             {
                 this._sqlPack.Sql.AppendFormat(sql, "*");
@@ -464,48 +484,6 @@ namespace SQLBuilder.Core
 
         #region Join
         /// <summary>
-        /// JoinParser
-        /// </summary>
-        /// <typeparam name="T2">泛型类型2</typeparam>
-        /// <param name="expression">表达式树</param>
-        /// <param name="leftOrRightJoin">左连接或者右连接</param>
-        /// <returns>SqlBuilderCore</returns>
-        private SqlBuilderCore<T> JoinParser<T2>(Expression<Func<T, T2, bool>> expression, string leftOrRightJoin = "")
-            where T2 : class
-        {
-            string joinTableName = this._sqlPack.GetTableName(typeof(T2));
-            this._sqlPack.SetTableAlias(joinTableName);
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
-                this._sqlPack.Sql.Append($"{(leftOrRightJoin.IsNullOrEmpty() ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            else
-                this._sqlPack.Sql.Append($"{(leftOrRightJoin.IsNullOrEmpty() ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
-            return this;
-        }
-
-        /// <summary>
-        /// JoinParser2
-        /// </summary>
-        /// <typeparam name="T2">泛型类型2</typeparam>
-        /// <typeparam name="T3">泛型类型3</typeparam>
-        /// <param name="expression">表达式树</param>
-        /// <param name="leftOrRightJoin">左连接或者右连接</param>
-        /// <returns>SqlBuilderCore</returns>
-        private SqlBuilderCore<T> JoinParser2<T2, T3>(Expression<Func<T2, T3, bool>> expression, string leftOrRightJoin = "")
-            where T2 : class
-            where T3 : class
-        {
-            string joinTableName = this._sqlPack.GetTableName(typeof(T3));
-            this._sqlPack.SetTableAlias(joinTableName);
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
-                this._sqlPack.Sql.Append($"{(leftOrRightJoin.IsNullOrEmpty() ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            else
-                this._sqlPack.Sql.Append($"{(leftOrRightJoin.IsNullOrEmpty() ? "" : " " + leftOrRightJoin)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
-            return this;
-        }
-
-        /// <summary>
         /// Join
         /// </summary>
         /// <param name="sql">自定义Join语句</param>
@@ -520,13 +498,67 @@ namespace SQLBuilder.Core
         /// <summary>
         /// Join
         /// </summary>
+        /// <param name="sql">自定义Join语句</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> Join(StringBuilder sql)
+        {
+            this._sqlPack += " JOIN ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="join">连接类型</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join)
+            where T2 : class
+        {
+            string joinTableName = this._sqlPack.GetTableName(typeof(T2));
+            this._sqlPack.SetTableAlias(joinTableName);
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            else
+                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
+            return this;
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="join">连接类型</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2, T3>(Expression<Func<T2, T3, bool>> expression, string join)
+            where T2 : class
+            where T3 : class
+        {
+            string joinTableName = this._sqlPack.GetTableName(typeof(T3));
+            this._sqlPack.SetTableAlias(joinTableName);
+            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            else
+                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
+            return this;
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return JoinParser(expression);
+            return this.Join<T2>(expression, "");
         }
 
         /// <summary>
@@ -540,7 +572,7 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            return JoinParser2(expression);
+            return this.Join<T2, T3>(expression, "");
         }
 
         /// <summary>
@@ -558,13 +590,25 @@ namespace SQLBuilder.Core
         /// <summary>
         /// InnerJoin
         /// </summary>
+        /// <param name="sql">自定义InnerJoin语句</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> InnerJoin(StringBuilder sql)
+        {
+            this._sqlPack += " INNER JOIN ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// InnerJoin
+        /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> InnerJoin<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return JoinParser(expression, "INNER");
+            return this.Join<T2>(expression, "INNER");
         }
 
         /// <summary>
@@ -578,7 +622,7 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            return JoinParser2(expression, "INNER");
+            return this.Join<T2, T3>(expression, "INNER");
         }
 
         /// <summary>
@@ -596,13 +640,25 @@ namespace SQLBuilder.Core
         /// <summary>
         /// LeftJoin
         /// </summary>
+        /// <param name="sql">自定义LeftJoin语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> LeftJoin(StringBuilder sql)
+        {
+            this._sqlPack += " LEFT JOIN ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// LeftJoin
+        /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> LeftJoin<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return JoinParser(expression, "LEFT");
+            return this.Join<T2>(expression, "LEFT");
         }
 
         /// <summary>
@@ -616,7 +672,7 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            return JoinParser2(expression, "LEFT");
+            return this.Join<T2, T3>(expression, "LEFT");
         }
 
         /// <summary>
@@ -634,13 +690,25 @@ namespace SQLBuilder.Core
         /// <summary>
         /// RightJoin
         /// </summary>
+        /// <param name="sql">自定义RightJoin语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> RightJoin(StringBuilder sql)
+        {
+            this._sqlPack += " RIGHT JOIN ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// RightJoin
+        /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> RightJoin<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return JoinParser(expression, "RIGHT");
+            return this.Join<T2>(expression, "RIGHT");
         }
 
         /// <summary>
@@ -654,7 +722,7 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            return JoinParser2(expression, "RIGHT");
+            return this.Join<T2, T3>(expression, "RIGHT");
         }
 
         /// <summary>
@@ -672,13 +740,25 @@ namespace SQLBuilder.Core
         /// <summary>
         /// FullJoin
         /// </summary>
+        /// <param name="sql">自定义FullJoin语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> FullJoin(StringBuilder sql)
+        {
+            this._sqlPack += " FULL JOIN ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// FullJoin
+        /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> FullJoin<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return JoinParser(expression, "FULL");
+            return this.Join<T2>(expression, "FULL");
         }
 
         /// <summary>
@@ -692,32 +772,24 @@ namespace SQLBuilder.Core
             where T2 : class
             where T3 : class
         {
-            return JoinParser2(expression, "FULL");
+            return this.Join<T2, T3>(expression, "FULL");
         }
         #endregion
 
         #region Where
         /// <summary>
-        /// WhereParser
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        private void WhereParser(Expression expression)
-        {
-            if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
-            {
-                this._sqlPack += " WHERE ";
-                SqlBuilderProvider.Where(expression, this._sqlPack);
-            }
-        }
-
-        /// <summary>
         /// Where
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> Where(string sql)
+        public SqlBuilderCore<T> Where(string sql, bool? hasWhere = null)
         {
-            this._sqlPack += " WHERE ";
+            if (hasWhere == true)
+                this._sqlPack += " AND ";
+            else
+                this._sqlPack += " WHERE ";
+
             this._sqlPack += sql;
 
             return this;
@@ -727,10 +799,15 @@ namespace SQLBuilder.Core
         /// Where
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> Where(StringBuilder sql)
+        public SqlBuilderCore<T> Where(StringBuilder sql, bool? hasWhere = null)
         {
-            this._sqlPack += " WHERE ";
+            if (hasWhere == true)
+                this._sqlPack += " AND ";
+            else
+                this._sqlPack += " WHERE ";
+
             this._sqlPack.Sql.Append(sql);
 
             return this;
@@ -740,11 +817,31 @@ namespace SQLBuilder.Core
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where(Expression<Func<T, bool>> expression)
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        public SqlBuilderCore<T> Where(Expression expression, bool? hasWhere = null)
         {
-            this.WhereParser(expression.Body);
+            if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
+            {
+                if (hasWhere == true)
+                    this._sqlPack += " AND ";
+                else
+                    this._sqlPack += " WHERE ";
+
+                SqlBuilderProvider.Where(expression, this._sqlPack);
+            }
+
             return this;
+        }
+
+        /// <summary>
+        /// Where
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Where(Expression<Func<T, bool>> expression, bool? hasWhere = null)
+        {
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -752,12 +849,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2>(Expression<Func<T, T2, bool>> expression)
+        public SqlBuilderCore<T> Where<T2>(Expression<Func<T, T2, bool>> expression, bool? hasWhere = null)
             where T2 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -766,13 +863,13 @@ namespace SQLBuilder.Core
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3>(Expression<Func<T, T2, T3, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -782,14 +879,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -800,15 +897,15 @@ namespace SQLBuilder.Core
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -820,16 +917,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
             where T6 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -842,8 +939,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -851,8 +949,7 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -866,8 +963,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -876,8 +974,7 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -892,8 +989,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -903,8 +1001,7 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -920,8 +1017,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
+        public SqlBuilderCore<T> Where<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -932,48 +1030,39 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            this.WhereParser(expression.Body);
-            return this;
+            return this.Where(expression.Body, hasWhere);
         }
         #endregion
 
         #region AndWhere
         /// <summary>
-        /// AndWhereParser
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        private void AndWhereParser(Expression expression)
-        {
-            var sql = this._sqlPack.ToString();
-            if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
-                this._sqlPack += " AND ";
-            }
-            else
-            {
-                this._sqlPack += " WHERE ";
-            }
-            this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
-        }
-
-        /// <summary>
         /// AndWhere
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> AndWhere(string sql)
+        public SqlBuilderCore<T> AndWhere(string sql, bool? hasWhere = null)
         {
-            var str = this._sqlPack.ToString();
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (hasWhere != null)
             {
-                this._sqlPack += " AND ";
+                if (hasWhere == true)
+                    this._sqlPack += " AND ";
+                else
+                    this._sqlPack += " WHERE ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                var str = this._sqlPack.ToString();
+                if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " AND ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
             }
+
             this._sqlPack += sql;
 
             return this;
@@ -983,18 +1072,30 @@ namespace SQLBuilder.Core
         /// AndWhere
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> AndWhere(StringBuilder sql)
+        public SqlBuilderCore<T> AndWhere(StringBuilder sql, bool? hasWhere = null)
         {
-            var str = this._sqlPack.ToString();
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (hasWhere != null)
             {
-                this._sqlPack += " AND ";
+                if (hasWhere == true)
+                    this._sqlPack += " AND ";
+                else
+                    this._sqlPack += " WHERE ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                var str = this._sqlPack.ToString();
+                if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " AND ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
             }
+
             this._sqlPack.Sql.Append(sql);
 
             return this;
@@ -1003,12 +1104,47 @@ namespace SQLBuilder.Core
         /// <summary>
         /// AndWhere
         /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere(Expression<Func<T, bool>> expression)
+        /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> AndWhere(Expression expression, bool? hasWhere = null)
         {
-            this.AndWhereParser(expression.Body);
+            if (hasWhere != null)
+            {
+                if (hasWhere == true)
+                    this._sqlPack += " AND ";
+                else
+                    this._sqlPack += " WHERE ";
+            }
+            else
+            {
+                var sql = this._sqlPack.ToString();
+                if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " AND ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
+            }
+
+            this._sqlPack += "(";
+            SqlBuilderProvider.Where(expression, this._sqlPack);
+            this._sqlPack += ")";
+
             return this;
+        }
+
+        /// <summary>
+        /// AndWhere
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> AndWhere(Expression<Func<T, bool>> expression, bool? hasWhere = null)
+        {
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1016,12 +1152,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2>(Expression<Func<T, T2, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2>(Expression<Func<T, T2, bool>> expression, bool? hasWhere = null)
             where T2 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1030,13 +1166,13 @@ namespace SQLBuilder.Core
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3>(Expression<Func<T, T2, T3, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1046,14 +1182,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1064,15 +1200,15 @@ namespace SQLBuilder.Core
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1084,16 +1220,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
             where T6 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1106,8 +1242,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1115,8 +1252,7 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1130,8 +1266,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1140,8 +1277,7 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1156,8 +1292,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1167,8 +1304,7 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1184,8 +1320,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
+        public SqlBuilderCore<T> AndWhere<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1196,48 +1333,39 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            this.AndWhereParser(expression.Body);
-            return this;
+            return this.AndWhere(expression.Body, hasWhere);
         }
         #endregion
 
         #region OrWhere
         /// <summary>
-        /// OrWhereParser
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        private void OrWhereParser(Expression expression)
-        {
-            var sql = this._sqlPack.ToString();
-            if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
-                this._sqlPack += " OR ";
-            }
-            else
-            {
-                this._sqlPack += " WHERE ";
-            }
-            this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
-        }
-
-        /// <summary>
         /// AndWhere
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> OrWhere(string sql)
+        public SqlBuilderCore<T> OrWhere(string sql, bool? hasWhere = null)
         {
-            var str = this._sqlPack.ToString();
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (hasWhere != null)
             {
-                this._sqlPack += " OR ";
+                if (hasWhere == true)
+                    this._sqlPack += " OR ";
+                else
+                    this._sqlPack += " WHERE ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                var str = this._sqlPack.ToString();
+                if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " OR ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
             }
+
             this._sqlPack += sql;
 
             return this;
@@ -1247,18 +1375,30 @@ namespace SQLBuilder.Core
         /// AndWhere
         /// </summary>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> OrWhere(StringBuilder sql)
+        public SqlBuilderCore<T> OrWhere(StringBuilder sql, bool? hasWhere = null)
         {
-            var str = this._sqlPack.ToString();
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (hasWhere != null)
             {
-                this._sqlPack += " OR ";
+                if (hasWhere == true)
+                    this._sqlPack += " OR ";
+                else
+                    this._sqlPack += " WHERE ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                var str = this._sqlPack.ToString();
+                if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " OR ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
             }
+
             this._sqlPack.Sql.Append(sql);
 
             return this;
@@ -1268,11 +1408,45 @@ namespace SQLBuilder.Core
         /// OrWhere
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere(Expression<Func<T, bool>> expression)
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        public SqlBuilderCore<T> OrWhere(Expression expression, bool? hasWhere = null)
         {
-            this.OrWhereParser(expression.Body);
+            if (hasWhere != null)
+            {
+                if (hasWhere == true)
+                    this._sqlPack += " OR ";
+                else
+                    this._sqlPack += " WHERE ";
+            }
+            else
+            {
+                var sql = this._sqlPack.ToString();
+                if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
+                {
+                    this._sqlPack += " OR ";
+                }
+                else
+                {
+                    this._sqlPack += " WHERE ";
+                }
+            }
+
+            this._sqlPack += "(";
+            SqlBuilderProvider.Where(expression, this._sqlPack);
+            this._sqlPack += ")";
+
             return this;
+        }
+
+        /// <summary>
+        /// OrWhere
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrWhere(Expression<Func<T, bool>> expression, bool? hasWhere = null)
+        {
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1280,12 +1454,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2>(Expression<Func<T, T2, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2>(Expression<Func<T, T2, bool>> expression, bool? hasWhere = null)
             where T2 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1294,13 +1468,13 @@ namespace SQLBuilder.Core
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3>(Expression<Func<T, T2, T3, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1310,14 +1484,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1328,15 +1502,15 @@ namespace SQLBuilder.Core
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1348,16 +1522,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
             where T6 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1370,8 +1544,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1379,8 +1554,7 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1394,8 +1568,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1404,8 +1579,7 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1420,8 +1594,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1431,8 +1606,7 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
 
         /// <summary>
@@ -1448,8 +1622,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
         /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
+        public SqlBuilderCore<T> OrWhere<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1460,8 +1635,7 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            this.OrWhereParser(expression.Body);
-            return this;
+            return this.OrWhere(expression.Body, hasWhere);
         }
         #endregion
 
@@ -1471,11 +1645,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, string sql)
+        public SqlBuilderCore<T> WhereIF(bool condition, string sql, bool? hasWhere = null)
         {
             if (condition)
-                this.AndWhere(sql);
+                this.AndWhere(sql, hasWhere);
 
             return this;
         }
@@ -1485,11 +1660,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, StringBuilder sql)
+        public SqlBuilderCore<T> WhereIF(bool condition, StringBuilder sql, bool? hasWhere = null)
         {
             if (condition)
-                this.AndWhere(sql);
+                this.AndWhere(sql, hasWhere);
 
             return this;
         }
@@ -1499,11 +1675,12 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, Expression<Func<T, bool>> expression)
+        public SqlBuilderCore<T> WhereIF(bool condition, Expression<Func<T, bool>> expression, bool? hasWhere = null)
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1514,12 +1691,13 @@ namespace SQLBuilder.Core
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2>(bool condition, Expression<Func<T, T2, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2>(bool condition, Expression<Func<T, T2, bool>> expression, bool? hasWhere = null)
             where T2 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1531,13 +1709,14 @@ namespace SQLBuilder.Core
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1550,14 +1729,15 @@ namespace SQLBuilder.Core
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1571,15 +1751,16 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1594,8 +1775,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1603,7 +1785,7 @@ namespace SQLBuilder.Core
             where T6 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1619,8 +1801,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1629,7 +1812,7 @@ namespace SQLBuilder.Core
             where T7 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1646,8 +1829,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1657,7 +1841,7 @@ namespace SQLBuilder.Core
             where T8 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1675,8 +1859,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1687,7 +1872,7 @@ namespace SQLBuilder.Core
             where T9 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1706,8 +1891,9 @@ namespace SQLBuilder.Core
         /// <typeparam name="T10">泛型类型10</typeparam>
         /// <param name="condition"></param>
         /// <param name="expression"></param>
+        /// <param name="hasWhere">指定是否已包含where关键字，默认null</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
+        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, bool? hasWhere = null)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -1719,7 +1905,7 @@ namespace SQLBuilder.Core
             where T10 : class
         {
             if (condition)
-                this.AndWhere(expression);
+                this.AndWhere(expression, hasWhere);
 
             return this;
         }
@@ -1821,17 +2007,268 @@ namespace SQLBuilder.Core
         /// <summary>
         /// GroupBy
         /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy(string sql)
+        {
+            this._sqlPack += " GROUP BY ";
+            this._sqlPack += sql;
+            return this;
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy(StringBuilder sql)
+        {
+            this._sqlPack += " GROUP BY ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy(Expression expression)
+        {
+            this._sqlPack += " GROUP BY ";
+            SqlBuilderProvider.GroupBy(expression, this._sqlPack);
+            return this;
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
         /// <param name="expression">表达式树</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(Expression<Func<T, object>> expression)
         {
-            this._sqlPack += " GROUP BY ";
-            SqlBuilderProvider.GroupBy(expression.Body, this._sqlPack);
-            return this;
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2>(Expression<Func<T, T2, object>> expression)
+            where T2 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3>(Expression<Func<T, T2, T3, object>> expression)
+            where T2 : class
+            where T3 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            return this.GroupBy(expression.Body);
+        }
+
+        /// <summary>
+        /// GroupBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> GroupBy<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            return this.GroupBy(expression.Body);
         }
         #endregion
 
         #region OrderBy
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy(string sql)
+        {
+            this._sqlPack += " ORDER BY ";
+            this._sqlPack += sql;
+            return this;
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy(StringBuilder sql)
+        {
+            this._sqlPack += " ORDER BY ";
+            this._sqlPack.Sql.Append(sql);
+            return this;
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy(Expression expression, params OrderType[] orders)
+        {
+            this._sqlPack += " ORDER BY ";
+            SqlBuilderProvider.OrderBy(expression, this._sqlPack, orders);
+            return this;
+        }
+
         /// <summary>
         /// OrderBy
         /// </summary>
@@ -1840,9 +2277,196 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(Expression<Func<T, object>> expression, params OrderType[] orders)
         {
-            this._sqlPack += " ORDER BY ";
-            SqlBuilderProvider.OrderBy(expression.Body, this._sqlPack, orders);
-            return this;
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2>(Expression<Func<T, T2, object>> expression, params OrderType[] orders)
+            where T2 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3>(Expression<Func<T, T2, T3, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            return this.OrderBy(expression.Body, orders);
+        }
+
+        /// <summary>
+        /// OrderBy
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="orders">排序方式</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderBy<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression, params OrderType[] orders)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            return this.OrderBy(expression.Body, orders);
         }
         #endregion
 

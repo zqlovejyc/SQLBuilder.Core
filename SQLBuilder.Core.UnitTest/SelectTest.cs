@@ -181,6 +181,24 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE [A].[Name] = @Param0 GROUP BY [A].[Id],[A].[Email]", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 分组8
+        /// </summary>
+        [TestMethod]
+        public void Test_GroupBy_08()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Student>(
+                                        (x, y) => new { x.Email, y.Name })
+                                    .InnerJoin<Student>(
+                                        (x, y) => x.Id == y.UserId)
+                                    .Where(
+                                        o => o.Name == "张强")
+                                    .GroupBy<Student>(
+                                        (x, y) => new { x.Email, y.Name });
+            Assert.AreEqual("SELECT [A].[Email],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Student] AS [B] ON [A].[Id] = [B].[UserId] WHERE [A].[Name] = @Param0 GROUP BY [A].[Email],[B].[Name]", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Order By
@@ -380,6 +398,26 @@ namespace SQLBuilder.Core.UnitTest
                                     .OrderBy(u => "[Id] DESC");
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] ORDER BY [A].[Id] DESC", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序17
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_17()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Student>(
+                                        (x, y) => new { x.Email, y.Name })
+                                    .InnerJoin<Student>(
+                                        (x, y) => x.Id == y.UserId)
+                                    .Where(
+                                        o => o.Name == "张强")
+                                    .GroupBy<Student>(
+                                        (x, y) => new { x.Email, y.Name })
+                                    .OrderBy<Student>(
+                                        (x, y) => y.Name);
+            Assert.AreEqual("SELECT [A].[Email],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Student] AS [B] ON [A].[Id] = [B].[UserId] WHERE [A].[Name] = @Param0 GROUP BY [A].[Email],[B].[Name] ORDER BY [B].[Name]", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
         }
         #endregion
 
@@ -1444,6 +1482,66 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("SELECT [A].[Id],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON ([B].[Name] IS NOT NULL AND [B].[Name] <> '') AND [A].[Id] = [B].[UserId] AND [A].[Id] = @Param0 AND [B].[UserId] <> @Param1 AND [B].[Id] = @Param2 WHERE [A].[Email] = @Param3", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询80
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_80()
+        {
+            //Where条件拼接
+            var whereCondition = Extensions.True<UserInfo>();
+            whereCondition = whereCondition.And(x => x.Email == "123");
+
+            //Join条件拼接
+            var name = "";
+            var joinCondition = Extensions.True<UserInfo, Account>()
+                                          .And((x, y) => x.Id == y.UserId)
+                                          .WhereIF(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
+
+            //sql构建
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
+                            .InnerJoin<Account>(joinCondition)
+                            .Where(whereCondition);
+
+            Assert.AreEqual("SELECT [A].[Id],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] WHERE [A].[Email] = @Param0", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询81
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_81()
+        {
+            //Join条件拼接
+            var name = "123";
+            var joinCondition = Extensions.True<UserInfo, Account>()
+                                          .And((x, y) => x.Id == y.UserId)
+                                          .WhereIF(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
+
+            //sql构建
+            var hasWhere = false;
+            var email = "123@qq.com";
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>(
+                                (u, a) => new { u.Id, a.Name })
+                            .InnerJoin<Account>(
+                                joinCondition)
+                            .WhereIF(
+                                !name.IsNullOrEmpty(),
+                                x => x.Name.Contains(name),
+                                ref hasWhere)
+                            .WhereIF(
+                                !email.IsNullOrEmpty(),
+                                x => x.Email == email,
+                                ref hasWhere);
+
+
+            Assert.AreEqual("SELECT [A].[Id],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] AND [A].[Name] LIKE '%' + @Param0 + '%' WHERE ([A].[Name] LIKE '%' + @Param1 + '%') AND ([A].[Email] = @Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
         }
         #endregion
 

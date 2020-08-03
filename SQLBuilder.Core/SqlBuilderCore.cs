@@ -2322,14 +2322,14 @@ namespace SQLBuilder.Core
         }
         #endregion
 
-        #region WhereIF
+        #region WhereIf
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, string sql)
+        public SqlBuilderCore<T> WhereIf(bool condition, string sql)
         {
             if (condition)
                 this.AndWhere(sql);
@@ -2338,13 +2338,32 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, string sql, Action callback)
+        {
+            if (condition)
+            {
+                this.AndWhere(sql);
+
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, string sql, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf(bool condition, string sql, ref bool hasWhere)
         {
             if (condition)
                 this.AndWhere(sql, ref hasWhere);
@@ -2353,12 +2372,32 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, string sql, ref bool hasWhere, Action callback)
+        {
+            if (condition)
+            {
+                this.AndWhere(sql, ref hasWhere);
+
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, StringBuilder sql)
+        public SqlBuilderCore<T> WhereIf(bool condition, StringBuilder sql)
         {
             if (condition)
                 this.AndWhere(sql);
@@ -2367,13 +2406,32 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, StringBuilder sql, Action callback)
+        {
+            if (condition)
+            {
+                this.AndWhere(sql);
+
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <param name="condition">条件</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, StringBuilder sql, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf(bool condition, StringBuilder sql, ref bool hasWhere)
         {
             if (condition)
                 this.AndWhere(sql, ref hasWhere);
@@ -2382,12 +2440,32 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, Expression expression)
+        public SqlBuilderCore<T> WhereIf(bool condition, StringBuilder sql, ref bool hasWhere, Action callback)
+        {
+            if (condition)
+            {
+                this.AndWhere(sql, ref hasWhere);
+
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression expression)
         {
             if (condition)
                 this.AndWhere(expression);
@@ -2396,13 +2474,32 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression expression, Action callback)
+        {
+            if (condition)
+            {
+                this.AndWhere(expression);
+
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, Expression expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression expression, ref bool hasWhere)
         {
             if (condition)
                 this.AndWhere(expression, ref hasWhere);
@@ -2411,205 +2508,435 @@ namespace SQLBuilder.Core
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, Expression<Func<T, bool>> expression)
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression expression, ref bool hasWhere, Action callback)
         {
-            return this.WhereIF(condition, expression.Body);
+            if (condition)
+            {
+                this.AndWhere(expression, ref hasWhere);
+
+                callback?.Invoke();
+            }
+
+            return this;
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression)
+        {
+            return this.WhereIf(condition, expression.Body);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, Action callback)
+        {
+            return this.WhereIf(condition, expression.Body, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF(bool condition, Expression<Func<T, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, ref bool hasWhere)
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, ref bool hasWhere, Action callback)
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2>(bool condition, Expression<Func<T, T2, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, Action callback)
+            where T2 : class
+        {
+            return this.WhereIf(condition, expression.Body, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2>(bool condition, Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
             where T2 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression)
             where T2 : class
             where T3 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3>(bool condition, Expression<Func<T, T2, T3, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4>(bool condition, Expression<Func<T, T2, T3, T4, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5>(bool condition, Expression<Func<T, T2, T3, T4, T5, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
             where T6 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
         /// <typeparam name="T4">泛型类型4</typeparam>
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
             where T6 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2617,10 +2944,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2628,11 +2955,11 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2640,11 +2967,11 @@ namespace SQLBuilder.Core
         /// <typeparam name="T5">泛型类型5</typeparam>
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2652,11 +2979,60 @@ namespace SQLBuilder.Core
             where T6 : class
             where T7 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2665,10 +3041,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2677,11 +3053,11 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2690,11 +3066,11 @@ namespace SQLBuilder.Core
         /// <typeparam name="T6">泛型类型6</typeparam>
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2703,11 +3079,64 @@ namespace SQLBuilder.Core
             where T7 : class
             where T8 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2717,10 +3146,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2730,11 +3159,11 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2744,11 +3173,11 @@ namespace SQLBuilder.Core
         /// <typeparam name="T7">泛型类型7</typeparam>
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2758,11 +3187,68 @@ namespace SQLBuilder.Core
             where T8 : class
             where T9 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2773,10 +3259,10 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2787,11 +3273,11 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            return this.WhereIF(condition, expression.Body);
+            return this.WhereIf(condition, expression.Body);
         }
 
         /// <summary>
-        /// WhereIF
+        /// WhereIf
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
@@ -2802,11 +3288,11 @@ namespace SQLBuilder.Core
         /// <typeparam name="T8">泛型类型8</typeparam>
         /// <typeparam name="T9">泛型类型9</typeparam>
         /// <typeparam name="T10">泛型类型10</typeparam>
-        /// <param name="condition"></param>
-        /// <param name="expression"></param>
-        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
         /// <returns></returns>
-        public SqlBuilderCore<T> WhereIF<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, ref bool hasWhere)
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, Action callback)
             where T2 : class
             where T3 : class
             where T4 : class
@@ -2817,7 +3303,68 @@ namespace SQLBuilder.Core
             where T9 : class
             where T10 : class
         {
-            return this.WhereIF(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression.Body, callback);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, ref bool hasWhere)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere);
+        }
+
+        /// <summary>
+        /// WhereIf
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="condition">条件</param>
+        /// <param name="expression">表达式树</param>
+        /// <param name="hasWhere">指定是否已包含where关键字</param>
+        /// <param name="callback">当条件满足时，执行完拼接后回调委托</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> WhereIf<T2, T3, T4, T5, T6, T7, T8, T9, T10>(bool condition, Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, bool>> expression, ref bool hasWhere, Action callback)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
         }
         #endregion
 

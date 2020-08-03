@@ -1498,7 +1498,7 @@ namespace SQLBuilder.Core.UnitTest
             var name = "";
             var joinCondition = Extensions.True<UserInfo, Account>()
                                           .And((x, y) => x.Id == y.UserId)
-                                          .WhereIF(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
+                                          .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
 
             //sql构建
             var builder = SqlBuilder
@@ -1520,7 +1520,7 @@ namespace SQLBuilder.Core.UnitTest
             var name = "123";
             var joinCondition = Extensions.True<UserInfo, Account>()
                                           .And((x, y) => x.Id == y.UserId)
-                                          .WhereIF(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
+                                          .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
 
             //sql构建
             var hasWhere = false;
@@ -1530,11 +1530,11 @@ namespace SQLBuilder.Core.UnitTest
                                 (u, a) => new { u.Id, a.Name })
                             .InnerJoin<Account>(
                                 joinCondition)
-                            .WhereIF(
+                            .WhereIf(
                                 !name.IsNullOrEmpty(),
                                 x => x.Name.Contains(name),
                                 ref hasWhere)
-                            .WhereIF(
+                            .WhereIf(
                                 !email.IsNullOrEmpty(),
                                 x => x.Email == email,
                                 ref hasWhere);

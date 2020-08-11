@@ -2121,7 +2121,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2162,7 +2162,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2204,7 +2204,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2260,7 +2260,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2301,7 +2301,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2342,7 +2342,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2383,7 +2383,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2619,7 +2619,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2660,7 +2660,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2702,7 +2702,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2758,7 +2758,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2799,7 +2799,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2840,7 +2840,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2881,7 +2881,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -2993,7 +2993,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3001,7 +3001,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                 var reader = Transaction.Connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3011,7 +3011,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                     var reader = connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3037,7 +3037,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3045,7 +3045,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var reader = Transaction.Connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3055,7 +3055,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var reader = connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3081,7 +3081,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3089,7 +3089,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                 var reader = Transaction.Connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3099,7 +3099,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                     var reader = connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3125,7 +3125,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3133,7 +3133,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var reader = Transaction.Connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3143,7 +3143,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var reader = connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3243,7 +3243,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3251,7 +3251,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3261,7 +3261,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                     var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3287,7 +3287,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3295,7 +3295,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3305,7 +3305,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var reader = await connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3331,7 +3331,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3339,7 +3339,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3349,7 +3349,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
                     var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }
@@ -3375,7 +3375,7 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}";
+            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
             sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
             if (Transaction?.Connection != null)
@@ -3383,7 +3383,7 @@ namespace SQLBuilder.Core.Repositories
                 var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                 var table = reader?.ToDataTable();
-                table?.Columns?.Remove("RowNumber");
+                table?.Columns?.Remove("ROWNUMBER");
                 return (table, total);
             }
             else
@@ -3393,7 +3393,7 @@ namespace SQLBuilder.Core.Repositories
                     var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var reader = await connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
                     var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("RowNumber");
+                    table?.Columns?.Remove("ROWNUMBER");
                     return (table, total);
                 }
             }

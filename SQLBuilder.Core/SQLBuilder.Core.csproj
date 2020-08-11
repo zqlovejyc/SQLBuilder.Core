@@ -2,16 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyVersion>1.0.5.3</AssemblyVersion>
+        <AssemblyVersion>1.0.5.5</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.5.3</Version>
+        <Version>1.0.5.5</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.重命名所有WhereIF方法为WhereIf；
-2.重载WhereIf方法，添加回调委托参数；</PackageReleaseNotes>
-        <FileVersion>1.0.5.3</FileVersion>
+        <PackageReleaseNotes>1.修复OracleRepository中FindListByWith和FindTableByWith分页错误bug；</PackageReleaseNotes>
+        <FileVersion>1.0.5.5</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>SQL.png</PackageIcon>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

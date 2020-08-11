@@ -111,9 +111,12 @@ namespace SQLBuilder.Core
                 var argument = expression.Arguments[i];
                 var member = expression.Members[i];
                 SqlBuilderProvider.Select(argument, sqlPack);
+
                 //添加字段别名
                 if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
-                    sqlPack.SelectFields[sqlPack.SelectFields.Count - 1] += " AS " + member.Name;
+                    sqlPack.SelectFields[sqlPack.SelectFields.Count - 1] += $" AS {sqlPack.GetFormatName(member.Name)}";
+                else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
+                    sqlPack.SelectFields[sqlPack.SelectFields.Count - 1] += $" AS {sqlPack.GetFormatName(member.Name)}";
             }
             return sqlPack;
         }

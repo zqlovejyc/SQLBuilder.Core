@@ -521,7 +521,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_04()
         {
             var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, UserName = u.Name });
-            Assert.AreEqual("SELECT [A].[Id],[A].[Name] AS UserName FROM [Base_UserInfo] AS [A]", builder.Sql);
+            Assert.AreEqual("SELECT [A].[Id],[A].[Name] AS [UserName] FROM [Base_UserInfo] AS [A]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -720,7 +720,7 @@ namespace SQLBuilder.Core.UnitTest
                                     .InnerJoin<Class, City>((c, d) => c.CityId == d.Id)
                                     .FullJoin<City, Country>((c, d) => c.CountryId == d.Id)
                                     .Where(u => u.Id != null);
-            Assert.AreEqual("SELECT [A].[Id],[B].[Name],[C].[Name] AS StudentName,[D].[Name] AS ClassName,[E].[City_Name],[F].[Name] AS CountryName FROM [Base_UserInfo] AS [A] JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] LEFT JOIN [Base_Student] AS [C] ON [B].[Id] = [C].[AccountId] RIGHT JOIN [Base_Class] AS [D] ON [C].[Id] = [D].[UserId] INNER JOIN [Base_City] AS [E] ON [D].[CityId] = [E].[Id] FULL JOIN [Base_Country] AS [F] ON [E].[CountryId] = [F].[Country_Id] WHERE [A].[Id] IS NOT NULL", builder.Sql);
+            Assert.AreEqual("SELECT [A].[Id],[B].[Name],[C].[Name] AS [StudentName],[D].[Name] AS [ClassName],[E].[City_Name],[F].[Name] AS [CountryName] FROM [Base_UserInfo] AS [A] JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] LEFT JOIN [Base_Student] AS [C] ON [B].[Id] = [C].[AccountId] RIGHT JOIN [Base_Class] AS [D] ON [C].[Id] = [D].[UserId] INNER JOIN [Base_City] AS [E] ON [D].[CityId] = [E].[Id] FULL JOIN [Base_Country] AS [F] ON [E].[CountryId] = [F].[Country_Id] WHERE [A].[Id] IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1255,7 +1255,7 @@ namespace SQLBuilder.Core.UnitTest
                                 .InnerJoin<Class, City>((c, d) => c.CityId == d.Id)
                                 .FullJoin<City, Country>((c, d) => c.CountryId == d.Id)
                                 .Where(u => u.Id != null);
-            Assert.AreEqual("SELECT [A].*,[B].[Name],[C].[Name] AS StudentName,[D].[Name] AS ClassName,[E].[City_Name],[F].[Name] AS CountryName FROM [Base_UserInfo] AS [A] JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] LEFT JOIN [Base_Student] AS [C] ON [B].[Id] = [C].[AccountId] RIGHT JOIN [Base_Class] AS [D] ON [C].[Id] = [D].[UserId] INNER JOIN [Base_City] AS [E] ON [D].[CityId] = [E].[Id] FULL JOIN [Base_Country] AS [F] ON [E].[CountryId] = [F].[Country_Id] WHERE [A].[Id] IS NOT NULL", builder.Sql);
+            Assert.AreEqual("SELECT [A].*,[B].[Name],[C].[Name] AS [StudentName],[D].[Name] AS [ClassName],[E].[City_Name],[F].[Name] AS [CountryName] FROM [Base_UserInfo] AS [A] JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] LEFT JOIN [Base_Student] AS [C] ON [B].[Id] = [C].[AccountId] RIGHT JOIN [Base_Class] AS [D] ON [C].[Id] = [D].[UserId] INNER JOIN [Base_City] AS [E] ON [D].[CityId] = [E].[Id] FULL JOIN [Base_Country] AS [F] ON [E].[CountryId] = [F].[Country_Id] WHERE [A].[Id] IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1541,6 +1541,40 @@ namespace SQLBuilder.Core.UnitTest
 
 
             Assert.AreEqual("SELECT [A].[Id],[B].[Name] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] AND [A].[Name] LIKE '%' + @Param0 + '%' WHERE ([A].[Name] LIKE '%' + @Param1 + '%') AND ([A].[Email] = @Param2)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询82
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_82()
+        {
+            //Join条件拼接
+            var name = "123";
+            var joinCondition = Extensions.True<UserInfo, Account>()
+                                          .And((x, y) => x.Id == y.UserId)
+                                          .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
+
+            //sql构建
+            var hasWhere = false;
+            var email = "123@qq.com";
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>(
+                                (u, a) => new { u.Id, UserName = "[A].[Name]" })
+                            .InnerJoin<Account>(
+                                joinCondition)
+                            .WhereIf(
+                                !name.IsNullOrEmpty(),
+                                x => x.Name.Contains(name),
+                                ref hasWhere)
+                            .WhereIf(
+                                !email.IsNullOrEmpty(),
+                                x => x.Email == email,
+                                ref hasWhere);
+
+
+            Assert.AreEqual("SELECT [A].[Id],[A].[Name] AS [UserName] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] AND [A].[Name] LIKE '%' + @Param0 + '%' WHERE ([A].[Name] LIKE '%' + @Param1 + '%') AND ([A].[Email] = @Param2)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
         #endregion

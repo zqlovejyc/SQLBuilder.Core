@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SQLBuilder.Core;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SQLBuilder.Core.UnitTest
 {
@@ -23,7 +17,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 1,
                 Email = "123456@qq.com"
             });
-            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Name] = @Param0,[Sex] = @Param1,[Email] = @Param2", builder.Sql);
+            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Name] = @P1,[Sex] = @P2,[Email] = @P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
 
@@ -38,7 +32,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 1,
                 Email = "123456@qq.com"
             }).Where(u => u.Id == 1);
-            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @Param0,[Email] = @Param1 WHERE [Id] = @Param2", builder.Sql);
+            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @P1,[Email] = @P2 WHERE [Id] = @P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
 
@@ -54,7 +48,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 2
             };
             var builder = SqlBuilder.Update<UserInfo>(() => userInfo).Where(u => u.Id == 1);
-            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @Param0,[Name] = @Param1,[Email] = NULL WHERE [Id] = @Param2", builder.Sql);
+            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @P1,[Name] = @P2,[Email] = NULL WHERE [Id] = @P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
 
@@ -69,7 +63,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 1,
                 Email = "123456@qq.com"
             }).Where(u => u.Id == 1);
-            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @Param0,[Email] = @Param1 WHERE [Id] = @Param2", builder.Sql);
+            Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @P1,[Email] = @P2 WHERE [Id] = @P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
 
@@ -84,7 +78,7 @@ namespace SQLBuilder.Core.UnitTest
                 UserId = 1,
                 Name = "123456@qq.com"
             }, DatabaseType.MySQL).Where(u => u.CityId == 1);
-            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?Param0 WHERE `CityId` = ?Param1", builder.Sql);
+            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?P1 WHERE `CityId` = ?P2", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -99,7 +93,7 @@ namespace SQLBuilder.Core.UnitTest
                 UserId = 1,
                 Name = "123456@qq.com"
             }, DatabaseType.MySQL).Where(u => u.CityId == 1);
-            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?Param0 WHERE `CityId` = ?Param1", builder.Sql);
+            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?P1 WHERE `CityId` = ?P2", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -116,7 +110,7 @@ namespace SQLBuilder.Core.UnitTest
             };
             var builder = SqlBuilder.Update<Class>(() => data, DatabaseType.MySQL)
                                     .Where(u => u.CityId == 1);
-            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?Param0 WHERE `CityId` = ?Param1", builder.Sql);
+            Assert.AreEqual("UPDATE `Base_Class` SET `Name` = ?P1 WHERE `CityId` = ?P2", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -132,7 +126,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张强"
             };
             var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySQL).WithKey(data);
-            Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?Param0,`Name` = ?Param1,`Email` = NULL WHERE `Id` = ?Param2", builder.Sql);
+            Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?P1,`Name` = ?P2,`Email` = NULL WHERE `Id` = ?P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
 
@@ -148,7 +142,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张强"
             };
             var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySQL, false).WithKey(2);
-            Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?Param0,`Name` = ?Param1 WHERE `Id` = ?Param2", builder.Sql);
+            Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?P1,`Name` = ?P2 WHERE `Id` = ?P3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
     }

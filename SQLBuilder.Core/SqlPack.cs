@@ -214,7 +214,7 @@ namespace SQLBuilder.Core
             }
             else if (parameterKey.IsNullOrEmpty())
             {
-                var name = this.DbParamPrefix + "Param" + this.DbParams.Count;
+                var name = this.DbParamPrefix + "P" + (this.DbParams.Count + 1);
                 this.DbParams.Add(name, parameterValue);
                 this.Sql.Append(name);
             }

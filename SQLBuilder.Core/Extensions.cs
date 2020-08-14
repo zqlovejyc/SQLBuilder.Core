@@ -2220,6 +2220,17 @@ namespace SQLBuilder.Core
         /// Add
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="oracleDbType"></param>
+        public void Add(string name, object value, OracleDbType oracleDbType)
+        {
+            this.Add(name, oracleDbType, ParameterDirection.Input, value);
+        }
+
+        /// <summary>
+        /// Add
+        /// </summary>
+        /// <param name="name"></param>
         /// <param name="oracleDbType"></param>
         /// <param name="direction"></param>
         public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction)

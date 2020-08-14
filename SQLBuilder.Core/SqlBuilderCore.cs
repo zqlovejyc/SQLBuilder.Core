@@ -55,19 +55,19 @@ namespace SQLBuilder.Core
             {
                 var sql = this._sqlPack.ToString();
                 //添加sql日志拦截
-                return this.SqlIntercept?.Invoke(sql, this._sqlPack.DbParams) ?? sql;
+                return this.SqlIntercept?.Invoke(sql, this._sqlPack.DbParameters) ?? sql;
             }
         }
 
         /// <summary>
         /// SQL格式化参数
         /// </summary>
-        public Dictionary<string, object> Parameters => this._sqlPack.DbParams;
+        public Dictionary<string, object> Parameters => this._sqlPack.DbParameters;
 
         /// <summary>
         /// Dapper格式化参数
         /// </summary>
-        public DynamicParameters DynamicParameters => this._sqlPack.DbParams.ToDynamicParameters();
+        public DynamicParameters DynamicParameters => this._sqlPack.DbParameters.ToDynamicParameters();
 
         /// <summary>
         /// SQL格式化参数
@@ -80,19 +80,19 @@ namespace SQLBuilder.Core
                 switch (this._sqlPack.DatabaseType)
                 {
                     case DatabaseType.SQLServer:
-                        parameters = this._sqlPack.DbParams.ToSqlParameters();
+                        parameters = this._sqlPack.DbParameters.ToSqlParameters();
                         break;
                     case DatabaseType.MySQL:
-                        parameters = this._sqlPack.DbParams.ToMySqlParameters();
+                        parameters = this._sqlPack.DbParameters.ToMySqlParameters();
                         break;
                     case DatabaseType.SQLite:
-                        parameters = this._sqlPack.DbParams.ToSqliteParameters();
+                        parameters = this._sqlPack.DbParameters.ToSqliteParameters();
                         break;
                     case DatabaseType.Oracle:
-                        parameters = this._sqlPack.DbParams.ToOracleParameters();
+                        parameters = this._sqlPack.DbParameters.ToOracleParameters();
                         break;
                     case DatabaseType.PostgreSQL:
-                        parameters = this._sqlPack.DbParams.ToNpgsqlParameters();
+                        parameters = this._sqlPack.DbParameters.ToNpgsqlParameters();
                         break;
                 }
                 return parameters;
@@ -3944,8 +3944,8 @@ namespace SQLBuilder.Core
                 orderField = this._sqlPack.GetColumnName(orderField);
             if (!sql.IsNullOrEmpty())
             {
-                this._sqlPack.DbParams.Clear();
-                if (parameters != null) this._sqlPack.DbParams = parameters;
+                this._sqlPack.DbParameters.Clear();
+                if (parameters != null) this._sqlPack.DbParameters = parameters;
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
             //SQLServer
@@ -4008,8 +4008,8 @@ namespace SQLBuilder.Core
                 orderField = this._sqlPack.GetColumnName(orderField);
             if (!sql.IsNullOrEmpty())
             {
-                this._sqlPack.DbParams.Clear();
-                if (parameters != null) this._sqlPack.DbParams = parameters;
+                this._sqlPack.DbParameters.Clear();
+                if (parameters != null) this._sqlPack.DbParameters = parameters;
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
             //SQLServer

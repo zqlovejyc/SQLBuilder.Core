@@ -107,9 +107,9 @@ namespace SQLBuilder.Core
         public DatabaseType DatabaseType { get; set; }
 
         /// <summary>
-        /// DbParams
+        /// DbParameters
         /// </summary>
-        public Dictionary<string, object> DbParams { get; set; }
+        public Dictionary<string, object> DbParameters { get; set; }
 
         /// <summary>
         /// DbParamPrefix
@@ -156,7 +156,7 @@ namespace SQLBuilder.Core
         /// </summary>
         public SqlPack()
         {
-            this.DbParams = new Dictionary<string, object>();
+            this.DbParameters = new Dictionary<string, object>();
             this.Sql = new StringBuilder();
             this.SelectFields = new List<string>();
         }
@@ -194,7 +194,7 @@ namespace SQLBuilder.Core
         {
             this.SelectFields.Clear();
             this.Sql.Clear();
-            this.DbParams.Clear();
+            this.DbParameters.Clear();
             this.dicTableName.Clear();
             this.tableAliasQueue = new Queue<string>(tableAlias);
         }
@@ -214,14 +214,14 @@ namespace SQLBuilder.Core
             }
             else if (parameterKey.IsNullOrEmpty())
             {
-                var name = this.DbParamPrefix + "P" + (this.DbParams.Count + 1);
-                this.DbParams.Add(name, parameterValue);
+                var name = this.DbParamPrefix + "Parameter" + (this.DbParameters.Count + 1);
+                this.DbParameters.Add(name, parameterValue);
                 this.Sql.Append(name);
             }
             else
             {
                 var name = this.DbParamPrefix + parameterKey;
-                this.DbParams.Add(name, parameterValue);
+                this.DbParameters.Add(name, parameterValue);
                 this.Sql.Append(name);
             }
         }

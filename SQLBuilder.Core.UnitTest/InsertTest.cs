@@ -19,7 +19,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张三",
                 Sex = 2
             });
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@P1,@P2)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@Parameter1,@Parameter2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -34,7 +34,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张三",
                 Sex = 2
             });
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@P1,@P2)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@Parameter1,@Parameter2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -50,7 +50,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 2
             };
             var builder = SqlBuilder.Insert<UserInfo>(() => userInfo);
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@P1,@P2,NULL)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@Parameter1,@Parameter2,NULL)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -65,7 +65,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = DateTime.Now.ToLongTimeString(),
                 AccountId = (new Random()).Next(1, 100)
             });
-            Assert.AreEqual("INSERT INTO [Base_Student] ([Name],[AccountId]) VALUES (@P1,@P2)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_Student] ([Name],[AccountId]) VALUES (@Parameter1,@Parameter2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -81,7 +81,7 @@ namespace SQLBuilder.Core.UnitTest
                 Sex = 2
             };
             var builder = SqlBuilder.Insert<UserInfo>(() => userInfo, isEnableNullValue: false);
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Sex],[Name]) VALUES (@P1,@P2)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Sex],[Name]) VALUES (@Parameter1,@Parameter2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
         #endregion
@@ -98,7 +98,7 @@ namespace SQLBuilder.Core.UnitTest
                 new UserInfo { Name = "张三", Sex = 2 },
                 new UserInfo { Name = "张三", Sex = 2 }
             }, DatabaseType.Oracle);
-            Assert.AreEqual("INSERT INTO \"Base_UserInfo\" (\"Name\",\"Sex\") SELECT :P1,:P2 FROM DUAL UNION ALL SELECT :P3,:P4 FROM DUAL", builder.Sql);
+            Assert.AreEqual("INSERT INTO \"Base_UserInfo\" (\"Name\",\"Sex\") SELECT :Parameter1,:Parameter2 FROM DUAL UNION ALL SELECT :Parameter3,:Parameter4 FROM DUAL", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -113,7 +113,7 @@ namespace SQLBuilder.Core.UnitTest
                 new { Name = "张三", Sex = 2 },
                 new { Name = "张三", Sex = 2 }
             });
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -129,7 +129,7 @@ namespace SQLBuilder.Core.UnitTest
                 new UserInfo { Name = "张三", Sex = 2 }
             }.ToArray();
             var builder = SqlBuilder.Insert<UserInfo>(() => array);
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@P1,@P2,NULL),(NULL,@P3,@P4,NULL)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@Parameter1,@Parameter2,NULL),(NULL,@Parameter3,@Parameter4,NULL)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -145,7 +145,7 @@ namespace SQLBuilder.Core.UnitTest
                 new { Name = "张三", Sex = 2 }
             }.ToArray();
             var builder = SqlBuilder.Insert<UserInfo>(() => array);
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -160,7 +160,7 @@ namespace SQLBuilder.Core.UnitTest
                 new Class { CityId = 2, UserId = 2, Name = "张三" },
                 new Class { CityId = 3, UserId = 3, Name = "李四" }
             });
-            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -176,7 +176,7 @@ namespace SQLBuilder.Core.UnitTest
                 new Class { CityId = 3, UserId = 3, Name = "李四" }
             };
             var builder = SqlBuilder.Insert<Class>(() => data);
-            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -191,7 +191,7 @@ namespace SQLBuilder.Core.UnitTest
                 new { CityId = 2, UserId = 2, Name = "张三" },
                 new { CityId = 3, UserId = 3, Name = "李四" }
             });
-            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -207,7 +207,7 @@ namespace SQLBuilder.Core.UnitTest
                 new { CityId = 3, UserId = 3, Name = "李四" }
             };
             var builder = SqlBuilder.Insert<Class>(() => data);
-            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_Class] ([UserId],[Name]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -223,7 +223,7 @@ namespace SQLBuilder.Core.UnitTest
                 new UserInfo { Name = "张三", Sex = 2 }
             };
             var builder = SqlBuilder.Insert<UserInfo>(() => list.ToArray());
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@P1,@P2,NULL),(NULL,@P3,@P4,NULL)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@Parameter1,@Parameter2,NULL),(NULL,@Parameter3,@Parameter4,NULL)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -239,7 +239,7 @@ namespace SQLBuilder.Core.UnitTest
                 new UserInfo { Name = "张三", Sex = 2 }
             };
             var builder = SqlBuilder.Insert<UserInfo>(() => list);
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@P1,@P2,NULL),(NULL,@P3,@P4,NULL)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@Parameter1,@Parameter2,NULL),(NULL,@Parameter3,@Parameter4,NULL)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -254,7 +254,7 @@ namespace SQLBuilder.Core.UnitTest
                 new UserInfo{ Name = "张三", Sex = 2 },
                 new UserInfo { Name = "张三", Sex = 2 }
             });
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@P1,@P2,NULL),(NULL,@P3,@P4,NULL)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Id],[Sex],[Name],[Email]) VALUES (NULL,@Parameter1,@Parameter2,NULL),(NULL,@Parameter3,@Parameter4,NULL)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
 
@@ -269,7 +269,7 @@ namespace SQLBuilder.Core.UnitTest
                 new { Name = "张三", Sex = 2 },
                 new { Name = "张三", Sex = 2 }
             });
-            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@P1,@P2),(@P3,@P4)", builder.Sql);
+            Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Name],[Sex]) VALUES (@Parameter1,@Parameter2),(@Parameter3,@Parameter4)", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
         #endregion

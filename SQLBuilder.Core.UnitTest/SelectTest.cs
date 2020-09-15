@@ -448,8 +448,8 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_Top_03()
         {
-            var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.Oracle).Top(100);
-            Assert.AreEqual("SELECT \"A\".\"Id\",\"A\".\"Name\" FROM \"Base_UserInfo\" \"A\" WHERE ROWNUM <= 100", builder.Sql);
+            var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.Oracle).OrderBy(x => x.Name).Top(100);
+            Assert.AreEqual("SELECT * FROM (SELECT \"A\".\"Id\",\"A\".\"Name\" FROM \"Base_UserInfo\" \"A\" ORDER BY \"A\".\"Name\") T WHERE ROWNUM <= 100", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

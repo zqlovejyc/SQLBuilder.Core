@@ -4210,14 +4210,7 @@ namespace SQLBuilder.Core
             }
             else if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
-                if (this._sqlPack.Sql.ToString().ToUpper().Contains("WHERE"))
-                {
-                    this._sqlPack.Sql.Append($" AND ROWNUM <= {topNumber}");
-                }
-                else
-                {
-                    this._sqlPack.Sql.Append($" WHERE ROWNUM <= {topNumber}");
-                }
+                this._sqlPack.Sql = new StringBuilder($"SELECT * FROM ({this._sqlPack.Sql}) T WHERE ROWNUM <= {topNumber}");
             }
             else if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite || this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
             {

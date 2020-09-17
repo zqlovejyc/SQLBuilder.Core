@@ -39,12 +39,12 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 超时时长，默认240s
         /// </summary>
-        public int CommandTimeout { get; set; } = 240;
+        public virtual int CommandTimeout { get; set; } = 240;
 
         /// <summary>
         /// 数据库连接字符串
         /// </summary>
-        public string ConnectionString { get; set; }
+        public virtual string ConnectionString { get; set; }
 
         /// <summary>
         /// 数据库连接对象
@@ -54,22 +54,22 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 事务对象
         /// </summary>
-        public DbTransaction Transaction { get; set; }
+        public virtual DbTransaction Transaction { get; set; }
 
         /// <summary>
         /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
         /// </summary>
-        public bool IsEnableFormat { get; set; } = true;
+        public virtual bool IsEnableFormat { get; set; } = true;
 
         /// <summary>
         /// 分页计数字段，默认COUNT(1)
         /// </summary>
-        public string CountSyntax { get; set; } = "COUNT(1)";
+        public virtual string CountSyntax { get; set; } = "COUNT(1)";
 
         /// <summary>
         /// sql拦截委托
         /// </summary>
-        public Func<string, object, string> SqlIntercept { get; set; }
+        public virtual Func<string, object, string> SqlIntercept { get; set; }
         #endregion
 
         #region Page

@@ -16,6 +16,7 @@
         <PackageIcon>SQL.png</PackageIcon>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <LangVersion>8.0</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,13 +31,13 @@
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.0.35" />
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.7" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.7" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.8" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.8" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.8" />
         <PackageReference Include="MySql.Data" Version="8.0.21" />
         <PackageReference Include="Npgsql" Version="4.1.4" />
-        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.80" />
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.90" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
         <PackageReference Include="System.Data.Common" Version="4.3.0" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />

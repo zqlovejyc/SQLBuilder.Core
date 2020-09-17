@@ -62,6 +62,11 @@ namespace SQLBuilder.Core.Repositories
         bool IsEnableFormat { get; set; }
 
         /// <summary>
+        /// 分页计数语法，默认COUNT(1)
+        /// </summary>
+        string CountSyntax { get; set; }
+
+        /// <summary>
         /// sql拦截委托
         /// </summary>
         Func<string, object, string> SqlIntercept { get; set; }
@@ -848,6 +853,32 @@ namespace SQLBuilder.Core.Repositories
         (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex);
 
         /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindListByWith<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindListByWith<T>(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindListByWith<T>(string sql, params DbParameter[] dbParameter);
+
+        /// <summary>
         /// with语法分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -1029,6 +1060,32 @@ namespace SQLBuilder.Core.Repositories
         Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex);
 
         /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListByWithAsync<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListByWithAsync<T>(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListByWithAsync<T>(string sql, params DbParameter[] dbParameter);
+
+        /// <summary>
         /// with语法分页查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -1117,6 +1174,29 @@ namespace SQLBuilder.Core.Repositories
         (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex);
 
         /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        DataTable FindTableByWith(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        DataTable FindTableByWith(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        DataTable FindTableByWith(string sql, params DbParameter[] dbParameter);
+
+        /// <summary>
         /// with语法分页查询
         /// </summary>
         /// <param name="sql">sql语句</param>
@@ -1199,6 +1279,29 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="pageIndex">当前页码</param>        
         /// <returns>返回DataTable和总记录数</returns>
         Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        Task<DataTable> FindTableByWithAsync(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        Task<DataTable> FindTableByWithAsync(string sql, object parameter);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        Task<DataTable> FindTableByWithAsync(string sql, params DbParameter[] dbParameter);
 
         /// <summary>
         /// with语法分页查询

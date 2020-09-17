@@ -37,7 +37,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// Oracle仓储实现类
     /// </summary>
-    public class OracleRepository : IRepository
+    public class OracleRepository : BaseRepository, IRepository
     {
         #region Field
         /// <summary>
@@ -48,19 +48,9 @@ namespace SQLBuilder.Core.Repositories
 
         #region Property
         /// <summary>
-        /// 超时时长，默认240s
-        /// </summary>
-        public int CommandTimeout { get; set; } = 240;
-
-        /// <summary>
-        /// 数据库连接字符串
-        /// </summary>
-        public string ConnectionString { get; set; }
-
-        /// <summary>
         /// 数据库连接对象
         /// </summary>
-        public DbConnection Connection
+        public override DbConnection Connection
         {
             get
             {
@@ -70,21 +60,6 @@ namespace SQLBuilder.Core.Repositories
                 return connection;
             }
         }
-
-        /// <summary>
-        /// 事务对象
-        /// </summary>
-        public DbTransaction Transaction { get; set; }
-
-        /// <summary>
-        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
-        /// </summary>
-        public bool IsEnableFormat { get; set; } = true;
-
-        /// <summary>
-        /// sql拦截委托
-        /// </summary>
-        public Func<string, object, string> SqlIntercept { get; set; }
         #endregion
 
         #region Constructor
@@ -147,340 +122,131 @@ namespace SQLBuilder.Core.Repositories
         }
         #endregion
 
-        #region ExecuteBySql
+        #region Page
+        /// <summary>
+        /// 获取分页语句
+        /// </summary>
+        /// <param name="isWithSyntax">是否with语法</param>
+        /// <param name="sql">原始sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序排序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns></returns>
+        public override string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            var sqlQuery = "";
+
+            //排序字段
+            if (!orderField.IsNullOrEmpty())
+            {
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
+                    orderField = $"ORDER BY {orderField}";
+                else
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+            }
+
+            //判断是否with语法
+            if (isWithSyntax)
+            {
+                sqlQuery = $"{sql} SELECT {CountSyntax} AS \"TOTAL\" FROM T;";
+
+                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
+            }
+            else
+            {
+                sqlQuery = $"SELECT {CountSyntax} AS \"TOTAL\" FROM ({sql}) T;";
+
+                sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}";
+            }
+
+            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
+
+            return sqlQuery;
+        }
+        #endregion
+
+        #region Query
         #region Sync
         /// <summary>
-        /// 执行sql语句
+        /// 查询多结果集数据
         /// </summary>
+        /// <param name="connection">数据库连接对像</param>
         /// <param name="sql">sql语句</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteBySql(string sql)
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override (IEnumerable<T> list, long total) QueryMultiple<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(sql, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            var sqlPage = sql.Split(';');
+            var sqlCount = sqlPage[0];
+            var sqlQuery = sqlPage[1];
+            var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+            var list = connection.Query<T>(sqlQuery, parameter, transaction, commandTimeout: CommandTimeout);
+            return (list, total);
         }
 
         /// <summary>
-        /// 执行sql语句
+        /// 查询多结果集数据
         /// </summary>
+        /// <param name="connection">数据库连接对像</param>
         /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteBySql(string sql, object parameter)
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override (DataTable table, long total) QueryMultiple(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql语句
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteBySql(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteByProc(string procName)
-        {
-            procName = SqlIntercept?.Invoke(procName, null) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(procName, transaction: Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(procName, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteByProc(string procName, object parameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(procName, parameter, Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(procName, parameter, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public IEnumerable<T> ExecuteByProc<T>(string procName, object parameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
-            IEnumerable<T> result = null;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Query<T>(procName, parameter, Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Query<T>(procName, parameter, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public int ExecuteByProc(string procName, params DbParameter[] dbParameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, dbParameter) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(procName, dbParameter.ToDynamicParameters(), Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(procName, dbParameter.ToDynamicParameters(), commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            var sqlPage = sql.Split(';');
+            var sqlCount = sqlPage[0];
+            var sqlQuery = sqlPage[1];
+            var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+            var reader = connection.ExecuteReader(sqlQuery, parameter, transaction, CommandTimeout);
+            var table = reader?.ToDataTable();
+            if (table?.Columns?.Contains("ROWNUMBER") == true)
+                table.Columns.Remove("ROWNUMBER");
+            return (table, total);
         }
         #endregion
 
         #region Async
         /// <summary>
-        /// 执行sql语句
+        /// 查询多结果集数据
         /// </summary>
+        /// <param name="connection">数据库连接对像</param>
         /// <param name="sql">sql语句</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteBySqlAsync(string sql)
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override async Task<(IEnumerable<T> list, long total)> QueryMultipleAsync<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(sql, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            var sqlPage = sql.Split(';');
+            var sqlCount = sqlPage[0];
+            var sqlQuery = sqlPage[1];
+            var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+            var list = await connection.QueryAsync<T>(sqlQuery, parameter, transaction, CommandTimeout);
+            return (list, total);
         }
 
         /// <summary>
-        /// 执行sql语句
+        /// 查询多结果集数据
         /// </summary>
+        /// <param name="connection">数据库连接对像</param>
         /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteBySqlAsync(string sql, object parameter)
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override async Task<(DataTable table, long total)> QueryMultipleAsync(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql语句
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteBySqlAsync(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteByProcAsync(string procName)
-        {
-            procName = SqlIntercept?.Invoke(procName, null) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(procName, transaction: Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(procName, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteByProcAsync(string procName, object parameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(procName, parameter, Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(procName, parameter, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<IEnumerable<T>> ExecuteByProcAsync<T>(string procName, object parameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, parameter) ?? procName;
-            IEnumerable<T> result = null;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.QueryAsync<T>(procName, parameter, Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.QueryAsync<T>(procName, parameter, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 执行sql存储过程
-        /// </summary>
-        /// <param name="procName">存储过程名称</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回受影响行数</returns>
-        public async Task<int> ExecuteByProcAsync(string procName, params DbParameter[] dbParameter)
-        {
-            procName = SqlIntercept?.Invoke(procName, dbParameter) ?? procName;
-            var result = 0;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(procName, dbParameter.ToDynamicParameters(), Transaction, commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(procName, dbParameter.ToDynamicParameters(), commandType: CommandType.StoredProcedure, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            var sqlPage = sql.Split(';');
+            var sqlCount = sqlPage[0];
+            var sqlQuery = sqlPage[1];
+            var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+            var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, transaction, CommandTimeout);
+            var table = reader?.ToDataTable();
+            if (table?.Columns?.Contains("ROWNUMBER") == true)
+                table.Columns.Remove("ROWNUMBER");
+            return (table, total);
         }
         #endregion
         #endregion
@@ -495,20 +261,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Insert<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
 
         /// <summary>
@@ -557,20 +311,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> InsertAsync<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Insert<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync<T>(builder);
         }
 
         /// <summary>
@@ -620,20 +362,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Delete<T>() where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
 
         /// <summary>
@@ -644,20 +374,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Delete<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(entity);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
 
         /// <summary>
@@ -704,20 +422,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Delete<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
 
         /// <summary>
@@ -734,17 +440,7 @@ namespace SQLBuilder.Core.Repositories
             if (keys.Count > 1 || keyValues.Length == 1)
             {
                 var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
-                if (Transaction?.Connection != null)
-                {
-                    result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                }
-                else
-                {
-                    using (var connection = Connection)
-                    {
-                        result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    }
-                }
+                result = Execute<T>(builder);
             }
             else
             {
@@ -785,22 +481,9 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Delete<T>(string propertyName, object propertyValue) where T : class
         {
-            var result = 0;
             var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName}=:PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute(sql, parameter);
         }
         #endregion
 
@@ -812,20 +495,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>() where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync<T>(builder);
         }
 
         /// <summary>
@@ -836,20 +507,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(entity);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync<T>(builder);
         }
 
         /// <summary>
@@ -896,20 +555,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var result = 0;
             var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync<T>(builder);
         }
 
         /// <summary>
@@ -926,17 +573,7 @@ namespace SQLBuilder.Core.Repositories
             if (keys.Count > 1 || keyValues.Length == 1)
             {
                 var builder = Sql.Delete<T>(DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
-                if (Transaction?.Connection != null)
-                {
-                    result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                }
-                else
-                {
-                    using (var connection = Connection)
-                    {
-                        result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    }
-                }
+                result = await ExecuteAsync<T>(builder);
             }
             else
             {
@@ -977,22 +614,9 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> DeleteAsync<T>(string propertyName, object propertyValue) where T : class
         {
-            var result = 0;
             var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName}=:PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync(sql, parameter);
         }
         #endregion
         #endregion
@@ -1007,20 +631,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Update<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).WithKey(entity);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
 
         /// <summary>
@@ -1068,20 +680,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public int Update<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return Execute<T>(builder);
         }
         #endregion
 
@@ -1094,20 +694,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> UpdateAsync<T>(T entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Update<T>(() => entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).WithKey(entity);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
+            return await ExecuteAsync<T>(builder);
         }
 
         /// <summary>
@@ -1155,134 +743,8 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回受影响行数</returns>
         public async Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class
         {
-            var result = 0;
             var builder = Sql.Update<T>(entity, DatabaseType.Oracle, false, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
-            return result;
-        }
-        #endregion
-        #endregion
-
-        #region FindObject
-        #region Sync
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果对象</returns>
-        public object FindObject(string sql)
-        {
-            return FindObject(sql, null);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public object FindObject(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.ExecuteScalar<object>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.ExecuteScalar<object>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public object FindObject(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.ExecuteScalar<object>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.ExecuteScalar<object>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果对象</returns>
-        public async Task<object> FindObjectAsync(string sql)
-        {
-            return await FindObjectAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public async Task<object> FindObjectAsync(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.ExecuteScalarAsync<object>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.ExecuteScalarAsync<object>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public async Task<object> FindObjectAsync(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.ExecuteScalarAsync<object>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.ExecuteScalarAsync<object>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
+            return await ExecuteAsync<T>(builder);
         }
         #endregion
         #endregion
@@ -1297,19 +759,11 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(params object[] keyValues) where T : class
         {
-            if (keyValues == null) return default(T);
+            if (keyValues == null)
+                return default;
+
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).WithKey(keyValues);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(builder);
         }
 
         /// <summary>
@@ -1320,18 +774,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(string sql)
         {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(false, sql, null);
         }
 
         /// <summary>
@@ -1343,18 +786,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(string sql, object parameter)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(false, sql, parameter);
         }
 
         /// <summary>
@@ -1366,18 +798,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(string sql, params DbParameter[] dbParameter)
         {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(false, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -1389,19 +810,11 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public T FindEntity<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
-            if (keyValues == null) return default(T);
+            if (keyValues == null)
+                return default;
+
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(builder);
         }
 
         /// <summary>
@@ -1413,17 +826,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(builder);
         }
 
         /// <summary>
@@ -1436,17 +839,7 @@ namespace SQLBuilder.Core.Repositories
         public T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return QueryFirstOrDefault<T>(builder);
         }
         #endregion
 
@@ -1459,19 +852,11 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(params object[] keyValues) where T : class
         {
-            if (keyValues == null) return await Task.FromResult(default(T));
+            if (keyValues == null)
+                return default;
+
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).WithKey(keyValues);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(builder);
         }
 
         /// <summary>
@@ -1482,18 +867,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(string sql)
         {
-            sql = SqlIntercept?.Invoke(sql, null) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(false, sql, null);
         }
 
         /// <summary>
@@ -1505,18 +879,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(string sql, object parameter)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(false, sql, parameter);
         }
 
         /// <summary>
@@ -1528,18 +891,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(string sql, params DbParameter[] dbParameter)
         {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(false, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -1551,19 +903,11 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回实体</returns>
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, params object[] keyValues) where T : class
         {
-            if (keyValues == null) return await Task.FromResult(default(T));
+            if (keyValues == null)
+                return default;
+
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).WithKey(keyValues);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(builder);
         }
 
         /// <summary>
@@ -1575,17 +919,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(builder);
         }
 
         /// <summary>
@@ -1598,17 +932,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryFirstOrDefaultAsync<T>(builder);
         }
         #endregion
         #endregion
@@ -1623,17 +947,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>() where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
 
         /// <summary>
@@ -1645,17 +959,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
 
         /// <summary>
@@ -1669,17 +973,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
 
         /// <summary>
@@ -1691,17 +985,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
 
         /// <summary>
@@ -1714,17 +998,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
 
         /// <summary>
@@ -1739,17 +1013,7 @@ namespace SQLBuilder.Core.Repositories
         public IQueryable<T> IQueryable<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout).AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout).AsQueryable();
-                }
-            }
+            return Query<T>(builder).AsQueryable();
         }
         #endregion
 
@@ -1762,19 +1026,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>() where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
 
         /// <summary>
@@ -1786,19 +1038,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
 
         /// <summary>
@@ -1812,19 +1052,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
 
         /// <summary>
@@ -1836,19 +1064,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
 
         /// <summary>
@@ -1861,19 +1077,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
 
         /// <summary>
@@ -1888,19 +1092,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IQueryable<T>> IQueryableAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                var query = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return query.AsQueryable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var query = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                    return query.AsQueryable();
-                }
-            }
+            return (await QueryAsync<T>(builder)).AsQueryable();
         }
         #endregion
         #endregion
@@ -1915,17 +1107,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>() where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -1937,17 +1119,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -1961,17 +1133,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -1983,17 +1145,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -2006,17 +1158,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -2031,17 +1173,7 @@ namespace SQLBuilder.Core.Repositories
         public IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(builder);
         }
 
         /// <summary>
@@ -2064,18 +1196,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(string sql, object parameter)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(false, sql, parameter);
         }
 
         /// <summary>
@@ -2087,18 +1208,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public IEnumerable<T> FindList<T>(string sql, params DbParameter[] dbParameter)
         {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.Query<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
+            return Query<T>(false, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -2113,32 +1223,7 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2154,32 +1239,7 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2196,32 +1256,7 @@ namespace SQLBuilder.Core.Repositories
         public (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2252,32 +1287,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2293,32 +1303,42 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回集合</returns>
+        public IEnumerable<T> FindListByWith<T>(string sql)
+        {
+            return FindListByWith<T>(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public IEnumerable<T> FindListByWith<T>(string sql, object parameter)
+        {
+            return Query<T>(true, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public IEnumerable<T> FindListByWith<T>(string sql, params DbParameter[] dbParameter)
+        {
+            return Query<T>(true, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -2334,32 +1354,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2375,32 +1370,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var list = Transaction.Connection.Query<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var list = connection.Query<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return PageQuery<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
         }
         #endregion
 
@@ -2413,17 +1383,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>() where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2435,17 +1395,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2459,17 +1409,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, transaction: Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2481,17 +1421,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2504,17 +1434,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2529,17 +1449,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(builder);
         }
 
         /// <summary>
@@ -2562,18 +1472,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(string sql, object parameter)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(false, sql, parameter);
         }
 
         /// <summary>
@@ -2585,18 +1484,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合</returns>
         public async Task<IEnumerable<T>> FindListAsync<T>(string sql, params DbParameter[] dbParameter)
         {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return await connection.QueryAsync<T>(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                }
-            }
+            return await QueryAsync<T>(false, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -2611,32 +1499,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2652,32 +1515,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2694,32 +1532,7 @@ namespace SQLBuilder.Core.Repositories
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType.Oracle, isEnableFormat: IsEnableFormat).Where(predicate);
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({builder.Sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({builder.Sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, builder.Parameters) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, builder.Parameters) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2750,32 +1563,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2791,32 +1579,42 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回集合</returns>
+        public async Task<IEnumerable<T>> FindListByWithAsync<T>(string sql)
+        {
+            return await FindListByWithAsync<T>(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public async Task<IEnumerable<T>> FindListByWithAsync<T>(string sql, object parameter)
+        {
+            return await QueryAsync<T>(true, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回集合</returns>
+        public async Task<IEnumerable<T>> FindListByWithAsync<T>(string sql, params DbParameter[] dbParameter)
+        {
+            return await QueryAsync<T>(true, sql, dbParameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -2832,32 +1630,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
+            return await PageQueryAsync<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
         }
 
         /// <summary>
@@ -2873,684 +1646,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回集合和总记录数</returns>
         public async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var list = await Transaction.Connection.QueryAsync<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                return (list, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var list = await connection.QueryAsync<T>(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    return (list, total);
-                }
-            }
-        }
-        #endregion
-        #endregion
-
-        #region FindTable
-        #region Sync
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public DataTable FindTable(string sql)
-        {
-            return FindTable(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public DataTable FindTable(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.ExecuteReader(sql, parameter, Transaction, commandTimeout: CommandTimeout).ToDataTable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.ExecuteReader(sql, parameter, commandTimeout: CommandTimeout).ToDataTable();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public DataTable FindTable(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.ExecuteReader(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout).ToDataTable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    return connection.ExecuteReader(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout).ToDataTable();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var reader = Transaction.Connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var reader = connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var reader = Transaction.Connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var reader = connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var reader = Transaction.Connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var reader = connection.ExecuteReader(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = Transaction.Connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var reader = Transaction.Connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = connection.QueryFirstOrDefault<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var reader = connection.ExecuteReader(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public async Task<DataTable> FindTableAsync(string sql)
-        {
-            return await FindTableAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public async Task<DataTable> FindTableAsync(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                return reader.ToDataTable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var reader = await connection.ExecuteReaderAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    return reader.ToDataTable();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public async Task<DataTable> FindTableAsync(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            if (Transaction?.Connection != null)
-            {
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                return reader.ToDataTable();
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var reader = await connection.ExecuteReaderAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    return reader.ToDataTable();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"SELECT COUNT(1) AS Total FROM ({sql}) T";
-            var sqlQuery = $"SELECT * FROM (SELECT X.*,ROWNUM AS ROWNUMBER FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.ROWNUMBER >= {pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var reader = await connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, parameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            if (!orderField.IsNullOrEmpty())
-            {
-                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
-                else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
-            }
-            var sqlCount = $"{sql} SELECT COUNT(1) AS Total FROM T";
-            var sqlQuery = $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
-            sqlCount = SqlIntercept?.Invoke(sqlCount, dbParameter) ?? sqlCount;
-            sqlQuery = SqlIntercept?.Invoke(sqlQuery, dbParameter) ?? sqlQuery;
-            if (Transaction?.Connection != null)
-            {
-                var total = await Transaction.Connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                var table = reader?.ToDataTable();
-                table?.Columns?.Remove("ROWNUMBER");
-                return (table, total);
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var reader = await connection.ExecuteReaderAsync(sqlQuery, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                    var table = reader?.ToDataTable();
-                    table?.Columns?.Remove("ROWNUMBER");
-                    return (table, total);
-                }
-            }
-        }
-        #endregion
-        #endregion
-
-        #region FindMultiple
-        #region Sync
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果集</returns>
-        public List<IEnumerable<dynamic>> FindMultiple(string sql)
-        {
-            return FindMultiple(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public List<IEnumerable<dynamic>> FindMultiple(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
-            {
-                var result = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(result.Read());
-                }
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var result = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
-                    while (result?.IsConsumed == false)
-                    {
-                        list.Add(result.Read());
-                    }
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public List<IEnumerable<dynamic>> FindMultiple(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
-            {
-                var result = Transaction.Connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(result.Read());
-                }
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var result = connection.QueryMultiple(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    while (result?.IsConsumed == false)
-                    {
-                        list.Add(result.Read());
-                    }
-                }
-            }
-            return list;
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果集</returns>
-        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql)
-        {
-            return await FindMultipleAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, object parameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
-            {
-                var result = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(await result.ReadAsync());
-                }
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var result = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                    while (result?.IsConsumed == false)
-                    {
-                        list.Add(await result.ReadAsync());
-                    }
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter)
-        {
-            sql = SqlIntercept?.Invoke(sql, dbParameter) ?? sql;
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
-            {
-                var result = await Transaction.Connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), Transaction, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(await result.ReadAsync());
-                }
-            }
-            else
-            {
-                using (var connection = Connection)
-                {
-                    var result = await connection.QueryMultipleAsync(sql, dbParameter.ToDynamicParameters(), commandTimeout: CommandTimeout);
-                    while (result?.IsConsumed == false)
-                    {
-                        list.Add(await result.ReadAsync());
-                    }
-                }
-            }
-            return list;
+            return await PageQueryAsync<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
         }
         #endregion
         #endregion

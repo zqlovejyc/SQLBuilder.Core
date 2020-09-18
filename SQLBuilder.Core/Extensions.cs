@@ -2108,7 +2108,8 @@ namespace SQLBuilder.Core
         /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
-        /// <param name="type">依赖注入模式，默认单例模式</param>
+        /// <param name="countSyntax">分页计数语法，默认：COUNT(1)</param>
+        /// <param name="lifeTime">生命周期，默认单例</param>
         /// <returns></returns>
         /// <example>
         ///     <code>
@@ -2145,7 +2146,8 @@ namespace SQLBuilder.Core
             string defaultName,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true,
-            DependencyInjectionType type = DependencyInjectionType.Singleton)
+            string countSyntax = "COUNT(1)",
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
             Func<string, IRepository> @delegate = key =>
             {
@@ -2154,49 +2156,54 @@ namespace SQLBuilder.Core
                 var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), config[0]);
                 switch (databaseType)
                 {
-                    case DatabaseType.SQLServer:
+                    case DatabaseType.SqlServer:
                         return new SqlRepository(config[1])
                         {
                             SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat
+                            IsEnableFormat = isEnableFormat,
+                            CountSyntax = countSyntax
                         };
-                    case DatabaseType.MySQL:
+                    case DatabaseType.MySql:
                         return new MySqlRepository(config[1])
                         {
                             SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat
+                            IsEnableFormat = isEnableFormat,
+                            CountSyntax = countSyntax
                         };
                     case DatabaseType.Oracle:
                         return new OracleRepository(config[1])
                         {
                             SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat
+                            IsEnableFormat = isEnableFormat,
+                            CountSyntax = countSyntax
                         };
-                    case DatabaseType.SQLite:
+                    case DatabaseType.Sqlite:
                         return new SqliteRepository(config[1])
                         {
                             SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat
+                            IsEnableFormat = isEnableFormat,
+                            CountSyntax = countSyntax
                         };
-                    case DatabaseType.PostgreSQL:
+                    case DatabaseType.PostgreSql:
                         return new NpgsqlRepository(config[1])
                         {
                             SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat
+                            IsEnableFormat = isEnableFormat,
+                            CountSyntax = countSyntax
                         };
                     default:
                         throw new ArgumentException("数据库类型配置有误！");
                 }
             };
-            switch (type)
+            switch (lifeTime)
             {
-                case DependencyInjectionType.Singleton:
+                case ServiceLifetime.Singleton:
                     @this.AddSingleton(x => @delegate);
                     break;
-                case DependencyInjectionType.Transient:
+                case ServiceLifetime.Transient:
                     @this.AddTransient(x => @delegate);
                     break;
-                case DependencyInjectionType.Scoped:
+                case ServiceLifetime.Scoped:
                     @this.AddScoped(x => @delegate);
                     break;
                 default:

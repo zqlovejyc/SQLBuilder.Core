@@ -86,7 +86,7 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.MySQL).Top(100),
+                SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.MySql).Top(100),
                 "查询单表多个字段，并返回指定TOP数量的数据 MySQL"
             );
 
@@ -297,7 +297,7 @@ namespace SQLBuilder.Core
 
             #region Page
             Print(
-                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySQL)
+                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySql)
                           .Where(o => o.Score != null)
                           .AndWhere(o => o.Name == "")
                           .OrWhere(o => o.Subject == "")
@@ -323,7 +323,7 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySQL)
+                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySql)
                           .Where(o => o.Score != null)
                           .AndWhere(o => o.Name == "")
                           .OrWhere(o => o.Subject == "")
@@ -552,26 +552,26 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Update<UserInfo>(() => new { Sex = 1, Email = "123456@qq.com" }, DatabaseType.MySQL)
+                SqlBuilder.Update<UserInfo>(() => new { Sex = 1, Email = "123456@qq.com" }, DatabaseType.MySql)
                           .Where(u => u.Id == 1),
                 "根据where条件更新指定表记录 用法3"
             );
 
             Print(
-                SqlBuilder.Update<Class>(() => new { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySQL)
+                SqlBuilder.Update<Class>(() => new { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
                           .Where(u => u.CityId == 1),
                 "根据where条件更新指定表记录 用法4"
             );
 
             Print(
-                SqlBuilder.Update<Class>(() => new Class { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySQL)
+                SqlBuilder.Update<Class>(() => new Class { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
                           .Where(u => u.CityId == 1),
                 "根据where条件更新指定表记录 用法5"
             );
 
             var classData = new { UserId = 1, Name = "123456@qq.com" };
             Print(
-                SqlBuilder.Update<Class>(() => classData, DatabaseType.MySQL)
+                SqlBuilder.Update<Class>(() => classData, DatabaseType.MySql)
                           .Where(u => u.CityId == 1),
                 "根据where条件更新指定表记录 用法6"
             );

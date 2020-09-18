@@ -27,12 +27,12 @@ namespace SQLBuilder.Core
         /// <summary>
         /// SqlServer数据库类型
         /// </summary>
-        SQLServer,
+        SqlServer,
 
         /// <summary>
-        /// MySQL数据库类型
+        /// MySql数据库类型
         /// </summary>
-        MySQL,
+        MySql,
 
         /// <summary>
         /// Oracle数据库类型
@@ -40,14 +40,14 @@ namespace SQLBuilder.Core
         Oracle,
 
         /// <summary>
-        /// SQLite数据库类型
+        /// Sqlite数据库类型
         /// </summary>
-        SQLite,
+        Sqlite,
 
         /// <summary>
-        /// PostgreSQL数据库类型
+        /// PostgreSql数据库类型
         /// </summary>
-        PostgreSQL,
+        PostgreSql,
     }
     #endregion
 
@@ -69,24 +69,24 @@ namespace SQLBuilder.Core
     }
     #endregion
 
-    #region DependencyInjectionType
+    #region ServiceLifetime
     /// <summary>
-    /// 依赖注入模式
+    /// 服务生命周期
     /// </summary>
-    public enum DependencyInjectionType
+    public enum ServiceLifetime
     {
         /// <summary>
-        /// 单例模式
+        /// 单例
         /// </summary>
         Singleton,
 
         /// <summary>
-        /// 瞬时模式
+        /// 瞬时
         /// </summary>
         Transient,
 
         /// <summary>
-        /// 作用域模式
+        /// 作用域
         /// </summary>
         Scoped
     }

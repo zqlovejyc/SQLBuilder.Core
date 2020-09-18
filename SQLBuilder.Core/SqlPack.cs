@@ -120,11 +120,11 @@ namespace SQLBuilder.Core
             {
                 switch (this.DatabaseType)
                 {
-                    case DatabaseType.SQLite: return "@";
-                    case DatabaseType.SQLServer: return "@";
-                    case DatabaseType.MySQL: return "?";
+                    case DatabaseType.Sqlite: return "@";
+                    case DatabaseType.SqlServer: return "@";
+                    case DatabaseType.MySql: return "?";
                     case DatabaseType.Oracle: return ":";
-                    case DatabaseType.PostgreSQL: return ":";
+                    case DatabaseType.PostgreSql: return ":";
                     default: return "";
                 }
             }
@@ -139,11 +139,11 @@ namespace SQLBuilder.Core
             {
                 switch (this.DatabaseType)
                 {
-                    case DatabaseType.SQLite: return "\"{0}\"";
-                    case DatabaseType.SQLServer: return "[{0}]";
-                    case DatabaseType.MySQL: return "`{0}`";
+                    case DatabaseType.Sqlite: return "\"{0}\"";
+                    case DatabaseType.SqlServer: return "[{0}]";
+                    case DatabaseType.MySql: return "`{0}`";
                     case DatabaseType.Oracle: return "\"{0}\"";
-                    case DatabaseType.PostgreSQL: return "\"{0}\"";
+                    case DatabaseType.PostgreSql: return "\"{0}\"";
                     default: return "{0}";
                 }
             }

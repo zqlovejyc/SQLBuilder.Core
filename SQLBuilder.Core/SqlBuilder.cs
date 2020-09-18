@@ -40,7 +40,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Insert<T>(
             Expression<Func<object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             bool isEnableNullValue = true,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
@@ -61,7 +61,7 @@ namespace SQLBuilder.Core
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Delete<T>(
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -84,7 +84,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Update<T>(
             Expression<Func<object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             bool isEnableNullValue = true,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
@@ -107,7 +107,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T>(
             Expression<Func<T, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -128,7 +128,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2>(
             Expression<Func<T, T2, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -151,7 +151,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3>(
             Expression<Func<T, T2, T3, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -176,7 +176,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4>(
             Expression<Func<T, T2, T3, T4, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -203,7 +203,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5>(
             Expression<Func<T, T2, T3, T4, T5, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -232,7 +232,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6>(
             Expression<Func<T, T2, T3, T4, T5, T6, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -263,7 +263,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -296,7 +296,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -331,7 +331,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -368,7 +368,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -399,7 +399,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Max<T>(
             Expression<Func<T, object>> expression,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -421,7 +421,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Min<T>(
             Expression<Func<T, object>> expression,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -443,7 +443,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Avg<T>(
             Expression<Func<T, object>> expression,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -465,7 +465,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Count<T>(
             Expression<Func<T, object>> expression = null,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -487,7 +487,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Sum<T>(
             Expression<Func<T, object>> expression,
-            DatabaseType databaseType = DatabaseType.SQLServer,
+            DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -507,7 +507,7 @@ namespace SQLBuilder.Core
         public static string GetTableName<T>(bool isEnableFormat = true)
             where T : class
         {
-            return new SqlBuilderCore<T>(DatabaseType.SQLServer, isEnableFormat).GetTableName();
+            return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetTableName();
         }
         #endregion
 
@@ -521,7 +521,7 @@ namespace SQLBuilder.Core
         public static List<string> GetPrimaryKey<T>(bool isEnableFormat = true)
             where T : class
         {
-            return new SqlBuilderCore<T>(DatabaseType.SQLServer, isEnableFormat).GetPrimaryKey();
+            return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetPrimaryKey();
         }
         #endregion
     }

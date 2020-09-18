@@ -79,19 +79,19 @@ namespace SQLBuilder.Core
                 DbParameter[] parameters = null;
                 switch (this._sqlPack.DatabaseType)
                 {
-                    case DatabaseType.SQLServer:
+                    case DatabaseType.SqlServer:
                         parameters = this._sqlPack.DbParameters.ToSqlParameters();
                         break;
-                    case DatabaseType.MySQL:
+                    case DatabaseType.MySql:
                         parameters = this._sqlPack.DbParameters.ToMySqlParameters();
                         break;
-                    case DatabaseType.SQLite:
+                    case DatabaseType.Sqlite:
                         parameters = this._sqlPack.DbParameters.ToSqliteParameters();
                         break;
                     case DatabaseType.Oracle:
                         parameters = this._sqlPack.DbParameters.ToOracleParameters();
                         break;
-                    case DatabaseType.PostgreSQL:
+                    case DatabaseType.PostgreSql:
                         parameters = this._sqlPack.DbParameters.ToNpgsqlParameters();
                         break;
                 }
@@ -3949,7 +3949,7 @@ namespace SQLBuilder.Core
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
             //SQLServer
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer)
+            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
@@ -3965,7 +3965,7 @@ namespace SQLBuilder.Core
                     sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
             }
             //MySQL，注意8.0版本才支持WITH语法
-            if (this._sqlPack.DatabaseType == DatabaseType.MySQL)
+            if (this._sqlPack.DatabaseType == DatabaseType.MySql)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -3973,7 +3973,7 @@ namespace SQLBuilder.Core
                     sb.Append($"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $TEMPORARY;");
             }
             //PostgreSQL
-            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
+            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -3981,7 +3981,7 @@ namespace SQLBuilder.Core
                     sb.Append($"DROP TABLE IF EXISTS TEMPORARY_TABLE;CREATE TEMPORARY TABLE TEMPORARY_TABLE AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_TABLE;SELECT * FROM TEMPORARY_TABLE AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_TABLE;");
             }
             //SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -4013,7 +4013,7 @@ namespace SQLBuilder.Core
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
             //SQLServer
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer)
+            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
@@ -4029,7 +4029,7 @@ namespace SQLBuilder.Core
                     sb.Append($"WITH T AS ({sql}),R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
             }
             //MySQL，注意8.0版本才支持WITH语法
-            if (this._sqlPack.DatabaseType == DatabaseType.MySQL)
+            if (this._sqlPack.DatabaseType == DatabaseType.MySql)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -4037,7 +4037,7 @@ namespace SQLBuilder.Core
                     sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
             //PostgreSQL
-            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
+            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -4045,7 +4045,7 @@ namespace SQLBuilder.Core
                     sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
             //SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLite)
+            if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
             {
                 if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
                     sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
@@ -4197,7 +4197,7 @@ namespace SQLBuilder.Core
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Top(long topNumber)
         {
-            if (this._sqlPack.DatabaseType == DatabaseType.SQLServer)
+            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
             {
                 if (this._sqlPack.Sql.ToString().ToUpper().Contains("DISTINCT"))
                 {
@@ -4212,7 +4212,7 @@ namespace SQLBuilder.Core
             {
                 this._sqlPack.Sql = new StringBuilder($"SELECT * FROM ({this._sqlPack.Sql}) T WHERE ROWNUM <= {topNumber}");
             }
-            else if (this._sqlPack.DatabaseType == DatabaseType.MySQL || this._sqlPack.DatabaseType == DatabaseType.SQLite || this._sqlPack.DatabaseType == DatabaseType.PostgreSQL)
+            else if (this._sqlPack.DatabaseType == DatabaseType.MySql || this._sqlPack.DatabaseType == DatabaseType.Sqlite || this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
             {
                 this._sqlPack.Sql.Append($" LIMIT {topNumber} OFFSET 0");
             }

@@ -90,15 +90,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " LIKE '%' + ";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += " LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " LIKE '%' || ";
                     break;
                 default:
@@ -107,15 +107,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " + '%'";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += ",'%')";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " || '%'";
                     break;
                 default:
@@ -137,15 +137,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " LIKE '%' + ";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += " LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " LIKE '%' || ";
                     break;
                 default:
@@ -154,8 +154,8 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += ")";
                     break;
                 default:
@@ -177,13 +177,13 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " LIKE ";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += " LIKE CONCAT(";
                     break;
                 default:
@@ -192,15 +192,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " + '%'";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += ",'%')";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " || '%'";
                     break;
                 default:
@@ -222,15 +222,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " NOT LIKE '%' + ";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += " NOT LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " NOT LIKE '%' || ";
                     break;
                 default:
@@ -239,15 +239,15 @@ namespace SQLBuilder.Core
             SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
             switch (sqlPack.DatabaseType)
             {
-                case DatabaseType.SQLServer:
+                case DatabaseType.SqlServer:
                     sqlPack += " + '%'";
                     break;
-                case DatabaseType.MySQL:
-                case DatabaseType.PostgreSQL:
+                case DatabaseType.MySql:
+                case DatabaseType.PostgreSql:
                     sqlPack += ",'%')";
                     break;
                 case DatabaseType.Oracle:
-                case DatabaseType.SQLite:
+                case DatabaseType.Sqlite:
                     sqlPack += " || '%'";
                     break;
                 default:
@@ -275,15 +275,15 @@ namespace SQLBuilder.Core
                     SqlBuilderProvider.Where(expression.Object, sqlPack);
                     switch (sqlPack.DatabaseType)
                     {
-                        case DatabaseType.SQLServer:
+                        case DatabaseType.SqlServer:
                             sqlPack += " LIKE '%' + ";
                             break;
-                        case DatabaseType.MySQL:
-                        case DatabaseType.PostgreSQL:
+                        case DatabaseType.MySql:
+                        case DatabaseType.PostgreSql:
                             sqlPack += " LIKE CONCAT('%',";
                             break;
                         case DatabaseType.Oracle:
-                        case DatabaseType.SQLite:
+                        case DatabaseType.Sqlite:
                             sqlPack += " LIKE '%' || ";
                             break;
                         default:
@@ -292,15 +292,15 @@ namespace SQLBuilder.Core
                     SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
                     switch (sqlPack.DatabaseType)
                     {
-                        case DatabaseType.SQLServer:
+                        case DatabaseType.SqlServer:
                             sqlPack += " + '%'";
                             break;
-                        case DatabaseType.MySQL:
-                        case DatabaseType.PostgreSQL:
+                        case DatabaseType.MySql:
+                        case DatabaseType.PostgreSql:
                             sqlPack += ",'%')";
                             break;
                         case DatabaseType.Oracle:
-                        case DatabaseType.SQLite:
+                        case DatabaseType.Sqlite:
                             sqlPack += " || '%'";
                             break;
                         default:
@@ -393,7 +393,7 @@ namespace SQLBuilder.Core
         {
             if (expression.Object != null)
             {
-                if (sqlPack.DatabaseType == DatabaseType.SQLServer)
+                if (sqlPack.DatabaseType == DatabaseType.SqlServer)
                 {
                     sqlPack += "LTRIM(RTRIM(";
                 }
@@ -402,7 +402,7 @@ namespace SQLBuilder.Core
                     sqlPack += "TRIM(";
                 }
                 SqlBuilderProvider.Where(expression.Object, sqlPack);
-                if (sqlPack.DatabaseType == DatabaseType.SQLServer)
+                if (sqlPack.DatabaseType == DatabaseType.SqlServer)
                 {
                     sqlPack += "))";
                 }

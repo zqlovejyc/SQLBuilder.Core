@@ -2124,12 +2124,12 @@ namespace SQLBuilder.Core
         ///         },
         ///         "AllowedHosts": "*",
         ///         "ConnectionStrings": {
-        ///             "Base": [ "SQLServer", "数据库连接字符串" ],
-        ///             "Sqlserver": [ "SQLServer", "数据库连接字符串" ],
+        ///             "Base": [ "SqlServer", "数据库连接字符串" ],
+        ///             "Sqlserver": [ "SqlServer", "数据库连接字符串" ],
         ///             "Oracle": [ "Oracle", "数据库连接字符串" ],
-        ///             "MySql": [ "MySQL", "数据库连接字符串" ],
-        ///             "Sqlite": [ "SQLite", "数据库连接字符串" ],
-        ///             "Pgsql": [ "PostgreSQL", "数据库连接字符串" ]
+        ///             "MySql": [ "MySql", "数据库连接字符串" ],
+        ///             "Sqlite": [ "Sqlite", "数据库连接字符串" ],
+        ///             "Pgsql": [ "PostgreSql", "数据库连接字符串" ]
         ///         }
         ///     }
         ///     //Controller获取方法

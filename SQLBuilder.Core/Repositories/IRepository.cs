@@ -62,7 +62,7 @@ namespace SQLBuilder.Core.Repositories
         bool IsEnableFormat { get; set; }
 
         /// <summary>
-        /// 分页计数语法，默认COUNT(1)
+        /// 分页计数语法，默认COUNT(*)
         /// </summary>
         string CountSyntax { get; set; }
 

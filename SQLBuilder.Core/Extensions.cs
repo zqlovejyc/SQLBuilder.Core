@@ -2108,7 +2108,7 @@ namespace SQLBuilder.Core
         /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
-        /// <param name="countSyntax">分页计数语法，默认：COUNT(1)</param>
+        /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="lifeTime">生命周期，默认单例</param>
         /// <returns></returns>
         /// <example>
@@ -2146,7 +2146,7 @@ namespace SQLBuilder.Core
             string defaultName,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true,
-            string countSyntax = "COUNT(1)",
+            string countSyntax = "COUNT(*)",
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
             Func<string, IRepository> @delegate = key =>

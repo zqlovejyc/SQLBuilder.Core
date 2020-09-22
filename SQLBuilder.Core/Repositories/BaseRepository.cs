@@ -62,9 +62,9 @@ namespace SQLBuilder.Core.Repositories
         public virtual bool IsEnableFormat { get; set; } = true;
 
         /// <summary>
-        /// 分页计数字段，默认COUNT(1)
+        /// 分页计数语法，默认COUNT(*)
         /// </summary>
-        public virtual string CountSyntax { get; set; } = "COUNT(1)";
+        public virtual string CountSyntax { get; set; } = "COUNT(*)";
 
         /// <summary>
         /// sql拦截委托

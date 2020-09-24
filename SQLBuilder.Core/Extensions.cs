@@ -2154,46 +2154,40 @@ namespace SQLBuilder.Core
                 key = key.IsNullOrEmpty() ? defaultName : key;
                 var config = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
                 var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), config[0]);
-                switch (databaseType)
+                return databaseType switch
                 {
-                    case DatabaseType.SqlServer:
-                        return new SqlRepository(config[1])
-                        {
-                            SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat,
-                            CountSyntax = countSyntax
-                        };
-                    case DatabaseType.MySql:
-                        return new MySqlRepository(config[1])
-                        {
-                            SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat,
-                            CountSyntax = countSyntax
-                        };
-                    case DatabaseType.Oracle:
-                        return new OracleRepository(config[1])
-                        {
-                            SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat,
-                            CountSyntax = countSyntax
-                        };
-                    case DatabaseType.Sqlite:
-                        return new SqliteRepository(config[1])
-                        {
-                            SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat,
-                            CountSyntax = countSyntax
-                        };
-                    case DatabaseType.PostgreSql:
-                        return new NpgsqlRepository(config[1])
-                        {
-                            SqlIntercept = sqlIntercept,
-                            IsEnableFormat = isEnableFormat,
-                            CountSyntax = countSyntax
-                        };
-                    default:
-                        throw new ArgumentException("数据库类型配置有误！");
-                }
+                    DatabaseType.SqlServer => new SqlRepository(config[1])
+                    {
+                        SqlIntercept = sqlIntercept,
+                        IsEnableFormat = isEnableFormat,
+                        CountSyntax = countSyntax
+                    },
+                    DatabaseType.MySql => new MySqlRepository(config[1])
+                    {
+                        SqlIntercept = sqlIntercept,
+                        IsEnableFormat = isEnableFormat,
+                        CountSyntax = countSyntax
+                    },
+                    DatabaseType.Oracle => new OracleRepository(config[1])
+                    {
+                        SqlIntercept = sqlIntercept,
+                        IsEnableFormat = isEnableFormat,
+                        CountSyntax = countSyntax
+                    },
+                    DatabaseType.Sqlite => new SqliteRepository(config[1])
+                    {
+                        SqlIntercept = sqlIntercept,
+                        IsEnableFormat = isEnableFormat,
+                        CountSyntax = countSyntax
+                    },
+                    DatabaseType.PostgreSql => new NpgsqlRepository(config[1])
+                    {
+                        SqlIntercept = sqlIntercept,
+                        IsEnableFormat = isEnableFormat,
+                        CountSyntax = countSyntax
+                    },
+                    _ => throw new ArgumentException("数据库类型配置有误！"),
+                };
             };
             switch (lifeTime)
             {

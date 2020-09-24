@@ -81,14 +81,14 @@ namespace SQLBuilder.Core
         Singleton,
 
         /// <summary>
-        /// 瞬时
-        /// </summary>
-        Transient,
-
-        /// <summary>
         /// 作用域
         /// </summary>
-        Scoped
+        Scoped,
+
+        /// <summary>
+        /// 瞬时
+        /// </summary>
+        Transient
     }
     #endregion
 }

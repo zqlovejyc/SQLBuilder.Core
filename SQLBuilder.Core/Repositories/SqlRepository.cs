@@ -16,6 +16,7 @@
  */
 #endregion
 
+using SQLBuilder.Core.LoadBalancer;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -58,7 +59,18 @@ namespace SQLBuilder.Core.Repositories
         {
             get
             {
-                var connection = new SqlConnection(ConnectionString);
+                SqlConnection connection;
+                if (!Master && SlaveConnectionStrings?.Count() > 0 && LoadBalancer != null)
+                {
+                    var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
+                    var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
+                    var connectionString = LoadBalancer.Get(connectionStrings, weights);
+
+                    connection = new SqlConnection(connectionString);
+                }
+                else
+                    connection = new SqlConnection(MasterConnectionString);
+
                 if (connection.State != ConnectionState.Open)
                     connection.Open();
 
@@ -74,16 +86,16 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="connString">链接字符串，或者链接字符串名称</param>
-        public SqlRepository(string connString)
+        /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
+        public SqlRepository(string connectionString)
         {
             //判断是链接字符串，还是链接字符串名称
-            if (connString?.Contains(":") == true)
-                ConnectionString = ConfigurationManager.GetValue<string>(connString);
+            if (connectionString?.Contains(":") == true)
+                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
             else
-                ConnectionString = ConfigurationManager.GetConnectionString(connString);
-            if (ConnectionString.IsNullOrEmpty())
-                ConnectionString = connString;
+                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
+            if (MasterConnectionString.IsNullOrEmpty())
+                MasterConnectionString = connectionString;
         }
         #endregion
 

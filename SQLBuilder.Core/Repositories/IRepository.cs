@@ -16,6 +16,7 @@
  */
 #endregion
 
+using SQLBuilder.Core.LoadBalancer;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,9 +43,19 @@ namespace SQLBuilder.Core.Repositories
         int CommandTimeout { get; set; }
 
         /// <summary>
-        /// 数据库连接串
+        /// 是否主库操作
         /// </summary>
-        string ConnectionString { get; set; }
+        bool Master { get; set; }
+
+        /// <summary>
+        /// 主库数据库连接字符串
+        /// </summary>
+        string MasterConnectionString { get; set; }
+
+        /// <summary>
+        /// 从库数据库连接字符串及权重集合
+        /// </summary>
+        (string connectionString, int weight)[] SlaveConnectionStrings { get; set; }
 
         /// <summary>
         /// 数据库连接对象
@@ -70,6 +81,11 @@ namespace SQLBuilder.Core.Repositories
         /// sql拦截委托
         /// </summary>
         Func<string, object, string> SqlIntercept { get; set; }
+
+        /// <summary>
+        /// 从库负载均衡接口
+        /// </summary>
+        ILoadBalancer LoadBalancer { get; set; }
         #endregion
 
         #region Transaction

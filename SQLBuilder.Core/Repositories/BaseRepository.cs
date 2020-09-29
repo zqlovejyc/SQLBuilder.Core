@@ -17,6 +17,7 @@
 #endregion
 
 using Dapper;
+using SQLBuilder.Core.LoadBalancer;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,9 +43,19 @@ namespace SQLBuilder.Core.Repositories
         public virtual int CommandTimeout { get; set; } = 240;
 
         /// <summary>
-        /// 数据库连接字符串
+        /// 是否主库操作
         /// </summary>
-        public virtual string ConnectionString { get; set; }
+        public virtual bool Master { get; set; } = true;
+
+        /// <summary>
+        /// 主库数据库连接字符串
+        /// </summary>
+        public virtual string MasterConnectionString { get; set; }
+
+        /// <summary>
+        /// 从库数据库连接字符串及权重集合
+        /// </summary>
+        public virtual (string connectionString, int weight)[] SlaveConnectionStrings { get; set; }
 
         /// <summary>
         /// 数据库连接对象
@@ -70,6 +81,11 @@ namespace SQLBuilder.Core.Repositories
         /// sql拦截委托
         /// </summary>
         public virtual Func<string, object, string> SqlIntercept { get; set; }
+
+        /// <summary>
+        /// 从库负载均衡接口
+        /// </summary>
+        public virtual ILoadBalancer LoadBalancer { get; set; }
         #endregion
 
         #region Page

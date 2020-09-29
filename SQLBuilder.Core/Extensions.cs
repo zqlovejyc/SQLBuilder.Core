@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
+using SQLBuilder.Core.LoadBalancer;
 using SQLBuilder.Core.Repositories;
 using System;
 using System.Collections.Generic;
@@ -1643,7 +1644,10 @@ namespace SQLBuilder.Core
             var table = new DataTable();
             if (@this?.IsClosed == false)
             {
-                table.Load(@this);
+                using (@this)
+                {
+                    table.Load(@this);
+                }
             }
             return table;
         }
@@ -1705,29 +1709,32 @@ namespace SQLBuilder.Core
         public static DataSet ToDataSet(this IDataReader @this)
         {
             var ds = new DataSet();
-            if (@this.IsClosed == false)
+            if (@this?.IsClosed == false)
             {
-                do
+                using (@this)
                 {
-                    var schemaTable = @this.GetSchemaTable();
-                    var dt = new DataTable();
-                    for (var i = 0; i < schemaTable.Rows.Count; i++)
+                    do
                     {
-                        var row = schemaTable.Rows[i];
-                        dt.Columns.Add(new DataColumn((string)row["ColumnName"], (Type)row["DataType"]));
-                    }
-                    while (@this.Read())
-                    {
-                        var dataRow = dt.NewRow();
-                        for (var i = 0; i < @this.FieldCount; i++)
+                        var schemaTable = @this.GetSchemaTable();
+                        var dt = new DataTable();
+                        for (var i = 0; i < schemaTable.Rows.Count; i++)
                         {
-                            dataRow[i] = @this.GetValue(i);
+                            var row = schemaTable.Rows[i];
+                            dt.Columns.Add(new DataColumn((string)row["ColumnName"], (Type)row["DataType"]));
                         }
-                        dt.Rows.Add(dataRow);
+                        while (@this.Read())
+                        {
+                            var dataRow = dt.NewRow();
+                            for (var i = 0; i < @this.FieldCount; i++)
+                            {
+                                dataRow[i] = @this.GetValue(i);
+                            }
+                            dt.Rows.Add(dataRow);
+                        }
+                        ds.Tables.Add(dt);
                     }
-                    ds.Tables.Add(dt);
+                    while (@this.NextResult());
                 }
-                while (@this.NextResult());
             }
             return ds;
         }
@@ -2102,6 +2109,7 @@ namespace SQLBuilder.Core
         #region AddSQLBuilder
         /// <summary>
         /// SQLBuilder仓储注入扩展
+        /// <para>注意：若要启用读写分离，则需要注入ILoadBalancer服务；</para>
         /// </summary>
         /// <param name="this">依赖注入服务集合</param>
         /// <param name="configuration">服务配置</param>
@@ -2124,7 +2132,7 @@ namespace SQLBuilder.Core
         ///         },
         ///         "AllowedHosts": "*",
         ///         "ConnectionStrings": {
-        ///             "Base": [ "SqlServer", "数据库连接字符串" ],
+        ///             "Base": [ "SqlServer", "数据库连接字符串","server=localhost;uid=sa;pwd=123;weight=1","server=localhost2;uid=sa;pwd=123;weight=1" ],
         ///             "Sqlserver": [ "SqlServer", "数据库连接字符串" ],
         ///             "Oracle": [ "Oracle", "数据库连接字符串" ],
         ///             "MySql": [ "MySql", "数据库连接字符串" ],
@@ -2149,56 +2157,95 @@ namespace SQLBuilder.Core
             string countSyntax = "COUNT(*)",
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
+            //从库负载均衡获取算法
+            ILoadBalancer loadBalancer = null;
+
+            //自定义仓储委托
             Func<string, IRepository> @delegate = key =>
             {
+                //数据库标识键值
                 key = key.IsNullOrEmpty() ? defaultName : key;
-                var config = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
-                var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), config[0]);
+
+                //数据库配置
+                var configs = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
+
+                //数据库类型
+                var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), configs[0]);
+
+                //从库连接集合
+                var slaveConnectionStrings = new List<(string connectionString, int weight)>();
+                if (configs.Count > 2)
+                {
+                    for (int i = 2; i < configs.Count; i++)
+                    {
+                        if (configs[i].IsNullOrEmpty() || !configs[i].Contains(";"))
+                            continue;
+
+                        var slaveConnectionStringArray = configs[i].Split(";");
+                        var slaveConnectionString = string.Join(';', slaveConnectionStringArray.Where(x => !x.StartsWith("weight", StringComparison.OrdinalIgnoreCase)));
+                        var weight = int.Parse(slaveConnectionStringArray.FirstOrDefault(x => x.StartsWith("weight", StringComparison.OrdinalIgnoreCase))?.Split("=")[1] ?? "1");
+                        slaveConnectionStrings.Add((slaveConnectionString, weight));
+                    }
+                }
+
+                //实例化仓储
                 return databaseType switch
                 {
-                    DatabaseType.SqlServer => new SqlRepository(config[1])
+                    DatabaseType.SqlServer => new SqlRepository(configs[1])
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
-                        CountSyntax = countSyntax
+                        CountSyntax = countSyntax,
+                        LoadBalancer = loadBalancer,
+                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.MySql => new MySqlRepository(config[1])
+                    DatabaseType.MySql => new MySqlRepository(configs[1])
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
-                        CountSyntax = countSyntax
+                        CountSyntax = countSyntax,
+                        LoadBalancer = loadBalancer,
+                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.Oracle => new OracleRepository(config[1])
+                    DatabaseType.Oracle => new OracleRepository(configs[1])
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
-                        CountSyntax = countSyntax
+                        CountSyntax = countSyntax,
+                        LoadBalancer = loadBalancer,
+                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.Sqlite => new SqliteRepository(config[1])
+                    DatabaseType.Sqlite => new SqliteRepository(configs[1])
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
-                        CountSyntax = countSyntax
+                        CountSyntax = countSyntax,
+                        LoadBalancer = loadBalancer,
+                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.PostgreSql => new NpgsqlRepository(config[1])
+                    DatabaseType.PostgreSql => new NpgsqlRepository(configs[1])
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
-                        CountSyntax = countSyntax
+                        CountSyntax = countSyntax,
+                        LoadBalancer = loadBalancer,
+                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
                     _ => throw new ArgumentException("数据库类型配置有误！"),
                 };
             };
+
+            //根据生命周期类型注入服务
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(x => @delegate);
+                    @this.AddSingleton(x => { loadBalancer = x.GetService<ILoadBalancer>(); return @delegate; });
                     break;
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => @delegate);
+                    @this.AddTransient(x => { loadBalancer = x.GetService<ILoadBalancer>(); return @delegate; });
                     break;
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => @delegate);
+                    @this.AddScoped(x => { loadBalancer = x.GetService<ILoadBalancer>(); return @delegate; });
                     break;
                 default:
                     break;

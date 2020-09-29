@@ -43,4 +43,11 @@
         <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="Icon\sql.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+
 </Project>

@@ -13,7 +13,7 @@
 2.优化IDataReader部分扩展方法；</PackageReleaseNotes>
         <FileVersion>1.0.5.9</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
-        <PackageIcon>SQL.png</PackageIcon>
+        <PackageIcon>sql.png</PackageIcon>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <LangVersion>8.0</LangVersion>
@@ -44,7 +44,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Icon\SQL.png">
+      <None Include="Icon\sql.png">
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>

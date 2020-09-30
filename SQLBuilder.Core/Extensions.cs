@@ -17,10 +17,11 @@
 #endregion
 
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SQLBuilder.Core.LoadBalancer;
@@ -29,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;

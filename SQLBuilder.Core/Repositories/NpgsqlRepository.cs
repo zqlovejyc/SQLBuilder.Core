@@ -17,7 +17,6 @@
 #endregion
 
 using Npgsql;
-using SQLBuilder.Core.LoadBalancer;
 using System;
 using System.Collections.Generic;
 using System.Data;

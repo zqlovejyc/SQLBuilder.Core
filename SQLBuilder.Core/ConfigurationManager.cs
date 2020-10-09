@@ -42,9 +42,14 @@ namespace SQLBuilder.Core
         /// </summary>
         static ConfigurationManager()
         {
+            var jsonFile = "appsettings.json";
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (!environment.IsNullOrEmpty())
+                jsonFile = $"appsettings.{environment}.json";
+
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile(jsonFile, optional: true, reloadOnChange: true)
                 .Build();
         }
         #endregion

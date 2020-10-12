@@ -16,6 +16,7 @@
  */
 #endregion
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,27 +33,36 @@ namespace SQLBuilder.Core.LoadBalancer
     public class RoundRobinLoadBalancer : ILoadBalancer
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-        private int _index;
+
+        private static readonly ConcurrentDictionary<string, int> _serviceIndexs =
+          new ConcurrentDictionary<string, int>();
 
         /// <summary>
         /// 获取数据集合中的一条数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="key">唯一标识，用于多数据库情况下的负载均衡</param>
         /// <param name="data">数据集合</param>
         /// <param name="weights">权重集合，当前轮询方式，权重无效</param>
         /// <returns></returns>
-        public T Get<T>(IEnumerable<T> data, int[] weights = null)
+        public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
             try
             {
                 _lock.Wait();
 
-                if (_index >= data.Count())
-                {
-                    _index = 0;
-                }
-                var retval = data.ElementAt(_index);
-                _index++;
+                var count = data.Count();
+                key = $"{key}_{count}";
+
+                var index = _serviceIndexs.GetOrAdd(key, 0);
+
+                var retval = data.ElementAt(index);
+
+                index++;
+                if (index >= count)
+                    index = 0;
+
+                _serviceIndexs[key] = index;
 
                 return retval;
             }

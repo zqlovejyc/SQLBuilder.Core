@@ -16,8 +16,10 @@
  */
 #endregion
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 /****************************
 * [Author] 张强
 * [Date] 2020-09-29
@@ -134,49 +136,56 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class WeightRoundRobinLoadBalancer : ILoadBalancer
     {
-        /// <summary>
-        /// 权重算法
-        /// </summary>
-        private WeightRoundRobin _weightRoundRobin;
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+
+        private static readonly ConcurrentDictionary<string, WeightRoundRobin> _weightRoundRobins =
+            new ConcurrentDictionary<string, WeightRoundRobin>();
 
         /// <summary>
         /// 获取数据集合中的一条数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="key">唯一标识，用于多数据库情况下的负载均衡</param>
         /// <param name="data">数据集合</param>
         /// <param name="weights">权重集合</param>
         /// <returns></returns>
-        public T Get<T>(IEnumerable<T> data, int[] weights = null)
+        public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
-            //初始化权重数组
-            var count = data.Count();
-            var weightList = new List<int>();
+            try
+            {
+                _lock.Wait();
 
-            if (weights == null)
-            {
-                data.ToList().ForEach(x => weightList.Add(1));
-            }
-            else
-            {
-                for (int i = 0; i < count; i++)
+                //初始化权重数组
+                var count = data.Count();
+                var weightList = new List<int>();
+
+                if (weights == null)
                 {
-                    if (i < weights.Length)
-                        weightList.Add(weights[i]);
-                    else
-                        weightList.Add(1);
+                    data.ToList().ForEach(x => weightList.Add(1));
                 }
-            }
+                else
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (i < weights.Length)
+                            weightList.Add(weights[i]);
+                        else
+                            weightList.Add(1);
+                    }
+                }
 
-            //初始化权重算法
-            if (_weightRoundRobin.IsNull())
+                //初始化权重算法
+                var weightRoundRobin = _weightRoundRobins.GetOrAdd($"{key}_{weightList.Count}", new WeightRoundRobin(weightList.ToArray()));
+
+                //获取索引值
+                var index = weightRoundRobin.Get();
+
+                return data.ElementAt(index);
+            }
+            finally
             {
-                _weightRoundRobin = new WeightRoundRobin(weightList.ToArray());
+                _lock.Release();
             }
-
-            //获取索引值
-            var index = _weightRoundRobin.Get();
-
-            return data.ElementAt(index);
         }
     }
 }

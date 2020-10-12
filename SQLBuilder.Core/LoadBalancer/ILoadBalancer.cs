@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 /****************************
 * [Author] 张强
 * [Date] 2020-09-29
@@ -34,9 +33,10 @@ namespace SQLBuilder.Core.LoadBalancer
         /// 获取数据集合中的一条数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="key">唯一标识，用于多数据库情况下的负载均衡</param>
         /// <param name="data">数据集合</param>
         /// <param name="weights">权重集合，仅当实现权重逻辑的实例才有效</param>
         /// <returns></returns>
-        T Get<T>(IEnumerable<T> data, int[] weights = null);
+        T Get<T>(string key, IEnumerable<T> data, int[] weights = null);
     }
 }

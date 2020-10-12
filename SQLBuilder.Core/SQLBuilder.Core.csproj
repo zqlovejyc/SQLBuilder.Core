@@ -2,16 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyVersion>1.0.6.0</AssemblyVersion>
+        <AssemblyVersion>1.0.6.1</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.6.0</Version>
+        <Version>1.0.6.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化AddSQLBuilder；
-2.修改SqlServer和MySql驱动，SqlServer由System.Data.SqlClient改为Microsoft.Data.SqlClient，MySql由MySql.Data改为MySqlConnector；</PackageReleaseNotes>
-        <FileVersion>1.0.6.0</FileVersion>
+        <PackageReleaseNotes>1.优化appsettings配置，根据环境变量自动选择开发环境和正式环境配置；
+2.优化负载均衡，修复多数据库情况下的索引超出界限bug；
+3.移除Microsoft.CSharp包引用；</PackageReleaseNotes>
+        <FileVersion>1.0.6.1</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>sql.png</PackageIcon>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

@@ -119,6 +119,146 @@ namespace SQLBuilder.Core.Repositories
             tranConnection?.Dispose();
             Transaction = null;
         }
+
+        /// <summary>
+        /// 执行事务，内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托</param>
+        public void ExecuteTrans(Action<IRepository> handler, Action<Exception> rollback = null)
+        {
+            IRepository repository = null;
+            try
+            {
+                if (handler != null)
+                {
+                    if (Transaction?.Connection != null)
+                        repository = this;
+                    else
+                        repository = BeginTrans();
+
+                    handler(repository);
+                    repository.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                repository?.Rollback();
+
+                if (rollback != null)
+                    rollback(ex);
+                else
+                    throw;
+            }
+        }
+
+        /// <summary>
+        /// 执行事务，根据自定义委托返回值内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
+        public void ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null)
+        {
+            IRepository repository = null;
+            try
+            {
+                if (handler != null)
+                {
+                    if (Transaction?.Connection != null)
+                        repository = this;
+                    else
+                        repository = BeginTrans();
+
+                    var res = handler(repository);
+                    if (res)
+                        repository.Commit();
+                    else
+                    {
+                        repository.Rollback();
+                        rollback?.Invoke(null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                repository?.Rollback();
+
+                if (rollback != null)
+                    rollback(ex);
+                else
+                    throw;
+            }
+        }
+
+        /// <summary>
+        /// 执行事务，内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托</param>
+        public async Task ExecuteTransAsync(Func<IRepository, Task> handler, Func<Exception, Task> rollback = null)
+        {
+            IRepository repository = null;
+            try
+            {
+                if (handler != null)
+                {
+                    if (Transaction?.Connection != null)
+                        repository = this;
+                    else
+                        repository = BeginTrans();
+
+                    await handler(repository);
+                    repository.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                repository?.Rollback();
+
+                if (rollback != null)
+                    await rollback(ex);
+                else
+                    throw;
+            }
+        }
+
+        /// <summary>
+        /// 执行事务，根据自定义委托返回值内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
+        public async Task ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null)
+        {
+            IRepository repository = null;
+            try
+            {
+                if (handler != null)
+                {
+                    if (Transaction?.Connection != null)
+                        repository = this;
+                    else
+                        repository = BeginTrans();
+
+                    var res = await handler(repository);
+                    if (res)
+                        repository.Commit();
+                    else
+                    {
+                        repository.Rollback();
+                        await rollback?.Invoke(null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                repository?.Rollback();
+
+                if (rollback != null)
+                    await rollback(ex);
+                else
+                    throw;
+            }
+        }
         #endregion
 
         #region Page

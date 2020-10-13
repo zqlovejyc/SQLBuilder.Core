@@ -96,7 +96,7 @@ namespace SQLBuilder.Core.Repositories
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        public IRepository BeginTrans()
+        public override IRepository BeginTrans()
         {
             tranConnection = Connection;
             Transaction = tranConnection.BeginTransaction();
@@ -104,29 +104,9 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 提交事务
-        /// </summary>
-        public void Commit()
-        {
-            Transaction?.Commit();
-            Transaction?.Dispose();
-            Close();
-        }
-
-        /// <summary>
-        /// 回滚事务
-        /// </summary>
-        public void Rollback()
-        {
-            Transaction?.Rollback();
-            Transaction?.Dispose();
-            Close();
-        }
-
-        /// <summary>
         /// 关闭连接
         /// </summary>
-        public void Close()
+        public override void Close()
         {
             tranConnection?.Close();
             tranConnection?.Dispose();

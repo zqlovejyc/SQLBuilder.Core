@@ -110,6 +110,34 @@ namespace SQLBuilder.Core.Repositories
         /// 关闭连接
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// 执行事务，内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托</param>
+        void ExecuteTrans(Action<IRepository> handler, Action<Exception> rollback = null);
+
+        /// <summary>
+        /// 执行事务，根据自定义委托返回值内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
+        void ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null);
+
+        /// <summary>
+        /// 执行事务，内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托</param>
+        Task ExecuteTransAsync(Func<IRepository, Task> handler, Func<Exception, Task> rollback = null);
+
+        /// <summary>
+        /// 执行事务，根据自定义委托返回值内部自动开启事务、提交和回滚事务
+        /// </summary>
+        /// <param name="handler">自定义委托</param>
+        /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
+        Task ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null);
         #endregion
 
         #region ExecuteBySql

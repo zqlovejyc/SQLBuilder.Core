@@ -2,15 +2,18 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyVersion>1.0.6.3</AssemblyVersion>
+        <AssemblyVersion>1.0.6.4</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>1.0.6.3</Version>
+        <Version>1.0.6.4</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化ExecuteTrans，添加对是否已开启事务进行判断；</PackageReleaseNotes>
-        <FileVersion>1.0.6.3</FileVersion>
+        <PackageReleaseNotes>1.优化BeginTrans，精简代码；
+2.调整代码结构及命名空间；重命名部分类命名；
+3.优化Page方法；
+4.修改AddSQLBuilder扩展方法，添加isInjectLoadBalancer是否注入从库负载均衡参数；</PackageReleaseNotes>
+        <FileVersion>1.0.6.4</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>sql.png</PackageIcon>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

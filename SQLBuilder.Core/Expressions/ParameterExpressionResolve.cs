@@ -16,29 +16,30 @@
  */
 #endregion
 
+using SQLBuilder.Core.Entry;
 using System.Linq.Expressions;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
     /// 表示命名参数表达式
     /// </summary>
-    public class ParameterExpressionResolve : BaseSqlBuilder<ParameterExpression>
+    public class ParameterExpressionResolve : BaseExpression<ParameterExpression>
     {
         #region Override Base Class Methods
         /// <summary>
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Select(ParameterExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Select(ParameterExpression expression, SqlWrapper sqlWrapper)
         {
-            var tableName = sqlPack.GetTableName(expression.Type);
-            sqlPack.SetTableAlias(tableName);
-            var tableAlias = sqlPack.GetTableAlias(tableName);
-            sqlPack.SelectFields.Add($"{tableAlias}.*");
-            return sqlPack;
+            var tableName = sqlWrapper.GetTableName(expression.Type);
+            sqlWrapper.SetTableAlias(tableName);
+            var tableAlias = sqlWrapper.GetTableAlias(tableName);
+            sqlWrapper.SelectFields.Add($"{tableAlias}.*");
+            return sqlWrapper;
         }
         #endregion
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SQLBuilder;
+﻿using SQLBuilder.Core.Attributes;
 
 namespace SQLBuilder.Core
 {

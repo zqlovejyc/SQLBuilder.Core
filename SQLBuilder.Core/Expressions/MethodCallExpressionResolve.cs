@@ -16,6 +16,9 @@
  */
 #endregion
 
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,18 +26,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
     /// 表示对静态方法或实例方法的调用
     /// </summary>
-	public class MethodCallExpressionResolve : BaseSqlBuilder<MethodCallExpression>
+	public class MethodCallExpressionResolve : BaseExpression<MethodCallExpression>
     {
         #region Private Static Methods
         /// <summary>
         /// methods
         /// </summary>
-        private static readonly Dictionary<string, Action<MethodCallExpression, SqlPack>> methods = new Dictionary<string, Action<MethodCallExpression, SqlPack>>
+        private static readonly Dictionary<string, Action<MethodCallExpression, SqlWrapper>> methods = new Dictionary<string, Action<MethodCallExpression, SqlWrapper>>
         {
             ["Like"] = Like,
             ["LikeLeft"] = LikeLeft,
@@ -56,67 +59,67 @@ namespace SQLBuilder.Core
         /// IN
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void IN(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void IN(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            sqlPack += " IN ";
-            SqlBuilderProvider.In(expression.Arguments[1], sqlPack);
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            sqlWrapper += " IN ";
+            SqlExpressionProvider.In(expression.Arguments[1], sqlWrapper);
         }
 
         /// <summary>
         /// Not In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void NotIn(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void NotIn(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            sqlPack += " NOT IN ";
-            SqlBuilderProvider.In(expression.Arguments[1], sqlPack);
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            sqlWrapper += " NOT IN ";
+            SqlExpressionProvider.In(expression.Arguments[1], sqlWrapper);
         }
 
         /// <summary>
         /// Like
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void Like(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void Like(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
             }
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " LIKE '%' + ";
+                    sqlWrapper += " LIKE '%' + ";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += " LIKE CONCAT('%',";
+                    sqlWrapper += " LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " LIKE '%' || ";
+                    sqlWrapper += " LIKE '%' || ";
                     break;
                 default:
                     break;
             }
-            SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[1], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " + '%'";
+                    sqlWrapper += " + '%'";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += ",'%')";
+                    sqlWrapper += ",'%')";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " || '%'";
+                    sqlWrapper += " || '%'";
                     break;
                 default:
                     break;
@@ -127,36 +130,36 @@ namespace SQLBuilder.Core
         /// LikeLeft
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void LikeLeft(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void LikeLeft(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
             }
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " LIKE '%' + ";
+                    sqlWrapper += " LIKE '%' + ";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += " LIKE CONCAT('%',";
+                    sqlWrapper += " LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " LIKE '%' || ";
+                    sqlWrapper += " LIKE '%' || ";
                     break;
                 default:
                     break;
             }
-            SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[1], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += ")";
+                    sqlWrapper += ")";
                     break;
                 default:
                     break;
@@ -167,41 +170,41 @@ namespace SQLBuilder.Core
         /// LikeRight
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void LikeRight(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void LikeRight(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
             }
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " LIKE ";
+                    sqlWrapper += " LIKE ";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += " LIKE CONCAT(";
+                    sqlWrapper += " LIKE CONCAT(";
                     break;
                 default:
                     break;
             }
-            SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[1], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " + '%'";
+                    sqlWrapper += " + '%'";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += ",'%')";
+                    sqlWrapper += ",'%')";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " || '%'";
+                    sqlWrapper += " || '%'";
                     break;
                 default:
                     break;
@@ -212,43 +215,43 @@ namespace SQLBuilder.Core
         /// NotLike
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void NotLike(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void NotLike(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
             }
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " NOT LIKE '%' + ";
+                    sqlWrapper += " NOT LIKE '%' + ";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += " NOT LIKE CONCAT('%',";
+                    sqlWrapper += " NOT LIKE CONCAT('%',";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " NOT LIKE '%' || ";
+                    sqlWrapper += " NOT LIKE '%' || ";
                     break;
                 default:
                     break;
             }
-            SqlBuilderProvider.Where(expression.Arguments[1], sqlPack);
-            switch (sqlPack.DatabaseType)
+            SqlExpressionProvider.Where(expression.Arguments[1], sqlWrapper);
+            switch (sqlWrapper.DatabaseType)
             {
                 case DatabaseType.SqlServer:
-                    sqlPack += " + '%'";
+                    sqlWrapper += " + '%'";
                     break;
                 case DatabaseType.MySql:
                 case DatabaseType.PostgreSql:
-                    sqlPack += ",'%')";
+                    sqlWrapper += ",'%')";
                     break;
                 case DatabaseType.Oracle:
                 case DatabaseType.Sqlite:
-                    sqlPack += " || '%'";
+                    sqlWrapper += " || '%'";
                     break;
                 default:
                     break;
@@ -259,49 +262,49 @@ namespace SQLBuilder.Core
         /// Contains
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void Contains(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void Contains(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
                 if (typeof(IList).IsAssignableFrom(expression.Object.Type))
                 {
-                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-                    sqlPack += " IN ";
-                    SqlBuilderProvider.In(expression.Object, sqlPack);
+                    SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+                    sqlWrapper += " IN ";
+                    SqlExpressionProvider.In(expression.Object, sqlWrapper);
                 }
                 else
                 {
-                    SqlBuilderProvider.Where(expression.Object, sqlPack);
-                    switch (sqlPack.DatabaseType)
+                    SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                    switch (sqlWrapper.DatabaseType)
                     {
                         case DatabaseType.SqlServer:
-                            sqlPack += " LIKE '%' + ";
+                            sqlWrapper += " LIKE '%' + ";
                             break;
                         case DatabaseType.MySql:
                         case DatabaseType.PostgreSql:
-                            sqlPack += " LIKE CONCAT('%',";
+                            sqlWrapper += " LIKE CONCAT('%',";
                             break;
                         case DatabaseType.Oracle:
                         case DatabaseType.Sqlite:
-                            sqlPack += " LIKE '%' || ";
+                            sqlWrapper += " LIKE '%' || ";
                             break;
                         default:
                             break;
                     }
-                    SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-                    switch (sqlPack.DatabaseType)
+                    SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+                    switch (sqlWrapper.DatabaseType)
                     {
                         case DatabaseType.SqlServer:
-                            sqlPack += " + '%'";
+                            sqlWrapper += " + '%'";
                             break;
                         case DatabaseType.MySql:
                         case DatabaseType.PostgreSql:
-                            sqlPack += ",'%')";
+                            sqlWrapper += ",'%')";
                             break;
                         case DatabaseType.Oracle:
                         case DatabaseType.Sqlite:
-                            sqlPack += " || '%'";
+                            sqlWrapper += " || '%'";
                             break;
                         default:
                             break;
@@ -310,9 +313,9 @@ namespace SQLBuilder.Core
             }
             else if (expression.Arguments.Count > 1 && expression.Arguments[1] is MemberExpression memberExpression)
             {
-                SqlBuilderProvider.Where(memberExpression, sqlPack);
-                sqlPack += " IN ";
-                SqlBuilderProvider.In(expression.Arguments[0], sqlPack);
+                SqlExpressionProvider.Where(memberExpression, sqlWrapper);
+                sqlWrapper += " IN ";
+                SqlExpressionProvider.In(expression.Arguments[0], sqlWrapper);
             }
         }
 
@@ -320,37 +323,37 @@ namespace SQLBuilder.Core
         /// IsNullOrEmpty
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void IsNullOrEmpty(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void IsNullOrEmpty(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            sqlPack += "(";
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            sqlPack += " IS NULL OR ";
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            sqlPack += " = ''";
-            sqlPack += ")";
+            sqlWrapper += "(";
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            sqlWrapper += " IS NULL OR ";
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            sqlWrapper += " = ''";
+            sqlWrapper += ")";
         }
 
         /// <summary>
         /// Equals
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void Equals(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void Equals(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
             }
-            var signIndex = sqlPack.Length;
-            SqlBuilderProvider.Where(expression.Arguments[0], sqlPack);
-            if (sqlPack.ToString().ToUpper().EndsWith("NULL"))
+            var signIndex = sqlWrapper.Length;
+            SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+            if (sqlWrapper.ToString().ToUpper().EndsWith("NULL"))
             {
-                sqlPack.Sql.Insert(signIndex, " IS ");
+                sqlWrapper.Sql.Insert(signIndex, " IS ");
             }
             else
             {
-                sqlPack.Sql.Insert(signIndex, " = ");
+                sqlWrapper.Sql.Insert(signIndex, " = ");
             }
         }
 
@@ -358,14 +361,14 @@ namespace SQLBuilder.Core
         /// ToUpper
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void ToUpper(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void ToUpper(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                sqlPack += "UPPER(";
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
-                sqlPack += ")";
+                sqlWrapper += "UPPER(";
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                sqlWrapper += ")";
             }
         }
 
@@ -373,14 +376,14 @@ namespace SQLBuilder.Core
         /// ToLower
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void ToLower(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void ToLower(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                sqlPack += "LOWER(";
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
-                sqlPack += ")";
+                sqlWrapper += "LOWER(";
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                sqlWrapper += ")";
             }
         }
 
@@ -388,27 +391,27 @@ namespace SQLBuilder.Core
         /// Trim
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void Trim(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void Trim(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                if (sqlPack.DatabaseType == DatabaseType.SqlServer)
+                if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
                 {
-                    sqlPack += "LTRIM(RTRIM(";
+                    sqlWrapper += "LTRIM(RTRIM(";
                 }
                 else
                 {
-                    sqlPack += "TRIM(";
+                    sqlWrapper += "TRIM(";
                 }
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
-                if (sqlPack.DatabaseType == DatabaseType.SqlServer)
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
                 {
-                    sqlPack += "))";
+                    sqlWrapper += "))";
                 }
                 else
                 {
-                    sqlPack += ")";
+                    sqlWrapper += ")";
                 }
             }
         }
@@ -417,14 +420,14 @@ namespace SQLBuilder.Core
         /// TrimStart
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void TrimStart(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void TrimStart(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                sqlPack += "LTRIM(";
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
-                sqlPack += ")";
+                sqlWrapper += "LTRIM(";
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                sqlWrapper += ")";
             }
         }
 
@@ -432,14 +435,14 @@ namespace SQLBuilder.Core
         /// TrimEnd
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        private static void TrimEnd(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void TrimEnd(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
             {
-                sqlPack += "RTRIM(";
-                SqlBuilderProvider.Where(expression.Object, sqlPack);
-                sqlPack += ")";
+                sqlWrapper += "RTRIM(";
+                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                sqlWrapper += ")";
             }
         }
         #endregion
@@ -449,14 +452,14 @@ namespace SQLBuilder.Core
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack In(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper In(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var val = expression?.ToObject();
             if (val != null)
             {
-                sqlPack += "(";
+                sqlWrapper += "(";
                 if (val.GetType().IsArray || typeof(IList).IsAssignableFrom(val.GetType()))
                 {
                     var list = val as IList;
@@ -464,45 +467,45 @@ namespace SQLBuilder.Core
                     {
                         foreach (var item in list)
                         {
-                            SqlBuilderProvider.In(Expression.Constant(item, item.GetType()), sqlPack);
-                            sqlPack += ",";
+                            SqlExpressionProvider.In(Expression.Constant(item, item.GetType()), sqlWrapper);
+                            sqlWrapper += ",";
                         }
                     }
                 }
                 else
                 {
-                    SqlBuilderProvider.In(Expression.Constant(val, val.GetType()), sqlPack);
+                    SqlExpressionProvider.In(Expression.Constant(val, val.GetType()), sqlWrapper);
                 }
-                if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-                    sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-                sqlPack += ")";
+                if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+                    sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+                sqlWrapper += ")";
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack Where(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Where(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var key = expression.Method;
             if (key.IsGenericMethod)
                 key = key.GetGenericMethodDefinition();
             //匹配到方法
-            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlPack> action))
+            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> action))
             {
-                action(expression, sqlPack);
-                return sqlPack;
+                action(expression, sqlWrapper);
+                return sqlWrapper;
             }
             else
             {
                 try
                 {
-                    sqlPack.AddDbParameter(expression.ToObject());
-                    return sqlPack;
+                    sqlWrapper.AddDbParameter(expression.ToObject());
+                    return sqlWrapper;
                 }
                 catch
                 {
@@ -515,100 +518,100 @@ namespace SQLBuilder.Core
         /// Insert
         /// </summary>
         /// <param name="expression"></param>
-        /// <param name="sqlPack"></param>
+        /// <param name="sqlWrapper"></param>
         /// <returns></returns>
-        public override SqlPack Insert(MethodCallExpression expression, SqlPack sqlPack)
+        public override SqlWrapper Insert(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var fields = new List<string>();
             var array = expression.ToObject() as object[];
             for (var i = 0; i < array.Length; i++)
             {
-                if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                    sqlPack.Sql.Append("(");
-                if (i > 0 && sqlPack.DatabaseType == DatabaseType.Oracle)
-                    sqlPack.Sql.Append(" UNION ALL SELECT ");
+                if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append("(");
+                if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append(" UNION ALL SELECT ");
                 var properties = array[i]?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : p.DeclaringType;
-                    (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, p);
+                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : p.DeclaringType;
+                    (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                     if (isInsert)
                     {
                         var value = p.GetValue(array[i], null);
-                        if (value != null || (sqlPack.IsEnableNullValue && value == null))
+                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlPack.AddDbParameter(value);
+                            sqlWrapper.AddDbParameter(value);
                             if (!fields.Contains(columnName)) fields.Add(columnName);
-                            sqlPack += ",";
+                            sqlWrapper += ",";
                         }
                     }
                 }
-                if (sqlPack[sqlPack.Length - 1] == ',')
+                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 {
-                    sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                    if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                        sqlPack.Sql.Append("),");
+                    sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                    if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                        sqlWrapper.Sql.Append("),");
                     else
-                        sqlPack.Sql.Append(" FROM DUAL");
+                        sqlWrapper.Sql.Append(" FROM DUAL");
                 }
             }
-            if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-                sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-            sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
-            return sqlPack;
+            if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            return sqlWrapper;
         }
 
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack GroupBy(MethodCallExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper GroupBy(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
             if (array != null)
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlBuilderProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
+                    SqlExpressionProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                 }
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="orders">排序方式</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack OrderBy(MethodCallExpression expression, SqlPack sqlPack, params OrderType[] orders)
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper OrderBy(MethodCallExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
             if (array != null)
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlBuilderProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
+                    SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                     if (i <= orders.Length - 1)
                     {
-                        sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                        sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                     }
                     else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
                     {
-                        sqlPack += " ASC,";
+                        sqlWrapper += " ASC,";
                     }
                     else
                     {
-                        sqlPack += ",";
+                        sqlWrapper += ",";
                     }
                 }
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
-            return sqlPack;
+            return sqlWrapper;
         }
         #endregion
     }

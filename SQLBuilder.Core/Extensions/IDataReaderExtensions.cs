@@ -1,0 +1,418 @@
+﻿#region License
+/***
+ * Copyright © 2018-2020, 张强 (943620963@qq.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * without warranties or conditions of any kind, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Reflection;
+
+namespace SQLBuilder.Core.Extensions
+{
+    /// <summary>
+    /// IDataReader扩展类
+    /// </summary>
+    public static class IDataReaderExtensions
+    {
+        #region ToDataTable
+        /// <summary>
+        /// IDataReader转换为DataTable
+        /// </summary>
+        /// <param name="this">reader数据源</param>
+        /// <returns>DataTable</returns>
+        public static DataTable ToDataTable(this IDataReader @this)
+        {
+            var table = new DataTable();
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    table.Load(@this);
+                }
+            }
+            return table;
+        }
+
+        /// <summary>
+        /// List集合转DataTable
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this">list数据源</param>
+        /// <returns>DataTable</returns>
+        public static DataTable ToDataTable<T>(this List<T> @this)
+        {
+            DataTable dt = null;
+            if (@this?.Count > 0)
+            {
+                dt = new DataTable(typeof(T).Name);
+                var typeName = typeof(T).Name;
+                var first = @this.FirstOrDefault();
+                var firstTypeName = first.GetType().Name;
+                if (typeName.Contains("Dictionary`2") || (typeName == "Object" && (firstTypeName == "DapperRow" || firstTypeName == "DynamicRow")))
+                {
+                    var dic = first as IDictionary<string, object>;
+                    dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key, o.Value?.GetType().GetCoreType() ?? typeof(object))).ToArray());
+                    var dics = @this.Select(o => o as IDictionary<string, object>);
+                    foreach (var item in dics)
+                    {
+                        dt.Rows.Add(item.Select(o => o.Value).ToArray());
+                    }
+                }
+                else
+                {
+                    var props = typeName == "Object" ? first.GetType().GetProperties() : typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                    foreach (var prop in props)
+                    {
+                        dt.Columns.Add(prop.Name, prop?.PropertyType.GetCoreType() ?? typeof(object));
+                    }
+                    foreach (var item in @this)
+                    {
+                        var values = new object[props.Length];
+                        for (var i = 0; i < props.Length; i++)
+                        {
+                            if (!props[i].CanRead) continue;
+                            values[i] = props[i].GetValue(item, null);
+                        }
+                        dt.Rows.Add(values);
+                    }
+                }
+            }
+            return dt;
+        }
+        #endregion
+
+        #region ToDataSet
+        /// <summary>
+        /// IDataReader转换为DataSet
+        /// </summary>
+        /// <param name="this">reader数据源</param>
+        /// <returns>DataSet</returns>
+        public static DataSet ToDataSet(this IDataReader @this)
+        {
+            var ds = new DataSet();
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    do
+                    {
+                        var schemaTable = @this.GetSchemaTable();
+                        var dt = new DataTable();
+                        for (var i = 0; i < schemaTable.Rows.Count; i++)
+                        {
+                            var row = schemaTable.Rows[i];
+                            dt.Columns.Add(new DataColumn((string)row["ColumnName"], (Type)row["DataType"]));
+                        }
+                        while (@this.Read())
+                        {
+                            var dataRow = dt.NewRow();
+                            for (var i = 0; i < @this.FieldCount; i++)
+                            {
+                                dataRow[i] = @this.GetValue(i);
+                            }
+                            dt.Rows.Add(dataRow);
+                        }
+                        ds.Tables.Add(dt);
+                    }
+                    while (@this.NextResult());
+                }
+            }
+            return ds;
+        }
+        #endregion
+
+        #region ToDynamic
+        /// <summary>
+        /// IDataReader数据转为dynamic对象
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>dynamic</returns>
+        public static dynamic ToDynamic(this IDataReader @this)
+        {
+            return @this.ToDynamics()?.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// IDataReader数据转为dynamic对象集合
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>dynamic集合</returns>
+        public static IEnumerable<dynamic> ToDynamics(this IDataReader @this)
+        {
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    while (@this.Read())
+                    {
+                        var row = new ExpandoObject() as IDictionary<string, object>;
+                        for (var i = 0; i < @this.FieldCount; i++)
+                        {
+                            row.Add(@this.GetName(i), @this.GetValue(i));
+                        }
+                        yield return row;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ToDictionary
+        /// <summary>
+        /// IDataReader数据转为Dictionary对象
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>Dictionary</returns>
+        public static Dictionary<string, object> ToDictionary(this IDataReader @this)
+        {
+            return @this.ToDictionaries()?.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// IDataReader数据转为Dictionary对象集合
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>Dictionary集合</returns>
+        public static IEnumerable<Dictionary<string, object>> ToDictionaries(this IDataReader @this)
+        {
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    while (@this.Read())
+                    {
+                        var dic = new Dictionary<string, object>();
+                        for (var i = 0; i < @this.FieldCount; i++)
+                        {
+                            dic[@this.GetName(i)] = @this.GetValue(i);
+                        }
+                        yield return dic;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ToEntity
+        /// <summary>
+        /// IDataReader数据转为强类型实体
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>强类型实体</returns>
+        public static T ToEntity<T>(this IDataReader @this)
+        {
+            var result = @this.ToEntities<T>();
+            if (result != null)
+            {
+                return result.FirstOrDefault();
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// IDataReader数据转为强类型实体集合
+        /// </summary>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>强类型实体集合</returns>
+        public static IEnumerable<T> ToEntities<T>(this IDataReader @this)
+        {
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    var fields = new List<string>();
+                    for (int i = 0; i < @this.FieldCount; i++)
+                    {
+                        fields.Add(@this.GetName(i));
+                    }
+                    while (@this.Read())
+                    {
+                        var instance = Activator.CreateInstance<T>();
+                        var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                        foreach (var p in props)
+                        {
+                            if (!p.CanWrite) continue;
+                            var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
+                            if (!field.IsNullOrEmpty() && !@this[field].IsNull())
+                            {
+                                p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
+                            }
+                        }
+                        yield return instance;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region ToList
+        /// <summary>
+        /// IDataReader转换为T集合
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>T类型集合</returns>
+        public static List<T> ToList<T>(this IDataReader @this)
+        {
+            List<T> list = null;
+            if (@this?.IsClosed == false)
+            {
+                var type = typeof(T);
+                if (type.Name.Contains("IDictionary`2"))
+                {
+                    list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
+                }
+                else if (type.Name.Contains("Dictionary`2"))
+                {
+                    list = @this.ToDictionaries()?.ToList() as List<T>;
+                }
+                else if (type.IsClass && type.Name != "Object" && type.Name != "String")
+                {
+                    list = @this.ToEntities<T>()?.ToList() as List<T>;
+                }
+                else
+                {
+                    var result = @this.ToDynamics()?.ToList();
+                    list = result as List<T>;
+                    if (list == null)
+                    {
+                        //适合查询单个字段的结果集
+                        list = result.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                    }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// IDataReader转换为T集合的集合
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>T类型集合的集合</returns>
+        public static List<List<T>> ToLists<T>(this IDataReader @this)
+        {
+            var result = new List<List<T>>();
+            if (@this?.IsClosed == false)
+            {
+                using (@this)
+                {
+                    var type = typeof(T);
+                    do
+                    {
+                        #region IDictionary
+                        if (type.Name.Contains("Dictionary`2"))
+                        {
+                            var list = new List<Dictionary<string, object>>();
+                            while (@this.Read())
+                            {
+                                var dic = new Dictionary<string, object>();
+                                for (var i = 0; i < @this.FieldCount; i++)
+                                {
+                                    dic[@this.GetName(i)] = @this.GetValue(i);
+                                }
+                                list.Add(dic);
+                            }
+                            if (type.Name.Contains("IDictionary`2"))
+                            {
+                                result.Add(list.Select(o => o as IDictionary<string, object>).ToList() as List<T>);
+                            }
+                            else
+                            {
+                                result.Add(list as List<T>);
+                            }
+                        }
+                        #endregion
+
+                        #region Class T
+                        else if (type.IsClass && type.Name != "Object" && type.Name != "String")
+                        {
+                            var list = new List<T>();
+                            var fields = new List<string>();
+                            for (int i = 0; i < @this.FieldCount; i++)
+                            {
+                                fields.Add(@this.GetName(i));
+                            }
+                            while (@this.Read())
+                            {
+                                var instance = Activator.CreateInstance<T>();
+                                var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                                foreach (var p in props)
+                                {
+                                    if (!p.CanWrite) continue;
+                                    var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
+                                    if (!field.IsNullOrEmpty() && !@this[field].IsNull())
+                                    {
+                                        p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
+                                    }
+                                }
+                                list.Add(instance);
+                            }
+                            result.Add(list);
+                        }
+                        #endregion
+
+                        #region dynamic
+                        else
+                        {
+                            var list = new List<dynamic>();
+                            while (@this.Read())
+                            {
+                                var row = new ExpandoObject() as IDictionary<string, object>;
+                                for (var i = 0; i < @this.FieldCount; i++)
+                                {
+                                    row.Add(@this.GetName(i), @this.GetValue(i));
+                                }
+                                list.Add(row);
+                            }
+                            var item = list as List<T>;
+                            if (item == null)
+                            {
+                                //适合查询单个字段的结果集
+                                item = list.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                            }
+                            result.Add(item);
+                        }
+                        #endregion
+                    } while (@this.NextResult());
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region ToFirstOrDefault
+        /// <summary>
+        /// IDataReader转换为T类型对象
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="this">IDataReader数据源</param>
+        /// <returns>T类型对象</returns>
+        public static T ToFirstOrDefault<T>(this IDataReader @this)
+        {
+            var list = @this.ToList<T>();
+            if (list != null)
+            {
+                return list.FirstOrDefault();
+            }
+            return default(T);
+        }
+        #endregion
+    }
+}

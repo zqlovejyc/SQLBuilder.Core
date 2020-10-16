@@ -16,9 +16,8 @@
  */
 #endregion
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Enums
 {
-    #region DatabaseType
     /// <summary>
     /// 数据库类型
     /// </summary>
@@ -47,48 +46,6 @@ namespace SQLBuilder.Core
         /// <summary>
         /// PostgreSql数据库类型
         /// </summary>
-        PostgreSql,
+        PostgreSql
     }
-    #endregion
-
-    #region OrderType
-    /// <summary>
-    /// 排序方式
-    /// </summary>
-    public enum OrderType
-    {
-        /// <summary>
-        /// 升序
-        /// </summary>
-        Ascending,
-
-        /// <summary>
-        /// 降序
-        /// </summary>
-        Descending
-    }
-    #endregion
-
-    #region ServiceLifetime
-    /// <summary>
-    /// 服务生命周期
-    /// </summary>
-    public enum ServiceLifetime
-    {
-        /// <summary>
-        /// 单例
-        /// </summary>
-        Singleton,
-
-        /// <summary>
-        /// 作用域
-        /// </summary>
-        Scoped,
-
-        /// <summary>
-        /// 瞬时
-        /// </summary>
-        Transient
-    }
-    #endregion
 }

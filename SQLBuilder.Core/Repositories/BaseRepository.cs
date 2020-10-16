@@ -17,6 +17,8 @@
 #endregion
 
 using Dapper;
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.LoadBalancer;
 using System;
 using System.Collections.Generic;

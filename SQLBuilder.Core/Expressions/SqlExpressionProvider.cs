@@ -16,15 +16,17 @@
  */
 #endregion
 
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
 using System;
 using System.Linq.Expressions;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
     /// SqlBuilderProvider
     /// </summary>
-	public class SqlBuilderProvider
+	public class SqlExpressionProvider
     {
         #region Private Static Methods
         /// <summary>
@@ -32,7 +34,7 @@ namespace SQLBuilder.Core
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <returns>ISqlBuilder</returns>
-        private static ISqlBuilder GetExpressionResolve(Expression expression)
+        private static IExpression GetExpressionResolve(Expression expression)
         {
             #region Implementation Of Expression
             //null
@@ -87,7 +89,7 @@ namespace SQLBuilder.Core
             }
             //表示将委托或lambda表达式应用于参数表达式列表的表达式
             else if (expression is InvocationExpression)
-            {
+            {                
                 return new InvocationExpressionResolve();
             }
             //描述一个lambda表达式
@@ -165,93 +167,93 @@ namespace SQLBuilder.Core
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Update(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Update(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Update(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Update(expression, sqlWrapper);
 
         /// <summary>
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Insert(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Insert(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Insert(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Insert(expression, sqlWrapper);
 
         /// <summary>
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Select(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Select(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Select(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Select(expression, sqlWrapper);
 
         /// <summary>
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Join(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Join(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Join(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Join(expression, sqlWrapper);
 
         /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Where(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Where(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Where(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Where(expression, sqlWrapper);
 
         /// <summary>
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void In(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).In(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void In(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).In(expression, sqlWrapper);
 
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void GroupBy(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).GroupBy(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void GroupBy(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).GroupBy(expression, sqlWrapper);
 
         /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="orders">排序方式</param>
-        public static void OrderBy(Expression expression, SqlPack sqlPack, params OrderType[] orders) => GetExpressionResolve(expression).OrderBy(expression, sqlPack, orders);
+        public static void OrderBy(Expression expression, SqlWrapper sqlWrapper, params OrderType[] orders) => GetExpressionResolve(expression).OrderBy(expression, sqlWrapper, orders);
 
         /// <summary>
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Max(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Max(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Max(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Max(expression, sqlWrapper);
 
         /// <summary>
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Min(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Min(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Min(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Min(expression, sqlWrapper);
 
         /// <summary>
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Avg(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Avg(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Avg(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Avg(expression, sqlWrapper);
 
         /// <summary>
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Count(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Count(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Count(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Count(expression, sqlWrapper);
 
         /// <summary>
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        public static void Sum(Expression expression, SqlPack sqlPack) => GetExpressionResolve(expression).Sum(expression, sqlPack);
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Sum(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolve(expression).Sum(expression, sqlWrapper);
         #endregion
     }
 }

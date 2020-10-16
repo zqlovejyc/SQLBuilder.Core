@@ -16,117 +16,120 @@
  */
 #endregion
 
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
     /// 表示包含集合初始值设定项的构造函数调用
     /// </summary>
-    public class ListInitExpressionResolve : BaseSqlBuilder<ListInitExpression>
+    public class ListInitExpressionResolve : BaseExpression<ListInitExpression>
     {
         #region Override Base Class Methods
         /// <summary>
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack Insert(ListInitExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Insert(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
             var fields = new List<string>();
             var array = expression.ToObject() as IEnumerable<object>;
             for (var i = 0; i < array.Count(); i++)
             {
-                if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                    sqlPack.Sql.Append("(");
-                if (i > 0 && sqlPack.DatabaseType == DatabaseType.Oracle)
-                    sqlPack.Sql.Append(" UNION ALL SELECT ");
+                if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append("(");
+                if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append(" UNION ALL SELECT ");
                 var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : p.DeclaringType;
-                    (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, p);
+                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : p.DeclaringType;
+                    (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                     if (isInsert)
                     {
                         var value = p.GetValue(array.ElementAt(i), null);
-                        if (value != null || (sqlPack.IsEnableNullValue && value == null))
+                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlPack.AddDbParameter(value);
+                            sqlWrapper.AddDbParameter(value);
                             if (!fields.Contains(columnName)) fields.Add(columnName);
-                            sqlPack += ",";
+                            sqlWrapper += ",";
                         }
                     }
                 }
-                if (sqlPack[sqlPack.Length - 1] == ',')
+                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 {
-                    sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                    if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                        sqlPack.Sql.Append("),");
+                    sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                    if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                        sqlWrapper.Sql.Append("),");
                     else
-                        sqlPack.Sql.Append(" FROM DUAL");
+                        sqlWrapper.Sql.Append(" FROM DUAL");
                 }
             }
-            if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
-                sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
-            sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
-            return sqlPack;
+            if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            return sqlWrapper;
         }
 
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack GroupBy(ListInitExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper GroupBy(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
             var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
             if (array != null)
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlBuilderProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
+                    SqlExpressionProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                 }
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="orders">排序方式</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack OrderBy(ListInitExpression expression, SqlPack sqlPack, params OrderType[] orders)
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper OrderBy(ListInitExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
             if (array != null)
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlBuilderProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
+                    SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                     if (i <= orders.Length - 1)
                     {
-                        sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                        sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                     }
                     else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
                     {
-                        sqlPack += " ASC,";
+                        sqlWrapper += " ASC,";
                     }
                     else
                     {
-                        sqlPack += ",";
+                        sqlWrapper += ",";
                     }
                 }
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
-            return sqlPack;
+            return sqlWrapper;
         }
         #endregion
     }

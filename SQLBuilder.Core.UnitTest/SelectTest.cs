@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SQLBuilder.Core;
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -755,7 +757,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_22()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => o.Id > 0);
             expr = expr.Or(o => o.Email != "");
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
@@ -780,7 +782,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_24()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
@@ -792,7 +794,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_25()
         {
-            var expr = Extensions.False<UserInfo>();
+            var expr = LinqExtensions.False<UserInfo>();
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE  1 = 0 ", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
@@ -947,7 +949,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_36()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => o.Id > 0 == false);
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE [A].[Id] <= @Parameter1", builder.Sql);
@@ -960,7 +962,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_37()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => o.Id >= 0 == false);
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE [A].[Id] < @Parameter1", builder.Sql);
@@ -973,7 +975,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_38()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => o.Id == null == false);
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE [A].[Id] IS NOT NULL", builder.Sql);
@@ -986,7 +988,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_39()
         {
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => !(o.Id > 0 && o.Id < 5));
             var builder = SqlBuilder.Select<UserInfo>().Where(expr);
             Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [A] WHERE [A].[Id] <= @Parameter1 OR [A].[Id] >= @Parameter2", builder.Sql);
@@ -1463,11 +1465,11 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_79()
         {
             //Where条件拼接
-            var whereCondition = Extensions.True<UserInfo>();
+            var whereCondition = LinqExtensions.True<UserInfo>();
             whereCondition = whereCondition.And(x => x.Email == "123");
 
             //Join条件拼接
-            var joinCondition = Extensions.True<UserInfo, Account>();
+            var joinCondition = LinqExtensions.True<UserInfo, Account>();
             joinCondition = joinCondition.And((u, a) => !a.Name.IsNullOrEmpty() && u.Id == a.UserId);
             joinCondition = joinCondition.And((u, a) => u.Id == 1 && !(a.UserId == 2));
             joinCondition = joinCondition.And((u, a) => a.Id == 1);
@@ -1489,12 +1491,12 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_80()
         {
             //Where条件拼接
-            var whereCondition = Extensions.True<UserInfo>();
+            var whereCondition = LinqExtensions.True<UserInfo>();
             whereCondition = whereCondition.And(x => x.Email == "123");
 
             //Join条件拼接
             var name = "";
-            var joinCondition = Extensions.True<UserInfo, Account>()
+            var joinCondition = LinqExtensions.True<UserInfo, Account>()
                                           .And((x, y) => x.Id == y.UserId)
                                           .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
 
@@ -1516,7 +1518,7 @@ namespace SQLBuilder.Core.UnitTest
         {
             //Join条件拼接
             var name = "123";
-            var joinCondition = Extensions.True<UserInfo, Account>()
+            var joinCondition = LinqExtensions.True<UserInfo, Account>()
                                           .And((x, y) => x.Id == y.UserId)
                                           .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
 
@@ -1550,7 +1552,7 @@ namespace SQLBuilder.Core.UnitTest
         {
             //Join条件拼接
             var name = "123";
-            var joinCondition = Extensions.True<UserInfo, Account>()
+            var joinCondition = LinqExtensions.True<UserInfo, Account>()
                                           .And((x, y) => x.Id == y.UserId)
                                           .WhereIf(!name.IsNullOrEmpty(), (x, y) => x.Name.Contains(name));
 
@@ -1589,7 +1591,7 @@ namespace SQLBuilder.Core.UnitTest
                                   .AndWhere(o => o.Name == "")
                                   .OrWhere(o => o.Subject == "")
                                   .Page(3, 2, "Id", "select * from student");
-            Assert.AreEqual(@"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM (select * from student) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY `Id` LIMIT 3 OFFSET 3;DROP TABLE $TEMPORARY;", builder.Sql);
+            Assert.AreEqual(@"SELECT COUNT(*)  AS `TOTAL` FROM (select * from student) AS T;SELECT * FROM (select * from student) AS T ORDER BY Id ASC LIMIT 3 OFFSET 3;", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1604,7 +1606,7 @@ namespace SQLBuilder.Core.UnitTest
                                   .AndWhere(o => o.Name == "")
                                   .OrWhere(o => o.Subject == "")
                                   .Page(3, 2, "`Id`");
-            Assert.AreEqual(@"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM (SELECT * FROM `student` AS `A` WHERE `A`.`Score` IS NOT NULL AND (`A`.`Name` = ?Parameter1) OR (`A`.`Subject` = ?Parameter2)) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY `Id` LIMIT 3 OFFSET 3;DROP TABLE $TEMPORARY;", builder.Sql);
+            Assert.AreEqual(@"SELECT COUNT(*)  AS `TOTAL` FROM (SELECT * FROM `student` AS `A` WHERE `A`.`Score` IS NOT NULL AND (`A`.`Name` = ?Parameter1) OR (`A`.`Subject` = ?Parameter2)) AS T;SELECT * FROM (SELECT * FROM `student` AS `A` WHERE `A`.`Score` IS NOT NULL AND (`A`.`Name` = ?Parameter1) OR (`A`.`Subject` = ?Parameter2)) AS T ORDER BY `Id` ASC LIMIT 3 OFFSET 3;", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 
@@ -1617,7 +1619,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(u => u.Id)
                                   .Where(u => u.Name == "b" && (u.Id > 2 && u.Name != null && (u.Email == "11" || u.Email == "22" && u.Email == "ee")))
                                   .Page(10, 1, "[Id]");
-            Assert.AreEqual(@"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;SELECT * INTO #TEMPORARY FROM (SELECT [A].[Id] FROM [Base_UserInfo] AS [A] WHERE [A].[Name] = @Parameter1 AND (([A].[Id] > @Parameter2 AND [A].[Name] IS NOT NULL) AND ([A].[Email] = @Parameter3 OR ([A].[Email] = @Parameter4 AND [A].[Email] = @Parameter5)))) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY [Id]) AS RowNumber, * FROM #TEMPORARY) AS N WHERE RowNumber BETWEEN 1 AND 10;DROP TABLE #TEMPORARY;", builder.Sql);
+            Assert.AreEqual(@"SELECT COUNT(*) AS [TOTAL] FROM (SELECT [A].[Id] FROM [Base_UserInfo] AS [A] WHERE [A].[Name] = @Parameter1 AND (([A].[Id] > @Parameter2 AND [A].[Name] IS NOT NULL) AND ([A].[Email] = @Parameter3 OR ([A].[Email] = @Parameter4 AND [A].[Email] = @Parameter5)))) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY [Id] ASC) AS [ROWNUMBER], * FROM (SELECT [A].[Id] FROM [Base_UserInfo] AS [A] WHERE [A].[Name] = @Parameter1 AND (([A].[Id] > @Parameter2 AND [A].[Name] IS NOT NULL) AND ([A].[Email] = @Parameter3 OR ([A].[Email] = @Parameter4 AND [A].[Email] = @Parameter5)))) AS T) AS N WHERE [ROWNUMBER] BETWEEN 1 AND 10;", builder.Sql);
             Assert.AreEqual(5, builder.Parameters.Count);
         }
 
@@ -1627,43 +1629,8 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Page_04()
         {
-            var builder = SqlBuilder.Select<UserInfo>(u => u.Id)
-                                  .Where(u => u.Name == "b" && (u.Id > 2 && u.Name != null && (u.Email == "11" || u.Email == "22" || u.Email == "ee")))
-                                  .PageByWith(10, 1, "Id");
-            Assert.AreEqual(@"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;WITH T AS (SELECT [A].[Id] FROM [Base_UserInfo] AS [A] WHERE [A].[Name] = @Parameter1 AND (([A].[Id] > @Parameter2 AND [A].[Name] IS NOT NULL) AND (([A].[Email] = @Parameter3 OR [A].[Email] = @Parameter4) OR [A].[Email] = @Parameter5))) SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY [Id]) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN 1 AND 10;DROP TABLE #TEMPORARY;", builder.Sql);
-            Assert.AreEqual(5, builder.Parameters.Count);
-        }
-
-        /// <summary>
-        /// 分页5
-        /// </summary>
-        [TestMethod]
-        public void Test_Page_05()
-        {
             var builder = SqlBuilder.Select<UserInfo>().PageByWith(10, 1, "Id", "WITH T AS (SELECT * FROM Base_UserInfo)");
-            Assert.AreEqual(@"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;WITH T AS (SELECT * FROM Base_UserInfo) SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY [Id]) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN 1 AND 10;DROP TABLE #TEMPORARY;", builder.Sql);
-            Assert.AreEqual(0, builder.Parameters.Count);
-        }
-
-        /// <summary>
-        /// 分页6
-        /// </summary>
-        [TestMethod]
-        public void Test_Page_06()
-        {
-            var builder = SqlBuilder.Select<UserInfo>().Page(10, 1, "Id", "WITH T AS (SELECT * FROM Base_UserInfo)");
-            Assert.AreEqual(@"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;WITH T AS (SELECT * FROM Base_UserInfo) SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY [Id]) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN 1 AND 10;DROP TABLE #TEMPORARY;", builder.Sql);
-            Assert.AreEqual(0, builder.Parameters.Count);
-        }
-
-        /// <summary>
-        /// 分页7
-        /// </summary>
-        [TestMethod]
-        public void Test_Page_07()
-        {
-            var builder = SqlBuilder.Select<UserInfo>(databaseType: DatabaseType.MySql).PageByWith(10, 1, "Id", "WITH T AS (SELECT * FROM `Base_UserInfo`)");
-            Assert.AreEqual(@"WITH T AS (SELECT * FROM `Base_UserInfo`) SELECT COUNT(1) AS Total FROM T;WITH T AS (SELECT * FROM `Base_UserInfo`) SELECT * FROM T ORDER BY `Id` LIMIT 10 OFFSET 0;", builder.Sql);
+            Assert.AreEqual(@"WITH T AS (SELECT * FROM Base_UserInfo) SELECT COUNT(*) AS [TOTAL] FROM T;WITH T AS (SELECT * FROM Base_UserInfo),R AS (SELECT ROW_NUMBER() OVER (ORDER BY Id ASC) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN 1 AND 10;", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SQLBuilder.Core.Entry;
 
 namespace SQLBuilder.Core.UnitTest
 {

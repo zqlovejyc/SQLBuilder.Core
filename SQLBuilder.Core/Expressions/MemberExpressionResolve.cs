@@ -16,26 +16,29 @@
  */
 #endregion
 
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
     /// 表示访问字段或属性
     /// </summary>
-    public class MemberExpressionResolve : BaseSqlBuilder<MemberExpression>
+	public class MemberExpressionResolve : BaseExpression<MemberExpression>
     {
         #region Override Base Class Methods
         /// <summary>
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack Insert(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Insert(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var objectArray = new List<object>();
             var fields = new List<string>();
@@ -48,118 +51,118 @@ namespace SQLBuilder.Core
                 objectArray.Add(obj);
             for (var i = 0; i < objectArray.Count; i++)
             {
-                if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                    sqlPack.Sql.Append("(");
-                if (i > 0 && sqlPack.DatabaseType == DatabaseType.Oracle)
-                    sqlPack.Sql.Append(" UNION ALL SELECT ");
+                if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append("(");
+                if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                    sqlWrapper.Sql.Append(" UNION ALL SELECT ");
                 var properties = objectArray[i]?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : p.DeclaringType;
-                    (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, p);
+                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : p.DeclaringType;
+                    (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                     if (isInsert)
                     {
                         var value = p.GetValue(objectArray[i], null);
-                        if (value != null || (sqlPack.IsEnableNullValue && value == null))
+                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlPack.AddDbParameter(value);
+                            sqlWrapper.AddDbParameter(value);
                             if (!fields.Contains(columnName)) fields.Add(columnName);
-                            sqlPack += ",";
+                            sqlWrapper += ",";
                         }
                     }
                 }
-                if (sqlPack[sqlPack.Length - 1] == ',')
+                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 {
-                    sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-                    if (sqlPack.DatabaseType != DatabaseType.Oracle)
-                        sqlPack.Sql.Append("),");
+                    sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                    if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                        sqlWrapper.Sql.Append("),");
                     else
-                        sqlPack.Sql.Append(" FROM DUAL");
+                        sqlWrapper.Sql.Append(" FROM DUAL");
                 }
             }
-            if (sqlPack[sqlPack.Length - 1] == ',')
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
-            sqlPack.Sql = new StringBuilder(string.Format(sqlPack.ToString(), string.Join(",", fields).TrimEnd(',')));
-            return sqlPack;
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-        public override SqlPack Update(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Update(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var obj = expression.ToObject();
             var properties = obj?.GetType().GetProperties();
             foreach (var item in properties)
             {
-                var type = item.DeclaringType.ToString().Contains("AnonymousType") ? sqlPack.DefaultType : item.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlPack.GetColumnInfo(type, item);
+                var type = item.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : item.DeclaringType;
+                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, item);
                 if (isUpdate)
                 {
                     var value = item.GetValue(obj, null);
-                    if (value != null || (sqlPack.IsEnableNullValue && value == null))
+                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlPack += columnName + " = ";
-                        sqlPack.AddDbParameter(value);
-                        sqlPack += ",";
+                        sqlWrapper += columnName + " = ";
+                        sqlWrapper.AddDbParameter(value);
+                        sqlWrapper += ",";
                     }
                 }
             }
-            if (sqlPack[sqlPack.Length - 1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
             {
-                sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Select(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Select(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            var tableName = sqlPack.GetTableName(type);
-            sqlPack.SetTableAlias(tableName);
-            string tableAlias = sqlPack.GetTableAlias(tableName);
+            var tableName = sqlWrapper.GetTableName(type);
+            sqlWrapper.SetTableAlias(tableName);
+            string tableAlias = sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
-            sqlPack.SelectFields.Add(tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
-            return sqlPack;
+            sqlWrapper.SelectFields.Add(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Join(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Join(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            var tableName = sqlPack.GetTableName(type);
-            sqlPack.SetTableAlias(tableName);
-            string tableAlias = sqlPack.GetTableAlias(tableName);
+            var tableName = sqlWrapper.GetTableName(type);
+            sqlWrapper.SetTableAlias(tableName);
+            string tableAlias = sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
-            sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
-            return sqlPack;
+            sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Where(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Where(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             //此处判断expression的Member是否是可空值类型
             if (expression.Expression?.NodeType == ExpressionType.MemberAccess &&
@@ -174,59 +177,59 @@ namespace SQLBuilder.Core
                     var type = expression.Expression.Type != expression.Member.DeclaringType ?
                                expression.Expression.Type :
                                expression.Member.DeclaringType;
-                    var tableName = sqlPack.GetTableName(type);
-                    sqlPack.SetTableAlias(tableName);
-                    var tableAlias = sqlPack.GetTableAlias(tableName);
+                    var tableName = sqlWrapper.GetTableName(type);
+                    sqlWrapper.SetTableAlias(tableName);
+                    var tableAlias = sqlWrapper.GetTableAlias(tableName);
                     if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
-                    sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess &&
                         expression.Type.GetCoreType() == typeof(bool))
                     {
-                        sqlPack += " = 1";
+                        sqlWrapper += " = 1";
                     }
                 }
                 else
                 {
-                    sqlPack.AddDbParameter(expression.ToObject());
+                    sqlWrapper.AddDbParameter(expression.ToObject());
                 }
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack In(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper In(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var obj = expression.ToObject();
             if (obj is IEnumerable array)
             {
-                sqlPack += "(";
+                sqlWrapper += "(";
                 foreach (var item in array)
                 {
-                    SqlBuilderProvider.In(Expression.Constant(item), sqlPack);
-                    sqlPack += ",";
+                    SqlExpressionProvider.In(Expression.Constant(item), sqlWrapper);
+                    sqlWrapper += ",";
                 }
-                if (sqlPack.Sql[sqlPack.Sql.Length - 1] == ',')
+                if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
                 {
-                    sqlPack.Sql.Remove(sqlPack.Sql.Length - 1, 1);
+                    sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
                 }
-                sqlPack += ")";
+                sqlWrapper += ")";
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack GroupBy(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper GroupBy(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             string tableName = string.Empty;
             if (expression.Expression.NodeType == ExpressionType.Parameter)
@@ -234,18 +237,18 @@ namespace SQLBuilder.Core
                 var type = expression.Expression.Type != expression.Member.DeclaringType ?
                            expression.Expression.Type :
                            expression.Member.DeclaringType;
-                tableName = sqlPack.GetTableName(type);
+                tableName = sqlWrapper.GetTableName(type);
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
-                tableName = sqlPack.GetTableName(sqlPack.DefaultType);
+                tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             }
-            sqlPack.SetTableAlias(tableName);
-            var tableAlias = sqlPack.GetTableAlias(tableName);
+            sqlWrapper.SetTableAlias(tableName);
+            var tableAlias = sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
@@ -257,36 +260,36 @@ namespace SQLBuilder.Core
                     {
                         foreach (var item in array)
                         {
-                            SqlBuilderProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlPack);
+                            SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
                         }
-                        sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
                     if (type == "List`1" && obj is List<string> list)
                     {
                         foreach (var item in list)
                         {
-                            SqlBuilderProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlPack);
+                            SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
                         }
-                        sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
                     if (type == "String" && obj is string str)
                     {
-                        SqlBuilderProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlPack);
-                        sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                        SqlExpressionProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlWrapper);
+                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
                 }
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="orders">排序方式</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack OrderBy(MemberExpression expression, SqlPack sqlPack, params OrderType[] orders)
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper OrderBy(MemberExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             string tableName = string.Empty;
             if (expression.Expression.NodeType == ExpressionType.Parameter)
@@ -294,20 +297,20 @@ namespace SQLBuilder.Core
                 var type = expression.Expression.Type != expression.Member.DeclaringType ?
                            expression.Expression.Type :
                            expression.Member.DeclaringType;
-                tableName = sqlPack.GetTableName(type);
+                tableName = sqlWrapper.GetTableName(type);
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
-                tableName = sqlPack.GetTableName(sqlPack.DefaultType);
+                tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             }
-            sqlPack.SetTableAlias(tableName);
-            var tableAlias = sqlPack.GetTableAlias(tableName);
+            sqlWrapper.SetTableAlias(tableName);
+            var tableAlias = sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlPack += tableAlias + sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                 if (orders?.Length > 0)
-                    sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
+                    sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
@@ -319,137 +322,137 @@ namespace SQLBuilder.Core
                     {
                         for (var i = 0; i < array.Length; i++)
                         {
-                            SqlBuilderProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlPack);
+                            SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                             if (i <= orders.Length - 1)
                             {
-                                sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                                sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else if (!array[i].ToUpper().Contains("ASC") && !array[i].ToUpper().Contains("DESC"))
                             {
-                                sqlPack += " ASC,";
+                                sqlWrapper += " ASC,";
                             }
                             else
                             {
-                                sqlPack += ",";
+                                sqlWrapper += ",";
                             }
                         }
-                        sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
                     if (type == "List`1" && obj is List<string> list)
                     {
                         for (var i = 0; i < list.Count; i++)
                         {
-                            SqlBuilderProvider.OrderBy(Expression.Constant(list[i], list[i].GetType()), sqlPack);
+                            SqlExpressionProvider.OrderBy(Expression.Constant(list[i], list[i].GetType()), sqlWrapper);
                             if (i <= orders.Length - 1)
                             {
-                                sqlPack += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                                sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else if (!list[i].ToUpper().Contains("ASC") && !list[i].ToUpper().Contains("DESC"))
                             {
-                                sqlPack += " ASC,";
+                                sqlWrapper += " ASC,";
                             }
                             else
                             {
-                                sqlPack += ",";
+                                sqlWrapper += ",";
                             }
                         }
-                        sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
                     if (type == "String" && obj is string str)
                     {
-                        SqlBuilderProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlPack);
+                        SqlExpressionProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlWrapper);
                         str = str.ToUpper();
                         if (!str.Contains("ASC") && !str.Contains("DESC"))
                         {
                             if (orders.Length >= 1)
                             {
-                                sqlPack += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";
+                                sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";
                             }
                             else
                             {
-                                sqlPack += " ASC,";
+                                sqlWrapper += " ASC,";
                             }
-                            sqlPack.Sql.Remove(sqlPack.Length - 1, 1);
+                            sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                         }
                     }
                 }
             }
-            return sqlPack;
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Max(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            sqlPack.Sql.Append($"SELECT MAX({sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlPack.GetTableName(type)}");
-            return sqlPack;
+            sqlWrapper.Sql.Append($"SELECT MAX({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Min(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            sqlPack.Sql.Append($"SELECT MIN({sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlPack.GetTableName(type)}");
-            return sqlPack;
+            sqlWrapper.Sql.Append($"SELECT MIN({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Avg(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            sqlPack.Sql.Append($"SELECT AVG({sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlPack.GetTableName(type)}");
-            return sqlPack;
+            sqlWrapper.Sql.Append($"SELECT AVG({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Count(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            sqlPack.Sql.Append($"SELECT COUNT({sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlPack.GetTableName(type)}");
-            return sqlPack;
+            sqlWrapper.Sql.Append($"SELECT COUNT({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            return sqlWrapper;
         }
 
         /// <summary>
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlPack">sql打包对象</param>
-        /// <returns>SqlPack</returns>
-		public override SqlPack Sum(MemberExpression expression, SqlPack sqlPack)
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
-            sqlPack.Sql.Append($"SELECT SUM({sqlPack.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlPack.GetTableName(type)}");
-            return sqlPack;
+            sqlWrapper.Sql.Append($"SELECT SUM({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            return sqlWrapper;
         }
         #endregion
     }

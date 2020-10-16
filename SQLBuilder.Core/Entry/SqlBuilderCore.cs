@@ -17,6 +17,9 @@
 #endregion
 
 using Dapper;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Expressions;
+using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -25,7 +28,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Entry
 {
     /// <summary>
     /// SqlBuilderCore
@@ -37,7 +40,7 @@ namespace SQLBuilder.Core
         /// <summary>
         /// _sqlPack
         /// </summary>
-        private SqlPack _sqlPack;
+        private SqlWrapper _sqlPack;
         #endregion
 
         #region Public Property
@@ -108,7 +111,7 @@ namespace SQLBuilder.Core
         /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
         public SqlBuilderCore(DatabaseType dbType, bool isEnableFormat)
         {
-            this._sqlPack = new SqlPack
+            this._sqlPack = new SqlWrapper
             {
                 DatabaseType = dbType,
                 DefaultType = typeof(T),
@@ -124,7 +127,7 @@ namespace SQLBuilder.Core
         /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
         public SqlBuilderCore(DatabaseType dbType, Func<string, object, string> sqlIntercept, bool isEnableFormat)
         {
-            this._sqlPack = new SqlPack
+            this._sqlPack = new SqlWrapper
             {
                 DatabaseType = dbType,
                 DefaultType = typeof(T),
@@ -185,7 +188,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression, this._sqlPack);
+                SqlExpressionProvider.Select(expression, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -205,7 +208,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -227,7 +230,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -251,7 +254,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -277,7 +280,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -305,7 +308,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -335,7 +338,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -367,7 +370,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -401,7 +404,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -437,7 +440,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -475,7 +478,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Select(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
                 this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
             }
             return this;
@@ -523,7 +526,7 @@ namespace SQLBuilder.Core
                 this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
             else
                 this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Join(expression.Body, this._sqlPack);
             return this;
         }
 
@@ -545,7 +548,7 @@ namespace SQLBuilder.Core
                 this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
             else
                 this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlBuilderProvider.Join(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Join(expression.Body, this._sqlPack);
             return this;
         }
 
@@ -853,7 +856,7 @@ namespace SQLBuilder.Core
             {
                 this._sqlPack += " WHERE ";
 
-                SqlBuilderProvider.Where(expression, this._sqlPack);
+                SqlExpressionProvider.Where(expression, this._sqlPack);
             }
 
             return this;
@@ -876,7 +879,7 @@ namespace SQLBuilder.Core
                     hasWhere = true;
                 }
 
-                SqlBuilderProvider.Where(expression, this._sqlPack);
+                SqlExpressionProvider.Where(expression, this._sqlPack);
             }
 
             return this;
@@ -1378,7 +1381,7 @@ namespace SQLBuilder.Core
             }
 
             this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
+            SqlExpressionProvider.Where(expression, this._sqlPack);
             this._sqlPack += ")";
 
             return this;
@@ -1401,7 +1404,7 @@ namespace SQLBuilder.Core
             }
 
             this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
+            SqlExpressionProvider.Where(expression, this._sqlPack);
             this._sqlPack += ")";
 
             return this;
@@ -1903,7 +1906,7 @@ namespace SQLBuilder.Core
             }
 
             this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
+            SqlExpressionProvider.Where(expression, this._sqlPack);
             this._sqlPack += ")";
 
             return this;
@@ -1925,7 +1928,7 @@ namespace SQLBuilder.Core
             }
 
             this._sqlPack += "(";
-            SqlBuilderProvider.Where(expression, this._sqlPack);
+            SqlExpressionProvider.Where(expression, this._sqlPack);
             this._sqlPack += ")";
 
             return this;
@@ -3493,7 +3496,7 @@ namespace SQLBuilder.Core
         public SqlBuilderCore<T> GroupBy(Expression expression)
         {
             this._sqlPack += " GROUP BY ";
-            SqlBuilderProvider.GroupBy(expression, this._sqlPack);
+            SqlExpressionProvider.GroupBy(expression, this._sqlPack);
             return this;
         }
 
@@ -3722,7 +3725,7 @@ namespace SQLBuilder.Core
         public SqlBuilderCore<T> OrderBy(Expression expression, params OrderType[] orders)
         {
             this._sqlPack += " ORDER BY ";
-            SqlBuilderProvider.OrderBy(expression, this._sqlPack, orders);
+            SqlExpressionProvider.OrderBy(expression, this._sqlPack, orders);
             return this;
         }
 
@@ -3936,59 +3939,72 @@ namespace SQLBuilder.Core
         /// <param name="orderField">排序字段</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
+        /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
+        /// <param name="sqlserverVersionGt10">sqlserver版本是否大于10，10版本以上采用ROWS FETCH NEXT最新语法</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
+        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", bool sqlserverVersionGt10 = false)
         {
             var sb = new StringBuilder();
-            if (!orderField.ToUpper().Contains(" ASC") && !orderField.ToUpper().Contains(" DESC"))
-                orderField = this._sqlPack.GetColumnName(orderField);
+
+            //排序字段
+            if (!orderField.IsNullOrEmpty())
+            {
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
+                    orderField = $"ORDER BY {orderField}";
+                else
+                    orderField = $"ORDER BY {orderField} ASC";
+            }
+            else if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            {
+                orderField = "ORDER BY (SELECT 0)";
+            }
+
             if (!sql.IsNullOrEmpty())
             {
                 this._sqlPack.DbParameters.Clear();
                 if (parameters != null) this._sqlPack.DbParameters = parameters;
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
+
             //SQLServer
             if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
+                if (sqlserverVersionGt10)
+                {
+                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} OFFSET {((pageIndex - 1) * pageSize)} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
+                }
                 else
-                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;SELECT * INTO #TEMPORARY FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM #TEMPORARY;SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber, * FROM #TEMPORARY) AS N WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
+                {
+                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};");
+                }
             }
+
             //Oracle，注意Oracle需要分开查询总条数和分页数据
             if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
-                else
-                    sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
+                sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
             }
+
             //MySQL，注意8.0版本才支持WITH语法
             if (this._sqlPack.DatabaseType == DatabaseType.MySql)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"DROP TEMPORARY TABLE IF EXISTS $TEMPORARY;CREATE TEMPORARY TABLE $TEMPORARY SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM $TEMPORARY;SELECT * FROM $TEMPORARY AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE $TEMPORARY;");
+                sb.Append($"SELECT {countSyntax}  AS `TOTAL` FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             //PostgreSQL
             if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"DROP TABLE IF EXISTS TEMPORARY_TABLE;CREATE TEMPORARY TABLE TEMPORARY_TABLE AS SELECT * FROM ({sql}) AS T;SELECT COUNT(1) AS Total FROM TEMPORARY_TABLE;SELECT * FROM TEMPORARY_TABLE AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};DROP TABLE TEMPORARY_TABLE;");
+                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             //SQLite
             if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"SELECT COUNT(1) AS Total FROM ({sql}) AS T;SELECT * FROM ({sql}) AS X ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             this._sqlPack.Sql.Clear().Append(sb);
+
             return this;
         }
 
@@ -4000,59 +4016,73 @@ namespace SQLBuilder.Core
         /// <param name="orderField">排序字段</param>
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
+        /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
+        /// <param name="sqlserverVersionGt10">sqlserver版本是否大于10，10版本以上采用ROWS FETCH NEXT最新语法</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null)
+        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", bool sqlserverVersionGt10 = false)
         {
             var sb = new StringBuilder();
-            if (!orderField.ToUpper().Contains(" ASC") && !orderField.ToUpper().Contains(" DESC"))
-                orderField = this._sqlPack.GetColumnName(orderField);
+
+            //排序字段
+            if (!orderField.IsNullOrEmpty())
+            {
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
+                    orderField = $"ORDER BY {orderField}";
+                else
+                    orderField = $"ORDER BY {orderField} ASC";
+            }
+            else if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            {
+                orderField = "ORDER BY (SELECT 0)";
+            }
+
             if (!sql.IsNullOrEmpty())
             {
                 this._sqlPack.DbParameters.Clear();
-                if (parameters != null) this._sqlPack.DbParameters = parameters;
+                if (parameters != null) 
+                    this._sqlPack.DbParameters = parameters;
             }
             sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
+
             //SQLServer
             if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;{sql} SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
+                if (sqlserverVersionGt10)
+                {
+                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql} SELECT * FROM T {orderField} OFFSET {((pageIndex - 1) * pageSize)} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
+                }
                 else
-                    sb.Append($"IF OBJECT_ID(N'TEMPDB..#TEMPORARY') IS NOT NULL DROP TABLE #TEMPORARY;WITH T AS ({sql}) SELECT * INTO #TEMPORARY FROM T;SELECT COUNT(1) AS Total FROM #TEMPORARY;WITH R AS (SELECT ROW_NUMBER() OVER (ORDER BY {orderField}) AS RowNumber,* FROM #TEMPORARY) SELECT * FROM R  WHERE RowNumber BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};DROP TABLE #TEMPORARY;");
+                {
+                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};");
+                }
             }
+
             //Oracle，注意Oracle需要分开查询总条数和分页数据
             if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
-                else
-                    sb.Append($"WITH T AS ({sql}),R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
+                sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
             }
+
             //MySQL，注意8.0版本才支持WITH语法
             if (this._sqlPack.DatabaseType == DatabaseType.MySql)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS `TOTAL` FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             //PostgreSQL
             if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             //SQLite
             if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
             {
-                if (Regex.IsMatch(sql, "WITH", RegexOptions.IgnoreCase))
-                    sb.Append($"{sql} SELECT COUNT(1) AS Total FROM T;{sql} SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
-                else
-                    sb.Append($"WITH T AS ({sql}) SELECT COUNT(1) AS Total FROM T;WITH T AS ({sql}) SELECT * FROM T ORDER BY {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
+
             this._sqlPack.Sql.Clear().Append(sb);
+
             return this;
         }
         #endregion
@@ -4084,7 +4114,7 @@ namespace SQLBuilder.Core
             this._sqlPack.IsSingleTable = true;
             this._sqlPack.IsEnableNullValue = isEnableNullValue;
             this._sqlPack += $"UPDATE {this._sqlPack.GetTableName(typeof(T))} SET ";
-            SqlBuilderProvider.Update(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Update(expression.Body, this._sqlPack);
             return this;
         }
         #endregion
@@ -4102,7 +4132,7 @@ namespace SQLBuilder.Core
             this._sqlPack.IsSingleTable = true;
             this._sqlPack.IsEnableNullValue = isEnableNullValue;
             this._sqlPack += $"INSERT INTO {this._sqlPack.GetTableName(typeof(T))} ({{0}}) {(this._sqlPack.DatabaseType == DatabaseType.Oracle ? "SELECT" : "VALUES")} ";
-            SqlBuilderProvider.Insert(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Insert(expression.Body, this._sqlPack);
             return this;
         }
         #endregion
@@ -4117,7 +4147,7 @@ namespace SQLBuilder.Core
         {
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = true;
-            SqlBuilderProvider.Max(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Max(expression.Body, this._sqlPack);
             return this;
         }
         #endregion
@@ -4132,7 +4162,7 @@ namespace SQLBuilder.Core
         {
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = true;
-            SqlBuilderProvider.Min(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Min(expression.Body, this._sqlPack);
             return this;
         }
         #endregion
@@ -4147,7 +4177,7 @@ namespace SQLBuilder.Core
         {
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = true;
-            SqlBuilderProvider.Avg(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Avg(expression.Body, this._sqlPack);
             return this;
         }
         #endregion
@@ -4168,7 +4198,7 @@ namespace SQLBuilder.Core
             }
             else
             {
-                SqlBuilderProvider.Count(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Count(expression.Body, this._sqlPack);
             }
             return this;
         }
@@ -4184,7 +4214,7 @@ namespace SQLBuilder.Core
         {
             this._sqlPack.Clear();
             this._sqlPack.IsSingleTable = true;
-            SqlBuilderProvider.Sum(expression.Body, this._sqlPack);
+            SqlExpressionProvider.Sum(expression.Body, this._sqlPack);
             return this;
         }
         #endregion

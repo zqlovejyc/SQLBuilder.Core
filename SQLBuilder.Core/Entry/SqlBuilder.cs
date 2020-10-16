@@ -16,11 +16,12 @@
  */
 #endregion
 
+using SQLBuilder.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Entry
 {
     /// <summary>
     /// SqlBuilder

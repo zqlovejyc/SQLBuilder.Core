@@ -21,8 +21,9 @@ using System.IO;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SQLBuilder.Core.Extensions;
 
-namespace SQLBuilder.Core
+namespace SQLBuilder.Core.Configuration
 {
     /// <summary>
     /// 配置工具类

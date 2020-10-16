@@ -1,4 +1,5 @@
 ﻿using SQLBuilder.Core;
+using SQLBuilder.Core.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

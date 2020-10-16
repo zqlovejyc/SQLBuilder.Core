@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SQLBuilder.Core;
+﻿using SQLBuilder.Core.Attributes;
 
 namespace SQLBuilder.Core.UnitTest
 {

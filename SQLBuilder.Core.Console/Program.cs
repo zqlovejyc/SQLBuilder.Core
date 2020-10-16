@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.Enums;
 
 namespace SQLBuilder.Core
 {
@@ -57,7 +60,7 @@ namespace SQLBuilder.Core
                 "Select"
             );
 
-            var expr = Extensions.True<UserInfo>();
+            var expr = LinqExtensions.True<UserInfo>();
             expr = expr.And(o => o.Id > 0);
             expr = expr.Or(o => o.Email != "");
             Print(
@@ -278,17 +281,17 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => 
+                    .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) =>
                         new { u.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                    .Join<Account>((u, a) => 
+                    .Join<Account>((u, a) =>
                         u.Id == a.UserId)
-                    .LeftJoin<Account, Student>((a, s) => 
+                    .LeftJoin<Account, Student>((a, s) =>
                         a.Id == s.AccountId)
-                    .RightJoin<Student, Class>((s, c) => 
+                    .RightJoin<Student, Class>((s, c) =>
                         s.Id == c.UserId)
-                    .InnerJoin<Class, City>((c, d) => 
+                    .InnerJoin<Class, City>((c, d) =>
                         c.CityId == d.Id)
-                    .FullJoin<City, Country>((c, d) => 
+                    .FullJoin<City, Country>((c, d) =>
                         c.CountryId == d.Id)
                     .Where(u => u.Id != null),
                 "多表复杂关联查询"

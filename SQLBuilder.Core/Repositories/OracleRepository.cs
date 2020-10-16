@@ -18,6 +18,9 @@
 
 using Dapper;
 using Oracle.ManagedDataAccess.Client;
+using SQLBuilder.Core.Configuration;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,7 +29,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Sql = SQLBuilder.Core.SqlBuilder;
+using Sql = SQLBuilder.Core.Entry.SqlBuilder;
 /****************************
 * [Author] 张强
 * [Date] 2018-07-27

@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.Enums;
 
 #region Refrence Alias
 //Table
@@ -34,8 +36,6 @@ using SysColumnAttribute = System.ComponentModel.DataAnnotations.Schema.ColumnAt
 //Key
 using CusKeyAttribute = SQLBuilder.Core.Attributes.KeyAttribute;
 using SysKeyAttribute = System.ComponentModel.DataAnnotations.KeyAttribute;
-using SQLBuilder.Core.Extensions;
-using SQLBuilder.Core.Enums;
 #endregion
 
 namespace SQLBuilder.Core.Entry

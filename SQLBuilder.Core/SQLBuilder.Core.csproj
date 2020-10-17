@@ -6,7 +6,7 @@
         <Authors>张强</Authors>
         <Version>1.0.6.4</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Description>Expression表达式转换为SQL语句，支持SqlServer、MySQL、Oracle、SQLite、PostgreSQL；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
+        <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
         <PackageReleaseNotes>1.优化BeginTrans，精简代码；

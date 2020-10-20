@@ -38,9 +38,9 @@ namespace SQLBuilder.Core.Entry
     {
         #region Private Field
         /// <summary>
-        /// _sqlPack
+        /// sqlWrapper
         /// </summary>
-        private SqlWrapper _sqlPack;
+        private SqlWrapper sqlWrapper;
         #endregion
 
         #region Public Property
@@ -56,21 +56,21 @@ namespace SQLBuilder.Core.Entry
         {
             get
             {
-                var sql = this._sqlPack.ToString();
+                var sql = this.sqlWrapper.ToString();
                 //添加sql日志拦截
-                return this.SqlIntercept?.Invoke(sql, this._sqlPack.DbParameters) ?? sql;
+                return this.SqlIntercept?.Invoke(sql, this.sqlWrapper.DbParameters) ?? sql;
             }
         }
 
         /// <summary>
         /// SQL格式化参数
         /// </summary>
-        public Dictionary<string, object> Parameters => this._sqlPack.DbParameters;
+        public Dictionary<string, object> Parameters => this.sqlWrapper.DbParameters;
 
         /// <summary>
         /// Dapper格式化参数
         /// </summary>
-        public DynamicParameters DynamicParameters => this._sqlPack.DbParameters.ToDynamicParameters();
+        public DynamicParameters DynamicParameters => this.sqlWrapper.DbParameters.ToDynamicParameters();
 
         /// <summary>
         /// SQL格式化参数
@@ -80,22 +80,22 @@ namespace SQLBuilder.Core.Entry
             get
             {
                 DbParameter[] parameters = null;
-                switch (this._sqlPack.DatabaseType)
+                switch (this.sqlWrapper.DatabaseType)
                 {
                     case DatabaseType.SqlServer:
-                        parameters = this._sqlPack.DbParameters.ToSqlParameters();
+                        parameters = this.sqlWrapper.DbParameters.ToSqlParameters();
                         break;
                     case DatabaseType.MySql:
-                        parameters = this._sqlPack.DbParameters.ToMySqlParameters();
+                        parameters = this.sqlWrapper.DbParameters.ToMySqlParameters();
                         break;
                     case DatabaseType.Sqlite:
-                        parameters = this._sqlPack.DbParameters.ToSqliteParameters();
+                        parameters = this.sqlWrapper.DbParameters.ToSqliteParameters();
                         break;
                     case DatabaseType.Oracle:
-                        parameters = this._sqlPack.DbParameters.ToOracleParameters();
+                        parameters = this.sqlWrapper.DbParameters.ToOracleParameters();
                         break;
                     case DatabaseType.PostgreSql:
-                        parameters = this._sqlPack.DbParameters.ToNpgsqlParameters();
+                        parameters = this.sqlWrapper.DbParameters.ToNpgsqlParameters();
                         break;
                 }
                 return parameters;
@@ -111,7 +111,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
         public SqlBuilderCore(DatabaseType dbType, bool isEnableFormat)
         {
-            this._sqlPack = new SqlWrapper
+            this.sqlWrapper = new SqlWrapper
             {
                 DatabaseType = dbType,
                 DefaultType = typeof(T),
@@ -127,7 +127,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="isEnableFormat">是否启用表名和列名格式化</param>
         public SqlBuilderCore(DatabaseType dbType, Func<string, object, string> sqlIntercept, bool isEnableFormat)
         {
-            this._sqlPack = new SqlWrapper
+            this.sqlWrapper = new SqlWrapper
             {
                 DatabaseType = dbType,
                 DefaultType = typeof(T),
@@ -144,7 +144,7 @@ namespace SQLBuilder.Core.Entry
         /// </summary>
         public void Clear()
         {
-            this._sqlPack.Clear();
+            this.sqlWrapper.Clear();
         }
         #endregion
 
@@ -156,22 +156,22 @@ namespace SQLBuilder.Core.Entry
         /// <returns>string</returns>
         private string Select(params Type[] array)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = false;
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = false;
             if (array?.Length > 0)
             {
                 foreach (var item in array)
                 {
-                    var tableName = this._sqlPack.GetTableName(item);
-                    this._sqlPack.SetTableAlias(tableName);
+                    var tableName = this.sqlWrapper.GetTableName(item);
+                    this.sqlWrapper.SetTableAlias(tableName);
                 }
             }
-            var _tableName = this._sqlPack.GetTableName(typeof(T));
+            var _tableName = this.sqlWrapper.GetTableName(typeof(T));
             //Oracle表别名不支持AS关键字，列别名支持；
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
-                return $"SELECT {{0}} FROM {_tableName} {this._sqlPack.GetTableAlias(_tableName)}";
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                return $"SELECT {{0}} FROM {_tableName} {this.sqlWrapper.GetTableAlias(_tableName)}";
             else
-                return $"SELECT {{0}} FROM {_tableName} AS {this._sqlPack.GetTableAlias(_tableName)}";
+                return $"SELECT {{0}} FROM {_tableName} AS {this.sqlWrapper.GetTableAlias(_tableName)}";
         }
 
         /// <summary>
@@ -184,12 +184,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -204,12 +204,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -226,12 +226,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -250,12 +250,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -276,12 +276,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -304,12 +304,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -334,12 +334,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -366,12 +366,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -400,12 +400,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -436,12 +436,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -474,12 +474,12 @@ namespace SQLBuilder.Core.Entry
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
             if (expression == null)
             {
-                this._sqlPack.Sql.AppendFormat(sql, "*");
+                this.sqlWrapper.Sql.AppendFormat(sql, "*");
             }
             else
             {
-                SqlExpressionProvider.Select(expression.Body, this._sqlPack);
-                this._sqlPack.Sql.AppendFormat(sql, this._sqlPack.SelectFieldsStr);
+                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
+                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
             }
             return this;
         }
@@ -493,8 +493,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Join(string sql)
         {
-            this._sqlPack += " JOIN ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " JOIN ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -505,8 +505,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Join(StringBuilder sql)
         {
-            this._sqlPack += " JOIN ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " JOIN ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -520,13 +520,13 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join)
             where T2 : class
         {
-            string joinTableName = this._sqlPack.GetTableName(typeof(T2));
-            this._sqlPack.SetTableAlias(joinTableName);
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
-                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            string joinTableName = this.sqlWrapper.GetTableName(typeof(T2));
+            this.sqlWrapper.SetTableAlias(joinTableName);
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
             else
-                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlExpressionProvider.Join(expression.Body, this._sqlPack);
+                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
+            SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
             return this;
         }
 
@@ -542,13 +542,13 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            string joinTableName = this._sqlPack.GetTableName(typeof(T3));
-            this._sqlPack.SetTableAlias(joinTableName);
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
-                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this._sqlPack.GetTableAlias(joinTableName)} ON ");
+            string joinTableName = this.sqlWrapper.GetTableName(typeof(T3));
+            this.sqlWrapper.SetTableAlias(joinTableName);
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
             else
-                this._sqlPack.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this._sqlPack.GetTableAlias(joinTableName)} ON ");
-            SqlExpressionProvider.Join(expression.Body, this._sqlPack);
+                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
+            SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
             return this;
         }
 
@@ -585,8 +585,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> InnerJoin(string sql)
         {
-            this._sqlPack += " INNER JOIN ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " INNER JOIN ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -597,8 +597,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> InnerJoin(StringBuilder sql)
         {
-            this._sqlPack += " INNER JOIN ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " INNER JOIN ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -635,8 +635,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> LeftJoin(string sql)
         {
-            this._sqlPack += " LEFT JOIN ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " LEFT JOIN ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -647,8 +647,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> LeftJoin(StringBuilder sql)
         {
-            this._sqlPack += " LEFT JOIN ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " LEFT JOIN ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -685,8 +685,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> RightJoin(string sql)
         {
-            this._sqlPack += " RIGHT JOIN ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " RIGHT JOIN ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -697,8 +697,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> RightJoin(StringBuilder sql)
         {
-            this._sqlPack += " RIGHT JOIN ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " RIGHT JOIN ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -735,8 +735,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> FullJoin(string sql)
         {
-            this._sqlPack += " FULL JOIN ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " FULL JOIN ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -747,8 +747,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> FullJoin(StringBuilder sql)
         {
-            this._sqlPack += " FULL JOIN ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " FULL JOIN ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -787,8 +787,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(string sql)
         {
-            this._sqlPack += " WHERE ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " WHERE ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -801,14 +801,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Where(string sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack += sql;
+            this.sqlWrapper += sql;
 
             return this;
         }
@@ -820,8 +820,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(StringBuilder sql)
         {
-            this._sqlPack += " WHERE ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " WHERE ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -834,14 +834,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Where(StringBuilder sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper.Sql.Append(sql);
 
             return this;
         }
@@ -854,9 +854,9 @@ namespace SQLBuilder.Core.Entry
         {
             if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
 
-                SqlExpressionProvider.Where(expression, this._sqlPack);
+                SqlExpressionProvider.Where(expression, this.sqlWrapper);
             }
 
             return this;
@@ -872,14 +872,14 @@ namespace SQLBuilder.Core.Entry
             if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
             {
                 if (hasWhere)
-                    this._sqlPack += " AND ";
+                    this.sqlWrapper += " AND ";
                 else
                 {
-                    this._sqlPack += " WHERE ";
+                    this.sqlWrapper += " WHERE ";
                     hasWhere = true;
                 }
 
-                SqlExpressionProvider.Where(expression, this._sqlPack);
+                SqlExpressionProvider.Where(expression, this.sqlWrapper);
             }
 
             return this;
@@ -1284,17 +1284,17 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(string sql)
         {
-            var str = this._sqlPack.ToString();
+            var str = this.sqlWrapper.ToString();
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack += sql;
+            this.sqlWrapper += sql;
 
             return this;
         }
@@ -1308,14 +1308,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(string sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack += sql;
+            this.sqlWrapper += sql;
 
             return this;
         }
@@ -1327,17 +1327,17 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(StringBuilder sql)
         {
-            var str = this._sqlPack.ToString();
+            var str = this.sqlWrapper.ToString();
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper.Sql.Append(sql);
 
             return this;
         }
@@ -1351,14 +1351,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(StringBuilder sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper.Sql.Append(sql);
 
             return this;
         }
@@ -1370,19 +1370,19 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(Expression expression)
         {
-            var sql = this._sqlPack.ToString();
+            var sql = this.sqlWrapper.ToString();
             if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack += "(";
-            SqlExpressionProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
+            this.sqlWrapper += "(";
+            SqlExpressionProvider.Where(expression, this.sqlWrapper);
+            this.sqlWrapper += ")";
 
             return this;
         }
@@ -1396,16 +1396,16 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(Expression expression, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " AND ";
+                this.sqlWrapper += " AND ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack += "(";
-            SqlExpressionProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
+            this.sqlWrapper += "(";
+            SqlExpressionProvider.Where(expression, this.sqlWrapper);
+            this.sqlWrapper += ")";
 
             return this;
         }
@@ -1809,17 +1809,17 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(string sql)
         {
-            var str = this._sqlPack.ToString();
+            var str = this.sqlWrapper.ToString();
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack += sql;
+            this.sqlWrapper += sql;
 
             return this;
         }
@@ -1833,14 +1833,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(string sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack += sql;
+            this.sqlWrapper += sql;
 
             return this;
         }
@@ -1852,17 +1852,17 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(StringBuilder sql)
         {
-            var str = this._sqlPack.ToString();
+            var str = this.sqlWrapper.ToString();
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper.Sql.Append(sql);
 
             return this;
         }
@@ -1877,14 +1877,14 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(StringBuilder sql, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper.Sql.Append(sql);
 
             return this;
         }
@@ -1895,19 +1895,19 @@ namespace SQLBuilder.Core.Entry
         /// <param name="expression">表达式树</param>
         public SqlBuilderCore<T> OrWhere(Expression expression)
         {
-            var sql = this._sqlPack.ToString();
+            var sql = this.sqlWrapper.ToString();
             if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
             {
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             }
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
             }
 
-            this._sqlPack += "(";
-            SqlExpressionProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
+            this.sqlWrapper += "(";
+            SqlExpressionProvider.Where(expression, this.sqlWrapper);
+            this.sqlWrapper += ")";
 
             return this;
         }
@@ -1920,16 +1920,16 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(Expression expression, ref bool hasWhere)
         {
             if (hasWhere)
-                this._sqlPack += " OR ";
+                this.sqlWrapper += " OR ";
             else
             {
-                this._sqlPack += " WHERE ";
+                this.sqlWrapper += " WHERE ";
                 hasWhere = true;
             }
 
-            this._sqlPack += "(";
-            SqlExpressionProvider.Where(expression, this._sqlPack);
-            this._sqlPack += ")";
+            this.sqlWrapper += "(";
+            SqlExpressionProvider.Where(expression, this.sqlWrapper);
+            this.sqlWrapper += ")";
 
             return this;
         }
@@ -3383,15 +3383,15 @@ namespace SQLBuilder.Core.Entry
             {
                 throw new ArgumentNullException("实体参数不能为空！");
             }
-            var sql = this._sqlPack.ToString().ToUpper();
+            var sql = this.sqlWrapper.ToString().ToUpper();
             if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
             {
                 throw new ArgumentException("此方法只能用于Select、Update、Delete方法！");
             }
-            var tableName = this._sqlPack.GetTableName(typeof(T));
-            var tableAlias = this._sqlPack.GetTableAlias(tableName);
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
-            var keys = this._sqlPack.GetPrimaryKey(typeof(T));
+            var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && entity != null)
             {
                 for (int i = 0; i < keys.Count; i++)
@@ -3402,8 +3402,8 @@ namespace SQLBuilder.Core.Entry
                         var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
                         if (keyValue != null)
                         {
-                            this._sqlPack += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                            this._sqlPack.AddDbParameter(keyValue);
+                            this.sqlWrapper += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                            this.sqlWrapper.AddDbParameter(keyValue);
                         }
                         else
                         {
@@ -3434,15 +3434,15 @@ namespace SQLBuilder.Core.Entry
             {
                 throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
             }
-            var sql = this._sqlPack.ToString().ToUpper();
+            var sql = this.sqlWrapper.ToString().ToUpper();
             if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
             {
                 throw new ArgumentException("WithKey方法只能用于Select、Update、Delete方法！");
             }
-            var tableName = this._sqlPack.GetTableName(typeof(T));
-            var tableAlias = this._sqlPack.GetTableAlias(tableName);
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
-            var keys = this._sqlPack.GetPrimaryKey(typeof(T));
+            var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && keyValue != null)
             {
                 for (int i = 0; i < keys.Count; i++)
@@ -3450,8 +3450,8 @@ namespace SQLBuilder.Core.Entry
                     var (key, property) = keys[i];
                     if (!key.IsNullOrEmpty())
                     {
-                        this._sqlPack += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                        this._sqlPack.AddDbParameter(keyValue[i]);
+                        this.sqlWrapper += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                        this.sqlWrapper.AddDbParameter(keyValue[i]);
                     }
                 }
             }
@@ -3471,8 +3471,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(string sql)
         {
-            this._sqlPack += " GROUP BY ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " GROUP BY ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -3483,8 +3483,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(StringBuilder sql)
         {
-            this._sqlPack += " GROUP BY ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " GROUP BY ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -3495,8 +3495,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(Expression expression)
         {
-            this._sqlPack += " GROUP BY ";
-            SqlExpressionProvider.GroupBy(expression, this._sqlPack);
+            this.sqlWrapper += " GROUP BY ";
+            SqlExpressionProvider.GroupBy(expression, this.sqlWrapper);
             return this;
         }
 
@@ -3699,8 +3699,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(string sql)
         {
-            this._sqlPack += " ORDER BY ";
-            this._sqlPack += sql;
+            this.sqlWrapper += " ORDER BY ";
+            this.sqlWrapper += sql;
             return this;
         }
 
@@ -3711,8 +3711,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(StringBuilder sql)
         {
-            this._sqlPack += " ORDER BY ";
-            this._sqlPack.Sql.Append(sql);
+            this.sqlWrapper += " ORDER BY ";
+            this.sqlWrapper.Sql.Append(sql);
             return this;
         }
 
@@ -3724,8 +3724,8 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(Expression expression, params OrderType[] orders)
         {
-            this._sqlPack += " ORDER BY ";
-            SqlExpressionProvider.OrderBy(expression, this._sqlPack, orders);
+            this.sqlWrapper += " ORDER BY ";
+            SqlExpressionProvider.OrderBy(expression, this.sqlWrapper, orders);
             return this;
         }
 
@@ -3954,20 +3954,20 @@ namespace SQLBuilder.Core.Entry
                 else
                     orderField = $"ORDER BY {orderField} ASC";
             }
-            else if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            else if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 orderField = "ORDER BY (SELECT 0)";
             }
 
             if (!sql.IsNullOrEmpty())
             {
-                this._sqlPack.DbParameters.Clear();
-                if (parameters != null) this._sqlPack.DbParameters = parameters;
+                this.sqlWrapper.DbParameters.Clear();
+                if (parameters != null) this.sqlWrapper.DbParameters = parameters;
             }
-            sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
+            sql = sql.IsNullOrEmpty() ? this.sqlWrapper.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
             //SQLServer
-            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 if (sqlserverVersionGt10)
                 {
@@ -3980,30 +3980,30 @@ namespace SQLBuilder.Core.Entry
             }
 
             //Oracle，注意Oracle需要分开查询总条数和分页数据
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
                 sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
-            if (this._sqlPack.DatabaseType == DatabaseType.MySql)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
             {
                 sb.Append($"SELECT {countSyntax}  AS `TOTAL` FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
             //PostgreSQL
-            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
             {
                 sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
             //SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
             {
                 sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
-            this._sqlPack.Sql.Clear().Append(sb);
+            this.sqlWrapper.Sql.Clear().Append(sb);
 
             return this;
         }
@@ -4031,21 +4031,21 @@ namespace SQLBuilder.Core.Entry
                 else
                     orderField = $"ORDER BY {orderField} ASC";
             }
-            else if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            else if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 orderField = "ORDER BY (SELECT 0)";
             }
 
             if (!sql.IsNullOrEmpty())
             {
-                this._sqlPack.DbParameters.Clear();
+                this.sqlWrapper.DbParameters.Clear();
                 if (parameters != null) 
-                    this._sqlPack.DbParameters = parameters;
+                    this.sqlWrapper.DbParameters = parameters;
             }
-            sql = sql.IsNullOrEmpty() ? this._sqlPack.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
+            sql = sql.IsNullOrEmpty() ? this.sqlWrapper.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
             //SQLServer
-            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 if (sqlserverVersionGt10)
                 {
@@ -4058,30 +4058,30 @@ namespace SQLBuilder.Core.Entry
             }
 
             //Oracle，注意Oracle需要分开查询总条数和分页数据
-            if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
                 sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
-            if (this._sqlPack.DatabaseType == DatabaseType.MySql)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
             {
                 sb.Append($"{sql} SELECT {countSyntax} AS `TOTAL` FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
             //PostgreSQL
-            if (this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
             {
                 sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
             //SQLite
-            if (this._sqlPack.DatabaseType == DatabaseType.Sqlite)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
             {
                 sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
             }
 
-            this._sqlPack.Sql.Clear().Append(sb);
+            this.sqlWrapper.Sql.Clear().Append(sb);
 
             return this;
         }
@@ -4094,9 +4094,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Delete()
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            this._sqlPack += $"DELETE FROM {this._sqlPack.GetTableName(typeof(T))}";
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            this.sqlWrapper += $"DELETE FROM {this.sqlWrapper.GetTableName(typeof(T))}";
             return this;
         }
         #endregion
@@ -4110,11 +4110,11 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Update(Expression<Func<object>> expression = null, bool isEnableNullValue = true)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            this._sqlPack.IsEnableNullValue = isEnableNullValue;
-            this._sqlPack += $"UPDATE {this._sqlPack.GetTableName(typeof(T))} SET ";
-            SqlExpressionProvider.Update(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            this.sqlWrapper.IsEnableNullValue = isEnableNullValue;
+            this.sqlWrapper += $"UPDATE {this.sqlWrapper.GetTableName(typeof(T))} SET ";
+            SqlExpressionProvider.Update(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4128,11 +4128,11 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Insert(Expression<Func<object>> expression = null, bool isEnableNullValue = true)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            this._sqlPack.IsEnableNullValue = isEnableNullValue;
-            this._sqlPack += $"INSERT INTO {this._sqlPack.GetTableName(typeof(T))} ({{0}}) {(this._sqlPack.DatabaseType == DatabaseType.Oracle ? "SELECT" : "VALUES")} ";
-            SqlExpressionProvider.Insert(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            this.sqlWrapper.IsEnableNullValue = isEnableNullValue;
+            this.sqlWrapper += $"INSERT INTO {this.sqlWrapper.GetTableName(typeof(T))} ({{0}}) {(this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? "SELECT" : "VALUES")} ";
+            SqlExpressionProvider.Insert(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4145,9 +4145,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Max(Expression<Func<T, object>> expression)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            SqlExpressionProvider.Max(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            SqlExpressionProvider.Max(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4160,9 +4160,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Min(Expression<Func<T, object>> expression)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            SqlExpressionProvider.Min(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            SqlExpressionProvider.Min(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4175,9 +4175,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Avg(Expression<Func<T, object>> expression)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            SqlExpressionProvider.Avg(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            SqlExpressionProvider.Avg(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4190,15 +4190,15 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Count(Expression<Func<T, object>> expression = null)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
             if (expression == null)
             {
-                this._sqlPack.Sql.Append($"SELECT COUNT(*) FROM {this._sqlPack.GetTableName(typeof(T))}");
+                this.sqlWrapper.Sql.Append($"SELECT COUNT(*) FROM {this.sqlWrapper.GetTableName(typeof(T))}");
             }
             else
             {
-                SqlExpressionProvider.Count(expression.Body, this._sqlPack);
+                SqlExpressionProvider.Count(expression.Body, this.sqlWrapper);
             }
             return this;
         }
@@ -4212,9 +4212,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Sum(Expression<Func<T, object>> expression)
         {
-            this._sqlPack.Clear();
-            this._sqlPack.IsSingleTable = true;
-            SqlExpressionProvider.Sum(expression.Body, this._sqlPack);
+            this.sqlWrapper.Clear();
+            this.sqlWrapper.IsSingleTable = true;
+            SqlExpressionProvider.Sum(expression.Body, this.sqlWrapper);
             return this;
         }
         #endregion
@@ -4227,24 +4227,24 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Top(long topNumber)
         {
-            if (this._sqlPack.DatabaseType == DatabaseType.SqlServer)
+            if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
-                if (this._sqlPack.Sql.ToString().ToUpper().Contains("DISTINCT"))
+                if (this.sqlWrapper.Sql.ToString().ToUpper().Contains("DISTINCT"))
                 {
-                    this._sqlPack.Sql.Replace("DISTINCT", $"DISTINCT TOP {topNumber}", this._sqlPack.Sql.ToString().IndexOf("DISTINCT"), 8);
+                    this.sqlWrapper.Sql.Replace("DISTINCT", $"DISTINCT TOP {topNumber}", this.sqlWrapper.Sql.ToString().IndexOf("DISTINCT"), 8);
                 }
                 else
                 {
-                    this._sqlPack.Sql.Replace("SELECT", $"SELECT TOP {topNumber}", this._sqlPack.Sql.ToString().IndexOf("SELECT"), 6);
+                    this.sqlWrapper.Sql.Replace("SELECT", $"SELECT TOP {topNumber}", this.sqlWrapper.Sql.ToString().IndexOf("SELECT"), 6);
                 }
             }
-            else if (this._sqlPack.DatabaseType == DatabaseType.Oracle)
+            else if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
-                this._sqlPack.Sql = new StringBuilder($"SELECT * FROM ({this._sqlPack.Sql}) T WHERE ROWNUM <= {topNumber}");
+                this.sqlWrapper.Sql = new StringBuilder($"SELECT * FROM ({this.sqlWrapper.Sql}) T WHERE ROWNUM <= {topNumber}");
             }
-            else if (this._sqlPack.DatabaseType == DatabaseType.MySql || this._sqlPack.DatabaseType == DatabaseType.Sqlite || this._sqlPack.DatabaseType == DatabaseType.PostgreSql)
+            else if (this.sqlWrapper.DatabaseType == DatabaseType.MySql || this.sqlWrapper.DatabaseType == DatabaseType.Sqlite || this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
             {
-                this._sqlPack.Sql.Append($" LIMIT {topNumber} OFFSET 0");
+                this.sqlWrapper.Sql.Append($" LIMIT {topNumber} OFFSET 0");
             }
             return this;
         }
@@ -4257,7 +4257,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Distinct()
         {
-            this._sqlPack.Sql.Replace("SELECT", $"SELECT DISTINCT", this._sqlPack.Sql.ToString().IndexOf("SELECT"), 6);
+            this.sqlWrapper.Sql.Replace("SELECT", $"SELECT DISTINCT", this.sqlWrapper.Sql.ToString().IndexOf("SELECT"), 6);
             return this;
         }
         #endregion
@@ -4269,7 +4269,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public string GetTableName()
         {
-            return this._sqlPack.GetTableName(typeof(T));
+            return this.sqlWrapper.GetTableName(typeof(T));
         }
         #endregion
 
@@ -4280,7 +4280,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public List<string> GetPrimaryKey()
         {
-            return this._sqlPack.GetPrimaryKey(typeof(T)).Select(o => o.key).ToList();
+            return this.sqlWrapper.GetPrimaryKey(typeof(T)).Select(o => o.key).ToList();
         }
         #endregion
         #endregion

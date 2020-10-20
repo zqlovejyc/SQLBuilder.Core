@@ -1577,6 +1577,25 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT [A].[Id],[A].[Name] AS [UserName] FROM [Base_UserInfo] AS [A] INNER JOIN [Base_Account] AS [B] ON [A].[Id] = [B].[UserId] AND [A].[Name] LIKE '%' + @Parameter1 + '%' WHERE ([A].[Name] LIKE '%' + @Parameter2 + '%') AND ([A].[Email] = @Parameter3)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询83，linq写法，注意目前仅支持单表查询
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_83()
+        {
+            var query = from a in new SqlBuilderCore<UserInfo>(DatabaseType.SqlServer, true)
+                        where a.Id == 1
+                        orderby new { a.Id, a.Email } ascending
+                        select new
+                        {
+                            a.Name,
+                            Address = a.Email
+                        };
+
+            Assert.AreEqual("SELECT [A].[Name],[A].[Email] AS [Address] FROM [Base_UserInfo] AS [A] WHERE [A].[Id] = @Parameter1 ORDER BY [A].[Id] ASC,[A].[Email] ASC", query.Sql);
+            Assert.AreEqual(1, query.Parameters.Count);
+        }
         #endregion
 
         #region Page

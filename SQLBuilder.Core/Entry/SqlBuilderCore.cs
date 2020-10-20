@@ -156,7 +156,6 @@ namespace SQLBuilder.Core.Entry
         /// <returns>string</returns>
         private string Select(params Type[] array)
         {
-            this.sqlWrapper.Clear();
             this.sqlWrapper.IsSingleTable = false;
             if (array?.Length > 0)
             {
@@ -178,19 +177,37 @@ namespace SQLBuilder.Core.Entry
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
+        /// <param name="sql">sql语句</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Select(Expression expression = null)
+        public SqlBuilderCore<T> Select(Expression expression = null, string sql = null)
         {
-            var sql = this.Select(typeof(T));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
+            var len = this.sqlWrapper.Sql.Length;
+
+            if (sql == null)
+                sql = this.Select(typeof(T));
+
+            var selectFields = "*";
+            if (expression != null)
             {
                 SqlExpressionProvider.Select(expression, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
+                selectFields = this.sqlWrapper.SelectFieldsStr;
+
+                //移除默认的查询语句
+                if (len > 0)
+                {
+                    var sqlReplace = string.Format(this.Select(typeof(T)), "*");
+                    var sqlNew = this.sqlWrapper.Sql.ToString().Replace(sqlReplace, "");
+                    this.sqlWrapper.Sql = new StringBuilder(sqlNew);
+                }
             }
+
+            sql = string.Format(sql, selectFields);
+
+            if (len == 0)
+                this.sqlWrapper.Sql.Append(sql);
+            else
+                this.sqlWrapper.Sql = new StringBuilder($"{sql}{this.sqlWrapper.Sql}");
+
             return this;
         }
 
@@ -201,17 +218,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Select(Expression<Func<T, object>> expression = null)
         {
-            var sql = this.Select(typeof(T));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression?.Body);
         }
 
         /// <summary>
@@ -224,16 +231,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
         {
             var sql = this.Select(typeof(T), typeof(T2));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -248,16 +246,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -274,16 +263,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -302,16 +282,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -332,16 +303,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -364,16 +326,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -398,16 +351,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -434,16 +378,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
 
         /// <summary>
@@ -472,16 +407,7 @@ namespace SQLBuilder.Core.Entry
             where T10 : class
         {
             var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
-            if (expression == null)
-            {
-                this.sqlWrapper.Sql.AppendFormat(sql, "*");
-            }
-            else
-            {
-                SqlExpressionProvider.Select(expression.Body, this.sqlWrapper);
-                this.sqlWrapper.Sql.AppendFormat(sql, this.sqlWrapper.SelectFieldsStr);
-            }
-            return this;
+            return this.Select(expression.Body, sql);
         }
         #endregion
 
@@ -787,6 +713,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(string sql)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             this.sqlWrapper += " WHERE ";
             this.sqlWrapper += sql;
             return this;
@@ -800,6 +729,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(string sql, ref bool hasWhere)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             if (hasWhere)
                 this.sqlWrapper += " AND ";
             else
@@ -820,6 +752,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(StringBuilder sql)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             this.sqlWrapper += " WHERE ";
             this.sqlWrapper.Sql.Append(sql);
             return this;
@@ -833,6 +768,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(StringBuilder sql, ref bool hasWhere)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             if (hasWhere)
                 this.sqlWrapper += " AND ";
             else
@@ -852,6 +790,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="expression">表达式树</param>
         public SqlBuilderCore<T> Where(Expression expression)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
             {
                 this.sqlWrapper += " WHERE ";
@@ -869,6 +810,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         public SqlBuilderCore<T> Where(Expression expression, ref bool hasWhere)
         {
+            if (this.sqlWrapper.Sql.Length == 0)
+                this.Select(expression: null);
+
             if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
             {
                 if (hasWhere)
@@ -3930,6 +3874,29 @@ namespace SQLBuilder.Core.Entry
         }
         #endregion
 
+        #region OrderByDescending
+        /// <summary>
+        /// OrderByDescending
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> OrderByDescending(Expression<Func<T, object>> expression)
+        {
+            var orders = new List<OrderType>();
+            if (expression?.Body is NewExpression newExpression)
+            {
+                for (int i = 0; i < newExpression.Arguments.Count; i++)
+                {
+                    orders.Add(OrderType.Descending);
+                }
+            }
+            else
+                orders.Add(OrderType.Descending);
+
+            return this.OrderBy(expression.Body, orders.ToArray());
+        }
+        #endregion
+
         #region Page
         /// <summary>
         /// Page
@@ -4039,7 +4006,7 @@ namespace SQLBuilder.Core.Entry
             if (!sql.IsNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
-                if (parameters != null) 
+                if (parameters != null)
                     this.sqlWrapper.DbParameters = parameters;
             }
             sql = sql.IsNullOrEmpty() ? this.sqlWrapper.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');

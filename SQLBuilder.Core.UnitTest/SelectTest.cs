@@ -1596,6 +1596,44 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT [A].[Name],[A].[Email] AS [Address] FROM [Base_UserInfo] AS [A] WHERE [A].[Id] = @Parameter1 ORDER BY [A].[Id] ASC,[A].[Email] ASC", query.Sql);
             Assert.AreEqual(1, query.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询84，linq写法，注意目前仅支持单表查询
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_84()
+        {
+            var query = from a in SqlBuilder.Select<UserInfo>()
+                        where a.Id == 1
+                        orderby new { a.Id, a.Email } descending
+                        select new
+                        {
+                            a.Name,
+                            Address = a.Email
+                        };
+
+            Assert.AreEqual("SELECT [A].[Name],[A].[Email] AS [Address] FROM [Base_UserInfo] AS [A] WHERE [A].[Id] = @Parameter1 ORDER BY [A].[Id] DESC,[A].[Email] DESC", query.Sql);
+            Assert.AreEqual(1, query.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询85，linq写法，注意目前仅支持单表查询
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_85()
+        {
+            var query = from a in SqlBuilder.Select<UserInfo>()
+                        where a.Id != null && a.Name.Contains("1")
+                        orderby new { a.Id } descending
+                        group a by a.Id into g
+                        select new
+                        {
+                            g.Id
+                        };
+
+            Assert.AreEqual("SELECT [A].[Id] FROM [Base_UserInfo] AS [A] WHERE [A].[Id] IS NOT NULL AND [A].[Name] LIKE '%' + @Parameter1 + '%' ORDER BY [A].[Id] DESC GROUP BY [A].[Id]", query.Sql);
+            Assert.AreEqual(1, query.Parameters.Count);
+        }
         #endregion
 
         #region Page

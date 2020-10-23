@@ -4229,6 +4229,96 @@ namespace SQLBuilder.Core.Entry
         }
         #endregion
 
+        #region Append
+        /// <summary>
+        /// Append
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Append(string sql)
+        {
+            this.sqlWrapper += sql;
+            return this;
+        }
+
+        /// <summary>
+        /// Append
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Append(StringBuilder sql)
+        {
+            this.sqlWrapper.Sql.Append(sql);
+            return this;
+        }
+        #endregion
+
+        #region AppendIf
+        /// <summary>
+        /// AppendIf
+        /// </summary>
+        /// <param name="condition">自定义条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> AppendIf(bool condition, string sql)
+        {
+            if (condition)
+                this.sqlWrapper += sql;
+
+            return this;
+        }
+
+        /// <summary>
+        /// AppendIf
+        /// </summary>
+        /// <param name="condition">自定义条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="callback">回调委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> AppendIf(bool condition, string sql, Action callback)
+        {
+            if (condition)
+            {
+                this.sqlWrapper += sql;
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// AppendIf
+        /// </summary>
+        /// <param name="condition">自定义条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> AppendIf(bool condition, StringBuilder sql)
+        {
+            if (condition)
+                this.sqlWrapper.Sql.Append(sql);
+
+            return this;
+        }
+
+        /// <summary>
+        /// AppendIf
+        /// </summary>
+        /// <param name="condition">自定义条件</param>
+        /// <param name="sql">自定义sql语句</param>
+        /// <param name="callback">回调委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> AppendIf(bool condition, StringBuilder sql, Action callback)
+        {
+            if (condition)
+            {
+                this.sqlWrapper.Sql.Append(sql);
+                callback?.Invoke();
+            }
+
+            return this;
+        }
+        #endregion
+
         #region GetTableName
         /// <summary>
         /// 获取实体对应的表名

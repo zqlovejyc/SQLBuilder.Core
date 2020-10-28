@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -114,7 +114,7 @@ namespace SQLBuilder.Core.Extensions
                             continue;
 
                         var slaveConnectionStringArray = configs[i].Split(";");
-                        var slaveConnectionString = string.Join(';', slaveConnectionStringArray.Where(x => !x.StartsWith("weight", StringComparison.OrdinalIgnoreCase) && !x.IsNullOrEmpty()));
+                        var slaveConnectionString = string.Join(';', slaveConnectionStringArray.Where(x => !x.IsNullOrEmpty() && !x.StartsWith("weight", StringComparison.OrdinalIgnoreCase)));
                         var weight = int.Parse(slaveConnectionStringArray.FirstOrDefault(x => x.StartsWith("weight", StringComparison.OrdinalIgnoreCase))?.Split("=")[1] ?? "1");
                         slaveConnectionStrings.Add((slaveConnectionString, weight));
                     }

@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *

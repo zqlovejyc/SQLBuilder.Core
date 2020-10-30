@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -36,6 +36,18 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Where(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Where(expression.Body, sqlWrapper);
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(LambdaExpression expression, SqlWrapper sqlWrapper)
+        {
+            SqlExpressionProvider.Select(expression.Body, sqlWrapper);
             return sqlWrapper;
         }
         #endregion

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -84,7 +84,8 @@ namespace SQLBuilder.Core.Expressions
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
                         sqlWrapper.AddDbParameter(value);
-                        if (!fields.Contains(columnName)) fields.Add(columnName);
+                        if (!fields.Contains(columnName))
+                            fields.Add(columnName);
                         sqlWrapper += ",";
                     }
                 }

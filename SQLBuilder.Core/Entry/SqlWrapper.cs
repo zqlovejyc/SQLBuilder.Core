@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -43,23 +43,13 @@ namespace SQLBuilder.Core.Entry
     /// <summary>
     /// SqlWrapper
     /// </summary>
-	public class SqlWrapper
+    public class SqlWrapper
     {
         #region Private Field
         /// <summary>
-        /// tableAlias
+        /// 表别名字典
         /// </summary>
-        private static readonly List<string> tableAlias = new List<string> { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
-
-        /// <summary>
-        /// dicTableName
-        /// </summary>
-        private readonly Dictionary<string, string> dicTableName = new Dictionary<string, string>();
-
-        /// <summary>
-        /// tableAliasQueue
-        /// </summary>
-        private Queue<string> tableAliasQueue = new Queue<string>(tableAlias);
+        private readonly Dictionary<string, string> aliasDictionary = new Dictionary<string, string>();
         #endregion
 
         #region Public Property
@@ -79,22 +69,22 @@ namespace SQLBuilder.Core.Entry
         public Type DefaultType { get; set; }
 
         /// <summary>
-        /// IsSingleTable
+        /// 是否单表操作
         /// </summary>
         public bool IsSingleTable { get; set; }
 
         /// <summary>
-        /// SelectFields
+        /// 已选择的表字段
         /// </summary>
         public List<string> SelectFields { get; set; }
 
         /// <summary>
-        /// SelectFieldsStr
+        /// 已选择的表字段拼接字符串
         /// </summary>
         public string SelectFieldsStr => string.Join(",", this.SelectFields);
 
         /// <summary>
-        /// Length
+        /// 当前sql长度
         /// </summary>
         public int Length => this.Sql.Length;
 
@@ -104,17 +94,17 @@ namespace SQLBuilder.Core.Entry
         public StringBuilder Sql { get; set; }
 
         /// <summary>
-        /// DatabaseType
+        /// 数据库类型
         /// </summary>
         public DatabaseType DatabaseType { get; set; }
 
         /// <summary>
-        /// DbParameters
+        /// 数据库参数
         /// </summary>
         public Dictionary<string, object> DbParameters { get; set; }
 
         /// <summary>
-        /// DbParamPrefix
+        /// 数据参数化前缀
         /// </summary>
         public string DbParamPrefix
         {
@@ -133,7 +123,7 @@ namespace SQLBuilder.Core.Entry
         }
 
         /// <summary>
-        /// FormatTempl
+        /// 格式化模板
         /// </summary>
         public string FormatTempl
         {
@@ -154,7 +144,7 @@ namespace SQLBuilder.Core.Entry
 
         #region Constructor
         /// <summary>
-        /// SqlWrapper
+        /// 构造函数
         /// </summary>
         public SqlWrapper()
         {
@@ -167,7 +157,7 @@ namespace SQLBuilder.Core.Entry
         #region Public Methods
         #region this[index]
         /// <summary>
-        /// this[index]
+        /// 索引器
         /// </summary>
         /// <param name="index">索引</param>
         /// <returns>char</returns>
@@ -176,7 +166,7 @@ namespace SQLBuilder.Core.Entry
 
         #region operator +
         /// <summary>
-        /// operator +
+        /// 操作符
         /// </summary>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="sql">sql语句</param>
@@ -190,21 +180,20 @@ namespace SQLBuilder.Core.Entry
 
         #region Clear
         /// <summary>
-        /// Clear
+        /// 清空
         /// </summary>
         public void Clear()
         {
             this.SelectFields.Clear();
             this.Sql.Clear();
             this.DbParameters.Clear();
-            this.dicTableName.Clear();
-            this.tableAliasQueue = new Queue<string>(tableAlias);
+            this.aliasDictionary.Clear();
         }
         #endregion
 
         #region AddDbParameter
         /// <summary>
-        /// AddDbParameter
+        /// 新增格式化参数
         /// </summary>
         /// <param name="parameterValue">参数值</param>
         /// <param name="parameterKey">参数名称</param>
@@ -216,7 +205,7 @@ namespace SQLBuilder.Core.Entry
             }
             else if (parameterKey.IsNullOrEmpty())
             {
-                var name = this.DbParamPrefix + "Parameter" + (this.DbParameters.Count + 1);
+                var name = this.DbParamPrefix + "p__" + (this.DbParameters.Count + 1);
                 this.DbParameters.Add(name, parameterValue);
                 this.Sql.Append(name);
             }
@@ -231,37 +220,51 @@ namespace SQLBuilder.Core.Entry
 
         #region SetTableAlias
         /// <summary>
-        /// SetTableAlias
+        /// 设置表别名
         /// </summary>
         /// <param name="tableName">表名</param>
+        /// <param name="tableAlias">表别名</param>
         /// <returns>bool</returns>
-        public bool SetTableAlias(string tableName)
+        public bool SetTableAlias(string tableName, string tableAlias = null)
         {
-            if (!this.dicTableName.Keys.Contains(tableName))
+            if (tableAlias.IsNullOrEmpty())
+                tableAlias = "t";
+
+            tableAlias = this.GetFormatName(tableAlias);
+
+            if (!this.aliasDictionary.Keys.Contains(tableAlias))
             {
-                var tableAlias = this.tableAliasQueue.Dequeue();
-
-                if (this.IsEnableFormat == true)
-                    tableAlias = string.Format(this.FormatTempl, tableAlias);
-
-                this.dicTableName.Add(tableName, tableAlias);
+                this.aliasDictionary.Add(tableAlias, tableName);
                 return true;
             }
+
             return false;
         }
         #endregion
 
         #region GetTableAlias
         /// <summary>
-        /// GetTableAlias
+        /// 获取表别名
         /// </summary>
         /// <param name="tableName">表名</param>
+        /// <param name="tableAlias">表别名</param>
         /// <returns>string</returns>
-        public string GetTableAlias(string tableName)
+        public string GetTableAlias(string tableName, string tableAlias = null)
         {
-            if (!this.IsSingleTable && this.dicTableName.Keys.Contains(tableName))
+            if (!this.IsSingleTable)
             {
-                return this.dicTableName[tableName];
+                if (!tableAlias.IsNullOrEmpty())
+                {
+                    tableAlias = this.GetFormatName(tableAlias);
+
+                    //表别名+表名 同时满足
+                    if (aliasDictionary.Keys.Contains(tableAlias) && aliasDictionary[tableAlias] == tableName)
+                        return tableAlias;
+                }
+
+                //根据表名获取别名
+                if (aliasDictionary.Values.Contains(tableName))
+                    return aliasDictionary.FirstOrDefault(x => x.Value == tableName).Key;
             }
             return string.Empty;
         }
@@ -269,7 +272,7 @@ namespace SQLBuilder.Core.Entry
 
         #region GetFormatName
         /// <summary>
-        /// GetFormatName
+        /// 获取格式化名称
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -289,7 +292,7 @@ namespace SQLBuilder.Core.Entry
 
         #region GetTableName
         /// <summary>
-        /// GetTableName
+        /// 获取表名
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>string</returns>
@@ -324,7 +327,7 @@ namespace SQLBuilder.Core.Entry
 
         #region GetColumnName
         /// <summary>
-        /// GetFormatColumnName
+        /// 获取列名
         /// </summary>
         /// <param name="columnName">列名</param>
         /// <returns></returns>
@@ -333,7 +336,7 @@ namespace SQLBuilder.Core.Entry
 
         #region GetColumnInfo
         /// <summary>
-        /// GetColumnInfo
+        /// 获取列信息
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="member">成员</param>
@@ -394,7 +397,7 @@ namespace SQLBuilder.Core.Entry
 
         #region GetPrimaryKey
         /// <summary>
-        /// GetPrimaryKey
+        /// 获取主键
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>Tuple</returns>
@@ -435,7 +438,7 @@ namespace SQLBuilder.Core.Entry
 
         #region ToString
         /// <summary>
-        /// ToString
+        /// ToString重置
         /// </summary>
         /// <returns>string</returns>
         public override string ToString() => this.Sql.ToString();

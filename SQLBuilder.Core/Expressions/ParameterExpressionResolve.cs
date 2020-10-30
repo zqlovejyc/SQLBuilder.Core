@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -36,9 +36,11 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper Select(ParameterExpression expression, SqlWrapper sqlWrapper)
         {
             var tableName = sqlWrapper.GetTableName(expression.Type);
-            sqlWrapper.SetTableAlias(tableName);
-            var tableAlias = sqlWrapper.GetTableAlias(tableName);
+            sqlWrapper.SetTableAlias(tableName, expression.Name);
+
+            var tableAlias = sqlWrapper.GetTableAlias(tableName, expression.Name);
             sqlWrapper.SelectFields.Add($"{tableAlias}.*");
+
             return sqlWrapper;
         }
         #endregion

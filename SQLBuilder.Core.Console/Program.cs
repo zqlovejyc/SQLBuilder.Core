@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using SQLBuilder.Core.Entry;
@@ -114,8 +114,8 @@ namespace SQLBuilder.Core
             );
 
             Print(
-               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective.Value && x.IsOnLine),
-               "查询单表，带where bool类型字段"
+                SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective.Value && x.IsOnLine),
+                "查询单表，带where bool类型字段"
             );
 
             Print(
@@ -281,19 +281,21 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) =>
-                        new { u.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                    .Join<Account>((u, a) =>
-                        u.Id == a.UserId)
-                    .LeftJoin<Account, Student>((a, s) =>
-                        a.Id == s.AccountId)
-                    .RightJoin<Student, Class>((s, c) =>
-                        s.Id == c.UserId)
-                    .InnerJoin<Class, City>((c, d) =>
-                        c.CityId == d.Id)
-                    .FullJoin<City, Country>((c, d) =>
-                        c.CountryId == d.Id)
-                    .Where(u => u.Id != null),
+                    .Select<UserInfo, UserInfo, Account, Student, Class, City, Country>((u, t, a, s, d, e, f) =>
+                         new { u.Id, UId = t.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                    .Join<UserInfo>((x, t) =>
+                        x.Id == t.Id)
+                    .Join<Account>((x, y) =>
+                        x.Id == y.UserId)
+                    .LeftJoin<Account, Student>((x, y) =>
+                        x.Id == y.AccountId)
+                    .RightJoin<Student, Class>((x, y) =>
+                        x.Id == y.UserId)
+                    .InnerJoin<Class, City>((x, y) =>
+                        x.CityId == y.Id)
+                    .FullJoin<City, Country>((x, y) =>
+                        x.CountryId == y.Id)
+                    .Where(x => x.Id != null),
                 "多表复杂关联查询"
             );
             #endregion
@@ -365,11 +367,10 @@ namespace SQLBuilder.Core
                 "GroupBy分组查询 用法2-3"
             );
 
-            var groupBy = "Id,Email".Split(',');
             Print(
                 SqlBuilder.Select<UserInfo>()
                           .Where(o => o.Name == "张强")
-                          .GroupBy(u => groupBy),
+                          .GroupBy(u => "Id,Email".Split(new[] { ',' })),
                 "GroupBy分组查询 用法2-4"
             );
 
@@ -406,7 +407,7 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder.Select<UserInfo>()
-                         .OrderBy(u => groupBy, OrderType.Ascending, OrderType.Descending),
+                         .OrderBy(u => "Id,Email".Split(new[] { ',' }), OrderType.Ascending, OrderType.Descending),
                "OrderBy排序 用法1-3"
             );
 
@@ -503,7 +504,7 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Delete<UserInfo>().WithKey(2, 3),
+                SqlBuilder.Delete<UserInfo>().WithKey(2, 1),
                 "根据主键条件删除指定表记录1"
             );
             Print(
@@ -740,7 +741,7 @@ namespace SQLBuilder.Core
                 {
                     Console.WriteLine($"执行sql日志：{sql}");
                     //修改原sql
-                    return sql.Replace(" AS A", "");
+                    return sql.Replace(" AS [t]", "");
                 }),
                 "查询单表所有字段",
                 "Select"

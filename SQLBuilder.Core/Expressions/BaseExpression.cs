@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -27,7 +27,7 @@ namespace SQLBuilder.Core.Expressions
     /// Expression抽象基类
     /// </summary>
     /// <typeparam name="T">泛型类型</typeparam>
-	public abstract class BaseExpression<T> : IExpression where T : Expression
+    public abstract class BaseExpression<T> : IExpression where T : Expression
     {
         #region Virtural IExpression Methods
         /// <summary>

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -25,7 +25,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示具有一元运算符的表达式
     /// </summary>
-	public class UnaryExpressionResolve : BaseExpression<UnaryExpression>
+    public class UnaryExpressionResolve : BaseExpression<UnaryExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -82,84 +82,98 @@ namespace SQLBuilder.Core.Expressions
                 if (subString.Contains("IS NOT"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("IS NOT");
-                    if (index != -1) sqlWrapper.Sql.Replace("IS NOT", "IS", index, 6);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("IS NOT", "IS", index, 6);
                 }
                 if (subString.Contains("IS") && subString.LastIndexOf("IS") != subString.LastIndexOf("IS NOT"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("IS");
-                    if (index != -1) sqlWrapper.Sql.Replace("IS", "IS NOT", index, 2);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("IS", "IS NOT", index, 2);
                 }
 
                 //NOT LIKE、LIKE
                 if (subString.Contains("NOT LIKE"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("NOT LIKE");
-                    if (index != -1) sqlWrapper.Sql.Replace("NOT LIKE", "LIKE", index, 8);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("NOT LIKE", "LIKE", index, 8);
                 }
                 if (subString.Contains("LIKE") && subString.LastIndexOf("LIKE") != (subString.LastIndexOf("NOT LIKE") + 4))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("LIKE");
-                    if (index != -1) sqlWrapper.Sql.Replace("LIKE", "NOT LIKE", index, 4);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("LIKE", "NOT LIKE", index, 4);
                 }
 
                 //NOT IN、IN
                 if (subString.Contains("NOT IN"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("NOT IN");
-                    if (index != -1) sqlWrapper.Sql.Replace("NOT IN", "IN", index, 6);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("NOT IN", "IN", index, 6);
                 }
                 if (subString.Contains("IN") && subString.LastIndexOf("IN") != (subString.LastIndexOf("NOT IN") + 4))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("IN");
-                    if (index != -1) sqlWrapper.Sql.Replace("IN", "NOT IN", index, 2);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("IN", "NOT IN", index, 2);
                 }
 
                 //AND、OR
                 if (subString.Contains("AND"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("AND");
-                    if (index != -1) sqlWrapper.Sql.Replace("AND", "OR", index, 3);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("AND", "OR", index, 3);
                 }
                 if (subString.Contains("OR"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("OR");
-                    if (index != -1) sqlWrapper.Sql.Replace("OR", "AND", index, 2);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("OR", "AND", index, 2);
                 }
 
                 //=、<>
                 if (subString.Contains(" = "))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf(" = ");
-                    if (index != -1) sqlWrapper.Sql.Replace(" = ", " <> ", index, 3);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace(" = ", " <> ", index, 3);
                 }
                 if (subString.Contains("<>"))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf("<>");
-                    if (index != -1) sqlWrapper.Sql.Replace("<>", "=", index, 2);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace("<>", "=", index, 2);
                 }
 
                 //>、<
                 if (subString.Contains(" > "))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf(" > ");
-                    if (index != -1) sqlWrapper.Sql.Replace(" > ", " <= ", index, 3);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace(" > ", " <= ", index, 3);
                 }
                 if (subString.Contains(" < "))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf(" < ");
-                    if (index != -1) sqlWrapper.Sql.Replace(" < ", " >= ", index, 3);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace(" < ", " >= ", index, 3);
                 }
 
                 //>=、<=
                 if (subString.Contains(" >= "))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf(" >= ");
-                    if (index != -1) sqlWrapper.Sql.Replace(" >= ", " < ", index, 4);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace(" >= ", " < ", index, 4);
                 }
                 if (subString.Contains(" <= "))
                 {
                     var index = sqlWrapper.ToString().LastIndexOf(" <= ");
-                    if (index != -1) sqlWrapper.Sql.Replace(" <= ", " > ", index, 4);
+                    if (index != -1)
+                        sqlWrapper.Sql.Replace(" <= ", " > ", index, 4);
                 }
             }
             return sqlWrapper;

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -134,9 +134,8 @@ namespace SQLBuilder.Core.Expressions
         private static void LikeLeft(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
-            {
                 SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-            }
+
             SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
             switch (sqlWrapper.DatabaseType)
             {
@@ -219,9 +218,8 @@ namespace SQLBuilder.Core.Expressions
         private static void NotLike(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
-            {
                 SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-            }
+
             SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
             switch (sqlWrapper.DatabaseType)
             {
@@ -342,19 +340,15 @@ namespace SQLBuilder.Core.Expressions
         private static void Equals(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Object != null)
-            {
                 SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-            }
+
             var signIndex = sqlWrapper.Length;
             SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
+
             if (sqlWrapper.ToString().ToUpper().EndsWith("NULL"))
-            {
                 sqlWrapper.Sql.Insert(signIndex, " IS ");
-            }
             else
-            {
                 sqlWrapper.Sql.Insert(signIndex, " = ");
-            }
         }
 
         /// <summary>
@@ -397,22 +391,16 @@ namespace SQLBuilder.Core.Expressions
             if (expression.Object != null)
             {
                 if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
-                {
                     sqlWrapper += "LTRIM(RTRIM(";
-                }
                 else
-                {
                     sqlWrapper += "TRIM(";
-                }
+
                 SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+
                 if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
-                {
                     sqlWrapper += "))";
-                }
                 else
-                {
                     sqlWrapper += ")";
-                }
             }
         }
 
@@ -476,6 +464,7 @@ namespace SQLBuilder.Core.Expressions
                 {
                     SqlExpressionProvider.In(Expression.Constant(val, val.GetType()), sqlWrapper);
                 }
+
                 if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
                     sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
                 sqlWrapper += ")";
@@ -541,7 +530,8 @@ namespace SQLBuilder.Core.Expressions
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
                             sqlWrapper.AddDbParameter(value);
-                            if (!fields.Contains(columnName)) fields.Add(columnName);
+                            if (!fields.Contains(columnName))
+                                fields.Add(columnName);
                             sqlWrapper += ",";
                         }
                     }
@@ -597,17 +587,11 @@ namespace SQLBuilder.Core.Expressions
                 {
                     SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                     if (i <= orders.Length - 1)
-                    {
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                    }
                     else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
-                    {
                         sqlWrapper += " ASC,";
-                    }
                     else
-                    {
                         sqlWrapper += ",";
-                    }
                 }
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }

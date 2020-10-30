@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -29,7 +29,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示访问字段或属性
     /// </summary>
-	public class MemberExpressionResolve : BaseExpression<MemberExpression>
+    public class MemberExpressionResolve : BaseExpression<MemberExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -129,10 +129,16 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             var tableName = sqlWrapper.GetTableName(type);
-            sqlWrapper.SetTableAlias(tableName);
-            string tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+            var parameter = expression.Expression as ParameterExpression;
+            sqlWrapper.SetTableAlias(tableName, parameter?.Name);
+            string tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             sqlWrapper.SelectFields.Add(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
             return sqlWrapper;
         }
@@ -148,10 +154,14 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
+            var parameter = expression.Expression as ParameterExpression;
+
             var tableName = sqlWrapper.GetTableName(type);
-            sqlWrapper.SetTableAlias(tableName);
-            string tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+            string tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
             return sqlWrapper;
         }
@@ -178,8 +188,8 @@ namespace SQLBuilder.Core.Expressions
                                expression.Expression.Type :
                                expression.Member.DeclaringType;
                     var tableName = sqlWrapper.GetTableName(type);
-                    sqlWrapper.SetTableAlias(tableName);
-                    var tableAlias = sqlWrapper.GetTableAlias(tableName);
+                    var tableAlias = (expression.Expression as ParameterExpression)?.Name;
+                    tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
                     if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
                     sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
                     //字段是bool类型
@@ -231,20 +241,24 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper GroupBy(MemberExpression expression, SqlWrapper sqlWrapper)
         {
-            string tableName = string.Empty;
+            var tableAlias = string.Empty;
+            var tableName = string.Empty;
+
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 var type = expression.Expression.Type != expression.Member.DeclaringType ?
                            expression.Expression.Type :
                            expression.Member.DeclaringType;
                 tableName = sqlWrapper.GetTableName(type);
+                tableAlias = (expression.Expression as ParameterExpression)?.Name;
             }
+
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
                 tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             }
-            sqlWrapper.SetTableAlias(tableName);
-            var tableAlias = sqlWrapper.GetTableAlias(tableName);
+
+            tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
             if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
@@ -291,7 +305,9 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper OrderBy(MemberExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
-            string tableName = string.Empty;
+            var tableAlias = string.Empty;
+            var tableName = string.Empty;
+
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 var type = expression.Expression.Type != expression.Member.DeclaringType ?
@@ -303,9 +319,12 @@ namespace SQLBuilder.Core.Expressions
             {
                 tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             }
-            sqlWrapper.SetTableAlias(tableName);
-            var tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+            tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
+
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
                 sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;

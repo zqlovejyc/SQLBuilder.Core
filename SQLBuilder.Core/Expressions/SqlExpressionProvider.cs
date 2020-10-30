@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -24,9 +24,9 @@ using System.Linq.Expressions;
 namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
-    /// SqlExpressionProvider
+    /// SqlBuilderProvider
     /// </summary>
-    public class SqlExpressionProvider
+	public class SqlExpressionProvider
     {
         #region Private Static Methods
         /// <summary>

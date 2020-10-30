@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -43,6 +43,7 @@ namespace SQLBuilder.Core.Expressions
                 string tableAlias = sqlWrapper.GetTableAlias(tableName);
                 if (!tableAlias.IsNullOrEmpty())
                     tableAlias += ".";
+
                 sqlWrapper.SelectFields.Add($"{tableAlias}*");
             }
             else
@@ -119,9 +120,10 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper GroupBy(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
-            sqlWrapper.SetTableAlias(tableName);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             sqlWrapper += tableAlias + sqlWrapper.GetColumnName(expression.Value.ToString()) + ",";
             return sqlWrapper;
         }
@@ -136,15 +138,19 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper OrderBy(ConstantExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
-            sqlWrapper.SetTableAlias(tableName);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             var field = expression.Value.ToString();
             if (!field.ToUpper().Contains(" ASC") && !field.ToUpper().Contains(" DESC"))
                 field = sqlWrapper.GetColumnName(field);
+
             sqlWrapper += tableAlias + field;
+
             if (orders?.Length > 0)
                 sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
+
             return sqlWrapper;
         }
         #endregion

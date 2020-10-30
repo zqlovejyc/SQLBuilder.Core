@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -46,8 +46,10 @@ namespace SQLBuilder.Core.Expressions
             {
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                     sqlWrapper.Sql.Append("(");
+
                 if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
                     sqlWrapper.Sql.Append(" UNION ALL SELECT ");
+
                 var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
@@ -59,7 +61,8 @@ namespace SQLBuilder.Core.Expressions
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
                             sqlWrapper.AddDbParameter(value);
-                            if (!fields.Contains(columnName)) fields.Add(columnName);
+                            if (!fields.Contains(columnName))
+                                fields.Add(columnName);
                             sqlWrapper += ",";
                         }
                     }
@@ -114,18 +117,13 @@ namespace SQLBuilder.Core.Expressions
                 for (var i = 0; i < array.Count; i++)
                 {
                     SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
+
                     if (i <= orders.Length - 1)
-                    {
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                    }
                     else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
-                    {
                         sqlWrapper += " ASC,";
-                    }
                     else
-                    {
                         sqlWrapper += ",";
-                    }
                 }
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }

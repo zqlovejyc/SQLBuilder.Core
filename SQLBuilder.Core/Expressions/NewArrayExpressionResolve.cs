@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -25,7 +25,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示创建一个新数组，并可能初始化该新数组的元素
     /// </summary>
-	public class NewArrayExpressionResolve : BaseExpression<NewArrayExpression>
+    public class NewArrayExpressionResolve : BaseExpression<NewArrayExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -64,10 +64,13 @@ namespace SQLBuilder.Core.Expressions
                 else
                     sqlWrapper += ",";
             }
+
             if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+
             if (sqlWrapper.Sql.ToString().LastIndexOf(" UNION ALL SELECT ") > -1)
                 sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 18, 18);
+
             return sqlWrapper;
         }
 

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -150,27 +150,102 @@ namespace SQLBuilder.Core.Entry
 
         #region Select
         /// <summary>
+        /// 获取ParameterExpression别名
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        private (Type type, string alias)[] GetExpressionNames(Expression expression, params Type[] types)
+        {
+            var list = new List<(Type type, string alias)>();
+
+            if (expression != null && types?.Length > 0)
+            {
+                if (expression is NewExpression newExpression && newExpression.Arguments?.Count > 0)
+                {
+                    foreach (var item in newExpression.Arguments)
+                    {
+                        if (item.NodeType == ExpressionType.MemberAccess)
+                        {
+                            if (item is MemberExpression memberAccess && memberAccess.Expression is ParameterExpression parameter && types.Any(x => x == parameter.Type))
+                                list.Add((parameter.Type, parameter.Name));
+                        }
+                        else if (item.NodeType == ExpressionType.Parameter)
+                        {
+                            if (item is ParameterExpression parameter && types.Any(x => x == parameter.Type))
+                                list.Add((parameter.Type, parameter.Name));
+                        }
+                    }
+                }
+
+                else if (expression is LambdaExpression lambdaExpression && lambdaExpression.Parameters?.Count > 0)
+                {
+                    foreach (var item in lambdaExpression.Parameters)
+                    {
+                        if (item is ParameterExpression parameter && types.Any(x => x == parameter.Type))
+                            list.Add((parameter.Type, parameter.Name));
+                    }
+                }
+
+                else if (expression is ParameterExpression parameter)
+                {
+                    if (types.Any(x => x == parameter.Type))
+                        list.Add((parameter.Type, parameter.Name));
+                }
+
+                else if (expression is UnaryExpression unaryExpression)
+                {
+                    if (unaryExpression.Operand is MemberExpression memberAccess && memberAccess.Expression is ParameterExpression p)
+                    {
+                        if (types.Any(x => x == p.Type))
+                            list.Add((p.Type, p.Name));
+                    }
+                }
+
+                else if (expression is MemberExpression memberAccess)
+                {
+                    if (memberAccess.Expression is ParameterExpression p && types.Any(x => x == p.Type))
+                    {
+                        list.Add((p.Type, p.Name));
+                    }
+                }
+
+                else if (expression is ConstantExpression constantExpression)
+                {
+                    list.Add((types[0], null));
+                }
+            }
+
+            return list.ToArray();
+        }
+
+        /// <summary>
         /// SelectParser
         /// </summary>
         /// <param name="array">可变数量参数</param>
         /// <returns>string</returns>
-        private string Select(params Type[] array)
+        private string Select(params (Type type, string alias)[] array)
         {
             this.sqlWrapper.IsSingleTable = false;
             if (array?.Length > 0)
             {
-                foreach (var item in array)
+                foreach (var (type, alias) in array)
                 {
-                    var tableName = this.sqlWrapper.GetTableName(item);
-                    this.sqlWrapper.SetTableAlias(tableName);
+                    var name = this.sqlWrapper.GetTableName(type);
+                    this.sqlWrapper.SetTableAlias(name, alias);
                 }
             }
-            var _tableName = this.sqlWrapper.GetTableName(typeof(T));
+
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var tableAlias = this.sqlWrapper.GetTableAlias(tableName, array?.FirstOrDefault().alias);
+
             //Oracle表别名不支持AS关键字，列别名支持；
-            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                return $"SELECT {{0}} FROM {_tableName} {this.sqlWrapper.GetTableAlias(_tableName)}";
-            else
-                return $"SELECT {{0}} FROM {_tableName} AS {this.sqlWrapper.GetTableAlias(_tableName)}";
+            var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
+
+            if (tableAlias.IsNullOrEmpty())
+                @as = "";
+
+            return $"SELECT {{0}} FROM {tableName}{@as}{tableAlias}";
         }
 
         /// <summary>
@@ -183,8 +258,10 @@ namespace SQLBuilder.Core.Entry
         {
             var len = this.sqlWrapper.Sql.Length;
 
+            var tableAlias = GetExpressionNames(expression, typeof(T)).FirstOrDefault().alias;
+
             if (sql == null)
-                sql = this.Select(typeof(T));
+                sql = this.Select((typeof(T), tableAlias));
 
             var selectFields = "*";
             if (expression != null)
@@ -195,7 +272,7 @@ namespace SQLBuilder.Core.Entry
                 //移除默认的查询语句
                 if (len > 0)
                 {
-                    var sqlReplace = string.Format(this.Select(typeof(T)), "*");
+                    var sqlReplace = string.Format(this.Select((typeof(T), null)), "*");
                     var sqlNew = this.sqlWrapper.Sql.ToString().Replace(sqlReplace, "");
                     this.sqlWrapper.Sql = new StringBuilder(sqlNew);
                 }
@@ -206,7 +283,7 @@ namespace SQLBuilder.Core.Entry
             if (len == 0)
                 this.sqlWrapper.Sql.Append(sql);
             else
-                this.sqlWrapper.Sql = new StringBuilder($"{sql}{this.sqlWrapper.Sql}");
+                this.sqlWrapper.Sql = new StringBuilder($"{sql}{this.sqlWrapper.Sql.ToString().Replace("t", tableAlias)}");
 
             return this;
         }
@@ -218,7 +295,11 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Select(Expression<Func<T, object>> expression = null)
         {
-            return this.Select(expression?.Body);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant)
+                expr = expression;
+
+            return this.Select(expr);
         }
 
         /// <summary>
@@ -230,8 +311,12 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select<T2>(Expression<Func<T, T2, object>> expression = null)
             where T2 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -245,8 +330,12 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -262,8 +351,12 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -281,8 +374,12 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -302,8 +399,12 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -325,8 +426,12 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -350,8 +455,12 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -377,8 +486,12 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+            return this.Select(expression?.Body, sql);
         }
 
         /// <summary>
@@ -406,8 +519,12 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            var sql = this.Select(typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
-            return this.Select(expression.Body, sql);
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+            return this.Select(expression?.Body, sql);
         }
         #endregion
 
@@ -446,13 +563,26 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join)
             where T2 : class
         {
-            string joinTableName = this.sqlWrapper.GetTableName(typeof(T2));
-            this.sqlWrapper.SetTableAlias(joinTableName);
-            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
-            else
-                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
+            var alias = GetExpressionNames(expression, typeof(T2)).Last().alias;
+            var joinTableName = this.sqlWrapper.GetTableName(typeof(T2));
+
+            /***
+             * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
+             * 此时每个Join内的lambda表达式形参命名可以随意命名
+             * this.sqlWrapper.SetTableAlias(joinTableName, alias);
+             */
+
+            var tableAlias = this.sqlWrapper.GetTableAlias(joinTableName, alias);
+
+            var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
+
+            if (tableAlias.IsNullOrEmpty())
+                @as = "";
+
+            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {joinTableName}{@as}{tableAlias} ON ");
+
             SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
+
             return this;
         }
 
@@ -468,13 +598,24 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            string joinTableName = this.sqlWrapper.GetTableName(typeof(T3));
-            this.sqlWrapper.SetTableAlias(joinTableName);
-            if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
-            else
-                this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : " " + join)} JOIN {joinTableName} AS {this.sqlWrapper.GetTableAlias(joinTableName)} ON ");
+            var alias = GetExpressionNames(expression, typeof(T3)).Last().alias;
+            var joinTableName = this.sqlWrapper.GetTableName(typeof(T3));
+
+            /***
+             * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
+             * 此时每个Join内的lambda表达式形参命名可以随意命名
+             * this.sqlWrapper.SetTableAlias(joinTableName, alias);
+             */
+
+            var tableAlias = this.sqlWrapper.GetTableAlias(joinTableName, alias);
+
+            //Oracle表别名不支持AS关键字，列别名支持；
+            var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
+
+            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {joinTableName}{@as}{tableAlias} ON ");
+
             SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
+
             return this;
         }
 

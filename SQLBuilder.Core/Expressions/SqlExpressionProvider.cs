@@ -24,9 +24,9 @@ using System.Linq.Expressions;
 namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
-    /// SqlBuilderProvider
+    /// SqlExpressionProvider
     /// </summary>
-	public class SqlExpressionProvider
+    public class SqlExpressionProvider
     {
         #region Private Static Methods
         /// <summary>
@@ -36,128 +36,101 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>ISqlBuilder</returns>
         private static IExpression GetExpressionResolve(Expression expression)
         {
-            #region Implementation Of Expression
-            //null
+            #region Implemented Expression
             if (expression == null)
-            {
-                throw new ArgumentNullException("expression", "不能为null");
-            }
+                throw new ArgumentNullException("Expression", "Expression is null");
+
             //表示具有常数值的表达式
             else if (expression is ConstantExpression)
-            {
                 return new ConstantExpressionResolve();
-            }
+
             //表示具有二进制运算符的表达式
             else if (expression is BinaryExpression)
-            {
                 return new BinaryExpressionResolve();
-            }
+
             //表示访问字段或属性
             else if (expression is MemberExpression)
-            {
                 return new MemberExpressionResolve();
-            }
+
             //表示对静态方法或实例方法的调用
             else if (expression is MethodCallExpression)
-            {
                 return new MethodCallExpressionResolve();
-            }
+
             //表示创建一个新数组，并可能初始化该新数组的元素
             else if (expression is NewArrayExpression)
-            {
                 return new NewArrayExpressionResolve();
-            }
+
             //表示一个构造函数调用
             else if (expression is NewExpression)
-            {
                 return new NewExpressionResolve();
-            }
+
             //表示具有一元运算符的表达式
             else if (expression is UnaryExpression)
-            {
                 return new UnaryExpressionResolve();
-            }
+
             //表示调用构造函数并初始化新对象的一个或多个成员
             else if (expression is MemberInitExpression)
-            {
                 return new MemberInitExpressionResolve();
-            }
+
             //表示包含集合初始值设定项的构造函数调用
             else if (expression is ListInitExpression)
-            {
                 return new ListInitExpressionResolve();
-            }
+
             //表示将委托或lambda表达式应用于参数表达式列表的表达式
             else if (expression is InvocationExpression)
-            {                
                 return new InvocationExpressionResolve();
-            }
+
             //描述一个lambda表达式
             else if (expression is LambdaExpression)
-            {
                 return new LambdaExpressionResolve();
-            }
+
             //表示命名参数表达式
             else if (expression is ParameterExpression)
-            {
                 return new ParameterExpressionResolve();
-            }
             #endregion
 
-            #region Unimplementation Of Expression
+            #region NotImplemented Expression
             else if (expression is BlockExpression)
-            {
-                throw new NotImplementedException("未实现的BlockExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(BlockExpression)}");
+
             else if (expression is ConditionalExpression)
-            {
-                throw new NotImplementedException("未实现的ConditionalExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(ConditionalExpression)}");
+
             else if (expression is DebugInfoExpression)
-            {
-                throw new NotImplementedException("未实现的DebugInfoExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(DebugInfoExpression)}");
+
             else if (expression is DefaultExpression)
-            {
-                throw new NotImplementedException("未实现的DefaultExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(DefaultExpression)}");
+
             else if (expression is DynamicExpression)
-            {
-                throw new NotImplementedException("未实现的DynamicExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(DynamicExpression)}");
+
             else if (expression is GotoExpression)
-            {
-                throw new NotImplementedException("未实现的GotoExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(GotoExpression)}");
+
             else if (expression is IndexExpression)
-            {
-                throw new NotImplementedException("未实现的IndexExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(IndexExpression)}");
+
             else if (expression is LabelExpression)
-            {
-                throw new NotImplementedException("未实现的LabelExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(LabelExpression)}");
+
             else if (expression is LoopExpression)
-            {
-                throw new NotImplementedException("未实现的LoopExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(LoopExpression)}");
+
             else if (expression is RuntimeVariablesExpression)
-            {
-                throw new NotImplementedException("未实现的RuntimeVariablesExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(LoopExpression)}");
+
             else if (expression is SwitchExpression)
-            {
-                throw new NotImplementedException("未实现的SwitchExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(SwitchExpression)}");
+
             else if (expression is TryExpression)
-            {
-                throw new NotImplementedException("未实现的TryExpression2Sql");
-            }
+                throw new NotImplementedException($"NotImplemented {nameof(TryExpression)}");
+
             else if (expression is TypeBinaryExpression)
-            {
-                throw new NotImplementedException("未实现的TypeBinaryExpression2Sql");
-            }
-            throw new NotImplementedException("未实现的Expression2Sql");
+                throw new NotImplementedException($"NotImplemented {nameof(TypeBinaryExpression)}");
+
+            else
+                throw new NotImplementedException($"NotImplemented {nameof(Expression)}");
             #endregion
         }
         #endregion

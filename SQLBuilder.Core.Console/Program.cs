@@ -321,7 +321,7 @@ namespace SQLBuilder.Core
                 SqlBuilder.Select<UserInfo>(u => u.Id)
                           .Where(
                                 u => u.Name == "b" && (u.Id > 2 && u.Name != null && (u.Email == "11" || u.Email == "22" || u.Email == "ee"))
-                          ).PageByWith(10, 1, "Id"),
+                          ).Page(10, 1, "Id"),
                 "查询单表，带多个where条件 分页3"
             );
 
@@ -330,7 +330,7 @@ namespace SQLBuilder.Core
                           .Where(o => o.Score != null)
                           .AndWhere(o => o.Name == "")
                           .OrWhere(o => o.Subject == "")
-                          .PageByWith(3, 2, "Id"),
+                          .Page(3, 2, "Id"),
               "查询单表，带多个where条件 分页4"
             );
             #endregion

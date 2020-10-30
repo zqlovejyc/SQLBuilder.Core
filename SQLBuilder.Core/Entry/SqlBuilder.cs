@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -47,8 +47,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue);
         }
         #endregion
 
@@ -67,8 +66,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete();
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete();
         }
         #endregion
 
@@ -91,8 +89,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue);
         }
         #endregion
 
@@ -113,8 +110,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -135,8 +131,7 @@ namespace SQLBuilder.Core.Entry
             where T : class
             where T2 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -159,8 +154,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -185,8 +179,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -213,8 +206,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -243,8 +235,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -275,8 +266,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -309,8 +299,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -345,8 +334,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
 
         /// <summary>
@@ -383,8 +371,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
         }
         #endregion
 
@@ -405,8 +392,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression);
         }
         #endregion
 
@@ -427,8 +413,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression);
         }
         #endregion
 
@@ -449,8 +434,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression);
         }
         #endregion
 
@@ -471,8 +455,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression);
         }
         #endregion
 
@@ -493,8 +476,7 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = true)
             where T : class
         {
-            var builder = new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression);
-            return builder;
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression);
         }
         #endregion
 
@@ -505,8 +487,7 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <returns>string</returns>
-        public static string GetTableName<T>(bool isEnableFormat = true)
-            where T : class
+        public static string GetTableName<T>(bool isEnableFormat = true) where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetTableName();
         }
@@ -519,8 +500,7 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T"></typeparam>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <returns></returns>
-        public static List<string> GetPrimaryKey<T>(bool isEnableFormat = true)
-            where T : class
+        public static List<string> GetPrimaryKey<T>(bool isEnableFormat = true) where T : class
         {
             return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetPrimaryKey();
         }

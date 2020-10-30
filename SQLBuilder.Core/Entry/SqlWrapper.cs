@@ -43,7 +43,7 @@ namespace SQLBuilder.Core.Entry
     /// <summary>
     /// SqlWrapper
     /// </summary>
-    public class SqlWrapper
+	public class SqlWrapper
     {
         #region Private Field
         /// <summary>
@@ -110,15 +110,15 @@ namespace SQLBuilder.Core.Entry
         {
             get
             {
-                switch (this.DatabaseType)
+                return this.DatabaseType switch
                 {
-                    case DatabaseType.Sqlite: return "@";
-                    case DatabaseType.SqlServer: return "@";
-                    case DatabaseType.MySql: return "?";
-                    case DatabaseType.Oracle: return ":";
-                    case DatabaseType.PostgreSql: return ":";
-                    default: return "";
-                }
+                    DatabaseType.Sqlite => "@",
+                    DatabaseType.SqlServer => "@",
+                    DatabaseType.MySql => "?",
+                    DatabaseType.Oracle => ":",
+                    DatabaseType.PostgreSql => ":",
+                    _ => "",
+                };
             }
         }
 
@@ -129,15 +129,15 @@ namespace SQLBuilder.Core.Entry
         {
             get
             {
-                switch (this.DatabaseType)
+                return this.DatabaseType switch
                 {
-                    case DatabaseType.Sqlite: return "\"{0}\"";
-                    case DatabaseType.SqlServer: return "[{0}]";
-                    case DatabaseType.MySql: return "`{0}`";
-                    case DatabaseType.Oracle: return "\"{0}\"";
-                    case DatabaseType.PostgreSql: return "\"{0}\"";
-                    default: return "{0}";
-                }
+                    DatabaseType.Sqlite => "\"{0}\"",
+                    DatabaseType.SqlServer => "[{0}]",
+                    DatabaseType.MySql => "`{0}`",
+                    DatabaseType.Oracle => "\"{0}\"",
+                    DatabaseType.PostgreSql => "\"{0}\"",
+                    _ => "{0}",
+                };
             }
         }
         #endregion
@@ -200,9 +200,8 @@ namespace SQLBuilder.Core.Entry
         public void AddDbParameter(object parameterValue, string parameterKey = null)
         {
             if (parameterValue == null || parameterValue == DBNull.Value)
-            {
                 this.Sql.Append("NULL");
-            }
+
             else if (parameterKey.IsNullOrEmpty())
             {
                 var name = this.DbParamPrefix + "p__" + (this.DbParameters.Count + 1);
@@ -302,24 +301,18 @@ namespace SQLBuilder.Core.Entry
             if (type.GetFirstOrDefaultAttribute<CusTableAttribute>() is CusTableAttribute cta)
             {
                 if (!cta.Name.IsNullOrEmpty())
-                {
                     tableName = this.GetFormatName(cta.Name);
-                }
+
                 if (!cta.Schema.IsNullOrEmpty())
-                {
                     tableName = $"{this.GetFormatName(cta.Schema)}.{tableName}";
-                }
             }
             else if (type.GetFirstOrDefaultAttribute<SysTableAttribute>() is SysTableAttribute sta)
             {
                 if (!sta.Name.IsNullOrEmpty())
-                {
                     tableName = this.GetFormatName(sta.Name);
-                }
+
                 if (!sta.Schema.IsNullOrEmpty())
-                {
                     tableName = $"{this.GetFormatName(sta.Schema)}.{tableName}";
-                }
             }
             return tableName;
         }
@@ -347,11 +340,11 @@ namespace SQLBuilder.Core.Entry
             var isInsert = true;
             var isUpdate = true;
             var props = type.GetProperties();
+
             var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
             if (!isHaveColumnAttribute)
-            {
                 isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
-            }
+
             if (isHaveColumnAttribute)
             {
                 if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
@@ -361,9 +354,7 @@ namespace SQLBuilder.Core.Entry
                     isUpdate = cca.Update;
                 }
                 else if (member?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
-                {
                     columnName = sca.Name;
-                }
                 else
                 {
                     var p = props.Where(x => x.Name == member?.Name).FirstOrDefault();
@@ -374,12 +365,12 @@ namespace SQLBuilder.Core.Entry
                         isUpdate = cus.Update;
                     }
                     else if (p?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
-                    {
                         columnName = sys.Name;
-                    }
                 }
             }
-            columnName = columnName ?? member?.Name;
+
+            columnName ??= member?.Name;
+
             //判断列是否是Key
             if (member?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
             {
@@ -388,9 +379,8 @@ namespace SQLBuilder.Core.Entry
                     columnName = cka.Name;
             }
             else if (member?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
-            {
                 isUpdate = false;
-            }
+
             return (this.GetColumnName(columnName), isInsert, isUpdate);
         }
         #endregion
@@ -405,30 +395,27 @@ namespace SQLBuilder.Core.Entry
         {
             var result = new List<(string key, string property)>();
             var props = type.GetProperties();
+
             var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
             if (!isHaveColumnAttribute)
-            {
                 isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
-            }
+
             if (isHaveColumnAttribute)
             {
                 var properties = props.Where(x => x.ContainsAttribute<CusKeyAttribute>()).ToList();
                 if (properties.Count() == 0)
-                {
                     properties = props.Where(x => x.ContainsAttribute<SysKeyAttribute>()).ToList();
-                }
+
                 foreach (var property in properties)
                 {
                     var propertyName = property?.Name;
                     string keyName = null;
+
                     if (property?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
-                    {
                         keyName = cka.Name ?? propertyName;
-                    }
                     else if (property?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
-                    {
                         keyName = propertyName;
-                    }
+
                     result.Add((this.GetColumnName(keyName), propertyName));
                 }
             }

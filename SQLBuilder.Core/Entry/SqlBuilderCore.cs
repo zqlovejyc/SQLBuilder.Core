@@ -564,7 +564,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
         {
             var alias = GetExpressionNames(expression, typeof(T2)).Last().alias;
-            var joinTableName = this.sqlWrapper.GetTableName(typeof(T2));
+            var tableName = this.sqlWrapper.GetTableName(typeof(T2));
 
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
@@ -572,14 +572,14 @@ namespace SQLBuilder.Core.Entry
              * this.sqlWrapper.SetTableAlias(joinTableName, alias);
              */
 
-            var tableAlias = this.sqlWrapper.GetTableAlias(joinTableName, alias);
+            var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);
 
             var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
 
             if (tableAlias.IsNullOrEmpty())
                 @as = "";
 
-            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {joinTableName}{@as}{tableAlias} ON ");
+            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableName}{@as}{tableAlias} ON ");
 
             SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
 
@@ -599,7 +599,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
         {
             var alias = GetExpressionNames(expression, typeof(T3)).Last().alias;
-            var joinTableName = this.sqlWrapper.GetTableName(typeof(T3));
+            var tableName = this.sqlWrapper.GetTableName(typeof(T3));
 
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
@@ -607,12 +607,12 @@ namespace SQLBuilder.Core.Entry
              * this.sqlWrapper.SetTableAlias(joinTableName, alias);
              */
 
-            var tableAlias = this.sqlWrapper.GetTableAlias(joinTableName, alias);
+            var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);
 
             //Oracle表别名不支持AS关键字，列别名支持；
             var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
 
-            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {joinTableName}{@as}{tableAlias} ON ");
+            this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableName}{@as}{tableAlias} ON ");
 
             SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
 
@@ -1370,14 +1370,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(string sql)
         {
             var str = this.sqlWrapper.ToString();
+
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " AND ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper += sql;
 
@@ -1413,14 +1410,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(StringBuilder sql)
         {
             var str = this.sqlWrapper.ToString();
+
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " AND ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper.Sql.Append(sql);
 
@@ -1456,14 +1450,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere(Expression expression)
         {
             var sql = this.sqlWrapper.ToString();
+
             if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " AND ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper += "(";
             SqlExpressionProvider.Where(expression, this.sqlWrapper);
@@ -1895,14 +1886,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(string sql)
         {
             var str = this.sqlWrapper.ToString();
+
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " OR ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper += sql;
 
@@ -1938,14 +1926,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(StringBuilder sql)
         {
             var str = this.sqlWrapper.ToString();
+
             if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " OR ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper.Sql.Append(sql);
 
@@ -1981,14 +1966,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere(Expression expression)
         {
             var sql = this.sqlWrapper.ToString();
+
             if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
-            {
                 this.sqlWrapper += " OR ";
-            }
             else
-            {
                 this.sqlWrapper += " WHERE ";
-            }
 
             this.sqlWrapper += "(";
             SqlExpressionProvider.Where(expression, this.sqlWrapper);
@@ -3465,17 +3447,19 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WithKey(T entity)
         {
             if (entity == null)
-            {
                 throw new ArgumentNullException("实体参数不能为空！");
-            }
+
             var sql = this.sqlWrapper.ToString().ToUpper();
+
             if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
-            {
                 throw new ArgumentException("此方法只能用于Select、Update、Delete方法！");
-            }
+
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && entity != null)
             {
@@ -3512,21 +3496,21 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WithKey(params dynamic[] keyValue)
         {
             if (keyValue == null)
-            {
                 throw new ArgumentNullException("keyValue不能为空！");
-            }
+
             if (!keyValue.Any(o => o.GetType().IsValueType || o.GetType() == typeof(string)))
-            {
                 throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
-            }
+
             var sql = this.sqlWrapper.ToString().ToUpper();
             if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
-            {
                 throw new ArgumentException("WithKey方法只能用于Select、Update、Delete方法！");
-            }
+
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
             if (keys.Count > 0 && keyValue != null)
             {
@@ -4070,27 +4054,25 @@ namespace SQLBuilder.Core.Entry
             if (!sql.IsNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
-                if (parameters != null) this.sqlWrapper.DbParameters = parameters;
+                if (parameters != null)
+                    this.sqlWrapper.DbParameters = parameters;
             }
+
             sql = sql.IsNullOrEmpty() ? this.sqlWrapper.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
             //SQLServer
             if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 if (sqlserverVersionGt10)
-                {
                     sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} OFFSET {((pageIndex - 1) * pageSize)} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
-                }
                 else
-                {
                     sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};");
-                }
             }
 
             //Oracle，注意Oracle需要分开查询总条数和分页数据
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
-                sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS RowNumber FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE T.RowNumber >= {pageSize * (pageIndex - 1) + 1}");
+                sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
@@ -4150,6 +4132,7 @@ namespace SQLBuilder.Core.Entry
                 if (parameters != null)
                     this.sqlWrapper.DbParameters = parameters;
             }
+
             sql = sql.IsNullOrEmpty() ? this.sqlWrapper.Sql.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
             //SQLServer
@@ -4168,7 +4151,7 @@ namespace SQLBuilder.Core.Entry
             //Oracle，注意Oracle需要分开查询总条数和分页数据
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
-                sb.Append($"{sql},R AS (SELECT ROWNUM AS RowNumber,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE RowNumber>={pageSize * (pageIndex - 1) + 1}");
+                sb.Append($"{sql},R AS (SELECT ROWNUM AS \"ROWNUMBER\",T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE \"ROWNUMBER\">={pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
@@ -4300,14 +4283,12 @@ namespace SQLBuilder.Core.Entry
         {
             this.sqlWrapper.Clear();
             this.sqlWrapper.IsSingleTable = true;
+
             if (expression == null)
-            {
                 this.sqlWrapper.Sql.Append($"SELECT COUNT(*) FROM {this.sqlWrapper.GetTableName(typeof(T))}");
-            }
             else
-            {
                 SqlExpressionProvider.Count(expression.Body, this.sqlWrapper);
-            }
+
             return this;
         }
         #endregion
@@ -4338,13 +4319,9 @@ namespace SQLBuilder.Core.Entry
             if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 if (this.sqlWrapper.Sql.ToString().ToUpper().Contains("DISTINCT"))
-                {
                     this.sqlWrapper.Sql.Replace("DISTINCT", $"DISTINCT TOP {topNumber}", this.sqlWrapper.Sql.ToString().IndexOf("DISTINCT"), 8);
-                }
                 else
-                {
                     this.sqlWrapper.Sql.Replace("SELECT", $"SELECT TOP {topNumber}", this.sqlWrapper.Sql.ToString().IndexOf("SELECT"), 6);
-                }
             }
             else if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {

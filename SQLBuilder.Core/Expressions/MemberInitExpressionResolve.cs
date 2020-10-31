@@ -41,23 +41,29 @@ namespace SQLBuilder.Core.Expressions
         {
             if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                 sqlWrapper.Sql.Append("(");
+
             var fields = new List<string>();
             foreach (MemberAssignment m in expression.Bindings)
             {
-                var type = m.Member.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : m.Member.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
+                var type = m.Member.DeclaringType.ToString().Contains("AnonymousType") ?
+                    sqlWrapper.DefaultType :
+                    m.Member.DeclaringType;
+
+                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
                 if (isInsert)
                 {
                     var value = m.Expression.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
                         sqlWrapper.AddDbParameter(value);
-                        if (!fields.Contains(columnName)) fields.Add(columnName);
+                        if (!fields.Contains(columnName))
+                            fields.Add(columnName);
                         sqlWrapper += ",";
                     }
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
             {
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -65,6 +71,7 @@ namespace SQLBuilder.Core.Expressions
                 else
                     sqlWrapper.Sql.Append(" FROM DUAL");
             }
+
             sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlWrapper;
         }
@@ -79,8 +86,11 @@ namespace SQLBuilder.Core.Expressions
         {
             foreach (MemberAssignment m in expression.Bindings)
             {
-                var type = m.Member.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : m.Member.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
+                var type = m.Member.DeclaringType.ToString().Contains("AnonymousType") ?
+                    sqlWrapper.DefaultType :
+                    m.Member.DeclaringType;
+
+                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
                 if (isUpdate)
                 {
                     var value = m.Expression.ToObject();
@@ -92,8 +102,10 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             return sqlWrapper;
         }
         #endregion

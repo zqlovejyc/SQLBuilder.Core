@@ -42,8 +42,11 @@ namespace SQLBuilder.Core.Expressions
             for (int i = 0; i < expression.Members.Count; i++)
             {
                 var m = expression.Members[i];
-                var t = m.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : m.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(t, m);
+                var t = m.DeclaringType.ToString().Contains("AnonymousType") ?
+                    sqlWrapper.DefaultType :
+                    m.DeclaringType;
+
+                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(t, m);
                 if (isUpdate)
                 {
                     var value = expression.Arguments[i]?.ToObject();
@@ -55,10 +58,10 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
-            {
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
-            }
+
             return sqlWrapper;
         }
 
@@ -72,12 +75,16 @@ namespace SQLBuilder.Core.Expressions
         {
             if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                 sqlWrapper.Sql.Append("(");
+
             var fields = new List<string>();
             for (int i = 0; i < expression.Members?.Count; i++)
             {
                 var m = expression.Members[i];
-                var t = m.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : m.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(t, m);
+                var t = m.DeclaringType.ToString().Contains("AnonymousType") ?
+                    sqlWrapper.DefaultType :
+                    m.DeclaringType;
+
+                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(t, m);
                 if (isInsert)
                 {
                     var value = expression.Arguments[i]?.ToObject();
@@ -90,7 +97,8 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
             {
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -98,7 +106,9 @@ namespace SQLBuilder.Core.Expressions
                 else
                     sqlWrapper.Sql.Append(" FROM DUAL");
             }
+
             sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+
             return sqlWrapper;
         }
 
@@ -118,10 +128,11 @@ namespace SQLBuilder.Core.Expressions
 
                 //添加字段别名
                 if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
-                    sqlWrapper.SelectFields[sqlWrapper.SelectFields.Count - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
                 else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
-                    sqlWrapper.SelectFields[sqlWrapper.SelectFields.Count - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
             }
+
             return sqlWrapper;
         }
 
@@ -138,7 +149,9 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.GroupBy(item, sqlWrapper);
                 sqlWrapper += ",";
             }
+
             sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             return sqlWrapper;
         }
 
@@ -154,12 +167,15 @@ namespace SQLBuilder.Core.Expressions
             for (var i = 0; i < expression.Arguments.Count; i++)
             {
                 SqlExpressionProvider.OrderBy(expression.Arguments[i], sqlWrapper);
+
                 if (i <= orders.Length - 1)
                     sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                 else
                     sqlWrapper += " ASC,";
             }
+
             sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             return sqlWrapper;
         }
         #endregion

@@ -53,8 +53,11 @@ namespace SQLBuilder.Core.Expressions
                 var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : p.DeclaringType;
-                    (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, p);
+                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ?
+                        sqlWrapper.DefaultType :
+                        p.DeclaringType;
+
+                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                     if (isInsert)
                     {
                         var value = p.GetValue(array.ElementAt(i), null);
@@ -67,7 +70,8 @@ namespace SQLBuilder.Core.Expressions
                         }
                     }
                 }
-                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+                if (sqlWrapper[^1] == ',')
                 {
                     sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -76,9 +80,12 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Sql.Append(" FROM DUAL");
                 }
             }
-            if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+
             sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+
             return sqlWrapper;
         }
 
@@ -99,6 +106,7 @@ namespace SQLBuilder.Core.Expressions
                 }
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
+
             return sqlWrapper;
         }
 
@@ -127,6 +135,7 @@ namespace SQLBuilder.Core.Expressions
                 }
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
             }
+
             return sqlWrapper;
         }
         #endregion

@@ -36,6 +36,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Where(InvocationExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Where(expression.Expression, sqlWrapper);
+
             return sqlWrapper;
         }
         #endregion

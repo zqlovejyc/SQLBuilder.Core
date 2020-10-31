@@ -42,9 +42,12 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.In(expressionItem, sqlWrapper);
                 sqlWrapper += ",";
             }
-            if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+
             sqlWrapper += ")";
+
             return sqlWrapper;
         }
 
@@ -65,7 +68,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += ",";
             }
 
-            if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
 
             if (sqlWrapper.Sql.ToString().LastIndexOf(" UNION ALL SELECT ") > -1)
@@ -86,7 +89,9 @@ namespace SQLBuilder.Core.Expressions
             {
                 SqlExpressionProvider.GroupBy(expression.Expressions[i], sqlWrapper);
             }
+
             sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             return sqlWrapper;
         }
 
@@ -102,10 +107,9 @@ namespace SQLBuilder.Core.Expressions
             for (var i = 0; i < expression.Expressions.Count; i++)
             {
                 SqlExpressionProvider.OrderBy(expression.Expressions[i], sqlWrapper);
+
                 if (i <= orders.Length - 1)
-                {
                     sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                }
                 else if (expression.Expressions[i] is ConstantExpression order)
                 {
                     if (!order.Value.ToString().ToUpper().Contains("ASC") && !order.Value.ToString().ToUpper().Contains("DESC"))
@@ -114,11 +118,11 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper += ",";
                 }
                 else
-                {
                     sqlWrapper += " ASC,";
-                }
             }
+
             sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             return sqlWrapper;
         }
         #endregion

@@ -37,6 +37,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Select(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Select(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -49,6 +50,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Insert(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Insert(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -61,6 +63,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Update(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Update(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -73,10 +76,12 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Where(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             var startIndex = sqlWrapper.Length;
+
             SqlExpressionProvider.Where(expression.Operand, sqlWrapper);
+
             if (expression.NodeType == ExpressionType.Not)
             {
-                var subString = sqlWrapper.ToString().Substring(startIndex, sqlWrapper.ToString().Length - startIndex).ToUpper();
+                var subString = sqlWrapper.ToString()[startIndex..].ToUpper();
 
                 //IS NOT、IS                     
                 if (subString.Contains("IS NOT"))
@@ -176,6 +181,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Sql.Replace(" <= ", " > ", index, 4);
                 }
             }
+
             return sqlWrapper;
         }
 
@@ -188,6 +194,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper GroupBy(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.GroupBy(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -201,6 +208,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper OrderBy(UnaryExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             SqlExpressionProvider.OrderBy(expression.Operand, sqlWrapper, orders);
+
             return sqlWrapper;
         }
 
@@ -213,6 +221,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Max(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Max(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -225,6 +234,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Min(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Min(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -237,6 +247,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Avg(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Avg(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -249,6 +260,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Count(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Count(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -261,6 +273,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Sum(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Sum(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -273,6 +286,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Join(UnaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Join(expression.Operand, sqlWrapper);
+
             return sqlWrapper;
         }
         #endregion

@@ -47,9 +47,8 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper.SelectFields.Add($"{tableAlias}*");
             }
             else
-            {
                 sqlWrapper.SelectFields.Add(expression.Value.ToString());
-            }
+
             return sqlWrapper;
         }
 
@@ -66,14 +65,11 @@ namespace SQLBuilder.Core.Expressions
             {
                 var sql = sqlWrapper.ToString().ToUpper().Trim();
                 if (!b && (sql.EndsWith("WHERE") || sql.EndsWith("AND") || sql.EndsWith("OR")))
-                {
                     sqlWrapper += " 1 = 0 ";
-                }
             }
             else
-            {
                 sqlWrapper.AddDbParameter(expression.Value);
-            }
+
             return sqlWrapper;
         }
 
@@ -93,9 +89,8 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += " 1 = 0 ";
             }
             else
-            {
                 sqlWrapper.AddDbParameter(expression.Value);
-            }
+
             return sqlWrapper;
         }
 
@@ -108,6 +103,7 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper In(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             sqlWrapper.AddDbParameter(expression.Value);
+
             return sqlWrapper;
         }
 
@@ -125,6 +121,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             sqlWrapper += tableAlias + sqlWrapper.GetColumnName(expression.Value.ToString()) + ",";
+
             return sqlWrapper;
         }
 

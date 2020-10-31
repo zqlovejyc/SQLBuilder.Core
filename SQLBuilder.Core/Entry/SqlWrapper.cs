@@ -43,7 +43,7 @@ namespace SQLBuilder.Core.Entry
     /// <summary>
     /// SqlWrapper
     /// </summary>
-	public class SqlWrapper
+    public class SqlWrapper
     {
         #region Private Field
         /// <summary>
@@ -155,7 +155,7 @@ namespace SQLBuilder.Core.Entry
         #endregion
 
         #region Public Methods
-        #region this[index]
+        #region [index]
         /// <summary>
         /// 索引器
         /// </summary>
@@ -164,7 +164,7 @@ namespace SQLBuilder.Core.Entry
         public char this[int index] => this.Sql[index];
         #endregion
 
-        #region operator +
+        #region +
         /// <summary>
         /// 操作符
         /// </summary>
@@ -347,7 +347,7 @@ namespace SQLBuilder.Core.Entry
 
             if (isHaveColumnAttribute)
             {
-                if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
+                if (member?.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
                 {
                     columnName = cca.Name;
                     isInsert = cca.Insert;
@@ -378,8 +378,20 @@ namespace SQLBuilder.Core.Entry
                 if (!cka.Name.IsNullOrEmpty() && cka.Name != columnName)
                     columnName = cka.Name;
             }
-            else if (member?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
+            else if (member?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
                 isUpdate = false;
+            else
+            {
+                var p = props.Where(x => x.Name == member?.Name).FirstOrDefault();
+                if (p?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
+                {
+                    isUpdate = false;
+                    if (!cus.Name.IsNullOrEmpty() && cus.Name != columnName)
+                        columnName = cus.Name;
+                }
+                else if (p?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                    isUpdate = false;
+            }
 
             return (this.GetColumnName(columnName), isInsert, isUpdate);
         }
@@ -390,7 +402,7 @@ namespace SQLBuilder.Core.Entry
         /// 获取主键
         /// </summary>
         /// <param name="type">类型</param>
-        /// <returns>Tuple</returns>
+        /// <returns>List Tuple</returns>
         public List<(string key, string property)> GetPrimaryKey(Type type)
         {
             var result = new List<(string key, string property)>();

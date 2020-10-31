@@ -43,35 +43,44 @@ namespace SQLBuilder.Core.Expressions
             var objectArray = new List<object>();
             var fields = new List<string>();
             var obj = expression.ToObject();
+
             if (obj.GetType().IsArray)
                 objectArray.AddRange(obj as object[]);
             else if (obj.GetType().Name == "List`1")
                 objectArray.AddRange(obj as IEnumerable<object>);
             else
                 objectArray.Add(obj);
+
             for (var i = 0; i < objectArray.Count; i++)
             {
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                     sqlWrapper.Sql.Append("(");
+
                 if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
                     sqlWrapper.Sql.Append(" UNION ALL SELECT ");
+
                 var properties = objectArray[i]?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : p.DeclaringType;
-                    (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, p);
+                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ?
+                        sqlWrapper.DefaultType :
+                        p.DeclaringType;
+
+                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                     if (isInsert)
                     {
                         var value = p.GetValue(objectArray[i], null);
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
                             sqlWrapper.AddDbParameter(value);
-                            if (!fields.Contains(columnName)) fields.Add(columnName);
+                            if (!fields.Contains(columnName))
+                                fields.Add(columnName);
                             sqlWrapper += ",";
                         }
                     }
                 }
-                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+                if (sqlWrapper[^1] == ',')
                 {
                     sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -80,9 +89,12 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Sql.Append(" FROM DUAL");
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+
             sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+
             return sqlWrapper;
         }
 
@@ -96,10 +108,14 @@ namespace SQLBuilder.Core.Expressions
         {
             var obj = expression.ToObject();
             var properties = obj?.GetType().GetProperties();
+
             foreach (var item in properties)
             {
-                var type = item.DeclaringType.ToString().Contains("AnonymousType") ? sqlWrapper.DefaultType : item.DeclaringType;
-                (string columnName, bool isInsert, bool isUpdate) = sqlWrapper.GetColumnInfo(type, item);
+                var type = item.DeclaringType.ToString().Contains("AnonymousType") ?
+                    sqlWrapper.DefaultType :
+                    item.DeclaringType;
+
+                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, item);
                 if (isUpdate)
                 {
                     var value = item.GetValue(obj, null);
@@ -111,10 +127,10 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
-            {
+
+            if (sqlWrapper[^1] == ',')
                 sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
-            }
+
             return sqlWrapper;
         }
 
@@ -140,6 +156,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             sqlWrapper.SelectFields.Add(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+
             return sqlWrapper;
         }
 
@@ -163,6 +180,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+
             return sqlWrapper;
         }
 
@@ -175,11 +193,9 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper Where(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             //此处判断expression的Member是否是可空值类型
-            if (expression.Expression?.NodeType == ExpressionType.MemberAccess &&
-                expression.Member.DeclaringType.IsNullable())
-            {
+            if (expression.Expression?.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType.IsNullable())
                 expression = expression.Expression as MemberExpression;
-            }
+
             if (expression != null)
             {
                 if (expression.Expression?.NodeType == ExpressionType.Parameter)
@@ -187,23 +203,24 @@ namespace SQLBuilder.Core.Expressions
                     var type = expression.Expression.Type != expression.Member.DeclaringType ?
                                expression.Expression.Type :
                                expression.Member.DeclaringType;
+
                     var tableName = sqlWrapper.GetTableName(type);
                     var tableAlias = (expression.Expression as ParameterExpression)?.Name;
                     tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
-                    if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+                    if (!tableAlias.IsNullOrEmpty())
+                        tableAlias += ".";
+
                     sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+
                     //字段是bool类型
-                    if (expression.NodeType == ExpressionType.MemberAccess &&
-                        expression.Type.GetCoreType() == typeof(bool))
-                    {
+                    if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
                         sqlWrapper += " = 1";
-                    }
                 }
                 else
-                {
                     sqlWrapper.AddDbParameter(expression.ToObject());
-                }
             }
+
             return sqlWrapper;
         }
 
@@ -224,12 +241,13 @@ namespace SQLBuilder.Core.Expressions
                     SqlExpressionProvider.In(Expression.Constant(item), sqlWrapper);
                     sqlWrapper += ",";
                 }
-                if (sqlWrapper.Sql[sqlWrapper.Sql.Length - 1] == ',')
-                {
+
+                if (sqlWrapper[^1] == ',')
                     sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
-                }
+
                 sqlWrapper += ")";
             }
+
             return sqlWrapper;
         }
 
@@ -254,22 +272,23 @@ namespace SQLBuilder.Core.Expressions
             }
 
             if (expression.Expression.NodeType == ExpressionType.Constant)
-            {
                 tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
-            }
 
             tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
-            if (!tableAlias.IsNullOrEmpty()) tableAlias += ".";
+
+            if (!tableAlias.IsNullOrEmpty())
+                tableAlias += ".";
+
             if (expression.Expression.NodeType == ExpressionType.Parameter)
-            {
                 sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
-            }
+
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
                 var obj = expression.ToObject();
                 if (obj != null)
                 {
                     var type = obj.GetType().Name;
+
                     if (type == "String[]" && obj is string[] array)
                     {
                         foreach (var item in array)
@@ -278,6 +297,7 @@ namespace SQLBuilder.Core.Expressions
                         }
                         sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
+
                     if (type == "List`1" && obj is List<string> list)
                     {
                         foreach (var item in list)
@@ -286,6 +306,7 @@ namespace SQLBuilder.Core.Expressions
                         }
                         sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
+
                     if (type == "String" && obj is string str)
                     {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlWrapper);
@@ -293,6 +314,7 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
+
             return sqlWrapper;
         }
 
@@ -315,10 +337,9 @@ namespace SQLBuilder.Core.Expressions
                            expression.Member.DeclaringType;
                 tableName = sqlWrapper.GetTableName(type);
             }
+
             if (expression.Expression.NodeType == ExpressionType.Constant)
-            {
                 tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
-            }
 
             tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
 
@@ -331,52 +352,46 @@ namespace SQLBuilder.Core.Expressions
                 if (orders?.Length > 0)
                     sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }
+
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
                 var obj = expression.ToObject();
                 if (obj != null)
                 {
                     var type = obj.GetType().Name;
+
                     if (type == "String[]" && obj is string[] array)
                     {
                         for (var i = 0; i < array.Length; i++)
                         {
                             SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
+
                             if (i <= orders.Length - 1)
-                            {
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            }
                             else if (!array[i].ToUpper().Contains("ASC") && !array[i].ToUpper().Contains("DESC"))
-                            {
                                 sqlWrapper += " ASC,";
-                            }
                             else
-                            {
                                 sqlWrapper += ",";
-                            }
                         }
                         sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
+
                     if (type == "List`1" && obj is List<string> list)
                     {
                         for (var i = 0; i < list.Count; i++)
                         {
                             SqlExpressionProvider.OrderBy(Expression.Constant(list[i], list[i].GetType()), sqlWrapper);
+
                             if (i <= orders.Length - 1)
-                            {
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            }
                             else if (!list[i].ToUpper().Contains("ASC") && !list[i].ToUpper().Contains("DESC"))
-                            {
                                 sqlWrapper += " ASC,";
-                            }
                             else
-                            {
                                 sqlWrapper += ",";
-                            }
                         }
                         sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                     }
+
                     if (type == "String" && obj is string str)
                     {
                         SqlExpressionProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlWrapper);
@@ -384,18 +399,16 @@ namespace SQLBuilder.Core.Expressions
                         if (!str.Contains("ASC") && !str.Contains("DESC"))
                         {
                             if (orders.Length >= 1)
-                            {
                                 sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";
-                            }
                             else
-                            {
                                 sqlWrapper += " ASC,";
-                            }
+
                             sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
                         }
                     }
                 }
             }
+
             return sqlWrapper;
         }
 
@@ -410,7 +423,9 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             sqlWrapper.Sql.Append($"SELECT MAX({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+
             return sqlWrapper;
         }
 
@@ -425,7 +440,9 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             sqlWrapper.Sql.Append($"SELECT MIN({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+
             return sqlWrapper;
         }
 
@@ -440,7 +457,9 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             sqlWrapper.Sql.Append($"SELECT AVG({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+
             return sqlWrapper;
         }
 
@@ -455,7 +474,9 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             sqlWrapper.Sql.Append($"SELECT COUNT({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+
             return sqlWrapper;
         }
 
@@ -470,7 +491,9 @@ namespace SQLBuilder.Core.Expressions
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
+
             sqlWrapper.Sql.Append($"SELECT SUM({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+
             return sqlWrapper;
         }
         #endregion

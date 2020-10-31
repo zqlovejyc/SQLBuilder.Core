@@ -36,6 +36,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Where(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Where(expression.Body, sqlWrapper);
+
             return sqlWrapper;
         }
 
@@ -48,6 +49,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Select(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Select(expression.Body, sqlWrapper);
+
             return sqlWrapper;
         }
         #endregion

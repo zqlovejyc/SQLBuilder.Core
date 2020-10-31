@@ -563,6 +563,7 @@ namespace SQLBuilder.Core.Entry
 
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);
 
+            //Oracle表别名不支持AS关键字，列别名支持；
             var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
 
             if (tableAlias.IsNullOrEmpty())
@@ -600,6 +601,9 @@ namespace SQLBuilder.Core.Entry
 
             //Oracle表别名不支持AS关键字，列别名支持；
             var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
+
+            if (tableAlias.IsNullOrEmpty())
+                @as = "";
 
             this.sqlWrapper.Sql.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableName}{@as}{tableAlias} ON ");
 

@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
@@ -1634,6 +1634,18 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("SELECT [g].[Id] FROM [Base_UserInfo] AS [g] WHERE [g].[Id] IS NOT NULL AND [g].[Name] LIKE '%' + @p__1 + '%' ORDER BY [g].[Id] DESC GROUP BY [g].[Id]", query.Sql);
             Assert.AreEqual(1, query.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询86
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_86()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Account>((u, a) => a)
+                                    .InnerJoin<Account>((u, a) => u.Id == a.UserId);
+            Assert.AreEqual("SELECT [a].* FROM [Base_UserInfo] AS [u] INNER JOIN [Base_Account] AS [a] ON [u].[Id] = [a].[UserId]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion
 

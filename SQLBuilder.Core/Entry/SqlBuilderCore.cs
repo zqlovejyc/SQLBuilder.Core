@@ -285,7 +285,9 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select(Expression<Func<T, object>> expression = null)
         {
             var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant)
+            if (expr?.NodeType == ExpressionType.Constant ||
+                expr?.NodeType == ExpressionType.Parameter ||
+                expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
             return this.Select(expr);
@@ -300,11 +302,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select<T2>(Expression<Func<T, T2, object>> expression = null)
             where T2 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -319,11 +317,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -340,11 +334,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -363,11 +353,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -388,11 +374,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -415,11 +397,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -444,11 +422,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -475,11 +449,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -508,11 +478,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
-                expr = expression;
-
-            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+            var sql = this.Select(GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
             return this.Select(expression?.Body, sql);
         }
         #endregion

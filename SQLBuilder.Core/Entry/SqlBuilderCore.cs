@@ -79,26 +79,15 @@ namespace SQLBuilder.Core.Entry
         {
             get
             {
-                DbParameter[] parameters = null;
-                switch (this.sqlWrapper.DatabaseType)
+                return this.sqlWrapper.DatabaseType switch
                 {
-                    case DatabaseType.SqlServer:
-                        parameters = this.sqlWrapper.DbParameters.ToSqlParameters();
-                        break;
-                    case DatabaseType.MySql:
-                        parameters = this.sqlWrapper.DbParameters.ToMySqlParameters();
-                        break;
-                    case DatabaseType.Sqlite:
-                        parameters = this.sqlWrapper.DbParameters.ToSqliteParameters();
-                        break;
-                    case DatabaseType.Oracle:
-                        parameters = this.sqlWrapper.DbParameters.ToOracleParameters();
-                        break;
-                    case DatabaseType.PostgreSql:
-                        parameters = this.sqlWrapper.DbParameters.ToNpgsqlParameters();
-                        break;
-                }
-                return parameters;
+                    DatabaseType.SqlServer => this.sqlWrapper.DbParameters.ToSqlParameters(),
+                    DatabaseType.MySql => this.sqlWrapper.DbParameters.ToMySqlParameters(),
+                    DatabaseType.Sqlite => this.sqlWrapper.DbParameters.ToSqliteParameters(),
+                    DatabaseType.Oracle => this.sqlWrapper.DbParameters.ToOracleParameters(),
+                    DatabaseType.PostgreSql => this.sqlWrapper.DbParameters.ToNpgsqlParameters(),
+                    _ => null
+                };
             }
         }
         #endregion
@@ -150,12 +139,12 @@ namespace SQLBuilder.Core.Entry
 
         #region Select
         /// <summary>
-        /// 获取ParameterExpression别名
+        /// 获取自定义别名及其对应类型
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        private (Type type, string alias)[] GetExpressionNames(Expression expression, params Type[] types)
+        private (Type type, string alias)[] GetExpressionAlias(Expression expression, params Type[] types)
         {
             var list = new List<(Type type, string alias)>();
 
@@ -258,7 +247,7 @@ namespace SQLBuilder.Core.Entry
         {
             var len = this.sqlWrapper.Sql.Length;
 
-            var tableAlias = GetExpressionNames(expression, typeof(T)).FirstOrDefault().alias;
+            var tableAlias = GetExpressionAlias(expression, typeof(T)).FirstOrDefault().alias;
 
             if (sql == null)
                 sql = this.Select((typeof(T), tableAlias));
@@ -315,7 +304,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -334,7 +323,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -355,7 +344,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -378,7 +367,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -403,7 +392,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -430,7 +419,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -459,7 +448,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -490,7 +479,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
             return this.Select(expression?.Body, sql);
         }
 
@@ -523,7 +512,7 @@ namespace SQLBuilder.Core.Entry
             if (expr?.NodeType == ExpressionType.Constant || expr?.NodeType == ExpressionType.New)
                 expr = expression;
 
-            var sql = this.Select(GetExpressionNames(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+            var sql = this.Select(GetExpressionAlias(expr, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
             return this.Select(expression?.Body, sql);
         }
         #endregion
@@ -563,7 +552,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join)
             where T2 : class
         {
-            var alias = GetExpressionNames(expression, typeof(T2)).Last().alias;
+            var alias = GetExpressionAlias(expression, typeof(T2)).Last().alias;
             var tableName = this.sqlWrapper.GetTableName(typeof(T2));
 
             /***
@@ -598,7 +587,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var alias = GetExpressionNames(expression, typeof(T3)).Last().alias;
+            var alias = GetExpressionAlias(expression, typeof(T3)).Last().alias;
             var tableName = this.sqlWrapper.GetTableName(typeof(T3));
 
             /***

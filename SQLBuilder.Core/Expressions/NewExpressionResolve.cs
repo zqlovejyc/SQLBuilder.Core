@@ -21,7 +21,6 @@ using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace SQLBuilder.Core.Expressions
 {

@@ -40,7 +40,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Insert(MemberInitExpression expression, SqlWrapper sqlWrapper)
         {
             if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                sqlWrapper.Sql.Append("(");
+                sqlWrapper.Append("(");
 
             var fields = new List<string>();
             foreach (MemberAssignment m in expression.Bindings)
@@ -65,14 +65,14 @@ namespace SQLBuilder.Core.Expressions
 
             if (sqlWrapper[^1] == ',')
             {
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                    sqlWrapper.Sql.Append(")");
+                    sqlWrapper.Append(")");
                 else
-                    sqlWrapper.Sql.Append(" FROM DUAL");
+                    sqlWrapper.Append(" FROM DUAL");
             }
 
-            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
             return sqlWrapper;
         }
 
@@ -104,7 +104,7 @@ namespace SQLBuilder.Core.Expressions
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }

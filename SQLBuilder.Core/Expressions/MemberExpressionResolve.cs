@@ -29,7 +29,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示访问字段或属性
     /// </summary>
-    public class MemberExpressionResolve : BaseExpression<MemberExpression>
+	public class MemberExpressionResolve : BaseExpression<MemberExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -54,10 +54,10 @@ namespace SQLBuilder.Core.Expressions
             for (var i = 0; i < objectArray.Count; i++)
             {
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                    sqlWrapper.Sql.Append("(");
+                    sqlWrapper.Append("(");
 
                 if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                    sqlWrapper.Sql.Append(" UNION ALL SELECT ");
+                    sqlWrapper.Append(" UNION ALL SELECT ");
 
                 var properties = objectArray[i]?.GetType().GetProperties();
                 foreach (var p in properties)
@@ -82,18 +82,18 @@ namespace SQLBuilder.Core.Expressions
 
                 if (sqlWrapper[^1] == ',')
                 {
-                    sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                        sqlWrapper.Sql.Append("),");
+                        sqlWrapper.Append("),");
                     else
-                        sqlWrapper.Sql.Append(" FROM DUAL");
+                        sqlWrapper.Append(" FROM DUAL");
                 }
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
-            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
 
             return sqlWrapper;
         }
@@ -129,7 +129,7 @@ namespace SQLBuilder.Core.Expressions
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }
@@ -155,7 +155,7 @@ namespace SQLBuilder.Core.Expressions
             if (!tableAlias.IsNullOrEmpty())
                 tableAlias += ".";
 
-            sqlWrapper.SelectFields.Add(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+            sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
 
             return sqlWrapper;
         }
@@ -243,7 +243,7 @@ namespace SQLBuilder.Core.Expressions
                 }
 
                 if (sqlWrapper[^1] == ',')
-                    sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
                 sqlWrapper += ")";
             }
@@ -295,7 +295,7 @@ namespace SQLBuilder.Core.Expressions
                         {
                             SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
                         }
-                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (type == "List`1" && obj is List<string> list)
@@ -304,13 +304,13 @@ namespace SQLBuilder.Core.Expressions
                         {
                             SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
                         }
-                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (type == "String" && obj is string str)
                     {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlWrapper);
-                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
                 }
             }
@@ -373,7 +373,7 @@ namespace SQLBuilder.Core.Expressions
                             else
                                 sqlWrapper += ",";
                         }
-                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (type == "List`1" && obj is List<string> list)
@@ -389,7 +389,7 @@ namespace SQLBuilder.Core.Expressions
                             else
                                 sqlWrapper += ",";
                         }
-                        sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (type == "String" && obj is string str)
@@ -403,7 +403,7 @@ namespace SQLBuilder.Core.Expressions
                             else
                                 sqlWrapper += " ASC,";
 
-                            sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                         }
                     }
                 }
@@ -424,7 +424,7 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            sqlWrapper.Sql.Append($"SELECT MAX({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            sqlWrapper.Append($"SELECT MAX({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }
@@ -441,7 +441,7 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            sqlWrapper.Sql.Append($"SELECT MIN({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            sqlWrapper.Append($"SELECT MIN({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }
@@ -458,7 +458,7 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            sqlWrapper.Sql.Append($"SELECT AVG({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            sqlWrapper.Append($"SELECT AVG({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }
@@ -475,7 +475,7 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            sqlWrapper.Sql.Append($"SELECT COUNT({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            sqlWrapper.Append($"SELECT COUNT({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }
@@ -492,7 +492,7 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            sqlWrapper.Sql.Append($"SELECT SUM({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
+            sqlWrapper.Append($"SELECT SUM({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }

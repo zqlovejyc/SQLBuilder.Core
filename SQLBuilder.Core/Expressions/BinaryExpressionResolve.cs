@@ -42,50 +42,50 @@ namespace SQLBuilder.Core.Expressions
             {
                 case ExpressionType.And:
                 case ExpressionType.AndAlso:
-                    sqlWrapper.Sql.Insert(operatorIndex, " AND ");
+                    sqlWrapper.Insert(operatorIndex, " AND ");
                     break;
                 case ExpressionType.Equal:
                     if (useIs)
-                        sqlWrapper.Sql.Insert(operatorIndex, " IS ");
+                        sqlWrapper.Insert(operatorIndex, " IS ");
                     else
-                        sqlWrapper.Sql.Insert(operatorIndex, " = ");
+                        sqlWrapper.Insert(operatorIndex, " = ");
                     break;
                 case ExpressionType.GreaterThan:
-                    sqlWrapper.Sql.Insert(operatorIndex, " > ");
+                    sqlWrapper.Insert(operatorIndex, " > ");
                     break;
                 case ExpressionType.GreaterThanOrEqual:
-                    sqlWrapper.Sql.Insert(operatorIndex, " >= ");
+                    sqlWrapper.Insert(operatorIndex, " >= ");
                     break;
                 case ExpressionType.NotEqual:
                     if (useIs)
-                        sqlWrapper.Sql.Insert(operatorIndex, " IS NOT ");
+                        sqlWrapper.Insert(operatorIndex, " IS NOT ");
                     else
-                        sqlWrapper.Sql.Insert(operatorIndex, " <> ");
+                        sqlWrapper.Insert(operatorIndex, " <> ");
                     break;
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    sqlWrapper.Sql.Insert(operatorIndex, " OR ");
+                    sqlWrapper.Insert(operatorIndex, " OR ");
                     break;
                 case ExpressionType.LessThan:
-                    sqlWrapper.Sql.Insert(operatorIndex, " < ");
+                    sqlWrapper.Insert(operatorIndex, " < ");
                     break;
                 case ExpressionType.LessThanOrEqual:
-                    sqlWrapper.Sql.Insert(operatorIndex, " <= ");
+                    sqlWrapper.Insert(operatorIndex, " <= ");
                     break;
                 case ExpressionType.Add:
-                    sqlWrapper.Sql.Insert(operatorIndex, " + ");
+                    sqlWrapper.Insert(operatorIndex, " + ");
                     break;
                 case ExpressionType.Subtract:
-                    sqlWrapper.Sql.Insert(operatorIndex, " - ");
+                    sqlWrapper.Insert(operatorIndex, " - ");
                     break;
                 case ExpressionType.Multiply:
-                    sqlWrapper.Sql.Insert(operatorIndex, " * ");
+                    sqlWrapper.Insert(operatorIndex, " * ");
                     break;
                 case ExpressionType.Divide:
-                    sqlWrapper.Sql.Insert(operatorIndex, " / ");
+                    sqlWrapper.Insert(operatorIndex, " / ");
                     break;
                 case ExpressionType.Modulo:
-                    sqlWrapper.Sql.Insert(operatorIndex, " % ");
+                    sqlWrapper.Insert(operatorIndex, " % ");
                     break;
                 default:
                     throw new NotImplementedException("NotImplemented ExpressionType " + expressionNodeType);
@@ -119,7 +119,7 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper += ")";
             }
 
-            var operatorIndex = sqlWrapper.Sql.Length;
+            var operatorIndex = sqlWrapper.Length;
 
             //右侧嵌套
             var rightBinary = expression.Right as BinaryExpression;
@@ -141,8 +141,8 @@ namespace SQLBuilder.Core.Expressions
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
-                var sqlLength = sqlWrapper.Sql.Length;
-                if (sqlLength - operatorIndex == 5 && sqlWrapper.ToString().ToUpper().EndsWith("NULL"))
+                var sqlLength = sqlWrapper.Length;
+                if (sqlLength - operatorIndex == 5 && sqlWrapper.EndsWith("NULL"))
                     OperatorParser(expression.NodeType, operatorIndex, sqlWrapper, true);
                 else
                     OperatorParser(expression.NodeType, operatorIndex, sqlWrapper);
@@ -209,110 +209,110 @@ namespace SQLBuilder.Core.Expressions
                 {
                     if (!r)
                     {
-                        var subString = sqlWrapper.ToString().Substring(startIndex, sqlWrapper.ToString().Length - startIndex).ToUpper();
+                        var subString = sqlWrapper.Substring(startIndex, sqlWrapper.Length - startIndex);
 
                         //IS NOT、IS                      
                         if (subString.Contains("IS NOT"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("IS NOT");
+                            var index = sqlWrapper.LastIndexOf("IS NOT");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("IS NOT", "IS", index, 6);
+                                sqlWrapper.Replace("IS NOT", "IS", index, 6);
                         }
                         if (subString.Contains("IS") && subString.LastIndexOf("IS") != subString.LastIndexOf("IS NOT"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("IS");
+                            var index = sqlWrapper.LastIndexOf("IS");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("IS", "IS NOT", index, 2);
+                                sqlWrapper.Replace("IS", "IS NOT", index, 2);
                         }
 
                         //NOT LIKE、LIKE
                         if (subString.Contains("NOT LIKE"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("NOT LIKE");
+                            var index = sqlWrapper.LastIndexOf("NOT LIKE");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("NOT LIKE", "LIKE", index, 8);
+                                sqlWrapper.Replace("NOT LIKE", "LIKE", index, 8);
                         }
                         if (subString.Contains("LIKE") && subString.LastIndexOf("LIKE") != (subString.LastIndexOf("NOT LIKE") + 4))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("LIKE");
+                            var index = sqlWrapper.LastIndexOf("LIKE");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("LIKE", "NOT LIKE", index, 4);
+                                sqlWrapper.Replace("LIKE", "NOT LIKE", index, 4);
                         }
 
                         //NOT IN、IN
                         if (subString.Contains("NOT IN"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("NOT IN");
+                            var index = sqlWrapper.LastIndexOf("NOT IN");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("NOT IN", "IN", index, 6);
+                                sqlWrapper.Replace("NOT IN", "IN", index, 6);
                         }
                         if (subString.Contains("IN") && subString.LastIndexOf("IN") != (subString.LastIndexOf("NOT IN") + 4))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("IN");
+                            var index = sqlWrapper.LastIndexOf("IN");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("IN", "NOT IN", index, 2);
+                                sqlWrapper.Replace("IN", "NOT IN", index, 2);
                         }
 
                         //AND、OR
                         if (subString.Contains("AND"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("AND");
+                            var index = sqlWrapper.LastIndexOf("AND");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("AND", "OR", index, 3);
+                                sqlWrapper.Replace("AND", "OR", index, 3);
                         }
                         if (subString.Contains("OR"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("OR");
+                            var index = sqlWrapper.LastIndexOf("OR");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("OR", "AND", index, 2);
+                                sqlWrapper.Replace("OR", "AND", index, 2);
                         }
 
                         //=、<>
                         if (subString.Contains(" = "))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf(" = ");
+                            var index = sqlWrapper.LastIndexOf(" = ");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace(" = ", " <> ", index, 3);
+                                sqlWrapper.Replace(" = ", " <> ", index, 3);
                         }
                         if (subString.Contains("<>"))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf("<>");
+                            var index = sqlWrapper.LastIndexOf("<>");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace("<>", "=", index, 2);
+                                sqlWrapper.Replace("<>", "=", index, 2);
                         }
 
                         //>、<
                         if (subString.Contains(" > "))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf(" > ");
+                            var index = sqlWrapper.LastIndexOf(" > ");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace(" > ", " <= ", index, 3);
+                                sqlWrapper.Replace(" > ", " <= ", index, 3);
                         }
                         if (subString.Contains(" < "))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf(" < ");
+                            var index = sqlWrapper.LastIndexOf(" < ");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace(" < ", " >= ", index, 3);
+                                sqlWrapper.Replace(" < ", " >= ", index, 3);
                         }
 
                         //>=、<=
                         if (subString.Contains(" >= "))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf(" >= ");
+                            var index = sqlWrapper.LastIndexOf(" >= ");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace(" >= ", " < ", index, 4);
+                                sqlWrapper.Replace(" >= ", " < ", index, 4);
                         }
                         if (subString.Contains(" <= "))
                         {
-                            var index = sqlWrapper.ToString().LastIndexOf(" <= ");
+                            var index = sqlWrapper.LastIndexOf(" <= ");
                             if (index != -1)
-                                sqlWrapper.Sql.Replace(" <= ", " > ", index, 4);
+                                sqlWrapper.Replace(" <= ", " > ", index, 4);
                         }
                     }
                 }
                 else
                 {
-                    if (sqlWrapper.ToString().ToUpper().EndsWith("NULL"))
+                    if (sqlWrapper.EndsWith("NULL"))
                         OperatorParser(expression.NodeType, signIndex, sqlWrapper, true);
                     else
                         OperatorParser(expression.NodeType, signIndex, sqlWrapper);

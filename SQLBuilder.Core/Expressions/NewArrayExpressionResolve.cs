@@ -25,7 +25,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示创建一个新数组，并可能初始化该新数组的元素
     /// </summary>
-    public class NewArrayExpressionResolve : BaseExpression<NewArrayExpression>
+	public class NewArrayExpressionResolve : BaseExpression<NewArrayExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -44,7 +44,7 @@ namespace SQLBuilder.Core.Expressions
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             sqlWrapper += ")";
 
@@ -69,10 +69,10 @@ namespace SQLBuilder.Core.Expressions
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
-            if (sqlWrapper.Sql.ToString().LastIndexOf(" UNION ALL SELECT ") > -1)
-                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 18, 18);
+            if (sqlWrapper.LastIndexOf(" UNION ALL SELECT ") > -1)
+                sqlWrapper.Remove(sqlWrapper.Length - 18, 18);
 
             return sqlWrapper;
         }
@@ -90,7 +90,7 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.GroupBy(expression.Expressions[i], sqlWrapper);
             }
 
-            sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }
@@ -121,7 +121,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += " ASC,";
             }
 
-            sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }

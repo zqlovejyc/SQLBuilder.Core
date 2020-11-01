@@ -45,10 +45,10 @@ namespace SQLBuilder.Core.Expressions
             for (var i = 0; i < array.Count(); i++)
             {
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                    sqlWrapper.Sql.Append("(");
+                    sqlWrapper.Append("(");
 
                 if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                    sqlWrapper.Sql.Append(" UNION ALL SELECT ");
+                    sqlWrapper.Append(" UNION ALL SELECT ");
 
                 var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
@@ -73,18 +73,18 @@ namespace SQLBuilder.Core.Expressions
 
                 if (sqlWrapper[^1] == ',')
                 {
-                    sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                        sqlWrapper.Sql.Append("),");
+                        sqlWrapper.Append("),");
                     else
-                        sqlWrapper.Sql.Append(" FROM DUAL");
+                        sqlWrapper.Append(" FROM DUAL");
                 }
             }
 
             if (sqlWrapper[^1] == ',')
-                sqlWrapper.Sql.Remove(sqlWrapper.Sql.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
-            sqlWrapper.Sql = new StringBuilder(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
+            sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
 
             return sqlWrapper;
         }
@@ -104,7 +104,7 @@ namespace SQLBuilder.Core.Expressions
                 {
                     SqlExpressionProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
                 }
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 
             return sqlWrapper;
@@ -133,7 +133,7 @@ namespace SQLBuilder.Core.Expressions
                     else
                         sqlWrapper += ",";
                 }
-                sqlWrapper.Sql.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 
             return sqlWrapper;

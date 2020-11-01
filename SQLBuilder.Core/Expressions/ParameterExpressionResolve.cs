@@ -36,10 +36,9 @@ namespace SQLBuilder.Core.Expressions
 		public override SqlWrapper Select(ParameterExpression expression, SqlWrapper sqlWrapper)
         {
             var tableName = sqlWrapper.GetTableName(expression.Type);
-            sqlWrapper.SetTableAlias(tableName, expression.Name);
-
             var tableAlias = sqlWrapper.GetTableAlias(tableName, expression.Name);
-            sqlWrapper.SelectFields.Add($"{tableAlias}.*");
+
+            sqlWrapper.AddField($"{tableAlias}.*");
 
             return sqlWrapper;
         }

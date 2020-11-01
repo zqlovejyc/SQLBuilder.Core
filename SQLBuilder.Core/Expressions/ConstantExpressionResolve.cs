@@ -44,10 +44,10 @@ namespace SQLBuilder.Core.Expressions
                 if (!tableAlias.IsNullOrEmpty())
                     tableAlias += ".";
 
-                sqlWrapper.SelectFields.Add($"{tableAlias}*");
+                sqlWrapper.AddField($"{tableAlias}*");
             }
             else
-                sqlWrapper.SelectFields.Add(expression.Value.ToString());
+                sqlWrapper.AddField(expression.Value.ToString());
 
             return sqlWrapper;
         }

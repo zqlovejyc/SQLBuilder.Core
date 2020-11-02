@@ -297,7 +297,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public int IndexOf(string value)
         {
-            return this.ToString().ToUpper().IndexOf(value);
+            return this.ToString().IndexOf(value, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public int IndexOf(string value, int startIndex)
         {
-            return this.ToString().ToUpper().IndexOf(value, startIndex);
+            return this.ToString().IndexOf(value, startIndex, StringComparison.OrdinalIgnoreCase);
         }
         #endregion
 
@@ -320,7 +320,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public int LastIndexOf(string value)
         {
-            return this.ToString().ToUpper().LastIndexOf(value);
+            return this.ToString().LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
         }
         #endregion
 

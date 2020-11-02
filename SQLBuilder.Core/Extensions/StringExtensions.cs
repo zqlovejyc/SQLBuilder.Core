@@ -16,6 +16,7 @@
  */
 #endregion
 
+using System;
 using System.Text.RegularExpressions;
 
 namespace SQLBuilder.Core.Extensions
@@ -35,9 +36,13 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>string</returns>
         public static string Substring(this string @this, string separator, bool lastIndexOf = true)
         {
-            var start = (lastIndexOf ? @this.LastIndexOf(separator) : @this.IndexOf(separator)) + separator.Length;
-            var length = @this.Length - start;
-            return @this.Substring(start, length);
+            var startIndex = (lastIndexOf ?
+                @this.LastIndexOf(separator, StringComparison.OrdinalIgnoreCase) :
+                @this.IndexOf(separator, StringComparison.OrdinalIgnoreCase)) +
+                separator.Length;
+
+            var length = @this.Length - startIndex;
+            return @this.Substring(startIndex, length);
         }
         #endregion
 

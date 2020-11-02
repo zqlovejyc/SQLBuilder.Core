@@ -62,7 +62,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 更新和新增时，是否对null值属性进行sql拼接操作
         /// </summary>
-        public bool IsEnableNullValue { get; set; } = true;
+        public bool IsEnableNullValue { get; set; } = false;
 
         /// <summary>
         /// 是否启用表名和列名格式化

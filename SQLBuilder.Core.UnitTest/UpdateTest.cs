@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 
@@ -49,7 +49,7 @@ namespace SQLBuilder.Core.UnitTest
                 Name = "张强",
                 Sex = 2
             };
-            var builder = SqlBuilder.Update<UserInfo>(() => userInfo).Where(u => u.Id == 1);
+            var builder = SqlBuilder.Update<UserInfo>(() => userInfo, isEnableNullValue: true).Where(u => u.Id == 1);
             Assert.AreEqual("UPDATE [Base_UserInfo] SET [Sex] = @p__1,[Name] = @p__2,[Email] = NULL WHERE [Id] = @p__3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
@@ -127,7 +127,7 @@ namespace SQLBuilder.Core.UnitTest
                 Id = 2,
                 Name = "张强"
             };
-            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySql).WithKey(data);
+            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySql, true).WithKey(data);
             Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?p__1,`Name` = ?p__2,`Email` = NULL WHERE `Id` = ?p__3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
@@ -143,7 +143,7 @@ namespace SQLBuilder.Core.UnitTest
                 Id = 2,
                 Name = "张强"
             };
-            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySql, false).WithKey(2);
+            var builder = SqlBuilder.Update<UserInfo>(() => data, DatabaseType.MySql).WithKey(2);
             Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?p__1,`Name` = ?p__2 WHERE `Id` = ?p__3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }

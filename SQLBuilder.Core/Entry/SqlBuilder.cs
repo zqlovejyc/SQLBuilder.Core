@@ -35,14 +35,14 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="databaseType">数据库类型</param>
-        /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：是</param>
+        /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：否</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Insert<T>(
             Expression<Func<object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
-            bool isEnableNullValue = true,
+            bool isEnableNullValue = false,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class
@@ -77,14 +77,14 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="databaseType">数据库类型</param>
-        /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：是</param>
+        /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：否</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Update<T>(
             Expression<Func<object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
-            bool isEnableNullValue = true,
+            bool isEnableNullValue = false,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = true)
             where T : class

@@ -526,7 +526,7 @@ namespace SQLBuilder.Core.Entry
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
              * 此时每个Join内的lambda表达式形参命名可以随意命名
-             * this.sqlWrapper.SetTableAlias(joinTableName, alias);
+             * this.sqlWrapper.SetTableAlias(tableName, alias);
              */
 
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);
@@ -562,7 +562,7 @@ namespace SQLBuilder.Core.Entry
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
              * 此时每个Join内的lambda表达式形参命名可以随意命名
-             * this.sqlWrapper.SetTableAlias(joinTableName, alias);
+             * this.sqlWrapper.SetTableAlias(tableName, alias);
              */
 
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);

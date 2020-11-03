@@ -119,17 +119,24 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(NewExpression expression, SqlWrapper sqlWrapper)
         {
-            for (var i = 0; i < expression.Members.Count; i++)
+            if (expression.Members != null)
             {
-                var argument = expression.Arguments[i];
-                var member = expression.Members[i];
-                SqlExpressionProvider.Select(argument, sqlWrapper);
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    var member = expression.Members[i];
+                    SqlExpressionProvider.Select(argument, sqlWrapper);
 
-                //添加字段别名
-                if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
-                    sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
-                else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
-                    sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    //添加字段别名
+                    if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
+                        sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
+                        sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                }
+            }
+            else
+            {
+                sqlWrapper.AddField("*");
             }
 
             return sqlWrapper;

@@ -38,14 +38,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Select(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.Value == null)
-            {
-                var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
-                string tableAlias = sqlWrapper.GetTableAlias(tableName);
-                if (!tableAlias.IsNullOrEmpty())
-                    tableAlias += ".";
-
-                sqlWrapper.AddField($"{tableAlias}*");
-            }
+                sqlWrapper.AddField("*");
             else
                 sqlWrapper.AddField(expression.Value.ToString());
 

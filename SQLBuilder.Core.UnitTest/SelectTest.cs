@@ -1294,7 +1294,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder.Select<UserInfo>(o => null, DatabaseType.MySql)
                                     .Where(u => 1 == 1)
                                     .AndWhere(u => u.Name == "");
-            Assert.AreEqual("SELECT `o`.* FROM `Base_UserInfo` AS `o` WHERE (`o`.`Name` = ?p__1)", builder.Sql);
+            Assert.AreEqual("SELECT * FROM `Base_UserInfo` AS `o` WHERE (`o`.`Name` = ?p__1)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1646,6 +1646,43 @@ namespace SQLBuilder.Core.UnitTest
                                     .InnerJoin<Account>((u, a) => u.Id == a.UserId);
             Assert.AreEqual("SELECT [a].* FROM [Base_UserInfo] AS [u] INNER JOIN [Base_Account] AS [a] ON [u].[Id] = [a].[UserId]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询87
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_87()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Account>((u, a) => null)
+                                    .InnerJoin<Account>((u, a) => u.Id == a.UserId);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [u] INNER JOIN [Base_Account] AS [a] ON [u].[Id] = [a].[UserId]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询88
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_88()
+        {
+            var builder = SqlBuilder.Select<UserInfo, Account>((u, a) => new { })
+                                    .InnerJoin<Account>((u, a) => u.Id == a.UserId);
+            Assert.AreEqual("SELECT * FROM [Base_UserInfo] AS [u] INNER JOIN [Base_Account] AS [a] ON [u].[Id] = [a].[UserId]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询89
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_89()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(o => new { }, DatabaseType.MySql)
+                                   .Where(u => 1 == 1)
+                                   .AndWhere(u => u.Name == "");
+            Assert.AreEqual("SELECT * FROM `Base_UserInfo` AS `o` WHERE (`o`.`Name` = ?p__1)", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
         }
         #endregion
 

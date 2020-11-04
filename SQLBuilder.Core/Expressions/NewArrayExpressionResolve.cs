@@ -43,7 +43,7 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper += ",";
             }
 
-            if (sqlWrapper[^1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             sqlWrapper += ")";
@@ -68,7 +68,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += ",";
             }
 
-            if (sqlWrapper[^1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             if (sqlWrapper.LastIndexOf(" UNION ALL SELECT ") > -1)

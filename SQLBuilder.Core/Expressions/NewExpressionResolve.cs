@@ -58,7 +58,7 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
 
-            if (sqlWrapper[^1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
@@ -97,7 +97,7 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
 
-            if (sqlWrapper[^1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
             {
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -129,9 +129,9 @@ namespace SQLBuilder.Core.Expressions
 
                     //添加字段别名
                     if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
-                        sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
                     else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
-                        sqlWrapper.SelectFields[^1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
                 }
             }
             else

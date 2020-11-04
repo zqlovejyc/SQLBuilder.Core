@@ -462,7 +462,7 @@ namespace SQLBuilder.Core.Expressions
                 else
                     SqlExpressionProvider.In(Expression.Constant(val, val.GetType()), sqlWrapper);
 
-                if (sqlWrapper[^1] == ',')
+                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                     sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
                 sqlWrapper += ")";
@@ -543,7 +543,7 @@ namespace SQLBuilder.Core.Expressions
                         }
                     }
                 }
-                if (sqlWrapper[^1] == ',')
+                if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 {
                     sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -553,7 +553,7 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
 
-            if (sqlWrapper[^1] == ',')
+            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));

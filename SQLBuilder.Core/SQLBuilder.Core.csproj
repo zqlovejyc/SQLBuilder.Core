@@ -18,7 +18,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <LangVersion>8.0</LangVersion>
-        <PackageTags>SQLBuilder;Expression;Repository;SQL;ORM</PackageTags>
+        <PackageTags>SQLBuilder;Expression;Repository;SQL;ORM;Dapper</PackageTags>
         <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>

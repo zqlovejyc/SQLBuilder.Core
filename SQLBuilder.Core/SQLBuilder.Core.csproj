@@ -2,17 +2,18 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-        <AssemblyVersion>2.0.1.0</AssemblyVersion>
+        <AssemblyVersion>2.0.2.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.0.1</Version>
+        <Version>2.0.2</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化Join AS别名；
-2.优化Select；
-3.修复多表连接查询只返回单表时(如单元测试Test_Select_86所示)，无法全部解析表别名bug；</PackageReleaseNotes>
-        <FileVersion>2.0.1.0</FileVersion>
+        <PackageReleaseNotes>1.优化SqlWrapper，新增部分方法，优化sql构建；
+2.Insert和Update默认不启用null值；
+3.优化Select查询，形如：Test_Select_87、Test_Select_88；
+4.优化Count、Sum、Max、Min、Avg方法，新增对应的单元测试用例；</PackageReleaseNotes>
+        <FileVersion>2.0.2.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>sql.png</PackageIcon>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

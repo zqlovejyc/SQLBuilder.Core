@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /***
  * Copyright © 2018-2020, 张强 (943620963@qq.com).
  *
@@ -93,14 +93,14 @@ namespace SQLBuilder.Core.Repositories
         }
         #endregion
 
-        #region UseMasterOrSalve
+        #region UseMasterOrSlave
         /// <summary>
         /// 使用主库/从库
         /// <para>注意使用从库必须满足：配置从库连接字符串 + 切换为从库 + 配置从库负载均衡，否则依然使用主库</para>
         /// </summary>
         /// <param name="master">是否使用主库，默认使用主库</param>
         /// <returns></returns>
-        public IRepository UseMasterOrSalve(bool master = true)
+        public IRepository UseMasterOrSlave(bool master = true)
         {
             this.Master = master;
             return this;

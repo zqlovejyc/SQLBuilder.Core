@@ -19,6 +19,7 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Repositories;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SQLBuilder.Core.Extensions
@@ -114,7 +115,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this"></param>
         /// <param name="repository"></param>
         /// <returns></returns>
-        public static IEnumerable<TEntity> ToList<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        public static List<TEntity> ToList<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
         {
             return @this.ToList<TEntity, TEntity>(repository);
         }
@@ -127,9 +128,9 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this"></param>
         /// <param name="repository"></param>
         /// <returns></returns>
-        public static IEnumerable<TReturn> ToList<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        public static List<TReturn> ToList<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
         {
-            return repository.FindList<TReturn>(@this.Sql, @this.DynamicParameters);
+            return repository.FindList<TReturn>(@this.Sql, @this.DynamicParameters)?.ToList();
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this"></param>
         /// <param name="repository"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<TEntity>> ToListAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        public static async Task<List<TEntity>> ToListAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
         {
             return await @this.ToListAsync<TEntity, TEntity>(repository);
         }
@@ -152,9 +153,9 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this"></param>
         /// <param name="repository"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<TReturn>> ToListAsync<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        public static async Task<List<TReturn>> ToListAsync<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
         {
-            return await repository.FindListAsync<TReturn>(@this.Sql, @this.DynamicParameters);
+            return (await repository.FindListAsync<TReturn>(@this.Sql, @this.DynamicParameters))?.ToList();
         }
         #endregion
 

@@ -184,6 +184,91 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
+        /// Max
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Member != null)
+            {
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper.AddField(columnName);
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Min
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Member != null)
+            {
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper.AddField(columnName);
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Avg
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Member != null)
+            {
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper.AddField(columnName);
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Member != null)
+            {
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper.AddField(columnName);
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Sum
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Member != null)
+            {
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper.AddField(columnName);
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
@@ -407,91 +492,6 @@ namespace SQLBuilder.Core.Expressions
                     }
                 }
             }
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Max
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
-        {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
-
-            sqlWrapper.Append($"SELECT MAX({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Min
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
-        {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
-
-            sqlWrapper.Append($"SELECT MIN({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Avg
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
-        {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
-
-            sqlWrapper.Append($"SELECT AVG({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Count
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
-        {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
-
-            sqlWrapper.Append($"SELECT COUNT({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Sum
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
-        {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
-
-            sqlWrapper.Append($"SELECT SUM({sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName}) FROM {sqlWrapper.GetTableName(type)}");
 
             return sqlWrapper;
         }

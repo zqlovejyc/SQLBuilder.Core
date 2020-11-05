@@ -4199,7 +4199,13 @@ namespace SQLBuilder.Core.Entry
         {
             this.Clear();
             this.sqlWrapper.IsSingleTable = true;
+
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var sql = $"SELECT MAX({{0}}) FROM {tableName}";
+
             SqlExpressionProvider.Max(expression.Body, this.sqlWrapper);
+            this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
+
             return this;
         }
         #endregion
@@ -4214,7 +4220,13 @@ namespace SQLBuilder.Core.Entry
         {
             this.Clear();
             this.sqlWrapper.IsSingleTable = true;
+
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var sql = $"SELECT MIN({{0}}) FROM {tableName}";
+
             SqlExpressionProvider.Min(expression.Body, this.sqlWrapper);
+            this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
+
             return this;
         }
         #endregion
@@ -4229,7 +4241,13 @@ namespace SQLBuilder.Core.Entry
         {
             this.Clear();
             this.sqlWrapper.IsSingleTable = true;
+
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var sql = $"SELECT AVG({{0}}) FROM {tableName}";
+
             SqlExpressionProvider.Avg(expression.Body, this.sqlWrapper);
+            this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
+
             return this;
         }
         #endregion
@@ -4245,10 +4263,17 @@ namespace SQLBuilder.Core.Entry
             this.Clear();
             this.sqlWrapper.IsSingleTable = true;
 
-            if (expression == null)
-                this.sqlWrapper.Append($"SELECT COUNT(*) FROM {this.sqlWrapper.GetTableName(typeof(T))}");
-            else
+            var field = "*";
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var sql = $"SELECT COUNT({{0}}) FROM {tableName}";
+
+            if (expression != null)
+            {
                 SqlExpressionProvider.Count(expression.Body, this.sqlWrapper);
+                field = this.sqlWrapper.SelectFieldsString;
+            }
+
+            this.sqlWrapper.AppendFormat(sql, field);
 
             return this;
         }
@@ -4264,7 +4289,13 @@ namespace SQLBuilder.Core.Entry
         {
             this.Clear();
             this.sqlWrapper.IsSingleTable = true;
+
+            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var sql = $"SELECT SUM({{0}}) FROM {tableName}";
+
             SqlExpressionProvider.Sum(expression.Body, this.sqlWrapper);
+            this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
+
             return this;
         }
         #endregion

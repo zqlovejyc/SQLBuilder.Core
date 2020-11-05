@@ -16,9 +16,31 @@ namespace SQLBuilder.Core.UnitTest
         /// 求最小值,NULL 值不包括在计算中
         /// </summary>
         [TestMethod]
-        public void Test_Max()
+        public void Test_Max_01()
         {
             var builder = SqlBuilder.Max<UserInfo>(u => u.Id).Where(o => o.Id == 3);
+            Assert.AreEqual("SELECT MAX([Id]) FROM [Base_UserInfo] WHERE [Id] = @p__1", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求最小值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Max_02()
+        {
+            var builder = SqlBuilder.Max<UserInfo>(u => new { u.Id }).Where(o => o.Id == 3);
+            Assert.AreEqual("SELECT MAX([Id]) FROM [Base_UserInfo] WHERE [Id] = @p__1", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求最小值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Max_03()
+        {
+            var builder = SqlBuilder.Max<UserInfo>(u => "[Id]").Where(o => o.Id == 3);
             Assert.AreEqual("SELECT MAX([Id]) FROM [Base_UserInfo] WHERE [Id] = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -29,9 +51,31 @@ namespace SQLBuilder.Core.UnitTest
         /// 求最小值,NULL 值不包括在计算中
         /// </summary>
         [TestMethod]
-        public void Test_Min()
+        public void Test_Min_01()
         {
             var builder = SqlBuilder.Min<UserInfo>(u => u.Id);
+            Assert.AreEqual("SELECT MIN([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求最小值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Min_02()
+        {
+            var builder = SqlBuilder.Min<UserInfo>(u => new { u.Id });
+            Assert.AreEqual("SELECT MIN([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求最小值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Min_03()
+        {
+            var builder = SqlBuilder.Min<UserInfo>(u => "[Id]");
             Assert.AreEqual("SELECT MIN([Id]) FROM [Base_UserInfo]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
@@ -42,9 +86,31 @@ namespace SQLBuilder.Core.UnitTest
         /// 求平均值,NULL 值不包括在计算中
         /// </summary>
         [TestMethod]
-        public void Test_Avg()
+        public void Test_Avg_01()
         {
             var builder = SqlBuilder.Avg<UserInfo>(u => u.Id);
+            Assert.AreEqual("SELECT AVG([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求平均值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Avg_02()
+        {
+            var builder = SqlBuilder.Avg<UserInfo>(u => new { u.Id });
+            Assert.AreEqual("SELECT AVG([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求平均值,NULL 值不包括在计算中
+        /// </summary>
+        [TestMethod]
+        public void Test_Avg_03()
+        {
+            var builder = SqlBuilder.Avg<UserInfo>(u => "[Id]");
             Assert.AreEqual("SELECT AVG([Id]) FROM [Base_UserInfo]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
@@ -72,6 +138,50 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT COUNT(*) FROM [Base_UserInfo]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 计数3
+        /// </summary>
+        [TestMethod]
+        public void Test_Count_03()
+        {
+            var builder = SqlBuilder.Count<UserInfo>(x => null);
+            Assert.AreEqual("SELECT COUNT(*) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 计数4
+        /// </summary>
+        [TestMethod]
+        public void Test_Count_04()
+        {
+            var builder = SqlBuilder.Count<UserInfo>(x => new { });
+            Assert.AreEqual("SELECT COUNT(*) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 计数5
+        /// </summary>
+        [TestMethod]
+        public void Test_Count_05()
+        {
+            var builder = SqlBuilder.Count<UserInfo>(x => "DISTINCT [Id]");
+            Assert.AreEqual("SELECT COUNT(DISTINCT [Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 计数6
+        /// </summary>
+        [TestMethod]
+        public void Test_Count_06()
+        {
+            var builder = SqlBuilder.Count<UserInfo>(x => new { x.Id });
+            Assert.AreEqual("SELECT COUNT([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Sum
@@ -79,9 +189,31 @@ namespace SQLBuilder.Core.UnitTest
         /// 求和
         /// </summary>
         [TestMethod]
-        public void Test_Sum()
+        public void Test_Sum_01()
         {
             var builder = SqlBuilder.Sum<UserInfo>(u => u.Id);
+            Assert.AreEqual("SELECT SUM([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求和
+        /// </summary>
+        [TestMethod]
+        public void Test_Sum_02()
+        {
+            var builder = SqlBuilder.Sum<UserInfo>(u => new { u.Id });
+            Assert.AreEqual("SELECT SUM([Id]) FROM [Base_UserInfo]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 求和
+        /// </summary>
+        [TestMethod]
+        public void Test_Sum_03()
+        {
+            var builder = SqlBuilder.Sum<UserInfo>(u => "[Id]");
             Assert.AreEqual("SELECT SUM([Id]) FROM [Base_UserInfo]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }

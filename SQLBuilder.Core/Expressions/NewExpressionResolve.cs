@@ -143,6 +143,110 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
+        /// Count
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Count(NewExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Members != null)
+            {
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    SqlExpressionProvider.Count(argument, sqlWrapper);
+                }
+            }
+            else
+            {
+                sqlWrapper.AddField("*");
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Sum
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Sum(NewExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Members != null)
+            {
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    SqlExpressionProvider.Sum(argument, sqlWrapper);
+                }
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Max
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Max(NewExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Members != null)
+            {
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    SqlExpressionProvider.Max(argument, sqlWrapper);
+                }
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Min
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Min(NewExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Members != null)
+            {
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    SqlExpressionProvider.Min(argument, sqlWrapper);
+                }
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Avg
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Avg(NewExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Members != null)
+            {
+                for (var i = 0; i < expression.Members.Count; i++)
+                {
+                    var argument = expression.Arguments[i];
+                    SqlExpressionProvider.Avg(argument, sqlWrapper);
+                }
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>

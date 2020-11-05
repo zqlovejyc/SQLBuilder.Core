@@ -37,9 +37,81 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
-            if (expression.Value == null)
+            if (expression?.Value == null)
                 sqlWrapper.AddField("*");
             else
+                sqlWrapper.AddField(expression.Value.ToString());
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Count(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Value == null)
+                sqlWrapper.AddField("*");
+            else
+                sqlWrapper.AddField(expression.Value.ToString());
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Sum
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Sum(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Value != null)
+                sqlWrapper.AddField(expression.Value.ToString());
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Max
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Max(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Value != null)
+                sqlWrapper.AddField(expression.Value.ToString());
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Min
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Min(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Value != null)
+                sqlWrapper.AddField(expression.Value.ToString());
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Avg
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Avg(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression?.Value != null)
                 sqlWrapper.AddField(expression.Value.ToString());
 
             return sqlWrapper;

@@ -86,6 +86,23 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("INSERT INTO [Base_UserInfo] ([Sex],[Name]) VALUES (@p__1,@p__2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 单个新增6
+        /// </summary>
+        [TestMethod]
+        public void Test_Insert_06()
+        {
+            var userInfo = new Account
+            {
+                Name = "张强",
+                UserId = 100,
+                Id = 1
+            };
+            var builder = SqlBuilder.Insert<Account>(() => userInfo);
+            Assert.AreEqual("INSERT INTO [Base_Account] ([UserId],[Name]) VALUES (@p__1,@p__2)", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
         #endregion
 
         #region 批量新增

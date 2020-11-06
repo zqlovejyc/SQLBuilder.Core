@@ -32,12 +32,18 @@ namespace SQLBuilder.Core.Attributes
         /// <param name="name"></param>
         public KeyAttribute(string name = null)
         {
-            if (name != null) this.Name = name;
+            if (name != null)
+                this.Name = name;
         }
 
         /// <summary>
         /// 主键名称
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 是否自增列
+        /// </summary>
+        public bool Identity { get; set; }
     }
 }

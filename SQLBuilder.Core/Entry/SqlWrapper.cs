@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.ComponentModel.DataAnnotations.Schema;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.Enums;
 
@@ -581,56 +582,94 @@ namespace SQLBuilder.Core.Entry
             var isUpdate = true;
             var props = type.GetProperties();
 
+            //判断列是否包含Column特性
             var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
             if (!isHaveColumnAttribute)
                 isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
 
-            if (isHaveColumnAttribute)
+            //包含Column特性
+            if (isHaveColumnAttribute && member != null)
             {
-                if (member?.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
+                if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
                 {
                     columnName = cca.Name;
                     isInsert = cca.Insert;
                     isUpdate = cca.Update;
                 }
-                else if (member?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
+                else if (member.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
                     columnName = sca.Name;
                 else
                 {
-                    var p = props.Where(x => x.Name == member?.Name).FirstOrDefault();
-                    if (p?.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
+                    var p = props.Where(x => x.Name == member.Name).FirstOrDefault();
+                    if (p != null)
                     {
-                        columnName = cus.Name;
-                        isInsert = cus.Insert;
-                        isUpdate = cus.Update;
+                        if (p.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
+                        {
+                            columnName = cus.Name;
+                            isInsert = cus.Insert;
+                            isUpdate = cus.Update;
+                        }
+                        else if (p.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
+                            columnName = sys.Name;
                     }
-                    else if (p?.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
-                        columnName = sys.Name;
                 }
             }
 
+            //列名
             columnName ??= member?.Name;
 
             //判断列是否是Key
-            if (member?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
+            if (member != null)
             {
-                isUpdate = false;
-                if (!cka.Name.IsNullOrEmpty() && cka.Name != columnName)
-                    columnName = cka.Name;
-            }
-            else if (member?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
-                isUpdate = false;
-            else
-            {
-                var p = props.Where(x => x.Name == member?.Name).FirstOrDefault();
-                if (p?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
+                if (member.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
                 {
                     isUpdate = false;
-                    if (!cus.Name.IsNullOrEmpty() && cus.Name != columnName)
-                        columnName = cus.Name;
+
+                    if (cka.Identity)
+                        isInsert = false;
+
+                    if (!cka.Name.IsNullOrEmpty() && cka.Name != columnName)
+                        columnName = cka.Name;
                 }
-                else if (p?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                else if (member.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                {
                     isUpdate = false;
+
+                    //判断是否自增
+                    if (member.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dga)
+                    {
+                        if (dga.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
+                            isInsert = false;
+                    }
+                }
+                else
+                {
+                    var p = props.Where(x => x.Name == member.Name).FirstOrDefault();
+                    if (p != null)
+                    {
+                        if (p.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
+                        {
+                            isUpdate = false;
+
+                            if (cus.Identity)
+                                isInsert = false;
+
+                            if (!cus.Name.IsNullOrEmpty() && cus.Name != columnName)
+                                columnName = cus.Name;
+                        }
+                        else if (p.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                        {
+                            isUpdate = false;
+
+                            //判断是否自增
+                            if (p.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dg)
+                            {
+                                if (dg.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
+                                    isInsert = false;
+                            }
+                        }
+                    }
+                }
             }
 
             return (this.GetColumnName(columnName), isInsert, isUpdate);

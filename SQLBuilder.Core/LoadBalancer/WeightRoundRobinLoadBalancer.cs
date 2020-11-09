@@ -20,11 +20,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-/****************************
-* [Author] 张强
-* [Date] 2020-09-29
-* [Describe] 带权重轮询负载均衡接口
-* **************************/
+
 namespace SQLBuilder.Core.LoadBalancer
 {
     /// <summary>

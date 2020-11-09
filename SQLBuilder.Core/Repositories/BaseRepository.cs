@@ -28,11 +28,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-/****************************
-* [Author] 张强
-* [Date] 2020-09-17
-* [Describe] 数据操作仓储抽象基类
-* **************************/
+
 namespace SQLBuilder.Core.Repositories
 {
     /// <summary>

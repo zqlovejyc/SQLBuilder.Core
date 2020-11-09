@@ -30,11 +30,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Sql = SQLBuilder.Core.Entry.SqlBuilder;
-/****************************
-* [Author] 张强
-* [Date] 2018-07-27
-* [Describe] Oracle仓储实现类
-* **************************/
+
 namespace SQLBuilder.Core.Repositories
 {
     /// <summary>

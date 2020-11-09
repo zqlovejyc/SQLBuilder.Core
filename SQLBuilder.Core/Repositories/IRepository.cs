@@ -25,11 +25,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-/****************************
-* [Author] 张强
-* [Date] 2018-07-23
-* [Describe] 数据操作仓储接口
-* **************************/
+
 namespace SQLBuilder.Core.Repositories
 {
     /// <summary>

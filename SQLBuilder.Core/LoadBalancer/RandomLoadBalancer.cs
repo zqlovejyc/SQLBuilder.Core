@@ -19,11 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-/****************************
-* [Author] 张强
-* [Date] 2020-09-29
-* [Describe] 随机负载均衡接口
-* **************************/
+
 namespace SQLBuilder.Core.LoadBalancer
 {
     /// <summary>

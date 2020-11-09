@@ -19,6 +19,7 @@
 using Dapper;
 using Oracle.ManagedDataAccess.Client;
 using SQLBuilder.Core.Configuration;
+using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
@@ -187,12 +188,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override (IEnumerable<T> list, long total) QueryMultiple<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var sqlPage = sql.Split(';');
-            var sqlCount = sqlPage[0];
-            var sqlQuery = sqlPage[1];
-            var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
-            var list = connection.Query<T>(sqlQuery, parameter, transaction, commandTimeout: CommandTimeout);
-            return (list, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var list = connection.Query<T>(sqlQuery, parameter, transaction, commandTimeout: CommandTimeout);
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -205,15 +220,29 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override (DataTable table, long total) QueryMultiple(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var sqlPage = sql.Split(';');
-            var sqlCount = sqlPage[0];
-            var sqlQuery = sqlPage[1];
-            var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
-            var reader = connection.ExecuteReader(sqlQuery, parameter, transaction, CommandTimeout);
-            var table = reader?.ToDataTable();
-            if (table?.Columns?.Contains("ROWNUMBER") == true)
-                table.Columns.Remove("ROWNUMBER");
-            return (table, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var reader = connection.ExecuteReader(sqlQuery, parameter, transaction, CommandTimeout);
+                var table = reader?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
         #endregion
 
@@ -228,12 +257,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override async Task<(IEnumerable<T> list, long total)> QueryMultipleAsync<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var sqlPage = sql.Split(';');
-            var sqlCount = sqlPage[0];
-            var sqlQuery = sqlPage[1];
-            var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
-            var list = await connection.QueryAsync<T>(sqlQuery, parameter, transaction, CommandTimeout);
-            return (list, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var list = await connection.QueryAsync<T>(sqlQuery, parameter, transaction, CommandTimeout);
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -246,15 +289,29 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override async Task<(DataTable table, long total)> QueryMultipleAsync(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var sqlPage = sql.Split(';');
-            var sqlCount = sqlPage[0];
-            var sqlQuery = sqlPage[1];
-            var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
-            var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, transaction, CommandTimeout);
-            var table = reader?.ToDataTable();
-            if (table?.Columns?.Contains("ROWNUMBER") == true)
-                table.Columns.Remove("ROWNUMBER");
-            return (table, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, transaction, CommandTimeout);
+                var table = reader?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
         #endregion
         #endregion

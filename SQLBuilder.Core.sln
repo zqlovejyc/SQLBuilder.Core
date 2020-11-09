@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core", "SQLBuilder.Core\SQLBuilder.Core.csproj", "{675BE0C1-10BC-41C7-928F-34A978A99967}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core", "SQLBuilder.Core\SQLBuilder.Core.csproj", "{675BE0C1-10BC-41C7-928F-34A978A99967}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core.Console", "SQLBuilder.Core.Console\SQLBuilder.Core.Console.csproj", "{6D616B3D-8AEA-43DF-BAA7-19E6C0481188}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core.Console", "SQLBuilder.Core.Console\SQLBuilder.Core.Console.csproj", "{6D616B3D-8AEA-43DF-BAA7-19E6C0481188}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core.UnitTest", "SQLBuilder.Core.UnitTest\SQLBuilder.Core.UnitTest.csproj", "{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core.UnitTest", "SQLBuilder.Core.UnitTest\SQLBuilder.Core.UnitTest.csproj", "{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core.SkyWalking", "SQLBuilder.Core.SkyWalking\SQLBuilder.Core.SkyWalking.csproj", "{7F00CEF4-28AE-477B-841D-86D916824238}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F00CEF4-28AE-477B-841D-86D916824238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F00CEF4-28AE-477B-841D-86D916824238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F00CEF4-28AE-477B-841D-86D916824238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F00CEF4-28AE-477B-841D-86D916824238}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

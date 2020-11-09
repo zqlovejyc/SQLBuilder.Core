@@ -17,6 +17,7 @@
 #endregion
 
 using Dapper;
+using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.LoadBalancer;
@@ -24,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 /****************************
@@ -38,6 +40,14 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public abstract class BaseRepository
     {
+        #region Field
+        /// <summary>
+        /// 诊断日志
+        /// </summary>
+        private static readonly DiagnosticListener _diagnosticListener =
+            new DiagnosticListener(DiagnosticStrings.DiagnosticListenerName);
+        #endregion
+
         #region Property
         /// <summary>
         /// 超时时长，默认240s
@@ -432,14 +442,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual IEnumerable<T> Query<T>(SqlBuilderCore<T> builder) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                IEnumerable<T> result = null;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -453,19 +480,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual IEnumerable<T> Query<T>(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+                IEnumerable<T> result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -478,19 +522,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual DataTable Query(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.ExecuteReader(sql, parameter, Transaction, CommandTimeout).ToDataTable();
+                DataTable result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.ExecuteReader(sql, parameter, Transaction, CommandTimeout).ToDataTable();
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.ExecuteReader(sql, parameter, commandTimeout: CommandTimeout).ToDataTable();
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.ExecuteReader(sql, parameter, commandTimeout: CommandTimeout).ToDataTable();
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -502,14 +563,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual T QueryFirstOrDefault<T>(SqlBuilderCore<T> builder) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                var result = default(T);
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -523,19 +601,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual T QueryFirstOrDefault<T>(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, CommandTimeout);
+                var result = default(T);
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -548,30 +643,45 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual List<IEnumerable<dynamic>> QueryMultiple(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                var result = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, CommandTimeout);
-                while (result?.IsConsumed == false)
+                var list = new List<IEnumerable<dynamic>>();
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
                 {
-                    list.Add(result.Read());
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    var result = Transaction.Connection.QueryMultiple(sql, parameter, Transaction, CommandTimeout);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(result.Read());
+                    }
                 }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    var result = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(result.Read());
+                    }
+                }
+
+                ExecuteAfter(message);
+
+                return list;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                var result = connection.QueryMultiple(sql, parameter, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(result.Read());
-                }
+                ExecuteError(message, ex);
+                throw;
             }
-            return list;
         }
 
         /// <summary>
@@ -584,10 +694,24 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual (IEnumerable<T> list, long total) QueryMultiple<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var multiQuery = connection.QueryMultiple(sql, parameter, transaction, CommandTimeout);
-            var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-            var list = multiQuery?.Read<T>();
-            return (list, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var multiQuery = connection.QueryMultiple(sql, parameter, transaction, CommandTimeout);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var list = multiQuery?.Read<T>();
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -600,12 +724,26 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual (DataTable table, long total) QueryMultiple(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var multiQuery = connection.QueryMultiple(sql, parameter, transaction, CommandTimeout);
-            var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
-            var table = multiQuery?.Read()?.ToList()?.ToDataTable();
-            if (table?.Columns?.Contains("ROWNUMBER") == true)
-                table.Columns.Remove("ROWNUMBER");
-            return (table, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var multiQuery = connection.QueryMultiple(sql, parameter, transaction, CommandTimeout);
+                var total = multiQuery?.ReadFirstOrDefault<long>() ?? 0;
+                var table = multiQuery?.Read()?.ToList()?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
         #endregion
 
@@ -618,14 +756,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<IEnumerable<T>> QueryAsync<T>(SqlBuilderCore<T> builder) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                IEnumerable<T> result = null;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -639,19 +794,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<IEnumerable<T>> QueryAsync<T>(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, CommandTimeout);
+                IEnumerable<T> result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -664,21 +836,38 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<DataTable> QueryAsync(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                var reader = await Transaction.Connection.ExecuteReaderAsync(sql, parameter, Transaction, CommandTimeout);
-                return reader.ToDataTable();
+                DataTable result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    var reader = await Transaction.Connection.ExecuteReaderAsync(sql, parameter, Transaction, CommandTimeout);
+                    result = reader.ToDataTable();
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    var reader = await connection.ExecuteReaderAsync(sql, parameter, commandTimeout: CommandTimeout);
+                    result = reader.ToDataTable();
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                var reader = await connection.ExecuteReaderAsync(sql, parameter, commandTimeout: CommandTimeout);
-                return reader.ToDataTable();
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -690,14 +879,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<T> QueryFirstOrDefaultAsync<T>(SqlBuilderCore<T> builder) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                var result = default(T);
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -711,19 +917,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<T> QueryFirstOrDefaultAsync<T>(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, CommandTimeout);
+                var result = default(T);
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -736,30 +959,45 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<List<IEnumerable<dynamic>>> QueryMultipleAsync(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            var list = new List<IEnumerable<dynamic>>();
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                var result = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, CommandTimeout);
-                while (result?.IsConsumed == false)
+                var list = new List<IEnumerable<dynamic>>();
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
                 {
-                    list.Add(await result.ReadAsync());
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    var result = await Transaction.Connection.QueryMultipleAsync(sql, parameter, Transaction, CommandTimeout);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(await result.ReadAsync());
+                    }
                 }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    var result = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
+                    while (result?.IsConsumed == false)
+                    {
+                        list.Add(await result.ReadAsync());
+                    }
+                }
+
+                ExecuteAfter(message);
+
+                return list;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                var result = await connection.QueryMultipleAsync(sql, parameter, commandTimeout: CommandTimeout);
-                while (result?.IsConsumed == false)
-                {
-                    list.Add(await result.ReadAsync());
-                }
+                ExecuteError(message, ex);
+                throw;
             }
-            return list;
         }
 
         /// <summary>
@@ -772,10 +1010,24 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<(IEnumerable<T> list, long total)> QueryMultipleAsync<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var multiQuery = await connection.QueryMultipleAsync(sql, parameter, transaction, CommandTimeout);
-            var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.TOTAL ?? 0);
-            var list = await multiQuery?.ReadAsync<T>();
-            return (list, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var multiQuery = await connection.QueryMultipleAsync(sql, parameter, transaction, CommandTimeout);
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.TOTAL ?? 0);
+                var list = await multiQuery?.ReadAsync<T>();
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -788,13 +1040,27 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<(DataTable table, long total)> QueryMultipleAsync(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
         {
-            var multiQuery = await connection.QueryMultipleAsync(sql, parameter, transaction, CommandTimeout);
-            var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.TOTAL ?? 0);
-            var reader = await multiQuery?.ReadAsync();
-            var table = reader?.ToList()?.ToDataTable();
-            if (table?.Columns?.Contains("ROWNUMBER") == true)
-                table.Columns.Remove("ROWNUMBER");
-            return (table, total);
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var multiQuery = await connection.QueryMultipleAsync(sql, parameter, transaction, CommandTimeout);
+                var total = (long)((await multiQuery?.ReadFirstOrDefaultAsync<dynamic>())?.TOTAL ?? 0);
+                var reader = await multiQuery?.ReadAsync();
+                var table = reader?.ToList()?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
         }
         #endregion
         #endregion
@@ -810,14 +1076,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual int Execute<T>(SqlBuilderCore<T> builder, CommandType? command = null) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                var result = 0;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = connection.Execute(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.Execute(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -830,16 +1113,33 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual int Execute(string sql, object parameter, CommandType? command = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            DiagnosticsMessage message = null;
+            try
+            {
+                var result = 0;
 
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Execute(sql, parameter, Transaction, CommandTimeout, command);
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Execute(sql, parameter, Transaction, CommandTimeout, command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.Execute(sql, parameter, null, CommandTimeout, command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.Execute(sql, parameter, null, CommandTimeout, command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -853,16 +1153,33 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual IEnumerable<T> Execute<T>(string sql, object parameter, CommandType? command = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            DiagnosticsMessage message = null;
+            try
+            {
+                IEnumerable<T> result = null;
 
-            if (Transaction?.Connection != null)
-            {
-                return Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout, commandType: command);
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout, commandType: command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.Query<T>(sql, parameter, null, commandTimeout: CommandTimeout, commandType: command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.Query<T>(sql, parameter, null, commandTimeout: CommandTimeout, commandType: command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -875,19 +1192,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual object ExecuteScalar(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return Transaction.Connection.ExecuteScalar<object>(sql, parameter, Transaction, CommandTimeout);
+                object result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.ExecuteScalar<object>(sql, parameter, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.ExecuteScalar<object>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return connection.ExecuteScalar<object>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
         #endregion
@@ -902,14 +1236,31 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<int> ExecuteAsync<T>(SqlBuilderCore<T> builder, CommandType? command = null) where T : class
         {
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                var result = 0;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
+                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -922,16 +1273,33 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<int> ExecuteAsync(string sql, object parameter, CommandType? command = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            DiagnosticsMessage message = null;
+            try
+            {
+                var result = 0;
 
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, CommandTimeout, command);
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, CommandTimeout, command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.ExecuteAsync(sql, parameter, null, CommandTimeout, command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.ExecuteAsync(sql, parameter, null, CommandTimeout, command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -945,16 +1313,33 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<IEnumerable<T>> ExecuteAsync<T>(string sql, object parameter, CommandType? command = null)
         {
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+            DiagnosticsMessage message = null;
+            try
+            {
+                IEnumerable<T> result = null;
 
-            if (Transaction?.Connection != null)
-            {
-                return await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, CommandTimeout, command);
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, CommandTimeout, command);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout, commandType: command);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout, commandType: command);
+                ExecuteError(message, ex);
+                throw;
             }
         }
 
@@ -967,19 +1352,36 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async Task<object> ExecuteScalarAsync(bool isWithSyntax, string sql, object parameter)
         {
-            if (isWithSyntax)
-                sql = $"{sql} SELECT * FROM T";
-
-            sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
-
-            if (Transaction?.Connection != null)
+            DiagnosticsMessage message = null;
+            try
             {
-                return await Transaction.Connection.ExecuteScalarAsync<object>(sql, parameter, Transaction, CommandTimeout);
+                object result = null;
+
+                if (isWithSyntax)
+                    sql = $"{sql} SELECT * FROM T";
+
+                sql = SqlIntercept?.Invoke(sql, parameter) ?? sql;
+
+                if (Transaction?.Connection != null)
+                {
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.ExecuteScalarAsync<object>(sql, parameter, Transaction, CommandTimeout);
+                }
+                else
+                {
+                    using var connection = Connection;
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.ExecuteScalarAsync<object>(sql, parameter, commandTimeout: CommandTimeout);
+                }
+
+                ExecuteAfter(message);
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                using var connection = Connection;
-                return await connection.ExecuteScalarAsync<object>(sql, parameter, commandTimeout: CommandTimeout);
+                ExecuteError(message, ex);
+                throw;
             }
         }
         #endregion
@@ -1561,6 +1963,69 @@ namespace SQLBuilder.Core.Repositories
             return await QueryMultipleAsync(false, sql, dbParameter.ToDynamicParameters());
         }
         #endregion
+        #endregion
+
+        #region Diagnostics
+        /// <summary>
+        /// 执行前诊断
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">sql参数</param>
+        /// <param name="dataSource">数据源</param>
+        /// <returns></returns>
+        public DiagnosticsMessage ExecuteBefore(string sql, object parameter, string dataSource)
+        {
+            if (_diagnosticListener.IsEnabled(DiagnosticStrings.BeforeExecute))
+            {
+                var message = new DiagnosticsMessage
+                {
+                    Sql = sql,
+                    Parameters = parameter,
+                    DataSource = dataSource,
+                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    Operation = DiagnosticStrings.BeforeExecute
+                };
+
+                _diagnosticListener.Write(DiagnosticStrings.BeforeExecute, message);
+
+                return message;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 执行后诊断
+        /// </summary>
+        /// <param name="message">诊断消息</param>
+        /// <returns></returns>
+        public void ExecuteAfter(DiagnosticsMessage message)
+        {
+            if (message?.Timestamp != null && _diagnosticListener.IsEnabled(DiagnosticStrings.AfterExecute))
+            {
+                message.Operation = DiagnosticStrings.AfterExecute;
+                message.ElapsedMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - message.Timestamp.Value;
+
+                _diagnosticListener.Write(DiagnosticStrings.AfterExecute, message);
+            }
+        }
+
+        /// <summary>
+        /// 执行异常诊断
+        /// </summary>
+        /// <param name="message">诊断消息</param>
+        /// <param name="exception">异常</param>
+        public void ExecuteError(DiagnosticsMessage message, Exception exception)
+        {
+            if (exception != null && message?.Timestamp != null && _diagnosticListener.IsEnabled(DiagnosticStrings.ErrorExecute))
+            {
+                message.Exception = exception;
+                message.Operation = DiagnosticStrings.ErrorExecute;
+                message.ElapsedMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - message.Timestamp.Value;
+
+                _diagnosticListener.Write(DiagnosticStrings.ErrorExecute, message);
+            }
+        }
         #endregion
     }
 }

@@ -22,9 +22,8 @@
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\netstandard2.0\SQLBuilder.Core.xml</DocumentationFile>
-        <DebugType>Full</DebugType>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.0\SQLBuilder.Core.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -42,6 +41,7 @@
         <PackageReference Include="Npgsql" Version="4.1.5" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.91" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.7.1" />
     </ItemGroup>
 
     <ItemGroup>

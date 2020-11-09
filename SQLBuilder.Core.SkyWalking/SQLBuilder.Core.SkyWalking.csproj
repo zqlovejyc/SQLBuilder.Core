@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>2.0.4</Version>
+        <Authors>张强</Authors>
+        <Company>张强</Company>
+        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
+        <Description>SkyWalking扩展，实现sql链路追踪；</Description>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
+        <PackageIcon>sql.png</PackageIcon>
+        <RepositoryUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>SQLBuilder;SkyWalking</PackageTags>
+        <PackageReleaseNotes>1.新增SQLBuilder的SkyWalking扩展；</PackageReleaseNotes>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SQLBuilder.Core\SQLBuilder.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Icon\sql.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="1.0.0" />
+    </ItemGroup>
+
+</Project>

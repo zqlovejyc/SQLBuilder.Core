@@ -24,6 +24,7 @@ using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.Parameters;
 using SQLBuilder.Core.SkyWalking.Extensions;
 using System;
 using System.Linq;
@@ -92,11 +93,15 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
             {
                 var parameterJson = string.Empty;
                 if (message.Parameters is DynamicParameters dynamicParameters)
-                    parameterJson = dynamicParameters.ParameterNames?.Select(x => new
-                    {
-                        key = x,
-                        value = dynamicParameters.Get<object>(x)
-                    }).ToDictionary(k => k.key, v => v.value).ToJson();
+                    parameterJson = dynamicParameters
+                        .ParameterNames?
+                        .ToDictionary(k => k, v => dynamicParameters.Get<object>(v))
+                        .ToJson();
+                else if (message.Parameters is OracleDynamicParameters oracleDynamicParameters)
+                    parameterJson = oracleDynamicParameters
+                        .OracleParameters
+                        .ToDictionary(k => k.ParameterName, v => v.Value)
+                        .ToJson();
                 else
                     parameterJson = message.Parameters.ToJson();
 

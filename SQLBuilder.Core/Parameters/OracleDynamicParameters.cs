@@ -28,12 +28,27 @@ namespace SQLBuilder.Core.Parameters
     /// </summary>
     public class OracleDynamicParameters : SqlMapper.IDynamicParameters
     {
-        private readonly DynamicParameters dynamicParameters = new DynamicParameters();
-
-        private readonly List<OracleParameter> oracleParameters = new List<OracleParameter>();
+        /// <summary>
+        /// 动态参数
+        /// </summary>
+        public DynamicParameters DynamicParameters { get; }
 
         /// <summary>
-        /// Add
+        /// Oracle参数
+        /// </summary>
+        public List<OracleParameter> OracleParameters { get; }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public OracleDynamicParameters()
+        {
+            DynamicParameters = new DynamicParameters();
+            OracleParameters = new List<OracleParameter>();
+        }
+
+        /// <summary>
+        /// 新增参数
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
@@ -44,7 +59,7 @@ namespace SQLBuilder.Core.Parameters
         }
 
         /// <summary>
-        /// Add
+        /// 新增参数
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oracleDbType"></param>
@@ -52,11 +67,11 @@ namespace SQLBuilder.Core.Parameters
         public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction)
         {
             var oracleParameter = new OracleParameter(name, oracleDbType, direction);
-            oracleParameters.Add(oracleParameter);
+            OracleParameters.Add(oracleParameter);
         }
 
         /// <summary>
-        /// Add
+        /// 新增参数
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oracleDbType"></param>
@@ -70,19 +85,19 @@ namespace SQLBuilder.Core.Parameters
                 oracleParameter = new OracleParameter(name, oracleDbType, size.Value, value, direction);
             else
                 oracleParameter = new OracleParameter(name, oracleDbType, value, direction);
-            oracleParameters.Add(oracleParameter);
+            OracleParameters.Add(oracleParameter);
         }
 
         /// <summary>
-        /// AddParameters
+        /// 新增参数
         /// </summary>
         /// <param name="command"></param>
         /// <param name="identity"></param>
         public void AddParameters(IDbCommand command, SqlMapper.Identity identity)
         {
-            ((SqlMapper.IDynamicParameters)dynamicParameters).AddParameters(command, identity);
+            ((SqlMapper.IDynamicParameters)DynamicParameters).AddParameters(command, identity);
             if (command is OracleCommand oracleCommand)
-                oracleCommand.Parameters.AddRange(oracleParameters.ToArray());
+                oracleCommand.Parameters.AddRange(OracleParameters.ToArray());
         }
     }
 }

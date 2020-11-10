@@ -76,9 +76,9 @@ namespace SQLBuilder.Core.Repositories
         public virtual DbTransaction Transaction { get; set; }
 
         /// <summary>
-        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
+        /// 是否启用对表名和列名格式化，默认不启用，注意：只针对Lambda表达式解析生成的sql
         /// </summary>
-        public virtual bool IsEnableFormat { get; set; } = true;
+        public virtual bool IsEnableFormat { get; set; } = false;
 
         /// <summary>
         /// 分页计数语法，默认COUNT(*)

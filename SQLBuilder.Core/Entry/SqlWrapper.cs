@@ -68,7 +68,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 是否启用表名和列名格式化
         /// </summary>
-        public bool IsEnableFormat { get; set; } = true;
+        public bool IsEnableFormat { get; set; } = false;
 
         /// <summary>
         /// 默认T类型

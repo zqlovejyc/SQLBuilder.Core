@@ -41,7 +41,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="configuration">服务配置</param>
         /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
-        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认启用</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="isInjectLoadBalancer">是否注入从库负载均衡，默认注入单例权重轮询方式(WeightRoundRobinLoadBalancer)，可以设置为false实现自定义方式</param>
         /// <param name="lifeTime">生命周期，默认单例</param>
@@ -80,7 +80,7 @@ namespace SQLBuilder.Core.Extensions
             IConfiguration configuration,
             string defaultName,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = true,
+            bool isEnableFormat = false,
             string countSyntax = "COUNT(*)",
             bool isInjectLoadBalancer = true,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)

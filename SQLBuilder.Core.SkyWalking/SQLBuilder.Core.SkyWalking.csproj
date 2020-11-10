@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.0.4</Version>
+        <Version>2.0.5</Version>
         <Authors>张强</Authors>
         <Company>张强</Company>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
@@ -14,7 +14,7 @@
         <RepositoryUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>SQLBuilder;SkyWalking</PackageTags>
-        <PackageReleaseNotes>1.新增SQLBuilder的SkyWalking扩展；</PackageReleaseNotes>
+        <PackageReleaseNotes>1.优化SQLBuilderTracingDiagnosticProcessor；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
     </PropertyGroup>

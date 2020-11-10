@@ -494,7 +494,7 @@ namespace SQLBuilder.Core.Repositories
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
                     result = connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
 

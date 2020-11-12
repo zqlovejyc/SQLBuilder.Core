@@ -2,15 +2,16 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
-        <AssemblyVersion>2.1.0.0</AssemblyVersion>
+        <AssemblyVersion>2.1.1.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.1.0</Version>
+        <Version>2.1.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.升级支持.net5.0；</PackageReleaseNotes>
-        <FileVersion>2.1.0.0</FileVersion>
+        <PackageReleaseNotes>1.引入FastExpressionCompiler，优化Expression编译；
+2.修复部分情况下sql拦截委托执行两次的bug；</PackageReleaseNotes>
+        <FileVersion>2.1.1.0</FileVersion>
         <PackageProjectUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>

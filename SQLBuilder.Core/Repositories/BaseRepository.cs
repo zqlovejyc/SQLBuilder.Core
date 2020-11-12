@@ -443,16 +443,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 IEnumerable<T> result = null;
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = Transaction.Connection.Query<T>(builder.Sql, builder.DynamicParameters, Transaction, commandTimeout: CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Query<T>(sql, parameter, Transaction, commandTimeout: CommandTimeout);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = connection.Query<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.Query<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
 
                 ExecuteAfter(message);
@@ -564,16 +567,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 var result = default(T);
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = Transaction.Connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.QueryFirstOrDefault<T>(sql, parameter, Transaction, CommandTimeout);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = connection.QueryFirstOrDefault<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.QueryFirstOrDefault<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
 
                 ExecuteAfter(message);
@@ -757,16 +763,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 IEnumerable<T> result = null;
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = await Transaction.Connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryAsync<T>(sql, parameter, Transaction, CommandTimeout);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = await connection.QueryAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.QueryAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
 
                 ExecuteAfter(message);
@@ -880,16 +889,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 var result = default(T);
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = await Transaction.Connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.QueryFirstOrDefaultAsync<T>(sql, parameter, Transaction, CommandTimeout);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = await connection.QueryFirstOrDefaultAsync<T>(builder.Sql, builder.DynamicParameters, commandTimeout: CommandTimeout);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.QueryFirstOrDefaultAsync<T>(sql, parameter, commandTimeout: CommandTimeout);
                 }
 
                 ExecuteAfter(message);
@@ -1077,16 +1089,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 var result = 0;
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = Transaction.Connection.Execute(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = Transaction.Connection.Execute(sql, parameter, Transaction, CommandTimeout, command);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = connection.Execute(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = connection.Execute(sql, parameter, null, CommandTimeout, command);
                 }
 
                 ExecuteAfter(message);
@@ -1237,16 +1252,19 @@ namespace SQLBuilder.Core.Repositories
             {
                 var result = 0;
 
+                var sql = builder.Sql;
+                var parameter = builder.DynamicParameters;
+
                 if (Transaction?.Connection != null)
                 {
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, Transaction.Connection.DataSource);
-                    result = await Transaction.Connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, Transaction, CommandTimeout, command);
+                    message = ExecuteBefore(sql, parameter, Transaction.Connection.DataSource);
+                    result = await Transaction.Connection.ExecuteAsync(sql, parameter, Transaction, CommandTimeout, command);
                 }
                 else
                 {
                     using var connection = Connection;
-                    message = ExecuteBefore(builder.Sql, builder.Parameters, connection.DataSource);
-                    result = await connection.ExecuteAsync(builder.Sql, builder.DynamicParameters, null, CommandTimeout, command);
+                    message = ExecuteBefore(sql, parameter, connection.DataSource);
+                    result = await connection.ExecuteAsync(sql, parameter, null, CommandTimeout, command);
                 }
 
                 ExecuteAfter(message);

@@ -520,8 +520,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join)
             where T2 : class
         {
-            var alias = GetExpressionAlias(expression, typeof(T2)).Last().alias;
-            var tableName = this.sqlWrapper.GetTableName(typeof(T2));
+            var type = typeof(T2);
+            this.sqlWrapper.AddJoinType(type);
+
+            var alias = GetExpressionAlias(expression, type).Last().alias;
+            var tableName = this.sqlWrapper.GetTableName(type);
 
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
@@ -556,8 +559,24 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var alias = GetExpressionAlias(expression, typeof(T3)).Last().alias;
-            var tableName = this.sqlWrapper.GetTableName(typeof(T3));
+            var type2 = typeof(T2);
+            var type3 = typeof(T3);
+            var type = type3;
+
+            //如果T3已被Join，则选择T2
+            if (this.sqlWrapper.IsJoined(type3))
+            {
+                type = type2;
+
+                //如果T2也已被Join，则重置为T3
+                if (this.sqlWrapper.IsJoined(type2))
+                    type = type3;
+            }
+
+            this.sqlWrapper.AddJoinType(type);
+
+            var alias = GetExpressionAlias(expression, type).Last().alias;
+            var tableName = this.sqlWrapper.GetTableName(type);
 
             /***
              * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
@@ -895,7 +914,11 @@ namespace SQLBuilder.Core.Entry
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
-            if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
+            if (!((expression.NodeType == ExpressionType.Constant
+                && expression.ToObject() is bool b && b)
+                || (expression is LambdaExpression lambdaExpression
+                && lambdaExpression.Body.NodeType == ExpressionType.Constant
+                && lambdaExpression.Body.ToObject() is bool r && r)))
             {
                 this.sqlWrapper += " WHERE ";
 
@@ -915,7 +938,11 @@ namespace SQLBuilder.Core.Entry
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
-            if (!(expression.NodeType == ExpressionType.Constant && expression.ToObject() is bool b && b))
+            if (!((expression.NodeType == ExpressionType.Constant
+                && expression.ToObject() is bool b && b)
+                || (expression is LambdaExpression lambdaExpression
+                && lambdaExpression.Body.NodeType == ExpressionType.Constant
+                && lambdaExpression.Body.ToObject() is bool r && r)))
             {
                 if (hasWhere)
                     this.sqlWrapper += " AND ";

@@ -147,6 +147,11 @@ namespace SQLBuilder.Core.Entry
                 };
             }
         }
+
+        /// <summary>
+        /// 已Join的表实体类型
+        /// </summary>
+        public List<Type> JoinTypes { get; set; }
         #endregion
 
         #region Constructor
@@ -159,6 +164,7 @@ namespace SQLBuilder.Core.Entry
             this.SelectFields = new List<string>();
             this.DbParameters = new Dictionary<string, object>();
             this.aliasDictionary = new Dictionary<string, string>();
+            this.JoinTypes = new List<Type>();
         }
         #endregion
 
@@ -416,6 +422,29 @@ namespace SQLBuilder.Core.Entry
         {
             this.Reset().Append(sql);
             return this;
+        }
+        #endregion
+
+        #region JoinType
+        /// <summary>
+        /// 添加已Join的表实体类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public SqlWrapper AddJoinType(Type type)
+        {
+            this.JoinTypes.Add(type);
+            return this;
+        }
+
+        /// <summary>
+        /// 是否已被Join
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool IsJoined(Type type)
+        {
+            return this.JoinTypes.Contains(type);
         }
         #endregion
 

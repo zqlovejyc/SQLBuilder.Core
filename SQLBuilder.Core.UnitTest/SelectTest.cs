@@ -1815,6 +1815,36 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM `Base_UserInfo` AS `o` WHERE (`o`.`Name` = ?p__1)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询90
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_90()
+        {
+            var expr = LinqExtensions.True<Student>().WhereIf(false, x => x.UserId == 1);
+            var builder = SqlBuilder.Select<UserInfo, Student>((x, y) => x).LeftJoin<Student>((x, y) => x.Id == y.UserId).Where(expr);
+            Assert.AreEqual("SELECT x.* FROM Base_UserInfo AS x LEFT JOIN Base_Student AS y ON x.Id = y.UserId", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询91
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_91()
+        {
+            var builder = SqlBuilder
+                                .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                                .Join<Account>((x, y) => x.Id == y.UserId)
+                                .LeftJoin<Account, Student>((x, y) => x.Id == y.AccountId)
+                                .RightJoin<Class, Student>((x, y) => y.Id == x.UserId)
+                                .InnerJoin<Class, City>((x, y) => x.CityId == y.Id)
+                                .FullJoin<City, Country>((x, y) => x.CountryId == y.Id)
+                                .Where(u => u.Id != null);
+            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

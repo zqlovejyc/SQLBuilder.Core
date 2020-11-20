@@ -472,6 +472,21 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            var field = expression.ToObject()?.ToString();
+            if (!field.IsNullOrEmpty())
+                sqlWrapper.AddField(field);
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>

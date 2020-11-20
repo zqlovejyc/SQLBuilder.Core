@@ -1845,6 +1845,18 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询92
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_92()
+        {
+            var field = "u.Name";
+            var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, UserName = $"{field}" });
+            Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

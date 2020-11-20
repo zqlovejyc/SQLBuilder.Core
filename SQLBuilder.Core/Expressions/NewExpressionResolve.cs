@@ -132,6 +132,8 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
                     else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
                         sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    else if (argument is MethodCallExpression methodCallExpression && methodCallExpression.ToObject()?.ToString() != member.Name)
+                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
                 }
             }
             else

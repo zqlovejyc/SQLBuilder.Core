@@ -21,7 +21,7 @@
         <LangVersion>8.0</LangVersion>
         <RepositoryUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>SQLBuilder;Expression;Repository;SQL;ORM;Dapper</PackageTags>
+        <PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

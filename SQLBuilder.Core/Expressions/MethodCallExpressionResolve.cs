@@ -389,17 +389,35 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression.Object != null)
             {
-                if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
-                    sqlWrapper += "LTRIM(RTRIM(";
-                else
-                    sqlWrapper += "TRIM(";
+                if (expression.Arguments?.Count > 0)
+                {
+                    var trimString = expression.Object.ToObject()?.ToString();
+                    if (!trimString.IsNullOrEmpty())
+                    {
+                        string constant;
+                        var argument = expression.Arguments[0].ToObject();
+                        if (argument is char @char)
+                            constant = trimString.Trim(@char);
+                        else
+                            constant = trimString.Trim((char[])argument);
 
-                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-
-                if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
-                    sqlWrapper += "))";
+                        SqlExpressionProvider.Where(Expression.Constant(constant), sqlWrapper);
+                    }
+                }
                 else
-                    sqlWrapper += ")";
+                {
+                    if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
+                        sqlWrapper += "LTRIM(RTRIM(";
+                    else
+                        sqlWrapper += "TRIM(";
+
+                    SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+
+                    if (sqlWrapper.DatabaseType == DatabaseType.SqlServer)
+                        sqlWrapper += "))";
+                    else
+                        sqlWrapper += ")";
+                }
             }
         }
 
@@ -412,9 +430,27 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression.Object != null)
             {
-                sqlWrapper += "LTRIM(";
-                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-                sqlWrapper += ")";
+                if (expression.Arguments?.Count > 0)
+                {
+                    var trimString = expression.Object.ToObject()?.ToString();
+                    if (!trimString.IsNullOrEmpty())
+                    {
+                        string constant;
+                        var argument = expression.Arguments[0].ToObject();
+                        if (argument is char @char)
+                            constant = trimString.TrimStart(@char);
+                        else
+                            constant = trimString.TrimStart((char[])argument);
+
+                        SqlExpressionProvider.Where(Expression.Constant(constant), sqlWrapper);
+                    }
+                }
+                else
+                {
+                    sqlWrapper += "LTRIM(";
+                    SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                    sqlWrapper += ")";
+                }
             }
         }
 
@@ -427,9 +463,27 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression.Object != null)
             {
-                sqlWrapper += "RTRIM(";
-                SqlExpressionProvider.Where(expression.Object, sqlWrapper);
-                sqlWrapper += ")";
+                if (expression.Arguments?.Count > 0)
+                {
+                    var trimString = expression.Object.ToObject()?.ToString();
+                    if (!trimString.IsNullOrEmpty())
+                    {
+                        string constant;
+                        var argument = expression.Arguments[0].ToObject();
+                        if (argument is char @char)
+                            constant = trimString.TrimEnd(@char);
+                        else
+                            constant = trimString.TrimEnd((char[])argument);
+
+                        SqlExpressionProvider.Where(Expression.Constant(constant), sqlWrapper);
+                    }
+                }
+                else
+                {
+                    sqlWrapper += "RTRIM(";
+                    SqlExpressionProvider.Where(expression.Object, sqlWrapper);
+                    sqlWrapper += ")";
+                }
             }
         }
         #endregion

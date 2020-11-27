@@ -87,14 +87,15 @@ namespace SQLBuilder.Core.Expressions
             //表示命名参数表达式
             else if (expression is ParameterExpression)
                 return new ParameterExpressionResolve();
+
+            //表示条件表达式
+            else if (expression is ConditionalExpression)
+                return new ConditionalExpressionReslove();
             #endregion
 
             #region NotImplemented Expression
             else if (expression is BlockExpression)
                 throw new NotImplementedException($"NotImplemented {nameof(BlockExpression)}");
-
-            else if (expression is ConditionalExpression)
-                throw new NotImplementedException($"NotImplemented {nameof(ConditionalExpression)}");
 
             else if (expression is DebugInfoExpression)
                 throw new NotImplementedException($"NotImplemented {nameof(DebugInfoExpression)}");

@@ -1891,6 +1891,40 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u INNER JOIN Base_Account AS a ON u.Id = a.UserId AND u.Name LIKE '%' + @p__1 + '%' WHERE (u.Name LIKE '%' + @p__2 + '%') AND (u.Email = @p__3)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询94
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_94()
+        {
+            //Join条件拼接
+            var name = "123[∞]";
+            var joinCondition = LinqExtensions.True<UserInfo, Account>()
+                                          .And((x, y) => x.Id == y.UserId)
+                                          .WhereIf(!name.IsNullOrEmpty(), (x, y) => name.EndsWith("∞") ? x.Name.Contains(name.Trim('∞')) : x.Name == name);
+
+            //sql构建
+            var hasWhere = false;
+            var email = "123@qq.com";
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>(
+                                (u, a) => new { u.Id, UserName = "u.Name" })
+                            .InnerJoin<Account>(
+                                joinCondition)
+                            .WhereIf(
+                                !name.IsNullOrEmpty(),
+                                x => name.EndsWith("[∞]") ? x.Name.Contains(name.Replace("[∞]", "")) : x.Name == name,
+                                ref hasWhere)
+                            .WhereIf(
+                                !email.IsNullOrEmpty(),
+                                x => x.Email == email,
+                                ref hasWhere);
+
+
+            Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u INNER JOIN Base_Account AS a ON u.Id = a.UserId AND u.Name = @p__1 WHERE (u.Name LIKE '%' + @p__2 + '%') AND (u.Email = @p__3)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

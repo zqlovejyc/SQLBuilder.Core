@@ -38,16 +38,18 @@ namespace SQLBuilder.Core.Entry
         /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：否</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Insert<T>(
             Expression<Func<object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             bool isEnableNullValue = false,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue, tableNameFunc);
         }
         #endregion
 
@@ -59,14 +61,16 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Delete<T>(
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete();
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete(tableNameFunc);
         }
         #endregion
 
@@ -80,16 +84,18 @@ namespace SQLBuilder.Core.Entry
         /// <param name="isEnableNullValue">是否对null值属性进行sql拼接操作，默认：否</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Update<T>(
             Expression<Func<object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             bool isEnableNullValue = false,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue, tableNameFunc);
         }
         #endregion
 
@@ -102,15 +108,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T>(
             Expression<Func<T, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -122,16 +130,18 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2>(
             Expression<Func<T, T2, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -144,17 +154,19 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3>(
             Expression<Func<T, T2, T3, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -168,18 +180,20 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4>(
             Expression<Func<T, T2, T3, T4, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
             where T4 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -194,19 +208,21 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5>(
             Expression<Func<T, T2, T3, T4, T5, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
             where T4 : class
             where T5 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -222,12 +238,14 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6>(
             Expression<Func<T, T2, T3, T4, T5, T6, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
@@ -235,7 +253,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -252,12 +270,14 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
@@ -266,7 +286,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -284,12 +304,14 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
@@ -299,7 +321,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -318,12 +340,14 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
@@ -334,7 +358,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
 
         /// <summary>
@@ -354,12 +378,14 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Select<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
             Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
             where T3 : class
@@ -371,7 +397,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         }
         #endregion
 
@@ -384,15 +410,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Max<T>(
             Expression<Func<T, object>> expression,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression, tableNameFunc);
         }
         #endregion
 
@@ -405,15 +433,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Min<T>(
             Expression<Func<T, object>> expression,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression, tableNameFunc);
         }
         #endregion
 
@@ -426,15 +456,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Avg<T>(
             Expression<Func<T, object>> expression,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression, tableNameFunc);
         }
         #endregion
 
@@ -447,15 +479,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Count<T>(
             Expression<Func<T, object>> expression = null,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
         }
         #endregion
 
@@ -468,15 +502,17 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public static SqlBuilderCore<T> Sum<T>(
             Expression<Func<T, object>> expression,
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
-            bool isEnableFormat = false)
+            bool isEnableFormat = false,
+            Func<string, string> tableNameFunc = null)
             where T : class
         {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression);
+            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression, tableNameFunc);
         }
         #endregion
 

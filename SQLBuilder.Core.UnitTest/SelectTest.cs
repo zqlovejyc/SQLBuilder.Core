@@ -1925,6 +1925,40 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u INNER JOIN Base_Account AS a ON u.Id = a.UserId AND u.Name = @p__1 WHERE (u.Name LIKE '%' + @p__2 + '%') AND (u.Email = @p__3)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询95
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_95()
+        {
+            Func<string[], string> @delegate = x => $"ks.{x[0]}{x[1]}{x[2]} WITH(NOLOCK)";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) =>
+                                new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name },
+                                tableNameFunc: @delegate)
+                            .Join<Account>((x, y) =>
+                                x.Id == y.UserId,
+                                @delegate)
+                            .LeftJoin<Account, Student>((x, y) =>
+                                x.Id == y.AccountId,
+                                @delegate)
+                            .RightJoin<Class, Student>((x, y) =>
+                                y.Id == x.UserId,
+                                @delegate)
+                            .InnerJoin<Class, City>((x, y) =>
+                                x.CityId == y.Id,
+                                @delegate)
+                            .FullJoin<City, Country>((x, y) =>
+                                x.CountryId == y.Id,
+                                @delegate)
+                            .Where(u =>
+                                u.Id != null);
+
+            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM ks.Base_UserInfo AS u WITH(NOLOCK) JOIN ks.Base_Account AS a WITH(NOLOCK) ON u.Id = a.UserId LEFT JOIN ks.Base_Student AS s WITH(NOLOCK) ON a.Id = s.AccountId RIGHT JOIN ks.Base_Class AS d WITH(NOLOCK) ON s.Id = d.UserId INNER JOIN ks.Base_City AS e WITH(NOLOCK) ON d.CityId = e.Id FULL JOIN ks.Base_Country AS f WITH(NOLOCK) ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

@@ -844,15 +844,24 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_19()
         {
-            var builder = SqlBuilder.Select<UserInfo, UserInfo, Account, Student, Class, City, Country>((u, t, a, s, d, e, f) => new { u.Id, UId = t.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                                    .Join<UserInfo>((x, t) => x.Id == t.Id) //注意此处单表多次Join所以要指明具体表别名，否则都会读取第一个表别名
-                                    .Join<Account>((x, y) => x.Id == y.UserId)
-                                    .LeftJoin<Account, Student>((x, y) => x.Id == y.AccountId)
-                                    .RightJoin<Student, Class>((x, y) => x.Id == y.UserId)
-                                    .InnerJoin<Class, City>((x, y) => x.CityId == y.Id)
-                                    .FullJoin<City, Country>((x, y) => x.CountryId == y.Id)
-                                    .Where(x => x.Id != null);
-            Assert.AreEqual("SELECT u.Id,t.Id AS UId,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_UserInfo AS t ON u.Id = t.Id JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            var builder = SqlBuilder
+                            .Select<UserInfo, UserInfo, Account, Student, Class, City, Country>((u, t, a, s, d, e, f) =>
+                                new { u.Id, UId = t.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                            .Join<UserInfo>((x, t) =>
+                                x.Id == t.Id) //注意此处单表多次Join所以要指明具体表别名，否则都会读取第一个表别名
+                            .Join<Account>((x, y) =>
+                                x.Id == y.UserId)
+                            .LeftJoin<Account, Student>((x, y) =>
+                                x.Id == y.AccountId)
+                            .RightJoin<Student, Class>((x, y) =>
+                                x.Id == y.UserId)
+                            .InnerJoin<Class, City>((x, y) =>
+                                x.CityId == y.Id)
+                            .FullJoin<City, Country>((x, y) =>
+                                x.CountryId == y.Id)
+                            .Where(x =>
+                                x.Id != null);
+            Assert.AreEqual("SELECT u.Id,t.Id AS UId,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_UserInfo AS t ON u.Id = t.Id JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1134,7 +1143,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_40()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.Id > 0);
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE o.Id > @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE o.Id > @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1145,7 +1154,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_41()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.ToUpper() == "郑州");
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE UPPER(o.City_Name) = @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE UPPER(o.City_Name) = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1156,7 +1165,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_42()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.ToLower() == "郑州");
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE LOWER(o.City_Name) = @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE LOWER(o.City_Name) = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1167,7 +1176,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_43()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim() == "郑州");
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE LTRIM(RTRIM(o.City_Name)) = @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE LTRIM(RTRIM(o.City_Name)) = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1178,7 +1187,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_44()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.TrimStart() == "郑州");
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE LTRIM(o.City_Name) = @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE LTRIM(o.City_Name) = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1189,7 +1198,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_45()
         {
             var builder = SqlBuilder.Select<City3>().Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.TrimEnd() == "郑州");
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE RTRIM(o.City_Name) = @p__1", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE RTRIM(o.City_Name) = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1200,7 +1209,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_46()
         {
             var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.MySql, isEnableFormat: true).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => !string.IsNullOrEmpty(o.CityName) && o.CityName.Trim() == "郑州".Trim());
-            Assert.AreEqual("SELECT `o`.`Id`,`o`.`City_Name`,`o`.`Age`,`o`.`Address` FROM `Base_City3` AS `o` WHERE (`o`.`City_Name` IS NOT NULL AND `o`.`City_Name` <> '') AND TRIM(`o`.`City_Name`) = TRIM(?p__1)", builder.Sql);
+            Assert.AreEqual("SELECT `o`.`Id`,`o`.`City_Name` AS `CityName`,`o`.`Age`,`o`.`Address` FROM `Base_City3` AS `o` WHERE (`o`.`City_Name` IS NOT NULL AND `o`.`City_Name` <> '') AND TRIM(`o`.`City_Name`) = TRIM(?p__1)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1211,7 +1220,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_47()
         {
             var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.MySql).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
-            Assert.AreEqual("SELECT o.Id,o.City_Name,o.Age,o.Address FROM Base_City3 AS o WHERE TRIM(o.City_Name) LIKE CONCAT('%',TRIM(?p__1),'%')", builder.Sql);
+            Assert.AreEqual("SELECT o.Id,o.City_Name AS CityName,o.Age,o.Address FROM Base_City3 AS o WHERE TRIM(o.City_Name) LIKE CONCAT('%',TRIM(?p__1),'%')", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1222,7 +1231,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_48()
         {
             var builder = SqlBuilder.Select<City3>(databaseType: DatabaseType.Sqlite, isEnableFormat: true).Select(o => new { o.Id, o.CityName, o.Age, o.Address }).Where(o => o.CityName.Trim().Contains("郑州".Trim()));
-            Assert.AreEqual("SELECT \"o\".\"Id\",\"o\".\"City_Name\",\"o\".\"Age\",\"o\".\"Address\" FROM \"Base_City3\" AS \"o\" WHERE TRIM(\"o\".\"City_Name\") LIKE '%' || TRIM(@p__1) || '%'", builder.Sql);
+            Assert.AreEqual("SELECT \"o\".\"Id\",\"o\".\"City_Name\" AS \"CityName\",\"o\".\"Age\",\"o\".\"Address\" FROM \"Base_City3\" AS \"o\" WHERE TRIM(\"o\".\"City_Name\") LIKE '%' || TRIM(@p__1) || '%'", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
 
@@ -1380,14 +1389,21 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_62()
         {
             var builder = SqlBuilder
-                                .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                                .Join<Account>((x, y) => x.Id == y.UserId)
-                                .LeftJoin<Account, Student>((x, y) => x.Id == y.AccountId)
-                                .RightJoin<Student, Class>((x, y) => x.Id == y.UserId)
-                                .InnerJoin<Class, City>((x, y) => x.CityId == y.Id)
-                                .FullJoin<City, Country>((x, y) => x.CountryId == y.Id)
-                                .Where(u => u.Id != null);
-            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+                            .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) =>
+                                new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                            .Join<Account>((x, y) =>
+                                x.Id == y.UserId)
+                            .LeftJoin<Account, Student>((x, y) =>
+                                x.Id == y.AccountId)
+                            .RightJoin<Student, Class>((x, y) =>
+                                x.Id == y.UserId)
+                            .InnerJoin<Class, City>((x, y) =>
+                                x.CityId == y.Id)
+                            .FullJoin<City, Country>((x, y) =>
+                                x.CountryId == y.Id)
+                            .Where(u =>
+                                u.Id != null);
+            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1835,14 +1851,21 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_91()
         {
             var builder = SqlBuilder
-                                .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) => new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
-                                .Join<Account>((x, y) => x.Id == y.UserId)
-                                .LeftJoin<Account, Student>((x, y) => x.Id == y.AccountId)
-                                .RightJoin<Class, Student>((x, y) => y.Id == x.UserId)
-                                .InnerJoin<Class, City>((x, y) => x.CityId == y.Id)
-                                .FullJoin<City, Country>((x, y) => x.CountryId == y.Id)
-                                .Where(u => u.Id != null);
-            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+                            .Select<UserInfo, Account, Student, Class, City, Country>((u, a, s, d, e, f) =>
+                                new { u, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                            .Join<Account>((x, y) =>
+                                x.Id == y.UserId)
+                            .LeftJoin<Account, Student>((x, y) =>
+                                x.Id == y.AccountId)
+                            .RightJoin<Class, Student>((x, y) =>
+                                y.Id == x.UserId)
+                            .InnerJoin<Class, City>((x, y) =>
+                                x.CityId == y.Id)
+                            .FullJoin<City, Country>((x, y) =>
+                                x.CountryId == y.Id)
+                            .Where(u =>
+                                u.Id != null);
+            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -1956,7 +1979,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(u =>
                                 u.Id != null);
 
-            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name,f.Name AS CountryName FROM ks.Base_UserInfo AS u WITH(NOLOCK) JOIN ks.Base_Account AS a WITH(NOLOCK) ON u.Id = a.UserId LEFT JOIN ks.Base_Student AS s WITH(NOLOCK) ON a.Id = s.AccountId RIGHT JOIN ks.Base_Class AS d WITH(NOLOCK) ON s.Id = d.UserId INNER JOIN ks.Base_City AS e WITH(NOLOCK) ON d.CityId = e.Id FULL JOIN ks.Base_Country AS f WITH(NOLOCK) ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual("SELECT u.*,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM ks.Base_UserInfo AS u WITH(NOLOCK) JOIN ks.Base_Account AS a WITH(NOLOCK) ON u.Id = a.UserId LEFT JOIN ks.Base_Student AS s WITH(NOLOCK) ON a.Id = s.AccountId RIGHT JOIN ks.Base_Class AS d WITH(NOLOCK) ON s.Id = d.UserId INNER JOIN ks.Base_City AS e WITH(NOLOCK) ON d.CityId = e.Id FULL JOIN ks.Base_Country AS f WITH(NOLOCK) ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

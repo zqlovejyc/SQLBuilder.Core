@@ -20,6 +20,7 @@ using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
@@ -127,13 +128,46 @@ namespace SQLBuilder.Core.Expressions
                     var member = expression.Members[i];
                     SqlExpressionProvider.Select(argument, sqlWrapper);
 
+                    var fieldName = sqlWrapper
+                        .SelectFields[sqlWrapper.FieldCount - 1]
+                        .Split('.')
+                        .LastOrDefault()?
+                        .Replace("[", "")
+                        .Replace("]", "")
+                        .Replace("\"", "")
+                        .Replace("`", "");
+
                     //添加字段别名
-                    if (argument is MemberExpression memberExpression && memberExpression.Member.Name != member.Name)
-                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
-                    else if (argument is ConstantExpression constantExpression && constantExpression.Value?.ToString() != member.Name)
-                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
-                    else if (argument is MethodCallExpression methodCallExpression && methodCallExpression.ToObject()?.ToString() != member.Name)
-                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+                    if (argument is MemberExpression memberExpression)
+                    {
+                        var agrumentName = memberExpression.Member.Name;
+
+                        if (agrumentName != member.Name)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+
+                        else if (agrumentName != fieldName)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(agrumentName)}";
+                    }
+                    else if (argument is ConstantExpression constantExpression)
+                    {
+                        var agrumentName = constantExpression.Value?.ToString();
+
+                        if (agrumentName != member.Name)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+
+                        else if (agrumentName != fieldName)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(agrumentName)}";
+                    }
+                    else if (argument is MethodCallExpression methodCallExpression)
+                    {
+                        var agrumentName = methodCallExpression.ToObject()?.ToString();
+
+                        if (agrumentName != member.Name)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+
+                        else if (agrumentName != fieldName)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(agrumentName)}";
+                    }
                 }
             }
             else

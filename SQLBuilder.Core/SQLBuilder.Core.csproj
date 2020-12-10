@@ -40,11 +40,11 @@
         <PackageReference Include="Dapper" Version="2.0.78" />
         <PackageReference Include="FastExpressionCompiler" Version="2.0.0" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
-        <PackageReference Include="MySqlConnector" Version="1.1.0" />
+        <PackageReference Include="MySqlConnector" Version="1.2.0" />
         <PackageReference Include="Npgsql" Version="5.0.0" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.100" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

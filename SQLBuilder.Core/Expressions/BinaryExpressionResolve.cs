@@ -95,6 +95,21 @@ namespace SQLBuilder.Core.Expressions
 
         #region Override Base Class Methods
         /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            var field = expression?.ToObject();
+            if (field != null)
+                SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>

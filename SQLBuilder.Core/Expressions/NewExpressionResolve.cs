@@ -168,6 +168,16 @@ namespace SQLBuilder.Core.Expressions
                         else if (agrumentName != fieldName)
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(agrumentName)}";
                     }
+                    else if (argument is BinaryExpression binaryExpression)
+                    {
+                        var agrumentName = binaryExpression.ToObject()?.ToString();
+
+                        if (agrumentName != member.Name)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";
+
+                        else if (agrumentName != fieldName)
+                            sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(agrumentName)}";
+                    }
                 }
             }
             else

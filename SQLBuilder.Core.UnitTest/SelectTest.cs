@@ -1993,6 +1993,22 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询97
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_97()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                new { u.Id, UserName = $"u.Name" })
+                            .Where(x =>
+                                new HashSet<int> { 1, 2, 3 }.ToArray().Contains(x.Id.Value));
+
+            Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u WHERE u.Id IN (@p__1,@p__2,@p__3)", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

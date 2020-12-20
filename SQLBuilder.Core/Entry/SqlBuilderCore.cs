@@ -211,7 +211,7 @@ namespace SQLBuilder.Core.Entry
         }
 
         /// <summary>
-        /// SelectParser
+        /// Select
         /// </summary>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <param name="array">可变数量参数</param>

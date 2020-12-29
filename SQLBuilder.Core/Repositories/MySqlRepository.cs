@@ -143,8 +143,6 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            var sqlQuery = "";
-
             //排序字段
             if (!orderField.IsNullOrEmpty())
             {
@@ -154,18 +152,22 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
 
+            string sqlQuery;
+            var limit = pageSize;
+            var offset = pageSize * (pageIndex - 1);
+
             //判断是否with语法
             if (isWithSyntax)
             {
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS `TOTAL` FROM T;";
 
-                sqlQuery += $"{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+                sqlQuery += $"{sql} SELECT * FROM T {orderField} LIMIT {limit} OFFSET {offset};";
             }
             else
             {
                 sqlQuery = $"SELECT {CountSyntax} AS `TOTAL` FROM ({sql}) AS T;";
 
-                sqlQuery += $"SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};";
+                sqlQuery += $"SELECT * FROM ({sql}) AS T {orderField} LIMIT {limit} OFFSET {offset};";
             }
 
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;

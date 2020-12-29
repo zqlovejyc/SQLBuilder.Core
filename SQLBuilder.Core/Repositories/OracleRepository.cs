@@ -145,8 +145,6 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public override string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
-            var sqlQuery = "";
-
             //排序字段
             if (!orderField.IsNullOrEmpty())
             {
@@ -156,18 +154,22 @@ namespace SQLBuilder.Core.Repositories
                     orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
 
+            string sqlQuery;
+            var rowStart = pageSize * (pageIndex - 1) + 1;
+            var rowEnd = pageSize * pageIndex;
+
             //判断是否with语法
             if (isWithSyntax)
             {
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS \"TOTAL\" FROM T;";
 
-                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE ROWNUMBER>={pageSize * (pageIndex - 1) + 1}";
+                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {rowEnd}) SELECT * FROM R WHERE ROWNUMBER>={rowStart}";
             }
             else
             {
                 sqlQuery = $"SELECT {CountSyntax} AS \"TOTAL\" FROM ({sql}) T;";
 
-                sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}";
+                sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {rowEnd}) T WHERE \"ROWNUMBER\" >= {rowStart}";
             }
 
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;

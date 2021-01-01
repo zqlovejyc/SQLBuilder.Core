@@ -7,7 +7,7 @@
         <Version>2.1.2</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
-        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
         <PackageReleaseNotes>1.优化多表Join，修复实体lambda先后顺序不一致造成的bug；
 2.修复部分条件下Where表达式SQL解析错误bug；</PackageReleaseNotes>

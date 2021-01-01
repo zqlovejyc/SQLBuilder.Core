@@ -6,7 +6,7 @@
         <Version>2.1.2</Version>
         <Authors>张强</Authors>
         <Company>张强</Company>
-        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <Description>SkyWalking扩展，实现sql链路追踪；</Description>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>

@@ -19,6 +19,7 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Repositories;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -182,6 +183,102 @@ namespace SQLBuilder.Core.Extensions
         public static async Task<object> ToObjectAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
         {
             return await repository.FindObjectAsync(@this.Sql, @this.DynamicParameters);
+        }
+        #endregion
+
+        #region ToPage
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static (List<TEntity> list, long total) ToPage<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            var (list, total) = repository.FindList<TEntity>(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static async Task<(List<TEntity> list, long total)> ToPageAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            var (list, total) = await repository.FindListAsync<TEntity>(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+        #endregion
+
+        #region ToDataTable
+        /// <summary>
+        /// 获取DataTable
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <returns></returns>
+        public static DataTable ToDataTable<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        {
+            return repository.FindTable(@this.Sql, @this.DynamicParameters);
+        }
+
+        /// <summary>
+        /// 获取DataTable
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static (DataTable table, long total) ToDataTable<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            return repository.FindTable(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 获取DataTable
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <returns></returns>
+        public static async Task<DataTable> ToDataTableAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository) where TEntity : class
+        {
+            return await repository.FindTableAsync(@this.Sql, @this.DynamicParameters);
+        }
+
+        /// <summary>
+        /// 获取DataTable
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static async Task<(DataTable table, long total)> ToDataTableAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            return await repository.FindTableAsync(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
         }
         #endregion
     }

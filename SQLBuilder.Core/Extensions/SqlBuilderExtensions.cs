@@ -209,6 +209,25 @@ namespace SQLBuilder.Core.Extensions
         /// 分页
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TReturn"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static (List<TReturn> list, long total) ToPage<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            var (list, total) = repository.FindList<TReturn>(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
         /// <param name="this"></param>
         /// <param name="repository"></param>
         /// <param name="orderField"></param>
@@ -219,6 +238,25 @@ namespace SQLBuilder.Core.Extensions
         public static async Task<(List<TEntity> list, long total)> ToPageAsync<TEntity>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
         {
             var (list, total) = await repository.FindListAsync<TEntity>(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TReturn"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="repository"></param>
+        /// <param name="orderField"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public static async Task<(List<TReturn> list, long total)> ToPageAsync<TEntity, TReturn>(this SqlBuilderCore<TEntity> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where TEntity : class
+        {
+            var (list, total) = await repository.FindListAsync<TReturn>(@this.Sql, @this.DynamicParameters, orderField, isAscending, pageSize, pageIndex);
 
             return (list?.ToList(), total);
         }

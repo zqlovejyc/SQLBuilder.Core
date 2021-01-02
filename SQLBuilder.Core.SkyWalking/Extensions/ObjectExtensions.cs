@@ -40,6 +40,17 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
         /// 对象序列化为json字符串
         /// </summary>
         /// <param name="this">待序列化的对象</param>
+        /// <param name="settings">JsonSerializerSettings配置</param>
+        /// <returns></returns>
+        public static string ToJson(this object @this, JsonSerializerSettings settings)
+        {
+            return JsonConvert.SerializeObject(@this, settings ?? new JsonSerializerSettings());
+        }
+
+        /// <summary>
+        /// 对象序列化为json字符串
+        /// </summary>
+        /// <param name="this">待序列化的对象</param>
         /// <param name="camelCase">是否驼峰</param>
         /// <param name="indented">是否缩进</param>
         /// <param name="nullValueHandling">空值处理</param>

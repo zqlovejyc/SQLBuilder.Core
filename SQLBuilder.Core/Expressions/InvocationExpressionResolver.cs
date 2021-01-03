@@ -22,9 +22,9 @@ using System.Linq.Expressions;
 namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
-    /// 描述一个lambda表达式
+    /// 表示将委托或lambda表达式应用于参数表达式列表的表达式
     /// </summary>
-    public class LambdaExpressionResolve : BaseExpression<LambdaExpression>
+    public class InvocationExpressionResolver : BaseExpression<InvocationExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -33,22 +33,9 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Where(LambdaExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Where(InvocationExpression expression, SqlWrapper sqlWrapper)
         {
-            SqlExpressionProvider.Where(expression.Body, sqlWrapper);
-
-            return sqlWrapper;
-        }
-
-        /// <summary>
-        /// Select
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Select(LambdaExpression expression, SqlWrapper sqlWrapper)
-        {
-            SqlExpressionProvider.Select(expression.Body, sqlWrapper);
+            SqlExpressionProvider.Where(expression.Expression, sqlWrapper);
 
             return sqlWrapper;
         }

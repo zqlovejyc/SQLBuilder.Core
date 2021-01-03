@@ -26,7 +26,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示具有常数值的表达式
     /// </summary>
-	public class ConstantExpressionResolve : BaseExpression<ConstantExpression>
+	public class ConstantExpressionResolver : BaseExpression<ConstantExpression>
     {
         #region Override Base Class Methods
         /// <summary>

@@ -17,15 +17,14 @@
 #endregion
 
 using SQLBuilder.Core.Entry;
-using SQLBuilder.Core.Extensions;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
-    /// 表示具有条件运算符的表达式
+    /// 描述一个lambda表达式
     /// </summary>
-    public class ConditionalExpressionReslove : BaseExpression<ConditionalExpression>
+    public class LambdaExpressionResolver : BaseExpression<LambdaExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -34,13 +33,22 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Where(ConditionalExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Where(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
-            var res = (bool)expression.Test.ToObject();
-            if (res)
-                SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
-            else
-                SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+            SqlExpressionProvider.Where(expression.Body, sqlWrapper);
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(LambdaExpression expression, SqlWrapper sqlWrapper)
+        {
+            SqlExpressionProvider.Select(expression.Body, sqlWrapper);
 
             return sqlWrapper;
         }

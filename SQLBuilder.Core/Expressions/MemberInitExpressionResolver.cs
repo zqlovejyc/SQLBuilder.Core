@@ -27,7 +27,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示调用构造函数并初始化新对象的一个或多个成员
     /// </summary>
-    public class MemberInitExpressionResolve : BaseExpression<MemberInitExpression>
+    public class MemberInitExpressionResolver : BaseExpression<MemberInitExpression>
     {
         #region Override Base Class Methods
         /// <summary>

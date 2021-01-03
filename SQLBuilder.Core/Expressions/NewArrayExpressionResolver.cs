@@ -25,7 +25,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示创建一个新数组，并可能初始化该新数组的元素
     /// </summary>
-	public class NewArrayExpressionResolve : BaseExpression<NewArrayExpression>
+	public class NewArrayExpressionResolver : BaseExpression<NewArrayExpression>
     {
         #region Override Base Class Methods
         /// <summary>

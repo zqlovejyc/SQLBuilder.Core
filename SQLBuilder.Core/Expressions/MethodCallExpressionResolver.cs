@@ -30,7 +30,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示对静态方法或实例方法的调用
     /// </summary>
-	public class MethodCallExpressionResolve : BaseExpression<MethodCallExpression>
+	public class MethodCallExpressionResolver : BaseExpression<MethodCallExpression>
     {
         #region Private Static Methods
         /// <summary>

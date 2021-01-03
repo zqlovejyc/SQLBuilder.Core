@@ -25,7 +25,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示具有一元运算符的表达式
     /// </summary>
-	public class UnaryExpressionResolve : BaseExpression<UnaryExpression>
+	public class UnaryExpressionResolver : BaseExpression<UnaryExpression>
     {
         #region Override Base Class Methods
         /// <summary>

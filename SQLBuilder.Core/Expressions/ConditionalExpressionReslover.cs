@@ -17,14 +17,15 @@
 #endregion
 
 using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Extensions;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
 {
     /// <summary>
-    /// 表示将委托或lambda表达式应用于参数表达式列表的表达式
+    /// 表示具有条件运算符的表达式
     /// </summary>
-    public class InvocationExpressionResolve : BaseExpression<InvocationExpression>
+    public class ConditionalExpressionReslover : BaseExpression<ConditionalExpression>
     {
         #region Override Base Class Methods
         /// <summary>
@@ -33,9 +34,13 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Where(InvocationExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Where(ConditionalExpression expression, SqlWrapper sqlWrapper)
         {
-            SqlExpressionProvider.Where(expression.Expression, sqlWrapper);
+            var res = (bool)expression.Test.ToObject();
+            if (res)
+                SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
+            else
+                SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
 
             return sqlWrapper;
         }

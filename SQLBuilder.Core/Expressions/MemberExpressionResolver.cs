@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示访问字段或属性
     /// </summary>
-	public class MemberExpressionResolve : BaseExpression<MemberExpression>
+	public class MemberExpressionResolver : BaseExpression<MemberExpression>
     {
         #region Override Base Class Methods
         /// <summary>

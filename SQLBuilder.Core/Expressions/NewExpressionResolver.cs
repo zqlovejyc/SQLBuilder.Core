@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示一个构造函数调用
     /// </summary>
-	public class NewExpressionResolve : BaseExpression<NewExpression>
+	public class NewExpressionResolver : BaseExpression<NewExpression>
     {
         #region Override Base Class Methods
         /// <summary>

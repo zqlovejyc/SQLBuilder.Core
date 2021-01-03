@@ -24,7 +24,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示命名参数表达式
     /// </summary>
-    public class ParameterExpressionResolve : BaseExpression<ParameterExpression>
+    public class ParameterExpressionResolver : BaseExpression<ParameterExpression>
     {
         #region Override Base Class Methods
         /// <summary>

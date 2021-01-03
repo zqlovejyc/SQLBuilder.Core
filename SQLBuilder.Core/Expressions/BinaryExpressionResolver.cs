@@ -26,7 +26,7 @@ namespace SQLBuilder.Core.Expressions
     /// <summary>
     /// 表示具有二进制运算符的表达式
     /// </summary>
-	public class BinaryExpressionResolve : BaseExpression<BinaryExpression>
+	public class BinaryExpressionResolver : BaseExpression<BinaryExpression>
     {
         #region Private Methods
         /// <summary>

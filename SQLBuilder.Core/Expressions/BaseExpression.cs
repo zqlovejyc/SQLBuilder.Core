@@ -87,6 +87,14 @@ namespace SQLBuilder.Core.Expressions
         public virtual SqlWrapper GroupBy(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression GroupBy");
 
         /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public virtual SqlWrapper Having(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Having");
+
+        /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
@@ -192,6 +200,14 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper GroupBy(Expression expression, SqlWrapper sqlWrapper) => this.GroupBy((T)expression, sqlWrapper);
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public SqlWrapper Having(Expression expression, SqlWrapper sqlWrapper) => this.Having((T)expression, sqlWrapper);
 
         /// <summary>
         /// OrderBy

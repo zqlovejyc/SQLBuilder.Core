@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Expressions
             ["LikeLeft"] = LikeLeft,
             ["LikeRight"] = LikeRight,
             ["NotLike"] = NotLike,
-            ["In"] = IN,
+            ["In"] = SqlIn,
             ["NotIn"] = NotIn,
             ["Contains"] = Contains,
             ["IsNullOrEmpty"] = IsNullOrEmpty,
@@ -51,15 +51,20 @@ namespace SQLBuilder.Core.Expressions
             ["ToLower"] = ToLower,
             ["Trim"] = Trim,
             ["TrimStart"] = TrimStart,
-            ["TrimEnd"] = TrimEnd
+            ["TrimEnd"] = TrimEnd,
+            ["Count"] = SqlCount,
+            ["Sum"] = SqlSum,
+            ["Avg"] = SqlAvg,
+            ["Max"] = SqlMax,
+            ["Min"] = SqlMin,
         };
 
         /// <summary>
-        /// IN
+        /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql打包对象</param>
-        private static void IN(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        private static void SqlIn(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
             sqlWrapper += " IN ";
@@ -486,6 +491,81 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void SqlCount(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Arguments?.Count > 0)
+            {
+                sqlWrapper += "COUNT(";
+                SqlExpressionProvider.Having(expression.Arguments[0], sqlWrapper);
+                sqlWrapper += ")";
+            }
+        }
+
+        /// <summary>
+        /// Sum
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void SqlSum(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Arguments?.Count > 0)
+            {
+                sqlWrapper += "SUM(";
+                SqlExpressionProvider.Having(expression.Arguments[0], sqlWrapper);
+                sqlWrapper += ")";
+            }
+        }
+
+        /// <summary>
+        /// Avg
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void SqlAvg(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Arguments?.Count > 0)
+            {
+                sqlWrapper += "AVG(";
+                SqlExpressionProvider.Having(expression.Arguments[0], sqlWrapper);
+                sqlWrapper += ")";
+            }
+        }
+
+        /// <summary>
+        /// Max
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void SqlMax(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Arguments?.Count > 0)
+            {
+                sqlWrapper += "MAX(";
+                SqlExpressionProvider.Having(expression.Arguments[0], sqlWrapper);
+                sqlWrapper += ")";
+            }
+        }
+
+        /// <summary>
+        /// Min
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        private static void SqlMin(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Arguments?.Count > 0)
+            {
+                sqlWrapper += "MIN(";
+                SqlExpressionProvider.Having(expression.Arguments[0], sqlWrapper);
+                sqlWrapper += ")";
+            }
+        }
         #endregion
 
         #region Override Base Class Methods
@@ -553,9 +633,9 @@ namespace SQLBuilder.Core.Expressions
                 key = key.GetGenericMethodDefinition();
 
             //匹配到方法
-            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> action))
+            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> handler))
             {
-                action(expression, sqlWrapper);
+                handler(expression, sqlWrapper);
 
                 return sqlWrapper;
             }
@@ -612,6 +692,7 @@ namespace SQLBuilder.Core.Expressions
                         }
                     }
                 }
+
                 if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                 {
                     sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
@@ -649,6 +730,40 @@ namespace SQLBuilder.Core.Expressions
             }
 
             return sqlWrapper;
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Having(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        {
+            var key = expression.Method;
+            if (key.IsGenericMethod)
+                key = key.GetGenericMethodDefinition();
+
+            //匹配到方法
+            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> handler))
+            {
+                handler(expression, sqlWrapper);
+
+                return sqlWrapper;
+            }
+            else
+            {
+                try
+                {
+                    sqlWrapper.AddDbParameter(expression.ToObject());
+
+                    return sqlWrapper;
+                }
+                catch
+                {
+                    throw new NotImplementedException("无法解析方法" + expression.Method);
+                }
+            }
         }
 
         /// <summary>

@@ -332,6 +332,30 @@ namespace SQLBuilder.Core.UnitTest
         }
         #endregion
 
+        #region Having
+        /// <summary>
+        /// Having1
+        /// </summary>
+        [TestMethod]
+        public void Test_Having_01()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo>(x =>
+                                x.Name)
+                            .Where(o =>
+                                o.Id > 1)
+                            .GroupBy(u =>
+                                u.Name)
+                            .Having(x =>
+                                x.Name.Count<int>() > 1)
+                            .OrderBy(x =>
+                                x.Name);
+
+            Assert.AreEqual("SELECT x.Name FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
+        #endregion
+
         #region Order By
         /// <summary>
         /// 排序1

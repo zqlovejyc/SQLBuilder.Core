@@ -97,6 +97,16 @@ namespace SQLBuilder.Core.Expressions
         SqlWrapper GroupBy(Expression expression, SqlWrapper sqlWrapper);
         #endregion
 
+        #region Having
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns></returns>
+        SqlWrapper Having(Expression expression, SqlWrapper sqlWrapper);
+        #endregion
+
         #region OrderBy
         /// <summary>
         /// OrderBy

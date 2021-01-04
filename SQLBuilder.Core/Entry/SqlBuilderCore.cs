@@ -3781,6 +3781,234 @@ namespace SQLBuilder.Core.Entry
         }
         #endregion
 
+        #region Having
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> Having(string sql)
+        {
+            this.sqlWrapper += " HAVING ";
+            this.sqlWrapper += sql;
+            return this;
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="sql">自定义sql语句</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> Having(StringBuilder sql)
+        {
+            this.sqlWrapper += " HAVING ";
+            this.sqlWrapper += sql;
+            return this;
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <returns></returns>
+        public SqlBuilderCore<T> Having(Expression expression)
+        {
+            this.sqlWrapper += " HAVING ";
+            SqlExpressionProvider.Having(expression, this.sqlWrapper);
+            return this;
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having(Expression<Func<T, object>> expression)
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2>(Expression<Func<T, T2, object>> expression)
+            where T2 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3>(Expression<Func<T, T2, T3, object>> expression)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            return this.Having(expression.Body);
+        }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Having<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            return this.Having(expression.Body);
+        }
+        #endregion
+
         #region OrderBy
         /// <summary>
         /// OrderBy

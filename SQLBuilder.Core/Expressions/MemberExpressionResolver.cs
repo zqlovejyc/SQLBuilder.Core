@@ -403,6 +403,46 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Having(MemberExpression expression, SqlWrapper sqlWrapper)
+        {
+            //此处判断expression的Member是否是可空值类型
+            if (expression.Expression?.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType.IsNullable())
+                expression = expression.Expression as MemberExpression;
+
+            if (expression != null)
+            {
+                if (expression.Expression?.NodeType == ExpressionType.Parameter)
+                {
+                    var type = expression.Expression.Type != expression.Member.DeclaringType ?
+                               expression.Expression.Type :
+                               expression.Member.DeclaringType;
+
+                    var tableName = sqlWrapper.GetTableName(type);
+                    var tableAlias = (expression.Expression as ParameterExpression)?.Name;
+                    tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
+
+                    if (!tableAlias.IsNullOrEmpty())
+                        tableAlias += ".";
+
+                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+
+                    //字段是bool类型
+                    if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
+                        sqlWrapper += " = 1";
+                }
+                else
+                    sqlWrapper.AddDbParameter(expression.ToObject());
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>

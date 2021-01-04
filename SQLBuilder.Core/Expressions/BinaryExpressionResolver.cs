@@ -336,6 +336,32 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+		public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            SqlExpressionProvider.Having(expression.Left, sqlWrapper);
+
+            var signIndex = sqlWrapper.Length;
+
+            SqlExpressionProvider.Having(expression.Right, sqlWrapper);
+
+            //表达式左侧为bool类型常量且为true时，不进行sql拼接
+            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
+            {
+                if (sqlWrapper.EndsWith("NULL"))
+                    OperatorParser(expression.NodeType, signIndex, sqlWrapper, true);
+                else
+                    OperatorParser(expression.NodeType, signIndex, sqlWrapper);
+            }
+
+            return sqlWrapper;
+        }
         #endregion
     }
 }

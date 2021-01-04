@@ -187,6 +187,13 @@ namespace SQLBuilder.Core.Expressions
         public static void GroupBy(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolver(expression).GroupBy(expression, sqlWrapper);
 
         /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        public static void Having(Expression expression, SqlWrapper sqlWrapper) => GetExpressionResolver(expression).Having(expression, sqlWrapper);
+
+        /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>

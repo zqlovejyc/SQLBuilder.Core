@@ -87,6 +87,51 @@ namespace SQLBuilder.Core.Extensions
         public static bool NotIn<T>(this object @this, params T[] array) => true;
         #endregion
 
+        #region Count
+        /// <summary>
+        /// 聚合函数Count
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T Count<T>(this object @this) => default;
+        #endregion
+
+        #region Sum
+        /// <summary>
+        /// 聚合函数Sum
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T Sum<T>(this object @this) => default;
+        #endregion
+
+        #region Avg
+        /// <summary>
+        /// 聚合函数Avg
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T Avg<T>(this object @this) => default;
+        #endregion
+
+        #region Max
+        /// <summary>
+        /// 聚合函数Max
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T Max<T>(this object @this) => default;
+        #endregion
+
+        #region Min
+        /// <summary>
+        /// 聚合函数Max
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T Min<T>(this object @this) => default;
+        #endregion
+
         #region ToSafeValue
         /// <summary>
         /// 转换为安全类型的值

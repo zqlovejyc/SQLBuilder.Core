@@ -191,6 +191,19 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Having(ConstantExpression expression, SqlWrapper sqlWrapper)
+        {
+            sqlWrapper.AddDbParameter(expression.Value);
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>

@@ -139,17 +139,15 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Select(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Select(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
             var tableName = sqlWrapper.GetTableName(type);
-
             var parameter = expression.Expression as ParameterExpression;
-            sqlWrapper.SetTableAlias(tableName, parameter?.Name);
-            string tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+            var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
 
             if (!tableAlias.IsNullOrEmpty())
                 tableAlias += ".";
@@ -171,10 +169,10 @@ namespace SQLBuilder.Core.Expressions
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            var parameter = expression.Expression as ParameterExpression;
-
             var tableName = sqlWrapper.GetTableName(type);
-            string tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+            var parameter = expression.Expression as ParameterExpression;
+            var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+
             if (!tableAlias.IsNullOrEmpty())
                 tableAlias += ".";
 

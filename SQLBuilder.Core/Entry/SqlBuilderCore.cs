@@ -158,13 +158,13 @@ namespace SQLBuilder.Core.Entry
                     {
                         if (item.NodeType == ExpressionType.MemberAccess)
                         {
-                            if (item is MemberExpression memberAccess && memberAccess.Expression is ParameterExpression parameter && types.Any(x => x == parameter.Type))
-                                list.Add((parameter.Type, parameter.Name));
+                            if (item is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                                list.Add((parameterExpr.Type, parameterExpr.Name));
                         }
                         else if (item.NodeType == ExpressionType.Parameter)
                         {
-                            if (item is ParameterExpression parameter && types.Any(x => x == parameter.Type))
-                                list.Add((parameter.Type, parameter.Name));
+                            if (item is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                                list.Add((parameterExpr.Type, parameterExpr.Name));
                         }
                     }
                 }
@@ -173,41 +173,51 @@ namespace SQLBuilder.Core.Entry
                 {
                     foreach (var item in lambdaExpression.Parameters)
                     {
-                        if (item is ParameterExpression parameter && types.Any(x => x == parameter.Type))
-                            list.Add((parameter.Type, parameter.Name));
+                        if (item is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                            list.Add((parameterExpr.Type, parameterExpr.Name));
                     }
                 }
 
-                else if (expression is ParameterExpression parameter)
+                else if (expression is ParameterExpression parameterExpression)
                 {
-                    if (types.Any(x => x == parameter.Type))
-                        list.Add((parameter.Type, parameter.Name));
+                    if (types.Any(x => x == parameterExpression.Type))
+                        list.Add((parameterExpression.Type, parameterExpression.Name));
                 }
 
                 else if (expression is UnaryExpression unaryExpression)
                 {
-                    if (unaryExpression.Operand is MemberExpression memberAccess && memberAccess.Expression is ParameterExpression p)
+                    if (unaryExpression.Operand is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr)
                     {
-                        if (types.Any(x => x == p.Type))
-                            list.Add((p.Type, p.Name));
+                        if (types.Any(x => x == parameterExpr.Type))
+                            list.Add((parameterExpr.Type, parameterExpr.Name));
                     }
                 }
 
-                else if (expression is MemberExpression memberAccess)
+                else if (expression is MemberExpression memberExpression)
                 {
-                    if (memberAccess.Expression is ParameterExpression p && types.Any(x => x == p.Type))
-                    {
-                        list.Add((p.Type, p.Name));
-                    }
+                    if (memberExpression.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                        list.Add((parameterExpr.Type, parameterExpr.Name));
                 }
 
                 else if (expression is ConstantExpression constantExpression)
                 {
                     list.Add((types[0], null));
                 }
+
+                else if (expression is MemberInitExpression memberInitExpression)
+                {
+                    foreach (MemberAssignment ma in memberInitExpression.Bindings)
+                    {
+                        if (ma.Expression is MemberExpression memberExpr && memberExpr?.Expression is ParameterExpression parameterExpr)
+                        {
+                            if (types.Any(x => x == parameterExpr.Type))
+                                list.Add((parameterExpr.Type, parameterExpr.Name));
+                        }
+                    }
+                }
             }
 
-            return list.ToArray();
+            return list.Distinct().ToArray();
         }
 
         /// <summary>
@@ -295,6 +305,7 @@ namespace SQLBuilder.Core.Entry
             var expr = expression?.Body;
             if (expr?.NodeType == ExpressionType.Constant ||
                 expr?.NodeType == ExpressionType.Parameter ||
+                expr?.NodeType == ExpressionType.MemberInit ||
                 expr?.NodeType == ExpressionType.New)
                 expr = expression;
 

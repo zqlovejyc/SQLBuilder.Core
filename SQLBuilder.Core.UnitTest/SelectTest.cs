@@ -2033,6 +2033,41 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u WHERE u.Id IN (@p__1,@p__2,@p__3)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询98
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_98()
+        {
+            var email = "123@qq.com";
+            var builder = SqlBuilder.Select<UserInfo>(u => new UserInfo { Id = u.Id, Name = $"'张三'", Email = $"'{email}'" }, isEnableFormat: true);
+            Assert.AreEqual("SELECT [u].[Id] AS [Id],'张三' AS [Name],'123@qq.com' AS [Email] FROM [Base_UserInfo] AS [u]", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询99
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_99()
+        {
+            var email = "123@qq.com";
+            var builder = SqlBuilder.Select<UserInfo>(u => new UserInfo { Id = u.Id, Name = $"'张三'", Email = $"'{email}'" });
+            Assert.AreEqual("SELECT u.Id AS Id,'张三' AS Name,'123@qq.com' AS Email FROM Base_UserInfo AS u", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询100
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_100()
+        {
+            var builder = SqlBuilder.Select<UserInfo>(u => new UserInfo { });
+            Assert.AreEqual("SELECT * FROM Base_UserInfo AS u", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

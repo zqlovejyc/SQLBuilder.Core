@@ -31,6 +31,54 @@ namespace SQLBuilder.Core.Expressions
     {
         #region Override Base Class Methods
         /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(MemberInitExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.Bindings?.Count > 0)
+            {
+                foreach (MemberAssignment memberAssignment in expression.Bindings)
+                {
+                    var type = expression.Type != memberAssignment.Member.DeclaringType ?
+                               expression.Type :
+                               memberAssignment.Member.DeclaringType;
+
+                    var aliasName = memberAssignment.Member.Name;
+                    var tableName = sqlWrapper.GetTableName(type);
+
+                    if ((memberAssignment.Expression as MemberExpression)?.Expression is ParameterExpression parameterExpr)
+                    {
+                        var tableAlias = sqlWrapper.GetTableAlias(tableName, parameterExpr.Name);
+
+                        if (!tableAlias.IsNullOrEmpty())
+                            tableAlias += ".";
+
+                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberAssignment.Member).columnName;
+
+                        sqlWrapper.AddField(fieldName);
+                    }
+                    else
+                    {
+                        var fieldName = memberAssignment.Expression.ToObject().ToString();
+
+                        sqlWrapper.AddField(fieldName);
+                    }
+
+                    sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(aliasName)}";
+                }
+            }
+            else
+            {
+                sqlWrapper.AddField("*");
+            }
+
+            return sqlWrapper;
+        }
+
+        /// <summary>
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>

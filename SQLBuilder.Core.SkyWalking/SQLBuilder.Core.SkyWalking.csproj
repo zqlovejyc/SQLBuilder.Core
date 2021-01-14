@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.1.3</Version>
+        <Version>2.1.4</Version>
         <Authors>张强</Authors>
         <Company>张强</Company>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
@@ -17,7 +17,7 @@
         <PackageReleaseNotes>1.升级SQLBuilder引用；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
-        <FileVersion>2.1.3.0</FileVersion>
+        <FileVersion>2.1.4.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

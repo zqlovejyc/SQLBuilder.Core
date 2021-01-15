@@ -161,7 +161,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
-        public virtual void ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null)
+        public virtual bool ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null)
         {
             IRepository repository = null;
             try
@@ -177,6 +177,8 @@ namespace SQLBuilder.Core.Repositories
                         repository.Rollback();
                         rollback?.Invoke(null);
                     }
+
+                    return res;
                 }
             }
             catch (Exception ex)
@@ -188,6 +190,8 @@ namespace SQLBuilder.Core.Repositories
                 else
                     throw;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -223,7 +227,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
-        public virtual async Task ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null)
+        public virtual async Task<bool> ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null)
         {
             IRepository repository = null;
             try
@@ -239,6 +243,8 @@ namespace SQLBuilder.Core.Repositories
                         repository.Rollback();
                         await rollback?.Invoke(null);
                     }
+
+                    return res;
                 }
             }
             catch (Exception ex)
@@ -250,6 +256,8 @@ namespace SQLBuilder.Core.Repositories
                 else
                     throw;
             }
+
+            return false;
         }
         #endregion
 

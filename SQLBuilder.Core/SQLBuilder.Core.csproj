@@ -2,6 +2,9 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <AssemblyVersion>2.1.4.0</AssemblyVersion>
         <Authors>张强</Authors>
         <Version>2.1.4</Version>
@@ -50,6 +53,10 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="MySqlConnector" Version="1.2.1" />
         <PackageReference Include="Npgsql" Version="5.0.1.1" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.101" />

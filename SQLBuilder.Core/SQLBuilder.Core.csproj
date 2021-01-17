@@ -5,6 +5,8 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <AssemblyVersion>2.1.4.0</AssemblyVersion>
         <Authors>张强</Authors>
         <Version>2.1.4</Version>

@@ -20,14 +20,14 @@
 6.适配Select返回强类型实体情形；
 7.升级Oracle及其他Nuget引用包到最新版本；</PackageReleaseNotes>
         <FileVersion>2.1.4.0</FileVersion>
-        <PackageProjectUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>
         <PackageIconUrl />
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <LangVersion>8.0</LangVersion>
-        <RepositoryUrl>https://gitee.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
+        <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
         <LangVersion>latest</LangVersion>

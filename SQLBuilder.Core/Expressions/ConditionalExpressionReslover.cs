@@ -80,9 +80,9 @@ namespace SQLBuilder.Core.Expressions
                 }
 
                 if (sqlWrapper.EndsWith("NULL"))
-                    BinaryExpressionResolver.OperatorParser(binaryExpression.NodeType, signIndex, sqlWrapper, true);
+                    BinaryExpressionResolver.OperatorResolver(binaryExpression.NodeType, signIndex, sqlWrapper, true);
                 else
-                    BinaryExpressionResolver.OperatorParser(binaryExpression.NodeType, signIndex, sqlWrapper);
+                    BinaryExpressionResolver.OperatorResolver(binaryExpression.NodeType, signIndex, sqlWrapper);
 
                 if (isNot ? !test : test)
                     SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);

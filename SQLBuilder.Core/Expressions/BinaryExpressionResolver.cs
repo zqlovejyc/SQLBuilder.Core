@@ -30,13 +30,13 @@ namespace SQLBuilder.Core.Expressions
     {
         #region Public Static Methods
         /// <summary>
-        /// OperatorParser
+        /// OperatorResolver
         /// </summary>
         /// <param name="expressionNodeType">表达式树节点类型</param>
         /// <param name="operatorIndex">操作符索引</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="useIs">是否使用is</param>
-        public static void OperatorParser(ExpressionType expressionNodeType, int operatorIndex, SqlWrapper sqlWrapper, bool useIs = false)
+        public static void OperatorResolver(ExpressionType expressionNodeType, int operatorIndex, SqlWrapper sqlWrapper, bool useIs = false)
         {
             switch (expressionNodeType)
             {
@@ -158,9 +158,9 @@ namespace SQLBuilder.Core.Expressions
             {
                 var sqlLength = sqlWrapper.Length;
                 if (sqlLength - operatorIndex == 5 && sqlWrapper.EndsWith("NULL"))
-                    OperatorParser(expression.NodeType, operatorIndex, sqlWrapper, true);
+                    OperatorResolver(expression.NodeType, operatorIndex, sqlWrapper, true);
                 else
-                    OperatorParser(expression.NodeType, operatorIndex, sqlWrapper);
+                    OperatorResolver(expression.NodeType, operatorIndex, sqlWrapper);
             }
 
             return sqlWrapper;
@@ -328,9 +328,9 @@ namespace SQLBuilder.Core.Expressions
                 else
                 {
                     if (sqlWrapper.EndsWith("NULL"))
-                        OperatorParser(expression.NodeType, signIndex, sqlWrapper, true);
+                        OperatorResolver(expression.NodeType, signIndex, sqlWrapper, true);
                     else
-                        OperatorParser(expression.NodeType, signIndex, sqlWrapper);
+                        OperatorResolver(expression.NodeType, signIndex, sqlWrapper);
                 }
             }
 
@@ -355,9 +355,9 @@ namespace SQLBuilder.Core.Expressions
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
                 if (sqlWrapper.EndsWith("NULL"))
-                    OperatorParser(expression.NodeType, signIndex, sqlWrapper, true);
+                    OperatorResolver(expression.NodeType, signIndex, sqlWrapper, true);
                 else
-                    OperatorParser(expression.NodeType, signIndex, sqlWrapper);
+                    OperatorResolver(expression.NodeType, signIndex, sqlWrapper);
             }
 
             return sqlWrapper;

@@ -36,11 +36,59 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Where(ConditionalExpression expression, SqlWrapper sqlWrapper)
         {
-            var res = (bool)expression.Test.ToObject();
-            if (res)
-                SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
-            else
-                SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+            var isNot = false;
+            var testExpression = expression.Test;
+
+            if (testExpression is UnaryExpression unaryExpression)
+            {
+                isNot = unaryExpression.NodeType == ExpressionType.Not;
+                testExpression = unaryExpression.Operand;
+            }
+
+            if (testExpression is MethodCallExpression methodCallExpression)
+            {
+                var test = (bool)methodCallExpression.ToObject();
+                if (isNot ? !test : test)
+                    SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
+                else
+                    SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+            }
+
+            if (testExpression is BinaryExpression binaryExpression)
+            {
+                var test = true;
+                var signIndex = 0;
+
+                if (binaryExpression.Left is BinaryExpression)
+                {
+                    SqlExpressionProvider.Where(binaryExpression.Left, sqlWrapper);
+                    signIndex = sqlWrapper.Length;
+                }
+                else
+                {
+                    test = (bool)binaryExpression.Left.ToObject();
+                }
+
+                if (binaryExpression.Right is BinaryExpression)
+                {
+                    SqlExpressionProvider.Where(binaryExpression.Right, sqlWrapper);
+                    signIndex = sqlWrapper.Length;
+                }
+                else
+                {
+                    test = test && (bool)binaryExpression.Right.ToObject();
+                }
+
+                if (sqlWrapper.EndsWith("NULL"))
+                    BinaryExpressionResolver.OperatorParser(binaryExpression.NodeType, signIndex, sqlWrapper, true);
+                else
+                    BinaryExpressionResolver.OperatorParser(binaryExpression.NodeType, signIndex, sqlWrapper);
+
+                if (isNot ? !test : test)
+                    SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
+                else
+                    SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+            }
 
             return sqlWrapper;
         }

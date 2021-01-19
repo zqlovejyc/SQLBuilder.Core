@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class BinaryExpressionResolver : BaseExpression<BinaryExpression>
     {
-        #region Private Methods
+        #region Public Static Methods
         /// <summary>
         /// OperatorParser
         /// </summary>
@@ -36,7 +36,7 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="operatorIndex">操作符索引</param>
         /// <param name="sqlWrapper">sql打包对象</param>
         /// <param name="useIs">是否使用is</param>
-        private void OperatorParser(ExpressionType expressionNodeType, int operatorIndex, SqlWrapper sqlWrapper, bool useIs = false)
+        public static void OperatorParser(ExpressionType expressionNodeType, int operatorIndex, SqlWrapper sqlWrapper, bool useIs = false)
         {
             switch (expressionNodeType)
             {

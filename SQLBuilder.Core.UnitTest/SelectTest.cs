@@ -2172,7 +2172,7 @@ namespace SQLBuilder.Core.UnitTest
         }
 
         /// <summary>
-        /// 查询103
+        /// 查询104
         /// </summary>
         [TestMethod]
         public void Test_Select_104()

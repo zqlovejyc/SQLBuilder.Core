@@ -175,7 +175,9 @@ namespace SQLBuilder.Core.Repositories
                     else
                     {
                         repository.Rollback();
-                        rollback?.Invoke(null);
+
+                        if (rollback != null)
+                            rollback(null);
                     }
 
                     return res;
@@ -241,7 +243,9 @@ namespace SQLBuilder.Core.Repositories
                     else
                     {
                         repository.Rollback();
-                        await rollback?.Invoke(null);
+
+                        if (rollback != null)
+                            await rollback(null);
                     }
 
                     return res;

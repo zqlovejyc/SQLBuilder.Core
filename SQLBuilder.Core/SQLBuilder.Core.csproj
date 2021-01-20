@@ -7,21 +7,19 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.1.4.0</AssemblyVersion>
+        <AssemblyVersion>2.1.5.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.1.4</Version>
+        <Version>2.1.5</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化SqlBuilderExtensions，重载ToPage扩展方法；
-2.优化ObjectExtensions，重载ToJson扩展方法；
-3.重命名Resolve后缀名文件为Resolver；
-4.新增对Having语法的支持；
-5.新增ToEntity、ToList、ToPage Linq扩展方法；
-6.适配Select返回强类型实体情形；
-7.升级Oracle及其他Nuget引用包到最新版本；</PackageReleaseNotes>
-        <FileVersion>2.1.4.0</FileVersion>
+        <PackageReleaseNotes>1.修改ExecuteTransAsync返回值类型；
+2.修复ExecuteTrans回滚rollback委托为null时异常；
+3.添加对SourceLink的支持；
+4.优化ConditionalExpression条件解析；
+5.重载ToObject扩展方法；</PackageReleaseNotes>
+        <FileVersion>2.1.5.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>

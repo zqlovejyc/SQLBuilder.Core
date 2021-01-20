@@ -2170,6 +2170,31 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u INNER JOIN Base_Account AS a ON u.Id = a.UserId AND u.Name LIKE '%' + @p__1 + '%' WHERE (u.Email IS NOT NULL AND u.Name = @p__2) AND (u.Email = @p__3)", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询103
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_104()
+        {
+            var input = new DryBoxInput
+            {
+                BarCodes = new[] { "111" },
+                BarCodeType = BarCodeType.UnitId
+            };
+
+            var builder = SqlBuilder
+                            .Select<UnitInfoEntity>(
+                                x => x, DatabaseType.Oracle)
+                            .Where(x =>
+                                x.Enabled == 1 &&
+                                input.BarCodeType == BarCodeType.Panel
+                                ? input.BarCodes.Contains(x.PanelNo)
+                                : input.BarCodes.Contains(x.UnitId));
+
+            Assert.AreEqual("SELECT x.* FROM WF_UNITINFO x WHERE x.ENABLED = :p__1 AND x.UNITID IN (:p__2)", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

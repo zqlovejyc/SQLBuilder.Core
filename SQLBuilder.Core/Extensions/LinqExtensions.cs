@@ -1187,6 +1187,26 @@ namespace SQLBuilder.Core.Extensions
             }
             return obj;
         }
+
+        /// <summary>
+        /// 转换Expression为object
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static T ToObject<T>(this Expression @this, out bool result)
+        {
+            try
+            {
+                result = true;
+                return (T)@this.ToObject();
+            }
+            catch
+            {
+                result = false;
+                return default;
+            }
+        }
         #endregion
 
         #region OrderBy

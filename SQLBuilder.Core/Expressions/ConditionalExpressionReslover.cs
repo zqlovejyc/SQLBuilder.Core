@@ -47,42 +47,42 @@ namespace SQLBuilder.Core.Expressions
 
             if (testExpression is MethodCallExpression methodCallExpression)
             {
-                var test = (bool)methodCallExpression.ToObject();
-                if (isNot ? !test : test)
-                    SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
-                else
-                    SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+                var test = methodCallExpression.ToObject<bool>(out var res);
+                if (res)
+                {
+                    if (isNot ? !test : test)
+                        SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);
+                    else
+                        SqlExpressionProvider.Where(expression.IfFalse, sqlWrapper);
+                }
             }
 
             if (testExpression is BinaryExpression binaryExpression)
             {
-                var test = true;
-                var signIndex = 0;
-
-                if (binaryExpression.Left is BinaryExpression)
+                var test = binaryExpression.Left.ToObject<bool>(out var left);
+                if (!left)
                 {
                     SqlExpressionProvider.Where(binaryExpression.Left, sqlWrapper);
-                    signIndex = sqlWrapper.Length;
-                }
-                else
-                {
-                    test = (bool)binaryExpression.Left.ToObject();
+                    BinaryExpressionResolver.OperatorResolver(
+                        binaryExpression.NodeType,
+                        sqlWrapper.Length,
+                        sqlWrapper,
+                        sqlWrapper.EndsWith("NULL"));
                 }
 
-                if (binaryExpression.Right is BinaryExpression)
+                var right = false;
+                if (!left)
+                    test = binaryExpression.Right.ToObject<bool>(out right);
+
+                if (left || !right)
                 {
                     SqlExpressionProvider.Where(binaryExpression.Right, sqlWrapper);
-                    signIndex = sqlWrapper.Length;
+                    BinaryExpressionResolver.OperatorResolver(
+                        binaryExpression.NodeType,
+                        sqlWrapper.Length,
+                        sqlWrapper,
+                        sqlWrapper.EndsWith("NULL"));
                 }
-                else
-                {
-                    test = test && (bool)binaryExpression.Right.ToObject();
-                }
-
-                if (sqlWrapper.EndsWith("NULL"))
-                    BinaryExpressionResolver.OperatorResolver(binaryExpression.NodeType, signIndex, sqlWrapper, true);
-                else
-                    BinaryExpressionResolver.OperatorResolver(binaryExpression.NodeType, signIndex, sqlWrapper);
 
                 if (isNot ? !test : test)
                     SqlExpressionProvider.Where(expression.IfTrue, sqlWrapper);

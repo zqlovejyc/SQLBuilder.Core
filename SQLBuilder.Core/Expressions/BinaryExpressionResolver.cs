@@ -124,15 +124,14 @@ namespace SQLBuilder.Core.Expressions
             var isBinaryRight = leftBinary?.Right is BinaryExpression;
             var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
             var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+
             if (leftNested)
-            {
                 sqlWrapper += "(";
-            }
+
             SqlExpressionProvider.Join(expression.Left, sqlWrapper);
+
             if (leftNested)
-            {
                 sqlWrapper += ")";
-            }
 
             var operatorIndex = sqlWrapper.Length;
 
@@ -143,24 +142,25 @@ namespace SQLBuilder.Core.Expressions
             isBinaryRight = rightBinary?.Right is BinaryExpression;
             isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
             var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+
             if (rightNested)
-            {
                 sqlWrapper += "(";
-            }
+
             SqlExpressionProvider.Where(expression.Right, sqlWrapper);
+
             if (rightNested)
-            {
                 sqlWrapper += ")";
-            }
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
                 var sqlLength = sqlWrapper.Length;
-                if (sqlLength - operatorIndex == 5 && sqlWrapper.EndsWith("NULL"))
-                    OperatorResolver(expression.NodeType, operatorIndex, sqlWrapper, true);
-                else
-                    OperatorResolver(expression.NodeType, operatorIndex, sqlWrapper);
+                OperatorResolver(
+                    expression.NodeType,
+                    operatorIndex,
+                    sqlWrapper,
+                    sqlLength - operatorIndex == 5 &&
+                    sqlWrapper.EndsWith("NULL"));
             }
 
             return sqlWrapper;
@@ -183,17 +183,16 @@ namespace SQLBuilder.Core.Expressions
             var isBinaryRight = leftBinary?.Right is BinaryExpression;
             var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
             var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
-            if (leftNested)
-            {
-                sqlWrapper += "(";
-            }
-            SqlExpressionProvider.Where(expression.Left, sqlWrapper);
-            if (leftNested)
-            {
-                sqlWrapper += ")";
-            }
 
-            var signIndex = sqlWrapper.Length;
+            if (leftNested)
+                sqlWrapper += "(";
+
+            SqlExpressionProvider.Where(expression.Left, sqlWrapper);
+
+            if (leftNested)
+                sqlWrapper += ")";
+
+            var operatorIndex = sqlWrapper.Length;
 
             //右侧嵌套
             var rightBinary = expression.Right as BinaryExpression;
@@ -202,15 +201,14 @@ namespace SQLBuilder.Core.Expressions
             isBinaryRight = rightBinary?.Right is BinaryExpression;
             isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
             var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
+
             if (rightNested)
-            {
                 sqlWrapper += "(";
-            }
+
             SqlExpressionProvider.Where(expression.Right, sqlWrapper);
+
             if (rightNested)
-            {
                 sqlWrapper += ")";
-            }
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
@@ -327,10 +325,11 @@ namespace SQLBuilder.Core.Expressions
                 }
                 else
                 {
-                    if (sqlWrapper.EndsWith("NULL"))
-                        OperatorResolver(expression.NodeType, signIndex, sqlWrapper, true);
-                    else
-                        OperatorResolver(expression.NodeType, signIndex, sqlWrapper);
+                    OperatorResolver(
+                        expression.NodeType, 
+                        operatorIndex, 
+                        sqlWrapper,
+                        sqlWrapper.EndsWith("NULL"));
                 }
             }
 
@@ -347,17 +346,18 @@ namespace SQLBuilder.Core.Expressions
         {
             SqlExpressionProvider.Having(expression.Left, sqlWrapper);
 
-            var signIndex = sqlWrapper.Length;
+            var operatorIndex = sqlWrapper.Length;
 
             SqlExpressionProvider.Having(expression.Right, sqlWrapper);
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
             {
-                if (sqlWrapper.EndsWith("NULL"))
-                    OperatorResolver(expression.NodeType, signIndex, sqlWrapper, true);
-                else
-                    OperatorResolver(expression.NodeType, signIndex, sqlWrapper);
+                OperatorResolver(
+                    expression.NodeType,
+                    operatorIndex,
+                    sqlWrapper, 
+                    sqlWrapper.EndsWith("NULL"));
             }
 
             return sqlWrapper;

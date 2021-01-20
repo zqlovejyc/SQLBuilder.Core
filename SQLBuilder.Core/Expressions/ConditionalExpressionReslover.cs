@@ -39,12 +39,14 @@ namespace SQLBuilder.Core.Expressions
             var isNot = false;
             var testExpression = expression.Test;
 
+            //UnaryExpression
             if (testExpression is UnaryExpression unaryExpression)
             {
                 isNot = unaryExpression.NodeType == ExpressionType.Not;
                 testExpression = unaryExpression.Operand;
             }
 
+            //MethodCallExpression
             if (testExpression is MethodCallExpression methodCallExpression)
             {
                 var test = methodCallExpression.ToObject<bool>(out var res);
@@ -57,6 +59,7 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
 
+            //BinaryExpression
             if (testExpression is BinaryExpression binaryExpression)
             {
                 var test = binaryExpression.Left.ToObject<bool>(out var left);

@@ -16,15 +16,19 @@
  */
 #endregion
 
+using Dapper;
 using Oracle.ManagedDataAccess.Client;
 using SQLBuilder.Core.Configuration;
+using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SQLBuilder.Core.Repositories
 {
@@ -175,6 +179,146 @@ namespace SQLBuilder.Core.Repositories
 
             return sqlQuery;
         }
+        #endregion
+
+        #region Query
+        #region Sync
+        /// <summary>
+        /// 查询多结果集数据
+        /// </summary>
+        /// <param name="connection">数据库连接对像</param>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override (IEnumerable<T> list, long total) QueryMultiple<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
+        {
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var list = connection.Query<T>(sqlQuery, parameter, transaction, commandTimeout: CommandTimeout);
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 查询多结果集数据
+        /// </summary>
+        /// <param name="connection">数据库连接对像</param>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override (DataTable table, long total) QueryMultiple(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
+        {
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = connection.QueryFirstOrDefault<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var reader = connection.ExecuteReader(sqlQuery, parameter, transaction, CommandTimeout);
+                var table = reader?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 查询多结果集数据
+        /// </summary>
+        /// <param name="connection">数据库连接对像</param>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override async Task<(IEnumerable<T> list, long total)> QueryMultipleAsync<T>(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
+        {
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var list = await connection.QueryAsync<T>(sqlQuery, parameter, transaction, CommandTimeout);
+
+                ExecuteAfter(message);
+
+                return (list, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 查询多结果集数据
+        /// </summary>
+        /// <param name="connection">数据库连接对像</param>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="transaction">事务</param>
+        /// <returns></returns>
+        public override async Task<(DataTable table, long total)> QueryMultipleAsync(DbConnection connection, string sql, object parameter, DbTransaction transaction = null)
+        {
+            DiagnosticsMessage message = null;
+            try
+            {
+                message = ExecuteBefore(sql, parameter, connection.DataSource);
+
+                var sqlPage = sql.Split(';');
+                var sqlCount = sqlPage[0];
+                var sqlQuery = sqlPage[1];
+                var total = await connection.QueryFirstOrDefaultAsync<long>(sqlCount, parameter, transaction, CommandTimeout);
+                var reader = await connection.ExecuteReaderAsync(sqlQuery, parameter, transaction, CommandTimeout);
+                var table = reader?.ToDataTable();
+                if (table?.Columns?.Contains("ROWNUMBER") == true)
+                    table.Columns.Remove("ROWNUMBER");
+
+                ExecuteAfter(message);
+
+                return (table, total);
+            }
+            catch (Exception ex)
+            {
+                ExecuteError(message, ex);
+                throw;
+            }
+        }
+        #endregion
         #endregion
     }
 }

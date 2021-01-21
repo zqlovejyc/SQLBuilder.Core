@@ -65,9 +65,14 @@ namespace SQLBuilder.Core.Repositories
         DbTransaction Transaction { get; set; }
 
         /// <summary>
-        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql
+        /// 是否启用对表名和列名格式化，注意：只针对Lambda表达式解析生成的sql，默认false
         /// </summary>
         bool IsEnableFormat { get; set; }
+
+        /// <summary>
+        /// 是否启用null实体属性值insert、update，默认false
+        /// </summary>
+        bool IsEnableNullValue { get; set; }
 
         /// <summary>
         /// 分页计数语法，默认COUNT(*)
@@ -83,6 +88,11 @@ namespace SQLBuilder.Core.Repositories
         /// 从库负载均衡接口
         /// </summary>
         ILoadBalancer LoadBalancer { get; set; }
+
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
+        DatabaseType DatabaseType { get; }
         #endregion
 
         #region UseMasterOrSlave
@@ -279,6 +289,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entities">要插入的实体集合</param>
         /// <returns>返回受影响行数</returns>
         int Insert<T>(IEnumerable<T> entities) where T : class;
+
+        /// <summary>
+        /// 插入多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要插入的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        int Insert<T>(List<T> entities) where T : class;
         #endregion
 
         #region Async
@@ -297,6 +315,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entities">要插入的实体集合</param>
         /// <returns>返回受影响行数</returns>
         Task<int> InsertAsync<T>(IEnumerable<T> entities) where T : class;
+
+        /// <summary>
+        /// 插入多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要插入的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        Task<int> InsertAsync<T>(List<T> entities) where T : class;
         #endregion
         #endregion
 
@@ -324,6 +350,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entities">要删除的实体集合</param>
         /// <returns>返回受影响行数</returns>
         int Delete<T>(IEnumerable<T> entities) where T : class;
+
+        /// <summary>
+        /// 删除多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要删除的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        int Delete<T>(List<T> entities) where T : class;
 
         /// <summary>
         /// 根据条件删除实体
@@ -376,6 +410,14 @@ namespace SQLBuilder.Core.Repositories
         Task<int> DeleteAsync<T>(IEnumerable<T> entities) where T : class;
 
         /// <summary>
+        /// 删除多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要删除的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        Task<int> DeleteAsync<T>(List<T> entities) where T : class;
+
+        /// <summary>
         /// 根据条件删除实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -421,6 +463,14 @@ namespace SQLBuilder.Core.Repositories
         int Update<T>(IEnumerable<T> entities) where T : class;
 
         /// <summary>
+        /// 更新多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要更新的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        int Update<T>(List<T> entities) where T : class;
+
+        /// <summary>
         /// 根据条件更新实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -446,6 +496,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entities">要更新的实体集合</param>
         /// <returns>返回受影响行数</returns>
         Task<int> UpdateAsync<T>(IEnumerable<T> entities) where T : class;
+
+        /// <summary>
+        /// 更新多个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entities">要更新的实体集合</param>
+        /// <returns>返回受影响行数</returns>
+        Task<int> UpdateAsync<T>(List<T> entities) where T : class;
 
         /// <summary>
         /// 根据条件更新实体

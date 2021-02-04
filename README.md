@@ -249,11 +249,11 @@ var capRepository=_handler("Cap");
 ### 🎣 读写分离
 
 ```csharp
-//读写分离默认主库
-_repository.UseMasterOrSlave(master)
-  
-//或者
+//方式一
 _repository.Master = false;
+
+//方式二
+_repository.UseMasterOrSlave(master)
 ```
 
 ## 🍻 贡献代码

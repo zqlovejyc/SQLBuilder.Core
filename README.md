@@ -40,7 +40,7 @@
 
 ## 🚀 快速入门
 
-- ####新增
+- #### 新增
 
 ```csharp
 //新增
@@ -58,7 +58,7 @@ await SqlBuilder
 
 ```
 
-- ####删除
+- #### 删除
 
 ```csharp
 //删除
@@ -71,7 +71,7 @@ await _repository.DeleteAsync(entitties);
 await _repository.DeleteAsync<MsdBoxEntity>(x => x.Id == "1");
 ```
 
-- ####更新
+- #### 更新
 
 ```csharp
 //更新
@@ -94,7 +94,7 @@ await SqlBuilder
         .ExecuteAsync(
             _repository);
 ```
-- ####查询
+- #### 查询
 
 ```csharp
 //简单查询

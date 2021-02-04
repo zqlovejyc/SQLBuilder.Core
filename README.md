@@ -6,7 +6,7 @@
 
 <div align="center">
 
-[![star](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/star.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/stargazers) [![fork](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/fork.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/members) [![GitHub stars](https://img.shields.io/github/stars/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/stargazers) [![GitHub forks](https://img.shields.io/github/forks/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/network) [![GitHub license](https://img.shields.io/badge/license-Apache2-yellow)](https://gitee.com/zqlovejyc/SQLBuilder.Core/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.svg?cacheSeconds=10800)](https://www.nuget.org/packages//Zq.SQLBuilder.Core)
+[![star](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/star.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/stargazers) [![fork](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/fork.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/members) [![GitHub stars](https://img.shields.io/github/stars/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/stargazers) [![GitHub forks](https://img.shields.io/github/forks/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/network) [![GitHub license](https://img.shields.io/badge/license-Apache2-yellow)](https://github.com/zqlovejyc/SQLBuilder.Core/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.svg?cacheSeconds=10800)](https://www.nuget.org/packages//Zq.SQLBuilder.Core)
 
 </div>
 

@@ -6,7 +6,7 @@
 
 <div align="center">
 
-[![star](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/star.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/stargazers) [![fork](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/fork.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/members) [![GitHub stars](https://img.shields.io/github/stars/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/stargazers) [![GitHub forks](https://img.shields.io/github/forks/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/network) [![GitHub license](https://img.shields.io/badge/license-Apache2-yellow)](https://github.com/zqlovejyc/SQLBuilder.Core/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.svg?cacheSeconds=10800)](https://www.nuget.org/packages//Zq.SQLBuilder.Core)
+[![star](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/star.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/stargazers) [![fork](https://gitee.com/zqlovejyc/SQLBuilder.Core/badge/fork.svg)](https://gitee.com/zqlovejyc/SQLBuilder.Core/members) [![GitHub stars](https://img.shields.io/github/stars/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/stargazers) [![GitHub forks](https://img.shields.io/github/forks/zqlovejyc/SQLBuilder.Core?logo=github)](https://github.com/zqlovejyc/SQLBuilder.Core/network) [![GitHub license](https://img.shields.io/badge/license-Apache2-yellow)](https://github.com/zqlovejyc/SQLBuilder.Core/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Zq.SQLBuilder.Core)
 
 </div>
 
@@ -29,6 +29,13 @@
 - Gitee：[https://gitee.com/zqlovejyc/SQLBuilder.Core](https://gitee.com/zqlovejyc/SQLBuilder.Core)
 - GitHub：[https://github.com/zqlovejyc/SQLBuilder.Core](https://github.com/zqlovejyc/SQLBuilder.Core)
 - Nuget：[https://www.nuget.org/packages/Zq.SQLBuilder.Core/](https://www.nuget.org/packages/Zq.SQLBuilder.Core/)
+
+## 🥥 框架扩展包
+
+|                                                                     包类型                                                                      | 名称                                       |                                                                                          版本                                                                                           | 描述                       |
+| :---------------------------------------------------------------------------------------------------------------------------------------------: | ------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -------------------------- |
+|                   [![nuget](https://shields.io/badge/-Nuget-blue?cacheSeconds=604800)](https://www.nuget.org/packages/Zq.SQLBuilder.Core)                   | Zq.SQLBuilder.Core                                     |                                     [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Zq.SQLBuilder.Core)                                     | SQLBuilder.Core 核心包              |
+|   [![nuget](https://shields.io/badge/-Nuget-blue?cacheSeconds=604800)](https://www.nuget.org/packages/Zq.SQLBuilder.Core.SkyWalking)   | Zq.SQLBuilder.Core.SkyWalking     |     [![nuget](https://img.shields.io/nuget/v/Zq.SQLBuilder.Core.SkyWalking.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Zq.SQLBuilder.Core.SkyWalking)     | SQLBuilder.Core SkyWalking 扩展包          |
 
 ## 🍻 贡献代码
 

@@ -19,7 +19,7 @@
 
 ## 🍟 文档地址
 
-- 单元测试：[https://gitee.com/zqlovejyc/SQLBuilder.Core/tree/master/SQLBuilder.Core.UnitTest](https://gitee.com/zqlovejyc/SQLBuilder/tree/master/SQLBuilder.Core.UnitTest)
+- 单元测试：[https://github.com/zqlovejyc/SQLBuilder.Core/tree/master/SQLBuilder.Core.UnitTest](https://github.com/zqlovejyc/SQLBuilder/tree/master/SQLBuilder.Core.UnitTest)
 
 
 **目前文档正在逐步完善中。**

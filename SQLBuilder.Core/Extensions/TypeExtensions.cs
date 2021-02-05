@@ -52,5 +52,15 @@ namespace SQLBuilder.Core.Extensions
             return @this.IsValueType && @this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
         #endregion
+
+        #region IsAnonymousType
+        /// <summary>
+        /// 是否是匿名类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsAnonymousType(this Type @this) =>
+            @this != null && (@this.FullName.StartsWith("<>f__AnonymousType") || @this.FullName.StartsWith("VB$AnonymousType"));
+        #endregion
     }
 }

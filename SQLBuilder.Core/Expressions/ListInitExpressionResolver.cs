@@ -52,7 +52,7 @@ namespace SQLBuilder.Core.Expressions
                 var properties = array.ElementAt(i)?.GetType().GetProperties();
                 foreach (var p in properties)
                 {
-                    var type = p.DeclaringType.ToString().Contains("AnonymousType") ?
+                    var type = p.DeclaringType.IsAnonymousType() ?
                         sqlWrapper.DefaultType :
                         p.DeclaringType;
 

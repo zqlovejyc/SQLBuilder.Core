@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Expressions
             for (int i = 0; i < expression.Members.Count; i++)
             {
                 var m = expression.Members[i];
-                var t = m.DeclaringType.ToString().Contains("AnonymousType") ?
+                var t = m.DeclaringType.IsAnonymousType() ?
                     sqlWrapper.DefaultType :
                     m.DeclaringType;
 
@@ -80,7 +80,7 @@ namespace SQLBuilder.Core.Expressions
             for (int i = 0; i < expression.Members?.Count; i++)
             {
                 var m = expression.Members[i];
-                var t = m.DeclaringType.ToString().Contains("AnonymousType") ?
+                var t = m.DeclaringType.IsAnonymousType() ?
                     sqlWrapper.DefaultType :
                     m.DeclaringType;
 

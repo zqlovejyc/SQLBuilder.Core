@@ -305,10 +305,10 @@ public MyService(Func<string, IRepository> hander)
 }
 
 //base仓储
-var baseRepository=_handler("Base");
+var baseRepository = _handler("Base");
 
 //cap仓储
-var capRepository=_handler("Cap");
+var capRepository = _handler("Cap");
 ```
 
 ### 🎣 读写分离

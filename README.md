@@ -328,6 +328,11 @@ _repository.UseMasterOrSlave(master)
 services.AddSkyApmSQLBuilder();
 ```
 
+## 🧪 测试文档
+
+- 单元测试 [https://github.com/zqlovejyc/SQLBuilder.Core/tree/master/SQLBuilder.Core.UnitTest](https://github.com/zqlovejyc/SQLBuilder.Core/tree/master/SQLBuilder.Core.UnitTest)
+
+
 ## 🍻 贡献代码
 
 `SQLBuilder.Core` 遵循 `Apache-2.0` 开源协议，欢迎大家提交 `PR` 或 `Issue`。

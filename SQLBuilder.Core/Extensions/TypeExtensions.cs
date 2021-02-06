@@ -31,14 +31,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">类型</param>
         /// <returns>Type</returns>
-        public static Type GetCoreType(this Type @this)
-        {
-            if (@this?.IsNullable() == true)
-            {
-                @this = Nullable.GetUnderlyingType(@this);
-            }
-            return @this;
-        }
+        public static Type GetCoreType(this Type @this) =>
+            @this.IsNullable() ? Nullable.GetUnderlyingType(@this) : @this;
         #endregion
 
         #region IsNullable
@@ -47,10 +41,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">类型</param>
         /// <returns>bool</returns>
-        public static bool IsNullable(this Type @this)
-        {
-            return @this.IsValueType && @this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>);
-        }
+        public static bool IsNullable(this Type @this) =>
+            @this != null && @this.IsValueType && @this.IsGenericType && @this.GetGenericTypeDefinition() == typeof(Nullable<>);
         #endregion
 
         #region IsAnonymousType

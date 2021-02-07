@@ -2195,6 +2195,32 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.* FROM WF_UNITINFO x WHERE x.ENABLED = :p__1 AND x.UNITID IN (:p__2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询105
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_105()
+        {
+            var input = new DryBoxInput
+            {
+                BarCodes = new[] { "111" },
+                BarCodeType = BarCodeType.UnitId
+            };
+
+            var builder = SqlBuilder
+                            .Select<UnitInfoEntity>(
+                                x => x, DatabaseType.Oracle)
+                            .WhereIf(
+                                input.BarCodeType == BarCodeType.Panel || input.BarCodeType == BarCodeType.UnitId,
+                                x =>
+                                input.BarCodeType == BarCodeType.Panel
+                                ? x.PanelNo == "N/A"
+                                : x.PanelNo != "N/A");
+
+            Assert.AreEqual("SELECT x.* FROM WF_UNITINFO x WHERE (x.PANELNO <> :p__1)", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

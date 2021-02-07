@@ -16,7 +16,6 @@
 */
 #endregion
 
-using FastExpressionCompiler;
 using SQLBuilder.Core.Repositories;
 using System;
 using System.Collections.Generic;
@@ -1117,70 +1116,70 @@ namespace SQLBuilder.Core.Extensions
                     switch (@this.Type.GetCoreType().Name.ToLower())
                     {
                         case "string":
-                            obj = @this.ToLambda<Func<string>>().CompileFast().Invoke();
+                            obj = @this.ToLambda<Func<string>>().Compile().Invoke();
                             break;
                         case "int16":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<short?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<short?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<short>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<short>>().Compile().Invoke();
                             break;
                         case "int32":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<int?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<int?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<int>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<int>>().Compile().Invoke();
                             break;
                         case "int64":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<long?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<long?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<long>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<long>>().Compile().Invoke();
                             break;
                         case "decimal":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<decimal?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<decimal?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<decimal>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<decimal>>().Compile().Invoke();
                             break;
                         case "double":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<double?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<double?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<double>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<double>>().Compile().Invoke();
                             break;
                         case "datetime":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<DateTime?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<DateTime?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<DateTime>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<DateTime>>().Compile().Invoke();
                             break;
                         case "boolean":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<bool?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<bool?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<bool>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<bool>>().Compile().Invoke();
                             break;
                         case "byte":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<byte?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<byte?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<byte>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<byte>>().Compile().Invoke();
                             break;
                         case "char":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<char?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<char?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<char>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<char>>().Compile().Invoke();
                             break;
                         case "single":
                             if (isNullable)
-                                obj = @this.ToLambda<Func<float?>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<float?>>().Compile().Invoke();
                             else
-                                obj = @this.ToLambda<Func<float>>().CompileFast().Invoke();
+                                obj = @this.ToLambda<Func<float>>().Compile().Invoke();
                             break;
                         default:
-                            obj = @this.ToLambda<Func<object>>().CompileFast().Invoke();
+                            obj = @this.ToLambda<Func<object>>().Compile().Invoke();
                             break;
                     }
                     break;

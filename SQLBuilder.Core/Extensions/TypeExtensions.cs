@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace SQLBuilder.Core.Extensions
 {
@@ -53,6 +56,155 @@ namespace SQLBuilder.Core.Extensions
         /// <returns></returns>
         public static bool IsAnonymousType(this Type @this) =>
             @this != null && (@this.FullName.StartsWith("<>f__AnonymousType") || @this.FullName.StartsWith("VB$AnonymousType"));
+        #endregion
+
+        #region AssignableTo
+        /// <summary>
+        /// Determines whether the current type can be assigned from base type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="baseType"></param>
+        /// <returns></returns>
+        public static bool AssignableTo(this Type type, Type baseType)
+        {
+            var typeInfo = type.GetTypeInfo();
+            var baseTypeInfo = baseType.GetTypeInfo();
+
+            if (baseTypeInfo.IsGenericTypeDefinition)
+            {
+                return typeInfo.IsAssignableToGenericTypeDefinition(baseTypeInfo);
+            }
+
+            return baseTypeInfo.IsAssignableFrom(typeInfo);
+        }
+        #endregion
+
+        #region IsAssignableToGenericTypeDefinition
+        /// <summary>
+        /// IsAssignableToGenericTypeDefinition
+        /// </summary>
+        /// <param name="typeInfo"></param>
+        /// <param name="genericTypeInfo"></param>
+        /// <returns></returns>
+        public static bool IsAssignableToGenericTypeDefinition(this TypeInfo typeInfo, TypeInfo genericTypeInfo)
+        {
+            var interfaceTypes = typeInfo.ImplementedInterfaces.Select(t => t.GetTypeInfo());
+
+            foreach (var interfaceType in interfaceTypes)
+            {
+                if (interfaceType.IsGenericType)
+                {
+                    var typeDefinitionTypeInfo = interfaceType
+                        .GetGenericTypeDefinition()
+                        .GetTypeInfo();
+
+                    if (typeDefinitionTypeInfo.Equals(genericTypeInfo))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (typeInfo.IsGenericType)
+            {
+                var typeDefinitionTypeInfo = typeInfo
+                    .GetGenericTypeDefinition()
+                    .GetTypeInfo();
+
+                if (typeDefinitionTypeInfo.Equals(genericTypeInfo))
+                {
+                    return true;
+                }
+            }
+
+            var baseTypeInfo = typeInfo.BaseType?.GetTypeInfo();
+
+            if (baseTypeInfo is null)
+            {
+                return false;
+            }
+
+            return baseTypeInfo.IsAssignableToGenericTypeDefinition(genericTypeInfo);
+        }
+        #endregion
+
+        #region IsDynamicOrObjectType
+        /// <summary>
+        /// 判断是否是dynamic或者object类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsDynamicOrObjectType(this Type @this) =>
+            @this == typeof(object);
+        #endregion
+
+        #region IsStringType
+        /// <summary>
+        /// 判断是否是string类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsStringType(this Type @this) =>
+            @this == typeof(string);
+        #endregion
+
+        #region IsGenericType
+        /// <summary>
+        /// IsGenericType
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsGenericType(this Type @this)
+        {
+            return @this.GetTypeInfo().IsGenericType;
+        }
+
+        /// <summary>
+        /// IsGenericType
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="genericType"></param>
+        /// <returns></returns>
+        public static bool IsGenericType(this Type @this, Type genericType)
+        {
+            return @this.IsGenericType() && @this.GetGenericTypeDefinition() == genericType;
+        }
+        #endregion
+
+        #region IsDictionaryType
+        /// <summary>
+        /// IsDictionaryType
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsDictionaryType(this Type @this)
+        {
+            return @this != null && @this.IsImplementsGenericInterface(typeof(IDictionary<,>));
+        }
+        #endregion
+
+        #region ImplementsGenericInterface
+        /// <summary>
+        /// ImplementsGenericInterface
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static bool IsImplementsGenericInterface(this Type @this, Type interfaceType)
+        {
+            if (@this.IsGenericType(interfaceType))
+            {
+                return true;
+            }
+            foreach (var @interface in @this.GetTypeInfo().ImplementedInterfaces)
+            {
+                if (@interface.IsGenericType(interfaceType))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
     }
 }

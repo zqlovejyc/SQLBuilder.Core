@@ -61,10 +61,10 @@ namespace SQLBuilder.Core.Extensions
             if (@this?.Count > 0)
             {
                 dt = new DataTable(typeof(T).Name);
-                var typeName = typeof(T).Name;
-                var first = @this.FirstOrDefault();
-                var firstTypeName = first.GetType().Name;
-                if (typeName.Contains("Dictionary`2") || (typeName == "Object" && (firstTypeName == "DapperRow" || firstTypeName == "DynamicRow")))
+                var type = typeof(T);
+                var first = @this.First();
+                var firstType = first.GetType();
+                if (type.IsDictionaryType() || (type.IsDynamicOrObjectType() && firstType.IsDictionaryType()))
                 {
                     var dic = first as IDictionary<string, object>;
                     dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key, o.Value?.GetType().GetCoreType() ?? typeof(object))).ToArray());
@@ -76,7 +76,7 @@ namespace SQLBuilder.Core.Extensions
                 }
                 else
                 {
-                    var props = typeName == "Object" ? first.GetType().GetProperties() : typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                    var props = type.IsDynamicOrObjectType() ? firstType.GetProperties() : typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
                     foreach (var prop in props)
                     {
                         dt.Columns.Add(prop.Name, prop?.PropertyType.GetCoreType() ?? typeof(object));
@@ -222,7 +222,7 @@ namespace SQLBuilder.Core.Extensions
             {
                 return result.FirstOrDefault();
             }
-            return default(T);
+            return default;
         }
 
         /// <summary>
@@ -247,7 +247,8 @@ namespace SQLBuilder.Core.Extensions
                         var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
                         foreach (var p in props)
                         {
-                            if (!p.CanWrite) continue;
+                            if (!p.CanWrite)
+                                continue;
                             var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
                             if (!field.IsNullOrEmpty() && !@this[field].IsNull())
                             {
@@ -274,26 +275,29 @@ namespace SQLBuilder.Core.Extensions
             if (@this?.IsClosed == false)
             {
                 var type = typeof(T);
-                if (type.Name.Contains("IDictionary`2"))
-                {
-                    list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
-                }
-                else if (type.Name.Contains("Dictionary`2"))
+                if (type.AssignableTo(typeof(Dictionary<,>)))
                 {
                     list = @this.ToDictionaries()?.ToList() as List<T>;
                 }
-                else if (type.IsClass && type.Name != "Object" && type.Name != "String")
+                else if (type.AssignableTo(typeof(IDictionary<,>)))
+                {
+                    list = @this.ToDictionaries()?.Select(o => o as IDictionary<string, object>).ToList() as List<T>;
+                }
+                else if (type.IsClass && !type.IsDynamicOrObjectType() && !type.IsStringType())
                 {
                     list = @this.ToEntities<T>()?.ToList() as List<T>;
                 }
                 else
                 {
-                    var result = @this.ToDynamics()?.ToList();
-                    list = result as List<T>;
-                    if (list == null)
+                    var result = @this.ToDynamics();
+                    if (result != null && result.Any())
                     {
-                        //适合查询单个字段的结果集
-                        list = result.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                        list = result.ToList() as List<T>;
+                        if (list == null && (type.IsStringType() || type.IsValueType))
+                        {
+                            //适合查询单个字段的结果集
+                            list = result.Select(o => (T)(o as IDictionary<string, object>).Select(x => x.Value).FirstOrDefault()).ToList();
+                        }
                     }
                 }
             }
@@ -317,7 +321,7 @@ namespace SQLBuilder.Core.Extensions
                     do
                     {
                         #region IDictionary
-                        if (type.Name.Contains("Dictionary`2"))
+                        if (type.IsDictionaryType())
                         {
                             var list = new List<Dictionary<string, object>>();
                             while (@this.Read())
@@ -329,7 +333,7 @@ namespace SQLBuilder.Core.Extensions
                                 }
                                 list.Add(dic);
                             }
-                            if (type.Name.Contains("IDictionary`2"))
+                            if (!type.AssignableTo(typeof(Dictionary<,>)))
                             {
                                 result.Add(list.Select(o => o as IDictionary<string, object>).ToList() as List<T>);
                             }
@@ -341,7 +345,7 @@ namespace SQLBuilder.Core.Extensions
                         #endregion
 
                         #region Class T
-                        else if (type.IsClass && type.Name != "Object" && type.Name != "String")
+                        else if (type.IsClass && !type.IsDynamicOrObjectType() && !type.IsStringType())
                         {
                             var list = new List<T>();
                             var fields = new List<string>();
@@ -382,10 +386,10 @@ namespace SQLBuilder.Core.Extensions
                                 list.Add(row);
                             }
                             var item = list as List<T>;
-                            if (item == null)
+                            if (item == null && (type.IsStringType() || type.IsValueType))
                             {
                                 //适合查询单个字段的结果集
-                                item = list.Select(o => (T)(o as IDictionary<string, object>)?.Select(x => x.Value).FirstOrDefault()).ToList();
+                                item = list.Select(o => (T)(o as IDictionary<string, object>).Select(x => x.Value).FirstOrDefault()).ToList();
                             }
                             result.Add(item);
                         }

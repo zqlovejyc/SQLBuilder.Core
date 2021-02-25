@@ -228,6 +228,7 @@ services.AddSQLBuilder(Configuration, "Base", (sql, parameter) =>
             _logger.LogInformation($"SQL语句：{sql}  参数：{parameter.ToJson()}");
     }
 
+    //返回null，不对原始sql进行任何更改，此处可以修改待执行的sql语句
     return null;
 });
 

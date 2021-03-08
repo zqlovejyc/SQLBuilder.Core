@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -32,11 +32,7 @@
         <PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\netstandard2.0\SQLBuilder.Core.xml</DocumentationFile>
-    </PropertyGroup>
-
+    
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.xml</DocumentationFile>
     </PropertyGroup>
@@ -46,9 +42,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.78" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.2" />
+        <PackageReference Include="Dapper" Version="2.0.82" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.3" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
@@ -56,9 +52,9 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MySqlConnector" Version="1.2.1" />
+        <PackageReference Include="MySqlConnector" Version="1.3.0" />
         <PackageReference Include="Npgsql" Version="5.0.3" />
-        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.101" />
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.1" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
     </ItemGroup>

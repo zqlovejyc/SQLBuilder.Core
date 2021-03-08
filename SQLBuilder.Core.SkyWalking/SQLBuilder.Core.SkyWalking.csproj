@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -24,11 +24,7 @@
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
         <FileVersion>2.1.5.0</FileVersion>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\netstandard2.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
-    </PropertyGroup>
-
+    
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
     </PropertyGroup>
@@ -54,7 +50,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="1.1.0" />
+        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="1.2.0" />
     </ItemGroup>
 
 </Project>

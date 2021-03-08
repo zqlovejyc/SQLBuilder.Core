@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using SQLBuilder.Core.Entry;
@@ -48,7 +48,7 @@ namespace SQLBuilder.Core
 
         #region Main
         /// <summary>
-        /// 主函数，程序入口
+        /// 主函数
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)

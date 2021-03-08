@@ -20,8 +20,8 @@
 
 - Gitee：[https://gitee.com/zqlovejyc/SQLBuilder.Core](https://gitee.com/zqlovejyc/SQLBuilder.Core)
 - GitHub：[https://github.com/zqlovejyc/SQLBuilder.Core](https://github.com/zqlovejyc/SQLBuilder.Core)
-- Nuget：[https://www.nuget.org/packages/Zq.SQLBuilder.Core](https://www.nuget.org/packages/Zq.SQLBuilder.Core)
-- Myget：[https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core](https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core)
+- NuGet：[https://www.nuget.org/packages/Zq.SQLBuilder.Core](https://www.nuget.org/packages/Zq.SQLBuilder.Core)
+- MyGet：[https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core](https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core)
 
 ## 🥥 框架扩展包
 
@@ -228,6 +228,7 @@ services.AddSQLBuilder(Configuration, "Base", (sql, parameter) =>
             _logger.LogInformation($"SQL语句：{sql}  参数：{parameter.ToJson()}");
     }
 
+    //返回null，不对原始sql进行任何更改，此处可以修改待执行的sql语句
     return null;
 });
 

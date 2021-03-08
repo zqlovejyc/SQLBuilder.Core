@@ -48,10 +48,7 @@ namespace SQLBuilder.Core.Configuration
             if (!environment.IsNullOrEmpty())
                 jsonFile = $"appsettings.{environment}.json";
 
-            Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(jsonFile, optional: true, reloadOnChange: true)
-                .Build();
+            SetConfigurationFile(jsonFile);
         }
         #endregion
 

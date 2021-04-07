@@ -326,8 +326,11 @@ _repository.UseMasterOrSlave(master)
 ### 🔗 链路追踪
 
 ```csharp
-//注入SQLBuilder链路追踪
-services.AddSkyApmSQLBuilder();
+//注入SQLBuilder SkyWalking链路追踪
+services.AddSqlBuilderSkyApm()
+
+//注入SQLBuilder ElasticApm链路追踪
+services.UseSqlBuilderElasticApm()
 ```
 
 ## 🧪 测试文档

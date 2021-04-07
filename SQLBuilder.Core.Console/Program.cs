@@ -1,13 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using SQLBuilder.Core.Entry;
-using SQLBuilder.Core.Extensions;
-using SQLBuilder.Core.Enums;
-using System.Diagnostics;
-using SQLBuilder.Core.Diagnostics;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DiagnosticAdapter;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.ElasticApm.Diagnostics;
+using SQLBuilder.Core.ElasticApm.Extensions;
+using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SQLBuilder.Core
 {
@@ -55,7 +60,32 @@ namespace SQLBuilder.Core
         /// 主函数
         /// </summary>
         /// <param name="args"></param>
-        public static void Main(string[] args)
+        private static async Task Main(string[] args)
+        {
+            //SqlBuilderTest();
+
+            //DiagnosticSourceTest();
+
+            var hostBuilder = CreateHostBuilder(args);
+
+            await hostBuilder.RunConsoleAsync();
+
+            Console.ReadLine();
+        }
+
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices((context, services) => services.AddHostedService<HostedService>())
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                })
+                .UseSqlBuilderElasticApm();
+        #endregion
+
+        #region SqlBuilderTest
+        public static void SqlBuilderTest()
         {
             #region Select
             Print(
@@ -751,7 +781,12 @@ namespace SQLBuilder.Core
                 "Select"
             );
             #endregion
+        }
+        #endregion
 
+        #region DiagnosticSource 
+        public static void DiagnosticSourceTest()
+        {
             #region DiagnosticSource
             var diagnosticListener =
                 new DiagnosticListener(DiagnosticStrings.DiagnosticListenerName);
@@ -816,10 +851,9 @@ namespace SQLBuilder.Core
                     message);
             }
             #endregion
-
-            Console.ReadLine();
         }
         #endregion
+
     }
 
     public class MyObserver<T> : IObserver<T>

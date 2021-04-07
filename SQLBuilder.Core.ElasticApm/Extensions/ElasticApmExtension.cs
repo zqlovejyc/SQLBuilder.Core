@@ -19,7 +19,9 @@
 using Elastic.Apm.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using SQLBuilder.Core.ElasticApm.Diagnostics;
+using Elastic.Apm.Extensions.Hosting;
 
 namespace SQLBuilder.Core.ElasticApm.Extensions
 {
@@ -34,13 +36,21 @@ namespace SQLBuilder.Core.ElasticApm.Extensions
         /// <param name="this"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IApplicationBuilder UseSqlBuilderElasticApm(
-            this IApplicationBuilder @this,
-            IConfiguration configuration = null)
+        public static IApplicationBuilder UseSqlBuilderElasticApm(this IApplicationBuilder @this, IConfiguration configuration = null)
         {
             return @this.UseElasticApm(
                 configuration,
                 new SqlBuilderDiagnosticSubscriber());
+        }
+
+        /// <summary>
+        /// 注入SQLBuilder的ElasticApm追踪
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IHostBuilder UseSqlBuilderElasticApm(this IHostBuilder @this)
+        {
+            return @this.UseElasticApm(new SqlBuilderDiagnosticSubscriber());
         }
     }
 }

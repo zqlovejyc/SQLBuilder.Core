@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.Enums;
+using System.Diagnostics;
+using SQLBuilder.Core.Diagnostics;
+using Microsoft.Extensions.DiagnosticAdapter;
+using SQLBuilder.Core.ElasticApm.Diagnostics;
 
 namespace SQLBuilder.Core
 {
@@ -748,8 +752,106 @@ namespace SQLBuilder.Core
             );
             #endregion
 
+            #region DiagnosticSource
+            var diagnosticListener =
+                new DiagnosticListener(DiagnosticStrings.DiagnosticListenerName);
+
+            ////订阅方法一
+            //DiagnosticListener.AllListeners.Subscribe(new MyObserver<DiagnosticListener>(listener =>
+            //{
+            //    //判断发布者的名字
+            //    if (listener.Name == DiagnosticStrings.DiagnosticListenerName)
+            //    {
+            //        //获取订阅信息
+            //        listener.Subscribe(new MyObserver<KeyValuePair<string, object>>(listenerData =>
+            //        {
+            //            Console.WriteLine($"监听名称:{listenerData.Key}");
+            //            dynamic data = listenerData.Value;
+            //            Console.WriteLine(data.Sql);
+            //        }));
+            //    }
+            //}));
+
+            ////订阅方法二
+            DiagnosticListener.AllListeners.Subscribe(new MyObserver<DiagnosticListener>(listener =>
+            {
+                if (listener.Name == DiagnosticStrings.DiagnosticListenerName)
+                {
+                    //适配订阅
+                    listener.SubscribeWithAdapter(new MyDiagnosticListener());
+                }
+            }));
+
+            //订阅方法三
+            //diagnosticListener.SubscribeWithAdapter(new MyDiagnosticListener());
+            diagnosticListener.SubscribeWithAdapter(new SqlBuilderDiagnosticListener(null));
+
+            //发送日志诊断消息
+            if (diagnosticListener.IsEnabled(DiagnosticStrings.BeforeExecute) &&
+                diagnosticListener.IsEnabled(DiagnosticStrings.AfterExecute) &&
+                diagnosticListener.IsEnabled(DiagnosticStrings.ErrorExecute))
+            {
+                var message = new DiagnosticsMessage
+                {
+                    Sql = "select * from table",
+                    Parameters = new Dictionary<string, object>
+                    {
+                        ["key"] = "123"
+                    },
+                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                };
+                diagnosticListener.Write(
+                    DiagnosticStrings.BeforeExecute,
+                    message);
+
+                message.ElapsedMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - message.Timestamp;
+                diagnosticListener.Write(
+                    DiagnosticStrings.AfterExecute,
+                    message);
+
+                message.ElapsedMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - message.Timestamp;
+                message.Exception = new Exception("测试异常");
+                diagnosticListener.Write(
+                    DiagnosticStrings.ErrorExecute,
+                    message);
+            }
+            #endregion
+
             Console.ReadLine();
         }
         #endregion
+    }
+
+    public class MyObserver<T> : IObserver<T>
+    {
+        private Action<T> _next;
+        public MyObserver(Action<T> next)
+        {
+            _next = next;
+        }
+
+        public void OnCompleted()
+        {
+        }
+
+        public void OnError(Exception error)
+        {
+        }
+
+        public void OnNext(T value) => _next(value);
+    }
+
+    public class MyDiagnosticListener
+    {
+        /// <summary>
+        /// 执行前
+        /// </summary>
+        /// <param name="message">诊断消息</param>
+        [DiagnosticName(DiagnosticStrings.BeforeExecute)]
+        public void ExecuteBefore(string sql, IDictionary<string, object> parameters)
+        {
+            Console.WriteLine(sql);
+            Console.WriteLine(parameters["key"]);
+        }
     }
 }

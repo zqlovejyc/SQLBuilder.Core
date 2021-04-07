@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SQLBuilder.Core.ElasticApm\SQLBuilder.Core.ElasticApm.csproj" />
     <ProjectReference Include="..\SQLBuilder.Core\SQLBuilder.Core.csproj" />
   </ItemGroup>
 

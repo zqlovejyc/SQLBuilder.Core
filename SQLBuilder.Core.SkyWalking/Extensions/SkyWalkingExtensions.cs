@@ -29,7 +29,7 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
     /// <summary>
     /// SkyWalking扩展类
     /// </summary>
-    public static class SkyWalkingBuilderExtensions
+    public static class SkyWalkingExtensions
     {
         /// <summary>
         /// 注入SQLBuilder的SkyApm追踪
@@ -39,9 +39,9 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
         /// <para>具体设定参照：https://github.com/dotnetcore/FreeSql/issues/222</para>
         /// </param>
         /// <returns></returns>
-        public static IServiceCollection AddSkyApmSQLBuilder(this IServiceCollection @this, StringOrIntValue? component = null)
+        public static IServiceCollection AddSqlBuilderSkyApm(this IServiceCollection @this, StringOrIntValue? component = null)
         {
-            @this.AddSkyApmExtensions().AddSkyApmSQLBuilder(component);
+            @this.AddSkyApmExtensions().AddSqlBuilderSkyApm(component);
 
             return @this;
         }
@@ -54,13 +54,13 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
         /// <para>具体设定参照：https://github.com/dotnetcore/FreeSql/issues/222</para>
         /// </param>
         /// <returns></returns>
-        public static SkyApmExtensions AddSkyApmSQLBuilder(this SkyApmExtensions @this, StringOrIntValue? component = null)
+        public static SkyApmExtensions AddSqlBuilderSkyApm(this SkyApmExtensions @this, StringOrIntValue? component = null)
         {
             if (@this == null)
                 throw new ArgumentNullException(nameof(SkyApmExtensions));
 
             @this.Services.AddSingleton<ITracingDiagnosticProcessor>(x =>
-                new SQLBuilderTracingDiagnosticProcessor(
+                new SqlBuilderTracingDiagnosticProcessor(
                     x.GetRequiredService<ITracingContext>(),
                     x.GetRequiredService<IExitSegmentContextAccessor>(),
                     component));

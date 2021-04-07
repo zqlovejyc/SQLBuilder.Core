@@ -25,7 +25,6 @@ using SkyApm.Tracing.Segments;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.Parameters;
-using SQLBuilder.Core.SkyWalking.Extensions;
 using System;
 using System.Linq;
 
@@ -34,7 +33,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
     /// <summary>
     /// SQLBuilder跟踪诊断处理器
     /// </summary>
-    public class SQLBuilderTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class SqlBuilderTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         /// <summary>
         /// 私有字段
@@ -54,7 +53,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         /// <param name="tracingContext"></param>
         /// <param name="contextAccessor"></param>
         /// <param name="component"></param>
-        public SQLBuilderTracingDiagnosticProcessor(
+        public SqlBuilderTracingDiagnosticProcessor(
             ITracingContext tracingContext,
             IExitSegmentContextAccessor contextAccessor,
             StringOrIntValue? component = null)
@@ -108,8 +107,8 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
                 var context = CreateExitSegmentContext(message.Sql, message.DataSource);
 
                 context.Span.AddLog(LogEvent.Event(DiagnosticStrings.BeforeExecute.Split(' ').Last()));
-                context.Span.AddLog(LogEvent.Message($"sql语句：{message.Sql}"));
-                context.Span.AddLog(LogEvent.Message($"sql参数：{parameterJson}"));
+                context.Span.AddLog(LogEvent.Message($"sql --> {message.Sql}"));
+                context.Span.AddLog(LogEvent.Message($"parameters --> {parameterJson}"));
             }
         }
 
@@ -124,7 +123,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
             if (context != null)
             {
                 context.Span.AddLog(LogEvent.Event(DiagnosticStrings.AfterExecute.Split(' ').Last()));
-                context.Span.AddLog(LogEvent.Message($"耗时：{elapsedMilliseconds}ms"));
+                context.Span.AddLog(LogEvent.Message($"elapsedMilliseconds --> {elapsedMilliseconds}ms"));
                 _tracingContext.Release(context);
             }
         }

@@ -3500,7 +3500,8 @@ namespace SQLBuilder.Core.Repositories
                     Parameters = parameter,
                     DataSource = dataSource,
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    Operation = DiagnosticStrings.BeforeExecute
+                    Operation = DiagnosticStrings.BeforeExecute,
+                    DatabaseType = DatabaseType
                 };
 
                 _diagnosticListener.Write(DiagnosticStrings.BeforeExecute, message);

@@ -16,6 +16,7 @@
  */
 #endregion
 
+using SQLBuilder.Core.Enums;
 using System;
 
 namespace SQLBuilder.Core.Diagnostics
@@ -36,6 +37,11 @@ namespace SQLBuilder.Core.Diagnostics
         public string Operation { get; set; }
 
         /// <summary>
+        /// 操作id
+        /// </summary>
+        public string OperationId { get; set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
         /// sql语句
         /// </summary>
         public string Sql { get; set; }
@@ -44,6 +50,11 @@ namespace SQLBuilder.Core.Diagnostics
         /// sql参数
         /// </summary>
         public object Parameters { get; set; }
+
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
+        public DatabaseType DatabaseType { get; set; }
 
         /// <summary>
         /// 数据库数据源

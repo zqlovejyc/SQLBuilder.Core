@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core.Console", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core.UnitTest", "SQLBuilder.Core.UnitTest\SQLBuilder.Core.UnitTest.csproj", "{9D9DD7D8-0195-4A0D-8F19-222BC2048AE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core.SkyWalking", "SQLBuilder.Core.SkyWalking\SQLBuilder.Core.SkyWalking.csproj", "{7F00CEF4-28AE-477B-841D-86D916824238}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLBuilder.Core.SkyWalking", "SQLBuilder.Core.SkyWalking\SQLBuilder.Core.SkyWalking.csproj", "{7F00CEF4-28AE-477B-841D-86D916824238}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLBuilder.Core.ElasticApm", "SQLBuilder.Core.ElasticApm\SQLBuilder.Core.ElasticApm.csproj", "{49B47662-707E-43F5-92A8-E0B43C823B07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7F00CEF4-28AE-477B-841D-86D916824238}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F00CEF4-28AE-477B-841D-86D916824238}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F00CEF4-28AE-477B-841D-86D916824238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49B47662-707E-43F5-92A8-E0B43C823B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49B47662-707E-43F5-92A8-E0B43C823B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49B47662-707E-43F5-92A8-E0B43C823B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49B47662-707E-43F5-92A8-E0B43C823B07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

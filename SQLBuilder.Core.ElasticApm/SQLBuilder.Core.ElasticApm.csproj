@@ -20,6 +20,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>sqlbuilder;elastic apm</PackageTags>
         <PackageReleaseNotes>1.发布ElasticApm扩展类库</PackageReleaseNotes>
+        <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

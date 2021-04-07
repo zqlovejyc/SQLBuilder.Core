@@ -49,14 +49,40 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
         }
 
         /// <summary>
+        /// 获取sql参数json
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        private string GetParameterJson(object parameters)
+        {
+            var parameterJson = string.Empty;
+            if (parameters is DynamicParameters dynamicParameters)
+                parameterJson = dynamicParameters
+                    .ParameterNames?
+                    .ToDictionary(k => k, v => dynamicParameters.Get<object>(v))
+                    .ToJson();
+            else if (parameters is OracleDynamicParameters oracleDynamicParameters)
+                parameterJson = oracleDynamicParameters
+                    .OracleParameters
+                    .ToDictionary(k => k.ParameterName, v => v.Value)
+                    .ToJson();
+            else
+                parameterJson = parameters.ToJson();
+
+            return parameterJson;
+        }
+
+        /// <summary>
         /// 执行前
         /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameters">参数</param>
         /// <param name="operationId">操作id</param>
         /// <param name="databaseType">数据库类型</param>
+        /// <param name="dataSource">数据库</param>
+        /// <param name="timestamp">时间戳</param>
         [DiagnosticName(DiagnosticStrings.BeforeExecute)]
-        public void ExecuteBefore(string sql, object parameters, string operationId, DatabaseType databaseType)
+        public void ExecuteBefore(string sql, object parameters, string operationId, DatabaseType databaseType, string dataSource, long? timestamp)
         {
             if (sql.IsNullOrEmpty() || operationId.IsNullOrEmpty())
                 return;
@@ -72,7 +98,15 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 DiagnosticStrings.BeforeExecute);
 
             if (span != null)
+            {
+                span.SetLabel("sql", sql);
+                span.SetLabel("parameters", GetParameterJson(parameters));
+                span.SetLabel("databaseType", databaseType.ToString());
+                span.SetLabel("dataSource", dataSource);
+                span.SetLabel("timestamp", timestamp.Value);
+                span.SetLabel("executeBefore", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                 _spans.TryAdd(operationId, span);
+            }
         }
 
         /// <summary>
@@ -82,11 +116,9 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
         /// <param name="parameters">参数</param>
         /// <param name="elapsedMilliseconds">耗时</param>
         /// <param name="operationId">操作id</param>
-        /// <param name="databaseType">数据库类型</param>
         /// <param name="dataSource">数据库</param>
-        /// <param name="timestamp">时间戳</param>
         [DiagnosticName(DiagnosticStrings.AfterExecute)]
-        public void ExecuteAfter(string sql, object parameters, long? elapsedMilliseconds, string operationId, DatabaseType databaseType, string dataSource, long? timestamp)
+        public void ExecuteAfter(string sql, object parameters, long? elapsedMilliseconds, string operationId, string dataSource)
         {
             if (elapsedMilliseconds == null || operationId.IsNullOrEmpty())
                 return;
@@ -96,34 +128,16 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
 
             if (span != null)
             {
-                var parameterJson = string.Empty;
-                if (parameters is DynamicParameters dynamicParameters)
-                    parameterJson = dynamicParameters
-                        .ParameterNames?
-                        .ToDictionary(k => k, v => dynamicParameters.Get<object>(v))
-                        .ToJson();
-                else if (parameters is OracleDynamicParameters oracleDynamicParameters)
-                    parameterJson = oracleDynamicParameters
-                        .OracleParameters
-                        .ToDictionary(k => k.ParameterName, v => v.Value)
-                        .ToJson();
-                else
-                    parameterJson = parameters.ToJson();
-
                 span.Outcome = Outcome.Success;
                 span.Duration = elapsedMilliseconds;
                 span.Context.Db = new Database
                 {
-                    Statement = $"sql --> {sql}, parameters --> {parameterJson}",
+                    Statement = $"sql --> {sql}, parameters --> {GetParameterJson(parameters)}",
                     Instance = dataSource,
                     Type = Database.TypeSql
                 };
-                span.SetLabel("sql", sql);
-                span.SetLabel("parameters", parameterJson);
                 span.SetLabel("elapsedMilliseconds", elapsedMilliseconds.Value);
-                span.SetLabel("databaseType", databaseType.ToString());
-                span.SetLabel("dataSource", dataSource);
-                span.SetLabel("timestamp", timestamp.Value);
+                span.SetLabel("executeAfter", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                 span.End();
             }
         }
@@ -148,6 +162,8 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 span.Outcome = Outcome.Failure;
                 span.Duration = elapsedMilliseconds;
                 span.CaptureException(exception);
+                span.SetLabel("elapsedMilliseconds", elapsedMilliseconds.Value);
+                span.SetLabel("executeError", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                 span.End();
             }
         }

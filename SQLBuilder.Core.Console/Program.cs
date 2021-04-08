@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace SQLBuilder.Core
 {
-    class Program
+    public class Program
     {
         #region Print
         /// <summary>
@@ -853,7 +853,6 @@ namespace SQLBuilder.Core
             #endregion
         }
         #endregion
-
     }
 
     public class MyObserver<T> : IObserver<T>

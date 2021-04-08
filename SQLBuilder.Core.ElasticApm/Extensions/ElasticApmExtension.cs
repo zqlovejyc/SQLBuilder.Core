@@ -17,11 +17,14 @@
 #endregion
 
 using Elastic.Apm.AspNetCore;
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using SQLBuilder.Core.ElasticApm.Diagnostics;
-using Elastic.Apm.Extensions.Hosting;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SQLBuilder.Core.ElasticApm.Extensions
 {
@@ -35,22 +38,37 @@ namespace SQLBuilder.Core.ElasticApm.Extensions
         /// </summary>
         /// <param name="this"></param>
         /// <param name="configuration"></param>
+        /// <param name="subscribers"></param>
         /// <returns></returns>
-        public static IApplicationBuilder UseSqlBuilderElasticApm(this IApplicationBuilder @this, IConfiguration configuration = null)
+        public static IApplicationBuilder UseSqlBuilderElasticApm(
+            this IApplicationBuilder @this,
+            IConfiguration configuration = null,
+            params IDiagnosticsSubscriber[] subscribers)
         {
+            var subs = new List<IDiagnosticsSubscriber> { new SqlBuilderDiagnosticSubscriber() };
+            if (subscribers?.Length > 0)
+                subs.AddRange(subscribers);
+
             return @this.UseElasticApm(
                 configuration,
-                new SqlBuilderDiagnosticSubscriber());
+                subs.Distinct().ToArray());
         }
 
         /// <summary>
         /// 注入SQLBuilder的ElasticApm追踪
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="subscribers"></param>
         /// <returns></returns>
-        public static IHostBuilder UseSqlBuilderElasticApm(this IHostBuilder @this)
+        public static IHostBuilder UseSqlBuilderElasticApm(
+            this IHostBuilder @this,
+            params IDiagnosticsSubscriber[] subscribers)
         {
-            return @this.UseElasticApm(new SqlBuilderDiagnosticSubscriber());
+            var subs = new List<IDiagnosticsSubscriber> { new SqlBuilderDiagnosticSubscriber() };
+            if (subscribers?.Length > 0)
+                subs.AddRange(subscribers);
+
+            return @this.UseElasticApm(subs.Distinct().ToArray());
         }
     }
 }

@@ -18,7 +18,7 @@
         <PackageIcon>sql.png</PackageIcon>
         <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>sqlbuilder;skywalking</PackageTags>
+        <PackageTags>sqlbuilder;skywalking;apm</PackageTags>
         <PackageReleaseNotes>1.优化日志诊断记录内容；
 2.重命名AddSkyApmSQLBuilder -&gt; AddSqlBuilderSkyApm；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

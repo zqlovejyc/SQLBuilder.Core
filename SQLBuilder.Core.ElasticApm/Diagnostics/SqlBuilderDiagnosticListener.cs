@@ -136,8 +136,8 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                     Instance = dataSource,
                     Type = Database.TypeSql
                 };
-                span.SetLabel("elapsedMilliseconds", elapsedMilliseconds.Value);
                 span.SetLabel("executeAfter", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
                 span.End();
             }
         }
@@ -162,8 +162,8 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 span.Outcome = Outcome.Failure;
                 span.Duration = elapsedMilliseconds;
                 span.CaptureException(exception);
-                span.SetLabel("elapsedMilliseconds", elapsedMilliseconds.Value);
                 span.SetLabel("executeError", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
                 span.End();
             }
         }

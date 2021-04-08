@@ -109,6 +109,9 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
                 context.Span.AddLog(LogEvent.Event(DiagnosticStrings.BeforeExecute.Split(' ').Last()));
                 context.Span.AddLog(LogEvent.Message($"sql --> {message.Sql}"));
                 context.Span.AddLog(LogEvent.Message($"parameters --> {parameterJson}"));
+                context.Span.AddLog(LogEvent.Message($"databaseType --> {message.DatabaseType}"));
+                context.Span.AddLog(LogEvent.Message($"dataSource --> {message.DataSource}"));
+                context.Span.AddLog(LogEvent.Message($"timestamp --> {message.Timestamp}"));
             }
         }
 

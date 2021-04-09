@@ -71,7 +71,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         /// <returns></returns>
         private SegmentContext CreateExitSegmentContext(string sql, string dataSource)
         {
-            var operationName = $"{DiagnosticStrings.Prefix}{sql.Split(' ').FirstOrDefault()}";
+            var operationName = sql?.Split(' ').FirstOrDefault();
             var context = _tracingContext.CreateExitSegmentContext(operationName, dataSource);
 
             context.Span.SpanLayer = SpanLayer.DB;
@@ -88,27 +88,27 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         [DiagnosticName(DiagnosticStrings.BeforeExecute)]
         public void ExecuteBefore([Object] DiagnosticsMessage message)
         {
-            if (message != null && !message.Sql.IsNullOrEmpty())
-            {
-                var parameterJson = string.Empty;
-                if (message.Parameters is DynamicParameters dynamicParameters)
-                    parameterJson = dynamicParameters
-                        .ParameterNames?
-                        .ToDictionary(k => k, v => dynamicParameters.Get<object>(v))
-                        .ToJson();
-                else if (message.Parameters is OracleDynamicParameters oracleDynamicParameters)
-                    parameterJson = oracleDynamicParameters
-                        .OracleParameters
-                        .ToDictionary(k => k.ParameterName, v => v.Value)
-                        .ToJson();
-                else
-                    parameterJson = message.Parameters.ToJson();
+            if (message == null || message.Sql.IsNullOrEmpty())
+                return;
 
-                var newLine = Environment.NewLine;
-                var context = CreateExitSegmentContext(message.Sql, message.DataSource);
-                context.Span.AddLog(LogEvent.Event($"{DiagnosticStrings.BeforeExecute.Split(' ').Last()}: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}"));
-                context.Span.AddLog(LogEvent.Message($"sql: {message.Sql}{newLine}parameters: {parameterJson}{newLine}databaseType: {message.DatabaseType}{newLine}dataSource: {message.DataSource}{newLine}timestamp: {message.Timestamp}"));
-            }
+            var parameterJson = string.Empty;
+            if (message.Parameters is DynamicParameters dynamicParameters)
+                parameterJson = dynamicParameters
+                    .ParameterNames?
+                    .ToDictionary(k => k, v => dynamicParameters.Get<object>(v))
+                    .ToJson();
+            else if (message.Parameters is OracleDynamicParameters oracleDynamicParameters)
+                parameterJson = oracleDynamicParameters
+                    .OracleParameters
+                    .ToDictionary(k => k.ParameterName, v => v.Value)
+                    .ToJson();
+            else
+                parameterJson = message.Parameters.ToJson();
+
+            var newLine = Environment.NewLine;
+            var context = CreateExitSegmentContext(message.Sql, message.DataSource);
+            context.Span.AddLog(LogEvent.Event($"{DiagnosticStrings.BeforeExecute.Split(' ').Last()}: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}"));
+            context.Span.AddLog(LogEvent.Message($"sql: {message.Sql}{newLine}parameters: {parameterJson}{newLine}databaseType: {message.DatabaseType}{newLine}dataSource: {message.DataSource}{newLine}timestamp: {message.Timestamp}"));
         }
 
         /// <summary>
@@ -119,12 +119,12 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         public void ExecuteAfter([Property(Name = "ElapsedMilliseconds")] long? elapsedMilliseconds)
         {
             var context = _contextAccessor.Context;
-            if (context != null)
-            {
-                context.Span.AddLog(LogEvent.Event($"{DiagnosticStrings.AfterExecute.Split(' ').Last()}: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}"));
-                context.Span.AddLog(LogEvent.Message($"elapsedMilliseconds: {elapsedMilliseconds}ms"));
-                _tracingContext.Release(context);
-            }
+            if (context == null)
+                return;
+
+            context.Span.AddLog(LogEvent.Event($"{DiagnosticStrings.AfterExecute.Split(' ').Last()}: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}"));
+            context.Span.AddLog(LogEvent.Message($"elapsedMilliseconds: {elapsedMilliseconds}ms"));
+            _tracingContext.Release(context);
         }
 
         /// <summary>
@@ -135,11 +135,11 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         public void ExecuteError([Property(Name = "Exception")] Exception ex)
         {
             var context = _contextAccessor.Context;
-            if (context != null)
-            {
-                context.Span.ErrorOccurred(ex);
-                _tracingContext.Release(context);
-            }
+            if (context == null)
+                return;
+
+            context.Span.ErrorOccurred(ex);
+            _tracingContext.Release(context);
         }
     }
 }

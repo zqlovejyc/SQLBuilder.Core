@@ -92,21 +92,22 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 return;
 
             var span = segment.StartSpan(
-                $"{DiagnosticStrings.Prefix}{sql.Split(' ').FirstOrDefault()}",
+                sql?.Split(' ').FirstOrDefault(),
                 ApiConstants.TypeDb,
                 databaseType.ToString(),
                 DiagnosticStrings.BeforeExecute);
 
-            if (span != null)
-            {
-                span.SetLabel("sql", sql);
-                span.SetLabel("parameters", GetParameterJson(parameters));
-                span.SetLabel("databaseType", databaseType.ToString());
-                span.SetLabel("dataSource", dataSource);
-                span.SetLabel("timestamp", timestamp.Value);
-                span.SetLabel("executeBefore", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-                _spans.TryAdd(operationId, span);
-            }
+            if (span == null)
+                return;
+
+            span.SetLabel("sql", sql);
+            span.SetLabel("parameters", GetParameterJson(parameters));
+            span.SetLabel("databaseType", databaseType.ToString());
+            span.SetLabel("dataSource", dataSource);
+            span.SetLabel("timestamp", timestamp.Value);
+            span.SetLabel("executeBefore", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+
+            _spans.TryAdd(operationId, span);
         }
 
         /// <summary>
@@ -126,20 +127,20 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
             if (!_spans.TryRemove(operationId, out var span))
                 return;
 
-            if (span != null)
+            if (span == null)
+                return;
+
+            span.Outcome = Outcome.Success;
+            span.Duration = elapsedMilliseconds;
+            span.Context.Db = new Database
             {
-                span.Outcome = Outcome.Success;
-                span.Duration = elapsedMilliseconds;
-                span.Context.Db = new Database
-                {
-                    Statement = $"sql: {sql}{Environment.NewLine}parameters: {GetParameterJson(parameters)}",
-                    Instance = dataSource,
-                    Type = Database.TypeSql
-                };
-                span.SetLabel("executeAfter", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-                span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
-                span.End();
-            }
+                Statement = $"sql: {sql}{Environment.NewLine}parameters: {GetParameterJson(parameters)}",
+                Instance = dataSource,
+                Type = Database.TypeSql
+            };
+            span.SetLabel("executeAfter", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
+            span.End();
         }
 
         /// <summary>
@@ -157,15 +158,15 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
             if (!_spans.TryRemove(operationId, out var span))
                 return;
 
-            if (span != null)
-            {
-                span.Outcome = Outcome.Failure;
-                span.Duration = elapsedMilliseconds;
-                span.CaptureException(exception);
-                span.SetLabel("executeError", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-                span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
-                span.End();
-            }
+            if (span == null)
+                return;
+
+            span.Outcome = Outcome.Failure;
+            span.Duration = elapsedMilliseconds;
+            span.CaptureException(exception);
+            span.SetLabel("executeError", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            span.SetLabel("elapsedMilliseconds", $"{elapsedMilliseconds.Value}ms");
+            span.End();
         }
     }
 }

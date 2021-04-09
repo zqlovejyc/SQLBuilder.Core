@@ -132,7 +132,7 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 span.Duration = elapsedMilliseconds;
                 span.Context.Db = new Database
                 {
-                    Statement = $"sql --> {sql}, parameters --> {GetParameterJson(parameters)}",
+                    Statement = $"sql: {sql}{Environment.NewLine}parameters: {GetParameterJson(parameters)}",
                     Instance = dataSource,
                     Type = Database.TypeSql
                 };

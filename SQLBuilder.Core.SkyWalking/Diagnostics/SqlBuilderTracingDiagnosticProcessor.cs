@@ -107,11 +107,11 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
                 var context = CreateExitSegmentContext(message.Sql, message.DataSource);
 
                 context.Span.AddLog(LogEvent.Event(DiagnosticStrings.BeforeExecute.Split(' ').Last()));
-                context.Span.AddLog(LogEvent.Message($"sql --> {message.Sql}"));
-                context.Span.AddLog(LogEvent.Message($"parameters --> {parameterJson}"));
-                context.Span.AddLog(LogEvent.Message($"databaseType --> {message.DatabaseType}"));
-                context.Span.AddLog(LogEvent.Message($"dataSource --> {message.DataSource}"));
-                context.Span.AddLog(LogEvent.Message($"timestamp --> {message.Timestamp}"));
+                context.Span.AddLog(LogEvent.Message($"sql: {message.Sql}"));
+                context.Span.AddLog(LogEvent.Message($"parameters: {parameterJson}"));
+                context.Span.AddLog(LogEvent.Message($"databaseType: {message.DatabaseType}"));
+                context.Span.AddLog(LogEvent.Message($"dataSource: {message.DataSource}"));
+                context.Span.AddLog(LogEvent.Message($"timestamp: {message.Timestamp}"));
             }
         }
 
@@ -126,7 +126,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
             if (context != null)
             {
                 context.Span.AddLog(LogEvent.Event(DiagnosticStrings.AfterExecute.Split(' ').Last()));
-                context.Span.AddLog(LogEvent.Message($"elapsedMilliseconds --> {elapsedMilliseconds}ms"));
+                context.Span.AddLog(LogEvent.Message($"elapsedMilliseconds: {elapsedMilliseconds}ms"));
                 _tracingContext.Release(context);
             }
         }

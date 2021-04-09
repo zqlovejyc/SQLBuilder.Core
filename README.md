@@ -210,7 +210,7 @@ await SqlBuilder
 
 ```csharp
 //注入SQLBuilder仓储
-services.AddSQLBuilder(Configuration, "Base", (sql, parameter) =>
+services.AddSqlBuilder(Configuration, "Base", (sql, parameter) =>
 {
     //写入文本日志
     if (WebHostEnvironment.IsDevelopment())

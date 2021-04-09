@@ -32,7 +32,7 @@ namespace SQLBuilder.Core.Extensions
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        #region AddSQLBuilder
+        #region AddSqlBuilder
         /// <summary>
         /// SQLBuilder仓储注入扩展
         /// <para>注意：若要启用读写分离，则需要注入ILoadBalancer服务；</para>
@@ -75,7 +75,7 @@ namespace SQLBuilder.Core.Extensions
         ///     }
         ///     </code>
         /// </example>
-        public static IServiceCollection AddSQLBuilder(
+        public static IServiceCollection AddSqlBuilder(
             this IServiceCollection @this,
             IConfiguration configuration,
             string defaultName,

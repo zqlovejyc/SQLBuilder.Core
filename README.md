@@ -329,7 +329,7 @@ _repository.UseMasterOrSlave(master)
 //注入SQLBuilder SkyWalking链路追踪
 services.AddSqlBuilderSkyApm()
 
-//注入SQLBuilder ElasticApm链路追踪
+//使用SQLBuilder ElasticApm链路追踪
 app.UseSqlBuilderElasticApm(Configuration)
 ```
 

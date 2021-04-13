@@ -43,7 +43,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Func<IRepository, int>> PreCommitResultQueue { get; }
+        Queue<Func<IRepository, bool>> PreCommitResultQueue { get; }
 
         /// <summary>
         /// 提交队列
@@ -57,7 +57,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        int CommitResultQueue(bool trans = true);
+        bool CommitResultQueue(bool trans = true);
         #endregion
 
         #region Async
@@ -69,7 +69,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Func<IRepository, Task<int>>> PreCommitResultAsyncQueue { get; }
+        Queue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; }
 
         /// <summary>
         /// 提交队列
@@ -83,7 +83,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        Task<int> CommitResultQueueAsync(bool trans = true);
+        Task<bool> CommitResultQueueAsync(bool trans = true);
         #endregion
         #endregion
 

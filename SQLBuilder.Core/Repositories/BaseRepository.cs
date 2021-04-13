@@ -58,7 +58,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual void CommitQueue(bool trans = false)
+        public virtual void CommitQueue(bool trans = true)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual int CommitResultQueue(bool trans = false)
+        public virtual int CommitResultQueue(bool trans = true)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual async Task CommitQueueAsync(bool trans = false)
+        public virtual async Task CommitQueueAsync(bool trans = true)
         {
             try
             {
@@ -157,7 +157,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual async Task<int> CommitResultQueueAsync(bool trans = false)
+        public virtual async Task<int> CommitResultQueueAsync(bool trans = true)
         {
             try
             {

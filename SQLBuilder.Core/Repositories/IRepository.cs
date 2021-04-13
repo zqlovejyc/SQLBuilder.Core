@@ -50,14 +50,14 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        void CommitQueue(bool trans = false);
+        void CommitQueue(bool trans = true);
 
         /// <summary>
         /// 提交队列
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        int CommitResultQueue(bool trans = false);
+        int CommitResultQueue(bool trans = true);
         #endregion
 
         #region Async

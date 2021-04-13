@@ -76,14 +76,14 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        Task CommitQueueAsync(bool trans = false);
+        Task CommitQueueAsync(bool trans = true);
 
         /// <summary>
         /// 提交队列
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        Task<int> CommitResultQueueAsync(bool trans = false);
+        Task<int> CommitResultQueueAsync(bool trans = true);
         #endregion
         #endregion
 

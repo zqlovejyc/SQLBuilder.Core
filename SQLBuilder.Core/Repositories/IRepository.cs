@@ -33,6 +33,60 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public interface IRepository : IDisposable
     {
+        #region Queue
+        #region Sync
+        /// <summary>
+        /// 预提交队列
+        /// </summary>
+        Queue<Action<IRepository>> PreCommitQueue { get; }
+
+        /// <summary>
+        /// 预提交队列
+        /// </summary>
+        Queue<Func<IRepository, int>> PreCommitResultQueue { get; }
+
+        /// <summary>
+        /// 提交队列
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        void CommitQueue(bool trans = false);
+
+        /// <summary>
+        /// 提交队列
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        int CommitResultQueue(bool trans = false);
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 预提交队列
+        /// </summary>
+        Queue<Func<IRepository, Task>> PreCommitAsyncQueue { get; }
+
+        /// <summary>
+        /// 预提交队列
+        /// </summary>
+        Queue<Func<IRepository, Task<int>>> PreCommitResultAsyncQueue { get; }
+
+        /// <summary>
+        /// 提交队列
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        Task CommitQueueAsync(bool trans = false);
+
+        /// <summary>
+        /// 提交队列
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        Task<int> CommitResultQueueAsync(bool trans = false);
+        #endregion
+        #endregion
+
         #region Property
         /// <summary>
         /// 超时时长，默认240s

@@ -34,14 +34,14 @@ namespace SQLBuilder.Core
                         //return await repo.ExecuteBySqlAsync("DELETE FROM UC_USERS WHERE ID='2c22ef0a-ed9b-4cde-a3cf-d3fdb9b26fee'");
                         var res = await repo.FindEntityAsync<dynamic>("SELECT * FROM UC_USERS WHERE ID='2c22ef0a-ed9b-4cde-a3cf-d3fdb9b26fee'");
                         Console.WriteLine($"event1:{ObjectExtensions.ToJson(res)}");
-                        return 1;
+                        return true;
                     });
 
                     repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
                     {
                         var res = await repo.FindEntityAsync<dynamic>("SELECT * FROM UC_USERS WHERE ROWNUM=1");
                         Console.WriteLine($"event2:{ObjectExtensions.ToJson(res)}");
-                        return 1;
+                        return true;
                     });
 
                     try

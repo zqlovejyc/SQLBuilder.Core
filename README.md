@@ -204,6 +204,25 @@ await SqlBuilder
 
 ```
 
+- #### 🎫 队列
+```csharp
+//预提交队列
+_repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+    await repo.UpdateAsync<UserEntity>(
+        x => x.Id == "1",
+        () => new
+        {
+            Name = "test"
+        }) > 0);
+
+_repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+    await repo.DeleteAsync<UserEntity>(x =>
+        x.Enabled == 1) > 0);
+
+//统一提交队列，默认开启事务
+var res = await _repository.CommitResultQueueAsync();
+```
+
 ### 🌌 IOC注入
 
 根据appsettions.json配置自动注入不同类型数据仓储，支持一主多从配置
@@ -232,8 +251,6 @@ services.AddSqlBuilder(Configuration, "Base", (sql, parameter) =>
     //返回null，不对原始sql进行任何更改，此处可以修改待执行的sql语句
     return null;
 });
-
-
 ```
 
 ### ⚙ 数据库配置

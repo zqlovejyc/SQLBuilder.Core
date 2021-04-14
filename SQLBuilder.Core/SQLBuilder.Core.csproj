@@ -7,18 +7,16 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.1.6.0</AssemblyVersion>
+        <AssemblyVersion>2.1.7.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.1.6</Version>
+        <Version>2.1.7</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化日志诊断内容，添加OperationId、DatabaseType；
-2.优化Oracle仓储；
-3.移除FastExpressionCompiler，存在部分情况下Expression编译错误；修复ConditionalExpression部分情况解析sql错误bug；
-4.优化IDataReader部分扩展方法；新增Type扩展方法；</PackageReleaseNotes>
-        <FileVersion>2.1.6.0</FileVersion>
+        <PackageReleaseNotes>1.仓储接口新增Queue操作；
+2.升级nuget依赖包版本；</PackageReleaseNotes>
+        <FileVersion>2.1.7.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>
@@ -51,7 +49,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MySqlConnector" Version="1.3.2" />
+        <PackageReference Include="MySqlConnector" Version="1.3.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Npgsql" Version="5.0.4" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.1" />

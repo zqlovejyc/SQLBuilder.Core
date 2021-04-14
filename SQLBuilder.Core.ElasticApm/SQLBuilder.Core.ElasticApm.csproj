@@ -8,7 +8,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <Version>2.1.6</Version>
+        <Version>2.1.7</Version>
         <Authors>张强</Authors>
         <Company>张强</Company>
         <Description>ElasticApm扩展，实现sql链路追踪；</Description>
@@ -19,8 +19,12 @@
         <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>sqlbuilder;elastic;apm</PackageTags>
-        <PackageReleaseNotes>1.发布ElasticApm扩展类库；</PackageReleaseNotes>
+        <PackageReleaseNotes>1.优化UseSqlBuilderElasticApm，添加subscribers参数；
+2.优化日志诊断内容格式；
+3.升级SQLBuilder版本；</PackageReleaseNotes>
         <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
+        <AssemblyVersion>2.1.7.0</AssemblyVersion>
+        <FileVersion>2.1.7.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

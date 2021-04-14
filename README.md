@@ -206,7 +206,7 @@ await SqlBuilder
 
 - #### 🎫 队列
 ```csharp
-//进入预提交对立
+//预提交队列
 _repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
     await repo.UpdateAsync<UserEntity>(
         x => x.Id == "1",

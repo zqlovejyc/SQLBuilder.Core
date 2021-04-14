@@ -155,21 +155,23 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>dynamic集合</returns>
         public static IEnumerable<dynamic> ToDynamics(this IDataReader @this)
         {
+            var res = new List<dynamic>();
+
             if (@this?.IsClosed == false)
-            {
                 using (@this)
                 {
                     while (@this.Read())
                     {
-                        var row = new ExpandoObject() as IDictionary<string, object>;
+                        var row = new Dictionary<string, object>();
+
                         for (var i = 0; i < @this.FieldCount; i++)
-                        {
                             row.Add(@this.GetName(i), @this.GetValue(i));
-                        }
-                        yield return row;
+
+                        res.Add(row);
                     }
                 }
-            }
+
+            return res;
         }
         #endregion
 

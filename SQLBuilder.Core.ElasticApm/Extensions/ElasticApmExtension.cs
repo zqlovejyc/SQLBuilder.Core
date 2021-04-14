@@ -34,7 +34,7 @@ namespace SQLBuilder.Core.ElasticApm.Extensions
     public static class ElasticApmExtension
     {
         /// <summary>
-        /// 注入SQLBuilder的ElasticApm追踪
+        /// 使用ElasticApm链路追踪
         /// </summary>
         /// <param name="this"></param>
         /// <param name="configuration"></param>
@@ -55,7 +55,7 @@ namespace SQLBuilder.Core.ElasticApm.Extensions
         }
 
         /// <summary>
-        /// 注入SQLBuilder的ElasticApm追踪
+        /// 使用ElasticApm链路追踪
         /// </summary>
         /// <param name="this"></param>
         /// <param name="subscribers"></param>

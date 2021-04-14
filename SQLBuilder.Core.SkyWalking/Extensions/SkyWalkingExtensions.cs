@@ -32,7 +32,7 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
     public static class SkyWalkingExtensions
     {
         /// <summary>
-        /// 注入SQLBuilder的SkyApm追踪
+        /// 注入SkyApm链路追踪
         /// </summary>
         /// <param name="this"></param>
         /// <param name="component">自定义设定SQLBuilder组件，若未设定则默认采用SqlClient组件，
@@ -47,7 +47,7 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
         }
 
         /// <summary>
-        /// 注入SQLBuilder的SkyApm追踪
+        /// 注入SkyApm链路追踪
         /// </summary>
         /// <param name="this"></param>
         /// <param name="component">自定义设定SQLBuilder组件，若未设定则默认采用SqlClient组件，

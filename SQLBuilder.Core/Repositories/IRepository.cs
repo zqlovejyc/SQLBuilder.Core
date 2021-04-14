@@ -19,6 +19,7 @@
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.LoadBalancer;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -38,12 +39,12 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Action<IRepository>> PreCommitQueue { get; }
+        ConcurrentQueue<Action<IRepository>> PreCommitQueue { get; }
 
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Func<IRepository, bool>> PreCommitResultQueue { get; }
+        ConcurrentQueue<Func<IRepository, bool>> PreCommitResultQueue { get; }
 
         /// <summary>
         /// 提交队列
@@ -64,12 +65,12 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Func<IRepository, Task>> PreCommitAsyncQueue { get; }
+        ConcurrentQueue<Func<IRepository, Task>> PreCommitAsyncQueue { get; }
 
         /// <summary>
         /// 预提交队列
         /// </summary>
-        Queue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; }
+        ConcurrentQueue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; }
 
         /// <summary>
         /// 提交队列

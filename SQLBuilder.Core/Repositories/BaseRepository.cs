@@ -23,6 +23,7 @@ using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.LoadBalancer;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -44,14 +45,12 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        public virtual Queue<Action<IRepository>> PreCommitQueue { get; } =
-            new Queue<Action<IRepository>>();
+        public virtual ConcurrentQueue<Action<IRepository>> PreCommitQueue { get; } = new();
 
         /// <summary>
         /// 预提交队列
         /// </summary>
-        public virtual Queue<Func<IRepository, bool>> PreCommitResultQueue { get; } =
-            new Queue<Func<IRepository, bool>>();
+        public virtual ConcurrentQueue<Func<IRepository, bool>> PreCommitResultQueue { get; } = new();
 
         /// <summary>
         /// 提交队列
@@ -116,14 +115,12 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 预提交队列
         /// </summary>
-        public virtual Queue<Func<IRepository, Task>> PreCommitAsyncQueue { get; } =
-            new Queue<Func<IRepository, Task>>();
+        public virtual ConcurrentQueue<Func<IRepository, Task>> PreCommitAsyncQueue { get; } = new();
 
         /// <summary>
         /// 预提交队列
         /// </summary>
-        public virtual Queue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; } =
-            new Queue<Func<IRepository, Task<bool>>>();
+        public virtual ConcurrentQueue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; } = new();
 
         /// <summary>
         /// 提交队列

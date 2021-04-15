@@ -66,7 +66,7 @@ namespace SQLBuilder.Core.Repositories
         {
             try
             {
-                if (Queue.Count == 0)
+                if (Queue.IsEmpty)
                     return false;
 
                 if (trans)
@@ -74,7 +74,7 @@ namespace SQLBuilder.Core.Repositories
 
                 var res = true;
 
-                while (Queue.Count > 0 && Queue.TryDequeue(out var func))
+                while (!Queue.IsEmpty && Queue.TryDequeue(out var func))
                     res = res && func(Repository);
 
                 if (trans)
@@ -117,7 +117,7 @@ namespace SQLBuilder.Core.Repositories
         {
             try
             {
-                if (AsyncQueue.Count == 0)
+                if (AsyncQueue.IsEmpty)
                     return false;
 
                 if (trans)
@@ -125,7 +125,7 @@ namespace SQLBuilder.Core.Repositories
 
                 var res = true;
 
-                while (AsyncQueue.Count > 0 && AsyncQueue.TryDequeue(out var func))
+                while (!AsyncQueue.IsEmpty && AsyncQueue.TryDequeue(out var func))
                     res = res && await func(Repository);
 
                 if (trans)

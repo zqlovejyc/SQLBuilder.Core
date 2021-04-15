@@ -29,7 +29,7 @@ namespace SQLBuilder.Core
                 {
                     var repository = new OracleRepository(@"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=giteadev)));Persist Security Info=True;User ID=uid;Password=pwd;");
 
-                    repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+                    repository.AddQueue(async repo =>
                     {
                         //return await repo.ExecuteBySqlAsync("DELETE FROM UC_USERS WHERE ID='2c22ef0a-ed9b-4cde-a3cf-d3fdb9b26fee'");
                         var res = await repo.FindEntityAsync<dynamic>("SELECT * FROM UC_USERS WHERE ID='2c22ef0a-ed9b-4cde-a3cf-d3fdb9b26fee'");
@@ -37,7 +37,7 @@ namespace SQLBuilder.Core
                         return true;
                     });
 
-                    repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+                    repository.AddQueue(async repo =>
                     {
                         var res = await repo.FindEntityAsync<dynamic>("SELECT * FROM UC_USERS WHERE ROWNUM=1");
                         Console.WriteLine($"event2:{ObjectExtensions.ToJson(res)}");
@@ -46,7 +46,7 @@ namespace SQLBuilder.Core
 
                     try
                     {
-                        var res = await repository.CommitResultQueueAsync(true);
+                        var res = await repository.SaveQueueAsync(true);
                     }
                     catch (Exception ex)
                     {

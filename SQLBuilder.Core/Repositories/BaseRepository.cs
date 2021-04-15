@@ -43,48 +43,26 @@ namespace SQLBuilder.Core.Repositories
         #region Queue
         #region Sync
         /// <summary>
-        /// 预提交队列
+        /// 同步委托队列(Queue)
         /// </summary>
-        public virtual ConcurrentQueue<Action<IRepository>> PreCommitQueue { get; } = new();
+        public virtual ConcurrentQueue<Func<IRepository, bool>> Queue { get; } = new();
 
         /// <summary>
-        /// 预提交队列
+        /// 加入同步委托队列(Queue)
         /// </summary>
-        public virtual ConcurrentQueue<Func<IRepository, bool>> PreCommitResultQueue { get; } = new();
-
-        /// <summary>
-        /// 提交队列
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="func">自定义委托</param>
         /// <returns></returns>
-        public virtual void CommitQueue(bool trans = true)
+        public virtual void AddQueue(Func<IRepository, bool> func)
         {
-            try
-            {
-                if (trans)
-                    BeginTrans();
-
-                while (PreCommitQueue.Count > 0 && PreCommitQueue.TryDequeue(out var action))
-                    action(Repository);
-
-                if (trans)
-                    Commit();
-            }
-            catch (Exception)
-            {
-                if (trans)
-                    Rollback();
-
-                throw;
-            }
+            Queue.Enqueue(func);
         }
 
         /// <summary>
-        /// 提交队列
+        /// 保存同步委托队列(Queue)
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual bool CommitResultQueue(bool trans = true)
+        public virtual bool SaveQueue(bool trans = true)
         {
             try
             {
@@ -93,7 +71,7 @@ namespace SQLBuilder.Core.Repositories
 
                 var res = true;
 
-                while (PreCommitResultQueue.Count > 0 && PreCommitResultQueue.TryDequeue(out var func))
+                while (Queue.Count > 0 && Queue.TryDequeue(out var func))
                     res = res && func(Repository);
 
                 if (trans)
@@ -113,48 +91,26 @@ namespace SQLBuilder.Core.Repositories
 
         #region Async
         /// <summary>
-        /// 预提交队列
+        /// 异步委托队列(AsyncQueue)
         /// </summary>
-        public virtual ConcurrentQueue<Func<IRepository, Task>> PreCommitAsyncQueue { get; } = new();
+        public virtual ConcurrentQueue<Func<IRepository, Task<bool>>> AsyncQueue { get; } = new();
 
         /// <summary>
-        /// 预提交队列
+        /// 加入异步委托队列(AsyncQueue)
         /// </summary>
-        public virtual ConcurrentQueue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; } = new();
-
-        /// <summary>
-        /// 提交队列
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="func">自定义委托</param>
         /// <returns></returns>
-        public virtual async Task CommitQueueAsync(bool trans = true)
+        public virtual void AddQueue(Func<IRepository, Task<bool>> func)
         {
-            try
-            {
-                if (trans)
-                    BeginTrans();
-
-                while (PreCommitAsyncQueue.Count > 0 && PreCommitAsyncQueue.TryDequeue(out var action))
-                    await action(Repository);
-
-                if (trans)
-                    Commit();
-            }
-            catch (Exception)
-            {
-                if (trans)
-                    Rollback();
-
-                throw;
-            }
+            AsyncQueue.Enqueue(func);
         }
 
         /// <summary>
-        /// 提交队列
+        /// 保存异步委托队列(AsyncQueue)
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        public virtual async Task<bool> CommitResultQueueAsync(bool trans = true)
+        public virtual async Task<bool> SaveQueueAsync(bool trans = true)
         {
             try
             {
@@ -163,7 +119,7 @@ namespace SQLBuilder.Core.Repositories
 
                 var res = true;
 
-                while (PreCommitResultAsyncQueue.Count > 0 && PreCommitResultAsyncQueue.TryDequeue(out var func))
+                while (AsyncQueue.Count > 0 && AsyncQueue.TryDequeue(out var func))
                     res = res && await func(Repository);
 
                 if (trans)

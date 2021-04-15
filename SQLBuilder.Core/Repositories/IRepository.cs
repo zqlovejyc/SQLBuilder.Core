@@ -37,54 +37,44 @@ namespace SQLBuilder.Core.Repositories
         #region Queue
         #region Sync
         /// <summary>
-        /// 预提交队列
+        /// 同步委托队列(Queue)
         /// </summary>
-        ConcurrentQueue<Action<IRepository>> PreCommitQueue { get; }
+        ConcurrentQueue<Func<IRepository, bool>> Queue { get; }
 
         /// <summary>
-        /// 预提交队列
+        /// 加入同步委托队列(Queue)
         /// </summary>
-        ConcurrentQueue<Func<IRepository, bool>> PreCommitResultQueue { get; }
+        /// <param name="func">自定义委托</param>
+        /// <returns></returns>
+        void AddQueue(Func<IRepository, bool> func);
 
         /// <summary>
-        /// 提交队列
+        /// 保存同步委托队列(Queue)
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        void CommitQueue(bool trans = true);
-
-        /// <summary>
-        /// 提交队列
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
-        /// <returns></returns>
-        bool CommitResultQueue(bool trans = true);
+        bool SaveQueue(bool trans = true);
         #endregion
 
         #region Async
         /// <summary>
-        /// 预提交队列
+        /// 异步委托队列(AsyncQueue)
         /// </summary>
-        ConcurrentQueue<Func<IRepository, Task>> PreCommitAsyncQueue { get; }
+        ConcurrentQueue<Func<IRepository, Task<bool>>> AsyncQueue { get; }
 
         /// <summary>
-        /// 预提交队列
+        /// 加入异步委托队列(AsyncQueue)
         /// </summary>
-        ConcurrentQueue<Func<IRepository, Task<bool>>> PreCommitResultAsyncQueue { get; }
+        /// <param name="func">自定义委托</param>
+        /// <returns></returns>
+        void AddQueue(Func<IRepository, Task<bool>> func);
 
         /// <summary>
-        /// 提交队列
+        /// 保存异步委托队列(AsyncQueue)
         /// </summary>
         /// <param name="trans">是否开启事务</param>
         /// <returns></returns>
-        Task CommitQueueAsync(bool trans = true);
-
-        /// <summary>
-        /// 提交队列
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
-        /// <returns></returns>
-        Task<bool> CommitResultQueueAsync(bool trans = true);
+        Task<bool> SaveQueueAsync(bool trans = true);
         #endregion
         #endregion
 

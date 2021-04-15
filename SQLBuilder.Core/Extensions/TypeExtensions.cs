@@ -71,9 +71,7 @@ namespace SQLBuilder.Core.Extensions
             var baseTypeInfo = baseType.GetTypeInfo();
 
             if (baseTypeInfo.IsGenericTypeDefinition)
-            {
                 return typeInfo.IsAssignableToGenericTypeDefinition(baseTypeInfo);
-            }
 
             return baseTypeInfo.IsAssignableFrom(typeInfo);
         }
@@ -99,9 +97,7 @@ namespace SQLBuilder.Core.Extensions
                         .GetTypeInfo();
 
                     if (typeDefinitionTypeInfo.Equals(genericTypeInfo))
-                    {
                         return true;
-                    }
                 }
             }
 
@@ -112,17 +108,13 @@ namespace SQLBuilder.Core.Extensions
                     .GetTypeInfo();
 
                 if (typeDefinitionTypeInfo.Equals(genericTypeInfo))
-                {
                     return true;
-                }
             }
 
             var baseTypeInfo = typeInfo.BaseType?.GetTypeInfo();
 
             if (baseTypeInfo is null)
-            {
                 return false;
-            }
 
             return baseTypeInfo.IsAssignableToGenericTypeDefinition(genericTypeInfo);
         }
@@ -154,10 +146,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this"></param>
         /// <returns></returns>
-        public static bool IsGenericType(this Type @this)
-        {
-            return @this.GetTypeInfo().IsGenericType;
-        }
+        public static bool IsGenericType(this Type @this) =>
+            @this.GetTypeInfo().IsGenericType;
 
         /// <summary>
         /// IsGenericType
@@ -165,10 +155,8 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this"></param>
         /// <param name="genericType"></param>
         /// <returns></returns>
-        public static bool IsGenericType(this Type @this, Type genericType)
-        {
-            return @this.IsGenericType() && @this.GetGenericTypeDefinition() == genericType;
-        }
+        public static bool IsGenericType(this Type @this, Type genericType) =>
+            @this.IsGenericType() && @this.GetGenericTypeDefinition() == genericType;
         #endregion
 
         #region IsDictionaryType
@@ -177,10 +165,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this"></param>
         /// <returns></returns>
-        public static bool IsDictionaryType(this Type @this)
-        {
-            return @this != null && @this.IsImplementsGenericInterface(typeof(IDictionary<,>));
-        }
+        public static bool IsDictionaryType(this Type @this) =>
+            @this != null && @this.IsImplementsGenericInterface(typeof(IDictionary<,>));
         #endregion
 
         #region ImplementsGenericInterface
@@ -193,16 +179,14 @@ namespace SQLBuilder.Core.Extensions
         public static bool IsImplementsGenericInterface(this Type @this, Type interfaceType)
         {
             if (@this.IsGenericType(interfaceType))
-            {
                 return true;
-            }
+
             foreach (var @interface in @this.GetTypeInfo().ImplementedInterfaces)
             {
                 if (@interface.IsGenericType(interfaceType))
-                {
                     return true;
-                }
             }
+
             return false;
         }
         #endregion

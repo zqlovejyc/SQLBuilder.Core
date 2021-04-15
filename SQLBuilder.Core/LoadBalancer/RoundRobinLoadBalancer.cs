@@ -28,10 +28,9 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class RoundRobinLoadBalancer : ILoadBalancer
     {
-        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _lock = new(1, 1);
 
-        private static readonly ConcurrentDictionary<string, int> _serviceIndexs =
-          new ConcurrentDictionary<string, int>();
+        private static readonly ConcurrentDictionary<string, int> _serviceIndexs = new();
 
         /// <summary>
         /// 获取数据集合中的一条数据

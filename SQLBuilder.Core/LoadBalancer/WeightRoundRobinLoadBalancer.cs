@@ -132,10 +132,9 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class WeightRoundRobinLoadBalancer : ILoadBalancer
     {
-        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _lock = new(1, 1);
 
-        private static readonly ConcurrentDictionary<string, WeightRoundRobin> _weightRoundRobins =
-            new ConcurrentDictionary<string, WeightRoundRobin>();
+        private static readonly ConcurrentDictionary<string, WeightRoundRobin> _weightRoundRobins = new();
 
         /// <summary>
         /// 获取数据集合中的一条数据
@@ -156,9 +155,7 @@ namespace SQLBuilder.Core.LoadBalancer
                 var weightList = new List<int>();
 
                 if (weights == null)
-                {
                     data.ToList().ForEach(x => weightList.Add(1));
-                }
                 else
                 {
                     for (int i = 0; i < count; i++)

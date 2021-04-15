@@ -47,10 +47,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Insert(expression, isEnableNullValue, tableNameFunc);
         #endregion
 
         #region Delete
@@ -68,10 +66,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete(tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Delete(tableNameFunc);
         #endregion
 
         #region Update
@@ -93,10 +89,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Update(expression, isEnableNullValue, tableNameFunc);
         #endregion
 
         #region Select
@@ -116,10 +110,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string[], string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -139,10 +131,8 @@ namespace SQLBuilder.Core.Entry
             bool isEnableFormat = false,
             Func<string[], string> tableNameFunc = null)
             where T : class
-            where T2 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T2 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -164,10 +154,8 @@ namespace SQLBuilder.Core.Entry
             Func<string[], string> tableNameFunc = null)
             where T : class
             where T2 : class
-            where T3 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T3 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -191,10 +179,8 @@ namespace SQLBuilder.Core.Entry
             where T : class
             where T2 : class
             where T3 : class
-            where T4 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T4 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -220,10 +206,8 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
             where T4 : class
-            where T5 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T5 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -251,10 +235,8 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
             where T5 : class
-            where T6 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T6 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -284,10 +266,8 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
             where T6 : class
-            where T7 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T7 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -319,10 +299,8 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
             where T7 : class
-            where T8 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T8 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -356,10 +334,8 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
             where T8 : class
-            where T9 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T9 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
 
         /// <summary>
         /// Select
@@ -395,10 +371,8 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
             where T9 : class
-            where T10 : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
-        }
+            where T10 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Select(expression, tableNameFunc);
         #endregion
 
         #region Max
@@ -418,10 +392,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Max(expression, tableNameFunc);
         #endregion
 
         #region Min
@@ -441,10 +413,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Min(expression, tableNameFunc);
         #endregion
 
         #region Avg
@@ -464,10 +434,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Avg(expression, tableNameFunc);
         #endregion
 
         #region Count
@@ -487,10 +455,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
         #endregion
 
         #region Sum
@@ -510,10 +476,8 @@ namespace SQLBuilder.Core.Entry
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             Func<string, string> tableNameFunc = null)
-            where T : class
-        {
-            return new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression, tableNameFunc);
-        }
+            where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Sum(expression, tableNameFunc);
         #endregion
 
         #region GetTableName
@@ -523,10 +487,9 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <returns>string</returns>
-        public static string GetTableName<T>(bool isEnableFormat = false) where T : class
-        {
-            return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetTableName();
-        }
+        public static string GetTableName<T>(bool isEnableFormat = false)
+            where T : class =>
+            new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetTableName();
         #endregion
 
         #region GetPrimaryKey
@@ -536,10 +499,9 @@ namespace SQLBuilder.Core.Entry
         /// <typeparam name="T"></typeparam>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <returns></returns>
-        public static List<string> GetPrimaryKey<T>(bool isEnableFormat = false) where T : class
-        {
-            return new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetPrimaryKey();
-        }
+        public static List<string> GetPrimaryKey<T>(bool isEnableFormat = false)
+            where T : class =>
+            new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetPrimaryKey();
         #endregion
     }
 }

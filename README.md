@@ -207,7 +207,7 @@ await SqlBuilder
 - #### 🎫 队列
 ```csharp
 //预提交队列
-_repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+_repository.AddQueue(async repo =>
     await repo.UpdateAsync<UserEntity>(
         x => x.Id == "1",
         () => new
@@ -215,12 +215,12 @@ _repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
             Name = "test"
         }) > 0);
 
-_repository.PreCommitResultAsyncQueue.Enqueue(async repo =>
+_repository.AddQueue(async repo =>
     await repo.DeleteAsync<UserEntity>(x =>
         x.Enabled == 1) > 0);
 
 //统一提交队列，默认开启事务
-var res = await _repository.CommitResultQueueAsync();
+var res = await _repository.SaveQueueAsync();
 ```
 
 ### 🌌 IOC注入

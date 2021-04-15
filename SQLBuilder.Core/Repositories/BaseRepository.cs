@@ -66,6 +66,9 @@ namespace SQLBuilder.Core.Repositories
         {
             try
             {
+                if (Queue.Count == 0)
+                    return false;
+
                 if (trans)
                     BeginTrans();
 
@@ -114,6 +117,9 @@ namespace SQLBuilder.Core.Repositories
         {
             try
             {
+                if (AsyncQueue.Count == 0)
+                    return false;
+
                 if (trans)
                     BeginTrans();
 

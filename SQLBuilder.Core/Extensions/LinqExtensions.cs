@@ -1213,48 +1213,48 @@ namespace SQLBuilder.Core.Extensions
         /// linq正序排序扩展
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="this"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string property)
+        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> @this, string property)
         {
-            return source.BuildIOrderedQueryable<T>(property, "OrderBy");
+            return @this.BuildIOrderedQueryable<T>(property, "OrderBy");
         }
 
         /// <summary>
         /// linq倒叙排序扩展
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="this"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> source, string property)
+        public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> @this, string property)
         {
-            return source.BuildIOrderedQueryable<T>(property, "OrderByDescending");
+            return @this.BuildIOrderedQueryable<T>(property, "OrderByDescending");
         }
 
         /// <summary>
         /// linq正序多列排序扩展
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="this"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> source, string property)
+        public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> @this, string property)
         {
-            return source.BuildIOrderedQueryable<T>(property, "ThenBy");
+            return @this.BuildIOrderedQueryable<T>(property, "ThenBy");
         }
 
         /// <summary>
         /// linq倒序多列排序扩展
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="this"></param>
         /// <param name="property"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> source, string property)
+        public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> @this, string property)
         {
-            return source.BuildIOrderedQueryable<T>(property, "ThenByDescending");
+            return @this.BuildIOrderedQueryable<T>(property, "ThenByDescending");
         }
 
         /// <summary>

@@ -1261,32 +1261,45 @@ namespace SQLBuilder.Core.Extensions
         /// 根据属性和排序方法构建IOrderedQueryable
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="this"></param>
         /// <param name="property"></param>
         /// <param name="methodName"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> BuildIOrderedQueryable<T>(this IQueryable<T> source, string property, string methodName)
+        public static IOrderedQueryable<T> BuildIOrderedQueryable<T>(this IQueryable<T> @this, string property, string methodName)
         {
-            var props = property.Split('.');
+            var props = property?.Split('.');
+            if (props == null || !props.Any())
+                throw new ArgumentException($"'{property}' can not be null or empty");
+
             var type = typeof(T);
             var arg = Expression.Parameter(type, "x");
             Expression expr = arg;
+
             foreach (var prop in props)
             {
-                // use reflection (not ComponentModel) to mirror LINQ
                 var pi = type.GetProperty(prop);
+
+                if (pi == null)
+                    continue;
+
                 expr = Expression.Property(expr, pi);
+
                 type = pi.PropertyType;
             }
+
             var delegateType = typeof(Func<,>).MakeGenericType(typeof(T), type);
             var lambda = Expression.Lambda(delegateType, expr, arg);
-            var result = typeof(Queryable).GetMethods().Single(
-              method => method.Name == methodName
-                && method.IsGenericMethodDefinition
-                && method.GetGenericArguments().Length == 2
-                && method.GetParameters().Length == 2)
-              .MakeGenericMethod(typeof(T), type)
-              .Invoke(null, new object[] { source, lambda });
+
+            var result = typeof(Queryable)
+                .GetMethods()
+                .Single(
+                    method => method.Name == methodName &&
+                    method.IsGenericMethodDefinition &&
+                    method.GetGenericArguments().Length == 2 &&
+                    method.GetParameters().Length == 2)
+                .MakeGenericMethod(typeof(T), type)
+                .Invoke(null, new object[] { @this, lambda });
+
             return (IOrderedQueryable<T>)result;
         }
         #endregion

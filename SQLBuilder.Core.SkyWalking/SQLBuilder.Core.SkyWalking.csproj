@@ -24,6 +24,7 @@
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
         <FileVersion>2.1.8.0</FileVersion>
         <AssemblyVersion>2.1.8.0</AssemblyVersion>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

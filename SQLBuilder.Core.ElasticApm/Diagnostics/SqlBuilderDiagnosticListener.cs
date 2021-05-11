@@ -36,8 +36,7 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
     public class SqlBuilderDiagnosticListener
     {
         private readonly IApmAgent _apmAgent;
-        private readonly ConcurrentDictionary<string, ISpan> _spans =
-            new ConcurrentDictionary<string, ISpan>();
+        private readonly ConcurrentDictionary<string, ISpan> _spans = new();
 
         /// <summary>
         /// 构造函数

@@ -70,7 +70,7 @@ namespace SQLBuilder.Core.Repositories
                     return false;
 
                 if (trans)
-                    BeginTrans();
+                    BeginTransaction();
 
                 var res = true;
 
@@ -121,7 +121,7 @@ namespace SQLBuilder.Core.Repositories
                     return false;
 
                 if (trans)
-                    BeginTrans();
+                    await BeginTransactionAsync();
 
                 var res = true;
 
@@ -149,7 +149,7 @@ namespace SQLBuilder.Core.Repositories
         /// 诊断日志
         /// </summary>
         private static readonly DiagnosticListener _diagnosticListener =
-            new DiagnosticListener(DiagnosticStrings.DiagnosticListenerName);
+            new(DiagnosticStrings.DiagnosticListenerName);
         #endregion
 
         #region Property
@@ -220,16 +220,12 @@ namespace SQLBuilder.Core.Repositories
         #endregion
 
         #region Transaction
+        #region Sync
         /// <summary>
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        public abstract IRepository BeginTrans();
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        public abstract void Close();
+        public abstract IRepository BeginTransaction();
 
         /// <summary>
         /// 提交事务
@@ -238,6 +234,7 @@ namespace SQLBuilder.Core.Repositories
         {
             Transaction?.Commit();
             Transaction?.Dispose();
+
             Close();
         }
 
@@ -248,6 +245,7 @@ namespace SQLBuilder.Core.Repositories
         {
             Transaction?.Rollback();
             Transaction?.Dispose();
+
             Close();
         }
 
@@ -263,7 +261,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 if (handler != null)
                 {
-                    repository = BeginTrans();
+                    repository = BeginTransaction();
                     handler(repository);
                     repository.Commit();
                 }
@@ -291,7 +289,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 if (handler != null)
                 {
-                    repository = BeginTrans();
+                    repository = BeginTransaction();
                     var res = handler(repository);
                     if (res)
                         repository.Commit();
@@ -318,6 +316,42 @@ namespace SQLBuilder.Core.Repositories
 
             return false;
         }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 开启事务
+        /// </summary>
+        /// <returns>IRepository</returns>
+        public abstract Task<IRepository> BeginTransactionAsync();
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        public virtual async Task CommitAsync()
+        {
+            if (Transaction != null)
+                await Transaction.CommitAsync();
+
+            if (Transaction != null)
+                await Transaction.DisposeAsync();
+
+            await CloseAsync();
+        }
+
+        /// <summary>
+        /// 回滚事务
+        /// </summary>
+        public virtual async Task RollbackAsync()
+        {
+            if (Transaction != null)
+                await Transaction.RollbackAsync();
+
+            if (Transaction != null)
+                await Transaction.DisposeAsync();
+
+            Close();
+        }
 
         /// <summary>
         /// 执行事务，内部自动开启事务、提交和回滚事务
@@ -331,7 +365,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 if (handler != null)
                 {
-                    repository = BeginTrans();
+                    repository = await BeginTransactionAsync();
                     await handler(repository);
                     repository.Commit();
                 }
@@ -359,7 +393,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 if (handler != null)
                 {
-                    repository = BeginTrans();
+                    repository = await BeginTransactionAsync();
                     var res = await handler(repository);
                     if (res)
                         repository.Commit();
@@ -386,6 +420,7 @@ namespace SQLBuilder.Core.Repositories
 
             return false;
         }
+        #endregion
         #endregion
 
         #region Page
@@ -2148,7 +2183,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    BeginTransaction();
                     foreach (var item in entities)
                     {
                         result += Insert(item);
@@ -2209,7 +2244,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    await BeginTransactionAsync();
                     foreach (var item in entities)
                     {
                         result += await InsertAsync(item);
@@ -2283,7 +2318,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    BeginTransaction();
                     foreach (var item in entities)
                     {
                         result += Delete(item);
@@ -2351,7 +2386,7 @@ namespace SQLBuilder.Core.Repositories
                 {
                     try
                     {
-                        BeginTrans();
+                        BeginTransaction();
                         foreach (var key in keyValues)
                         {
                             result += Delete<T>(key);
@@ -2428,7 +2463,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    await BeginTransactionAsync();
                     foreach (var item in entities)
                     {
                         result += await DeleteAsync(item);
@@ -2496,7 +2531,7 @@ namespace SQLBuilder.Core.Repositories
                 {
                     try
                     {
-                        BeginTrans();
+                        await BeginTransactionAsync();
                         foreach (var key in keyValues)
                         {
                             result += await DeleteAsync<T>(key);
@@ -2564,7 +2599,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    BeginTransaction();
                     foreach (var item in entities)
                     {
                         result += Update(item);
@@ -2638,7 +2673,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 try
                 {
-                    BeginTrans();
+                    await BeginTransactionAsync();
                     foreach (var item in entities)
                     {
                         result += await UpdateAsync(item);
@@ -3590,6 +3625,27 @@ namespace SQLBuilder.Core.Repositories
         {
             Close();
         }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        /// <returns></returns>
+        public virtual async ValueTask DisposeAsync()
+        {
+            await CloseAsync();
+        }
+        #endregion
+
+        #region Close
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        public abstract void Close();
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        public abstract ValueTask CloseAsync();
         #endregion
 
         #region Diagnostics

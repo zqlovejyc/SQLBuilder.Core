@@ -118,7 +118,7 @@ namespace SQLBuilder.Core.Repositories
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        public override IRepository BeginTrans()
+        public override IRepository BeginTransaction()
         {
             if (Transaction?.Connection == null)
             {
@@ -129,12 +129,42 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
+        /// 开启事务
+        /// </summary>
+        /// <returns>IRepository</returns>
+        public override async Task<IRepository> BeginTransactionAsync()
+        {
+            if (Transaction?.Connection == null)
+            {
+                tranConnection = Connection;
+                Transaction = await tranConnection.BeginTransactionAsync();
+            }
+            return this;
+        }
+        #endregion
+
+        #region Close
+        /// <summary>
         /// 关闭连接
         /// </summary>
         public override void Close()
         {
             tranConnection?.Close();
             tranConnection?.Dispose();
+            Transaction = null;
+        }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        public override async ValueTask CloseAsync()
+        {
+            if (tranConnection != null)
+                await tranConnection.CloseAsync();
+
+            if (tranConnection != null)
+                await tranConnection.DisposeAsync();
+
             Transaction = null;
         }
         #endregion

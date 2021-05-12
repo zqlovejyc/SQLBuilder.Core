@@ -32,7 +32,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// 数据操作仓储接口
     /// </summary>
-    public interface IRepository : IDisposable
+    public interface IRepository : IDisposable, IAsyncDisposable
     {
         #region Queue
         #region Sync
@@ -151,11 +151,12 @@ namespace SQLBuilder.Core.Repositories
         #endregion
 
         #region Transaction
+        #region Sync
         /// <summary>
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        IRepository BeginTrans();
+        IRepository BeginTransaction();
 
         /// <summary>
         /// 提交事务
@@ -167,11 +168,6 @@ namespace SQLBuilder.Core.Repositories
         /// 回滚事务
         /// </summary>
         void Rollback();
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        void Close();
 
         /// <summary>
         /// 执行事务，内部自动开启事务、提交和回滚事务
@@ -186,6 +182,25 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
         bool ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null);
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 开启事务
+        /// </summary>
+        /// <returns>IRepository</returns>
+        Task<IRepository> BeginTransactionAsync();
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        /// <returns></returns>
+        Task CommitAsync();
+
+        /// <summary>
+        /// 回滚事务
+        /// </summary>
+        Task RollbackAsync();
 
         /// <summary>
         /// 执行事务，内部自动开启事务、提交和回滚事务
@@ -200,6 +215,7 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
         Task<bool> ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null);
+        #endregion
         #endregion
 
         #region ExecuteBySql
@@ -1533,6 +1549,18 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果集</returns>
         Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter);
         #endregion
+        #endregion
+
+        #region Close
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        void Close();
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        ValueTask CloseAsync();
         #endregion
     }
 }

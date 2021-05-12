@@ -254,7 +254,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托</param>
-        public virtual void ExecuteTrans(Action<IRepository> handler, Action<Exception> rollback = null)
+        public virtual void ExecuteTransaction(Action<IRepository> handler, Action<Exception> rollback = null)
         {
             IRepository repository = null;
             try
@@ -282,7 +282,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
-        public virtual bool ExecuteTrans(Func<IRepository, bool> handler, Action<Exception> rollback = null)
+        public virtual bool ExecuteTransaction(Func<IRepository, bool> handler, Action<Exception> rollback = null)
         {
             IRepository repository = null;
             try
@@ -358,7 +358,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托</param>
-        public virtual async Task ExecuteTransAsync(Func<IRepository, Task> handler, Func<Exception, Task> rollback = null)
+        public virtual async Task ExecuteTransactionAsync(Func<IRepository, Task> handler, Func<Exception, Task> rollback = null)
         {
             IRepository repository = null;
             try
@@ -386,7 +386,7 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         /// <param name="handler">自定义委托</param>
         /// <param name="rollback">事务回滚处理委托，注意：自定义委托返回false时，rollback委托的异常参数为null</param>
-        public virtual async Task<bool> ExecuteTransAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null)
+        public virtual async Task<bool> ExecuteTransactionAsync(Func<IRepository, Task<bool>> handler, Func<Exception, Task> rollback = null)
         {
             IRepository repository = null;
             try

@@ -123,9 +123,9 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 保存同步委托队列(Queue)
         /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>
-        bool SaveQueue(bool trans = true);
+        bool SaveQueue(bool transaction = true);
         #endregion
 
         #region Async
@@ -144,9 +144,9 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 保存异步委托队列(AsyncQueue)
         /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>
-        Task<bool> SaveQueueAsync(bool trans = true);
+        Task<bool> SaveQueueAsync(bool transaction = true);
         #endregion
         #endregion
 

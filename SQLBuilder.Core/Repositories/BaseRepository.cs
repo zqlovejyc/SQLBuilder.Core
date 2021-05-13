@@ -135,16 +135,16 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 保存同步委托队列(Queue)
         /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>
-        public virtual bool SaveQueue(bool trans = true)
+        public virtual bool SaveQueue(bool transaction = true)
         {
             try
             {
                 if (Queue.IsEmpty)
                     return false;
 
-                if (trans)
+                if (transaction)
                     BeginTransaction();
 
                 var res = true;
@@ -152,14 +152,14 @@ namespace SQLBuilder.Core.Repositories
                 while (!Queue.IsEmpty && Queue.TryDequeue(out var func))
                     res = res && func(Repository);
 
-                if (trans)
+                if (transaction)
                     Commit();
 
                 return res;
             }
             catch (Exception)
             {
-                if (trans)
+                if (transaction)
                     Rollback();
 
                 throw;
@@ -186,16 +186,16 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 保存异步委托队列(AsyncQueue)
         /// </summary>
-        /// <param name="trans">是否开启事务</param>
+        /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>
-        public virtual async Task<bool> SaveQueueAsync(bool trans = true)
+        public virtual async Task<bool> SaveQueueAsync(bool transaction = true)
         {
             try
             {
                 if (AsyncQueue.IsEmpty)
                     return false;
 
-                if (trans)
+                if (transaction)
                     await BeginTransactionAsync();
 
                 var res = true;
@@ -203,14 +203,14 @@ namespace SQLBuilder.Core.Repositories
                 while (!AsyncQueue.IsEmpty && AsyncQueue.TryDequeue(out var func))
                     res = res && await func(Repository);
 
-                if (trans)
+                if (transaction)
                     Commit();
 
                 return res;
             }
             catch (Exception)
             {
-                if (trans)
+                if (transaction)
                     Rollback();
 
                 throw;

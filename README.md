@@ -280,18 +280,19 @@ IRepository trans = null;
 try
 {
     //开启事务
-    trans = _repository.BeginTransaction();
+    trans = await _repository.BeginTransactionAsync();
 
     //数据库写操作
     await _repository.InsertAsync(entity);
 
     //提交事务
-    trans.Commit();
+    await trans.CommitAsync();
 }
 catch (Exception)
 {
     //回滚事务
-    trans?.Rollback();
+    if(trans != null)
+        await tran.RollbackAsync();
     throw;
 }
 

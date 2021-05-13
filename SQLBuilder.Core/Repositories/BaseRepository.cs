@@ -204,14 +204,14 @@ namespace SQLBuilder.Core.Repositories
                     res = res && await func(Repository);
 
                 if (transaction)
-                    Commit();
+                    await CommitAsync();
 
                 return res;
             }
             catch (Exception)
             {
                 if (transaction)
-                    Rollback();
+                    await RollbackAsync();
 
                 throw;
             }

@@ -280,7 +280,7 @@ IRepository trans = null;
 try
 {
     //开启事务
-    trans = _repository.BeginTrans();
+    trans = _repository.BeginTransaction();
 
     //数据库写操作
     await _repository.InsertAsync(entity);
@@ -296,7 +296,7 @@ catch (Exception)
 }
 
 //方式二
-var res = await _repository.ExecuteTransAsync(async trans =>
+var res = await _repository.ExecuteTransactionAsync(async trans =>
 {
     var retval = (await trans.InsertAsync(entity)) > 0;
 

@@ -283,7 +283,7 @@ try
     trans = await _repository.BeginTransactionAsync();
 
     //数据库写操作
-    await _repository.InsertAsync(entity);
+    await trans.InsertAsync(entity);
 
     //提交事务
     await trans.CommitAsync();
@@ -293,6 +293,7 @@ catch (Exception)
     //回滚事务
     if(trans != null)
         await tran.RollbackAsync();
+       
     throw;
 }
 

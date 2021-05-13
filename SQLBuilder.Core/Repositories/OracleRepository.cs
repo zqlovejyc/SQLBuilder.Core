@@ -41,7 +41,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 事务数据库连接对象
         /// </summary>
-        private DbConnection tranConnection;
+        private DbConnection _tranConnection;
         #endregion
 
         #region Property
@@ -53,7 +53,7 @@ namespace SQLBuilder.Core.Repositories
             get
             {
                 OracleConnection connection;
-                if (!Master && SlaveConnectionStrings?.Count() > 0 && LoadBalancer != null)
+                if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
                 {
                     var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
                     var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
@@ -114,6 +114,7 @@ namespace SQLBuilder.Core.Repositories
         #endregion
 
         #region Transaction
+        #region Sync
         /// <summary>
         /// 开启事务
         /// </summary>
@@ -122,12 +123,14 @@ namespace SQLBuilder.Core.Repositories
         {
             if (Transaction?.Connection == null)
             {
-                tranConnection = Connection;
-                Transaction = tranConnection.BeginTransaction();
+                _tranConnection = Connection;
+                Transaction = _tranConnection.BeginTransaction();
             }
             return this;
         }
+        #endregion
 
+        #region Async
         /// <summary>
         /// 开启事务
         /// </summary>
@@ -136,37 +139,43 @@ namespace SQLBuilder.Core.Repositories
         {
             if (Transaction?.Connection == null)
             {
-                tranConnection = Connection;
-                Transaction = await tranConnection.BeginTransactionAsync();
+                _tranConnection = Connection;
+                Transaction = await _tranConnection.BeginTransactionAsync();
             }
             return this;
         }
         #endregion
+        #endregion
 
         #region Close
+        #region Sync
         /// <summary>
         /// 关闭连接
         /// </summary>
         public override void Close()
         {
-            tranConnection?.Close();
-            tranConnection?.Dispose();
+            _tranConnection?.Close();
+            _tranConnection?.Dispose();
+
             Transaction = null;
         }
+        #endregion
 
+        #region Async
         /// <summary>
         /// 关闭连接
         /// </summary>
         public override async ValueTask CloseAsync()
         {
-            if (tranConnection != null)
-                await tranConnection.CloseAsync();
+            if (_tranConnection != null)
+                await _tranConnection.CloseAsync();
 
-            if (tranConnection != null)
-                await tranConnection.DisposeAsync();
+            if (_tranConnection != null)
+                await _tranConnection.DisposeAsync();
 
             Transaction = null;
         }
+        #endregion
         #endregion
 
         #region Page

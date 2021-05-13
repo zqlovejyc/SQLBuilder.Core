@@ -34,50 +34,6 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public interface IRepository : IDisposable, IAsyncDisposable
     {
-        #region Queue
-        #region Sync
-        /// <summary>
-        /// 同步委托队列(Queue)
-        /// </summary>
-        ConcurrentQueue<Func<IRepository, bool>> Queue { get; }
-
-        /// <summary>
-        /// 加入同步委托队列(Queue)
-        /// </summary>
-        /// <param name="func">自定义委托</param>
-        /// <returns></returns>
-        void AddQueue(Func<IRepository, bool> func);
-
-        /// <summary>
-        /// 保存同步委托队列(Queue)
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
-        /// <returns></returns>
-        bool SaveQueue(bool trans = true);
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 异步委托队列(AsyncQueue)
-        /// </summary>
-        ConcurrentQueue<Func<IRepository, Task<bool>>> AsyncQueue { get; }
-
-        /// <summary>
-        /// 加入异步委托队列(AsyncQueue)
-        /// </summary>
-        /// <param name="func">自定义委托</param>
-        /// <returns></returns>
-        void AddQueue(Func<IRepository, Task<bool>> func);
-
-        /// <summary>
-        /// 保存异步委托队列(AsyncQueue)
-        /// </summary>
-        /// <param name="trans">是否开启事务</param>
-        /// <returns></returns>
-        Task<bool> SaveQueueAsync(bool trans = true);
-        #endregion
-        #endregion
-
         #region Property
         /// <summary>
         /// 超时时长，默认240s
@@ -148,6 +104,50 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="master">是否使用主库，默认使用主库</param>
         /// <returns></returns>
         IRepository UseMasterOrSlave(bool master = true);
+        #endregion
+
+        #region Queue
+        #region Sync
+        /// <summary>
+        /// 同步委托队列(Queue)
+        /// </summary>
+        ConcurrentQueue<Func<IRepository, bool>> Queue { get; }
+
+        /// <summary>
+        /// 加入同步委托队列(Queue)
+        /// </summary>
+        /// <param name="func">自定义委托</param>
+        /// <returns></returns>
+        void AddQueue(Func<IRepository, bool> func);
+
+        /// <summary>
+        /// 保存同步委托队列(Queue)
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        bool SaveQueue(bool trans = true);
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 异步委托队列(AsyncQueue)
+        /// </summary>
+        ConcurrentQueue<Func<IRepository, Task<bool>>> AsyncQueue { get; }
+
+        /// <summary>
+        /// 加入异步委托队列(AsyncQueue)
+        /// </summary>
+        /// <param name="func">自定义委托</param>
+        /// <returns></returns>
+        void AddQueue(Func<IRepository, Task<bool>> func);
+
+        /// <summary>
+        /// 保存异步委托队列(AsyncQueue)
+        /// </summary>
+        /// <param name="trans">是否开启事务</param>
+        /// <returns></returns>
+        Task<bool> SaveQueueAsync(bool trans = true);
+        #endregion
         #endregion
 
         #region Transaction
@@ -1552,15 +1552,19 @@ namespace SQLBuilder.Core.Repositories
         #endregion
 
         #region Close
+        #region Sync
         /// <summary>
         /// 关闭连接
         /// </summary>
         void Close();
+        #endregion
 
+        #region Async
         /// <summary>
         /// 关闭连接
         /// </summary>
         ValueTask CloseAsync();
+        #endregion
         #endregion
     }
 }

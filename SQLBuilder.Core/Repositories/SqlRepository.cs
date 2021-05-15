@@ -32,7 +32,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// Sqlserver仓储实现类
     /// </summary>
-    public class SqlRepository : BaseRepository, IRepository
+    public class SqlRepository : BaseRepository
     {
         #region Field
         /// <summary>
@@ -101,20 +101,6 @@ namespace SQLBuilder.Core.Repositories
                 MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
             if (MasterConnectionString.IsNullOrEmpty())
                 MasterConnectionString = connectionString;
-        }
-        #endregion
-
-        #region UseMasterOrSlave
-        /// <summary>
-        /// 使用主库/从库
-        /// <para>注意使用从库必须满足：配置从库连接字符串 + 切换为从库 + 配置从库负载均衡，否则依然使用主库</para>
-        /// </summary>
-        /// <param name="master">是否使用主库，默认使用主库</param>
-        /// <returns></returns>
-        public IRepository UseMasterOrSlave(bool master = true)
-        {
-            Master = master;
-            return this;
         }
         #endregion
 

@@ -38,7 +38,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// 数据操作仓储抽象基类
     /// </summary>
-    public abstract class BaseRepository
+    public abstract class BaseRepository : IRepository
     {
         #region Field
         /// <summary>
@@ -217,6 +217,20 @@ namespace SQLBuilder.Core.Repositories
             }
         }
         #endregion
+        #endregion
+
+        #region UseMasterOrSlave
+        /// <summary>
+        /// 使用主库/从库
+        /// <para>注意使用从库必须满足：配置从库连接字符串 + 切换为从库 + 配置从库负载均衡，否则依然使用主库</para>
+        /// </summary>
+        /// <param name="master">是否使用主库，默认使用主库</param>
+        /// <returns></returns>
+        public virtual IRepository UseMasterOrSlave(bool master = true)
+        {
+            Master = master;
+            return Repository;
+        }
         #endregion
 
         #region Transaction

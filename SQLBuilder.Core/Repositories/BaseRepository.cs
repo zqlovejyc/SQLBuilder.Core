@@ -46,6 +46,11 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         private static readonly DiagnosticListener _diagnosticListener =
             new(DiagnosticStrings.DiagnosticListenerName);
+
+        /// <summary>
+        /// 事务数据库连接对象
+        /// </summary>
+        private DbConnection _tranConnection;
         #endregion
 
         #region Property
@@ -239,7 +244,16 @@ namespace SQLBuilder.Core.Repositories
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        public abstract IRepository BeginTransaction();
+        public virtual IRepository BeginTransaction()
+        {
+            if (Transaction?.Connection == null)
+            {
+                _tranConnection = Connection;
+                Transaction = _tranConnection.BeginTransaction();
+            }
+
+            return Repository;
+        }
 
         /// <summary>
         /// 提交事务
@@ -336,7 +350,16 @@ namespace SQLBuilder.Core.Repositories
         /// 开启事务
         /// </summary>
         /// <returns>IRepository</returns>
-        public abstract Task<IRepository> BeginTransactionAsync();
+        public virtual async Task<IRepository> BeginTransactionAsync()
+        {
+            if (Transaction?.Connection == null)
+            {
+                _tranConnection = Connection;
+                Transaction = await _tranConnection.BeginTransactionAsync();
+            }
+
+            return Repository;
+        }
 
         /// <summary>
         /// 提交事务
@@ -3476,19 +3499,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 释放资源
         /// </summary>
-        public virtual void Dispose()
-        {
-            Close();
-        }
+        public virtual void Dispose() => Close();
 
         /// <summary>
         /// 释放资源
         /// </summary>
         /// <returns></returns>
-        public virtual async ValueTask DisposeAsync()
-        {
-            await CloseAsync();
-        }
+        public virtual async ValueTask DisposeAsync() => await CloseAsync();
         #endregion
 
         #region Close
@@ -3496,14 +3513,29 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 关闭连接
         /// </summary>
-        public abstract void Close();
+        public virtual void Close()
+        {
+            _tranConnection?.Close();
+            _tranConnection?.Dispose();
+
+            Transaction = null;
+        }
         #endregion
 
         #region Async
         /// <summary>
         /// 关闭连接
         /// </summary>
-        public abstract ValueTask CloseAsync();
+        public virtual async ValueTask CloseAsync()
+        {
+            if (_tranConnection != null)
+                await _tranConnection.CloseAsync();
+
+            if (_tranConnection != null)
+                await _tranConnection.DisposeAsync();
+
+            Transaction = null;
+        }
         #endregion
         #endregion
 

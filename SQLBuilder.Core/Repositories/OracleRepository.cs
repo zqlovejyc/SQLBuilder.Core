@@ -37,13 +37,6 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public class OracleRepository : BaseRepository
     {
-        #region Field
-        /// <summary>
-        /// 事务数据库连接对象
-        /// </summary>
-        private DbConnection _tranConnection;
-        #endregion
-
         #region Property
         /// <summary>
         /// 数据库连接对象
@@ -97,71 +90,6 @@ namespace SQLBuilder.Core.Repositories
             if (MasterConnectionString.IsNullOrEmpty())
                 MasterConnectionString = connectionString;
         }
-        #endregion
-
-        #region Transaction
-        #region Sync
-        /// <summary>
-        /// 开启事务
-        /// </summary>
-        /// <returns>IRepository</returns>
-        public override IRepository BeginTransaction()
-        {
-            if (Transaction?.Connection == null)
-            {
-                _tranConnection = Connection;
-                Transaction = _tranConnection.BeginTransaction();
-            }
-            return this;
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 开启事务
-        /// </summary>
-        /// <returns>IRepository</returns>
-        public override async Task<IRepository> BeginTransactionAsync()
-        {
-            if (Transaction?.Connection == null)
-            {
-                _tranConnection = Connection;
-                Transaction = await _tranConnection.BeginTransactionAsync();
-            }
-            return this;
-        }
-        #endregion
-        #endregion
-
-        #region Close
-        #region Sync
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        public override void Close()
-        {
-            _tranConnection?.Close();
-            _tranConnection?.Dispose();
-
-            Transaction = null;
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        public override async ValueTask CloseAsync()
-        {
-            if (_tranConnection != null)
-                await _tranConnection.CloseAsync();
-
-            if (_tranConnection != null)
-                await _tranConnection.DisposeAsync();
-
-            Transaction = null;
-        }
-        #endregion
         #endregion
 
         #region Page

@@ -16,13 +16,9 @@
  */
 #endregion
 
-using Microsoft.Data.SqlClient;
-using SQLBuilder.Core.Configuration;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -33,43 +29,7 @@ namespace SQLBuilder.Core.Repositories
     /// </summary>
     public class SqlRepository : BaseRepository
     {
-        #region Field
-        /// <summary>
-        /// SqlServer数据库版本
-        /// </summary>
-        private int _serverVersion;
-        #endregion
-
         #region Property
-        /// <summary>
-        /// 数据库连接对象
-        /// </summary>
-        public override DbConnection Connection
-        {
-            get
-            {
-                SqlConnection connection;
-                if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
-                {
-                    var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
-                    var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
-                    var connectionString = LoadBalancer.Get(MasterConnectionString, connectionStrings, weights);
-
-                    connection = new SqlConnection(connectionString);
-                }
-                else
-                    connection = new SqlConnection(MasterConnectionString);
-
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
-
-                //数据库版本
-                _serverVersion = int.Parse(connection.ServerVersion.Split('.')[0]);
-
-                return connection;
-            }
-        }
-
         /// <summary>
         /// 数据库类型
         /// </summary>
@@ -86,16 +46,7 @@ namespace SQLBuilder.Core.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
-        public SqlRepository(string connectionString)
-        {
-            //判断是链接字符串，还是链接字符串名称
-            if (connectionString?.Contains(":") == true)
-                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
-            else
-                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
-            if (MasterConnectionString.IsNullOrEmpty())
-                MasterConnectionString = connectionString;
-        }
+        public SqlRepository(string connectionString) : base(connectionString) { }
         #endregion
 
         #region Page
@@ -130,13 +81,14 @@ namespace SQLBuilder.Core.Repositories
             var offset = pageSize * (pageIndex - 1);
             var rowStart = pageSize * (pageIndex - 1) + 1;
             var rowEnd = pageSize * pageIndex;
+            var serverVersion = int.Parse(Connection.ServerVersion.Split('.')[0]);
 
             //判断是否with语法
             if (isWithSyntax)
             {
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS [TOTAL] FROM T;";
 
-                if (_serverVersion > 10)
+                if (serverVersion > 10)
                     sqlQuery += $"{sql} SELECT * FROM T {orderField} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
                 else
                     sqlQuery += $"{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
@@ -145,7 +97,7 @@ namespace SQLBuilder.Core.Repositories
             {
                 sqlQuery = $"SELECT {CountSyntax} AS [TOTAL] FROM ({sql}) AS T;";
 
-                if (_serverVersion > 10)
+                if (serverVersion > 10)
                     sqlQuery += $"SELECT * FROM ({sql}) AS T {orderField} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
                 else
                     sqlQuery += $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";

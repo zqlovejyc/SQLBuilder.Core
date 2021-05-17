@@ -17,6 +17,12 @@
 #endregion
 
 using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
+using MySqlConnector;
+using Npgsql;
+using Oracle.ManagedDataAccess.Client;
+using SQLBuilder.Core.Configuration;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
@@ -77,7 +83,31 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 数据库连接对象
         /// </summary>
-        public virtual DbConnection Connection { get; }
+        public virtual DbConnection Connection
+        {
+            get
+            {
+                DbConnection connection;
+
+                if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
+                {
+                    var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
+                    var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
+                    var connectionString = LoadBalancer.Get(MasterConnectionString, connectionStrings, weights);
+
+                    connection = GetDbConnection(connectionString);
+                }
+                else
+                {
+                    connection = GetDbConnection(MasterConnectionString);
+                }
+
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+
+                return connection;
+            }
+        }
 
         /// <summary>
         /// 事务对象
@@ -118,6 +148,24 @@ namespace SQLBuilder.Core.Repositories
         /// 仓储接口
         /// </summary>
         public virtual IRepository Repository { get; }
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
+        public BaseRepository(string connectionString)
+        {
+            //判断是链接字符串，还是链接字符串名称
+            if (connectionString?.Contains(":") == true)
+                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
+            else
+                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
+
+            if (MasterConnectionString.IsNullOrEmpty())
+                MasterConnectionString = connectionString;
+        }
         #endregion
 
         #region Queue
@@ -3599,6 +3647,24 @@ namespace SQLBuilder.Core.Repositories
                 _diagnosticListener.Write(DiagnosticStrings.ErrorExecute, message);
             }
         }
+        #endregion
+
+        #region GetDbConnection
+        /// <summary>
+        /// 根据数据库类型获取DbConnection
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <returns></returns>
+        public virtual DbConnection GetDbConnection(string connectionString) =>
+            DatabaseType switch
+            {
+                DatabaseType.Sqlite => new SqliteConnection(connectionString),
+                DatabaseType.SqlServer => new SqlConnection(connectionString),
+                DatabaseType.MySql => new MySqlConnection(connectionString),
+                DatabaseType.Oracle => new OracleConnection(connectionString),
+                DatabaseType.PostgreSql => new NpgsqlConnection(connectionString),
+                _ => new SqlConnection(connectionString),
+            };
         #endregion
     }
 }

@@ -16,13 +16,9 @@
  */
 #endregion
 
-using Npgsql;
-using SQLBuilder.Core.Configuration;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
-using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -34,32 +30,6 @@ namespace SQLBuilder.Core.Repositories
     public class NpgsqlRepository : BaseRepository
     {
         #region Property
-        /// <summary>
-        /// 数据库连接对象
-        /// </summary>
-        public override DbConnection Connection
-        {
-            get
-            {
-                NpgsqlConnection connection;
-                if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
-                {
-                    var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
-                    var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
-                    var connectionString = LoadBalancer.Get(MasterConnectionString, connectionStrings, weights);
-
-                    connection = new NpgsqlConnection(connectionString);
-                }
-                else
-                    connection = new NpgsqlConnection(MasterConnectionString);
-
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
-
-                return connection;
-            }
-        }
-
         /// <summary>
         /// 数据库类型
         /// </summary>
@@ -76,16 +46,7 @@ namespace SQLBuilder.Core.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
-        public NpgsqlRepository(string connectionString)
-        {
-            //判断是链接字符串，还是链接字符串名称
-            if (connectionString?.Contains(":") == true)
-                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
-            else
-                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
-            if (MasterConnectionString.IsNullOrEmpty())
-                MasterConnectionString = connectionString;
-        }
+        public NpgsqlRepository(string connectionString) : base(connectionString) { }
         #endregion
 
         #region Page

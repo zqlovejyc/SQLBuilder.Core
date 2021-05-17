@@ -17,8 +17,6 @@
 #endregion
 
 using Dapper;
-using Oracle.ManagedDataAccess.Client;
-using SQLBuilder.Core.Configuration;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
@@ -39,32 +37,6 @@ namespace SQLBuilder.Core.Repositories
     {
         #region Property
         /// <summary>
-        /// 数据库连接对象
-        /// </summary>
-        public override DbConnection Connection
-        {
-            get
-            {
-                OracleConnection connection;
-                if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
-                {
-                    var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
-                    var weights = SlaveConnectionStrings.Select(x => x.weight).ToArray();
-                    var connectionString = LoadBalancer.Get(MasterConnectionString, connectionStrings, weights);
-
-                    connection = new OracleConnection(connectionString);
-                }
-                else
-                    connection = new OracleConnection(MasterConnectionString);
-
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
-
-                return connection;
-            }
-        }
-
-        /// <summary>
         /// 数据库类型
         /// </summary>
         public override DatabaseType DatabaseType => DatabaseType.Oracle;
@@ -80,16 +52,7 @@ namespace SQLBuilder.Core.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
-        public OracleRepository(string connectionString)
-        {
-            //判断是链接字符串，还是链接字符串名称
-            if (connectionString?.Contains(":") == true)
-                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
-            else
-                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
-            if (MasterConnectionString.IsNullOrEmpty())
-                MasterConnectionString = connectionString;
-        }
+        public OracleRepository(string connectionString) : base(connectionString) { }
         #endregion
 
         #region Page

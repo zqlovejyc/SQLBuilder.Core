@@ -3539,16 +3539,20 @@ namespace SQLBuilder.Core.Repositories
         #endregion
 
         #region Dispose
+        #region Sync
         /// <summary>
         /// 释放资源
         /// </summary>
         public virtual void Dispose() => Close();
+        #endregion
 
+        #region Async
         /// <summary>
         /// 释放资源
         /// </summary>
         /// <returns></returns>
         public virtual async ValueTask DisposeAsync() => await CloseAsync();
+        #endregion
         #endregion
 
         #region Close

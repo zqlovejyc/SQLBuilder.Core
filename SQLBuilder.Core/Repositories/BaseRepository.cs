@@ -143,11 +143,6 @@ namespace SQLBuilder.Core.Repositories
         /// 数据库类型
         /// </summary>
         public virtual DatabaseType DatabaseType { get; }
-
-        /// <summary>
-        /// 仓储接口
-        /// </summary>
-        public virtual IRepository Repository { get; }
         #endregion
 
         #region Constructor
@@ -203,7 +198,7 @@ namespace SQLBuilder.Core.Repositories
                 var res = true;
 
                 while (!Queue.IsEmpty && Queue.TryDequeue(out var func))
-                    res = res && func(Repository);
+                    res = res && func(this);
 
                 if (transaction)
                     Commit();
@@ -254,7 +249,7 @@ namespace SQLBuilder.Core.Repositories
                 var res = true;
 
                 while (!AsyncQueue.IsEmpty && AsyncQueue.TryDequeue(out var func))
-                    res = res && await func(Repository);
+                    res = res && await func(this);
 
                 if (transaction)
                     await CommitAsync();
@@ -282,7 +277,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual IRepository UseMasterOrSlave(bool master = true)
         {
             Master = master;
-            return Repository;
+            return this;
         }
         #endregion
 
@@ -300,7 +295,7 @@ namespace SQLBuilder.Core.Repositories
                 Transaction = _tranConnection.BeginTransaction();
             }
 
-            return Repository;
+            return this;
         }
 
         /// <summary>
@@ -406,7 +401,7 @@ namespace SQLBuilder.Core.Repositories
                 Transaction = await _tranConnection.BeginTransactionAsync();
             }
 
-            return Repository;
+            return this;
         }
 
         /// <summary>

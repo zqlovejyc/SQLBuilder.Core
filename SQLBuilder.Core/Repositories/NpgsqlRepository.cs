@@ -34,11 +34,6 @@ namespace SQLBuilder.Core.Repositories
         /// 数据库类型
         /// </summary>
         public override DatabaseType DatabaseType => DatabaseType.PostgreSql;
-
-        /// <summary>
-        /// 仓储接口
-        /// </summary>
-        public override IRepository Repository => this;
         #endregion
 
         #region Constructor

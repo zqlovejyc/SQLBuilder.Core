@@ -19,6 +19,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Utilities.DependencyInjection;
 using SQLBuilder.Core.SkyWalking.Diagnostics;
@@ -63,6 +64,7 @@ namespace SQLBuilder.Core.SkyWalking.Extensions
                 new SqlBuilderTracingDiagnosticProcessor(
                     x.GetRequiredService<ITracingContext>(),
                     x.GetRequiredService<IExitSegmentContextAccessor>(),
+                    x.GetRequiredService<IConfigAccessor>(),
                     component));
 
             return @this;

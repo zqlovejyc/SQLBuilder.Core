@@ -19,6 +19,7 @@
 using Dapper;
 using SkyApm;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -40,6 +41,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         /// </summary>
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _contextAccessor;
+        private readonly TracingConfig _tracingConfig;
         private readonly StringOrIntValue? _component;
 
         /// <summary>
@@ -52,15 +54,18 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
         /// </summary>
         /// <param name="tracingContext"></param>
         /// <param name="contextAccessor"></param>
+        /// <param name="configAccessor"></param>
         /// <param name="component"></param>
         public SqlBuilderTracingDiagnosticProcessor(
             ITracingContext tracingContext,
             IExitSegmentContextAccessor contextAccessor,
+            IConfigAccessor configAccessor,
             StringOrIntValue? component = null)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
             _component = component ?? Components.SQLCLIENT;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         /// <summary>
@@ -138,7 +143,7 @@ namespace SQLBuilder.Core.SkyWalking.Diagnostics
             if (context == null)
                 return;
 
-            context.Span.ErrorOccurred(ex);
+            context.Span.ErrorOccurred(ex, _tracingConfig);
             _tracingContext.Release(context);
         }
     }

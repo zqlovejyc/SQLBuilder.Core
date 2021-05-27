@@ -2221,6 +2221,26 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.* FROM WF_UNITINFO x WHERE (x.PANELNO <> :p__1)", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询106
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_106()
+        {
+            var condition = LinqExtensions
+                                .True<UserInfo>()
+                                .And(x => ((x.Email != "" && x.Id > 10) || x.Email == "") && true)
+                                .And(x => x.Sex == 1);
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(
+                                x => x, DatabaseType.Oracle)
+                            .Where(condition);
+
+            Assert.AreEqual("SELECT x.* FROM Base_UserInfo x WHERE ((x.Email <> :p__1 AND x.Id > :p__2) OR x.Email = :p__3) AND x.Sex = :p__4", builder.Sql);
+            Assert.AreEqual(4, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

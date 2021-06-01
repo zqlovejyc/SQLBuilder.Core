@@ -264,7 +264,7 @@ namespace SQLBuilder.Core.Entry
         {
             var len = this.sqlWrapper.Length;
 
-            var tableAlias = GetExpressionAlias(expression, typeof(T)).FirstOrDefault().alias;
+            var tableAlias = this.GetExpressionAlias(expression, typeof(T)).FirstOrDefault().alias;
 
             if (sql == null)
                 sql = this.Select(tableNameFunc, (typeof(T), tableAlias));
@@ -322,7 +322,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select<T2>(Expression<Func<T, T2, object>> expression = null, Func<string[], string> tableNameFunc = null)
             where T2 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -338,7 +338,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -356,7 +356,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -376,7 +376,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -398,7 +398,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -422,7 +422,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -448,7 +448,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -476,7 +476,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -506,12 +506,37 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            var sql = this.Select(tableNameFunc, GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
         #endregion
 
         #region Join
+        /// <summary>
+        /// 获取目标Join类型
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        private Type GetJoinType(params Type[] types)
+        {
+            Type type = null;
+
+            for (int i = types.Length - 1; i >= 0; i--)
+            {
+                type = types[i];
+                if (this.sqlWrapper.IsJoined(type))
+                {
+                    //倒序判断，第一个被Join后，则重置为最后一个
+                    if (i == 0)
+                        type = types.Last();
+
+                    continue;
+                }
+            }
+
+            return type;
+        }
+
         /// <summary>
         /// Join
         /// </summary>
@@ -539,18 +564,16 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// Join
         /// </summary>
-        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="type">Join的实体类型</param>
         /// <param name="expression">表达式树</param>
         /// <param name="join">连接类型</param>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Join<T2>(Expression<Func<T, T2, bool>> expression, string join, Func<string[], string> tableNameFunc = null)
-            where T2 : class
+        public SqlBuilderCore<T> Join(Type type, Expression expression, string join, Func<string[], string> tableNameFunc = null)
         {
-            var type = typeof(T2);
             this.sqlWrapper.AddJoinType(type);
 
-            var alias = GetExpressionAlias(expression, type).Last().alias;
+            var alias = this.GetExpressionAlias(expression, type).Last().alias;
             var tableName = this.sqlWrapper.GetTableName(type);
 
             /***
@@ -572,9 +595,25 @@ namespace SQLBuilder.Core.Entry
             else
                 this.sqlWrapper.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableNameFunc(new[] { tableName, @as, tableAlias })} ON ");
 
-            SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Join(expression, this.sqlWrapper);
 
             return this;
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="join">连接类型</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2>(Expression expression, string join, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+        {
+            var type = this.GetJoinType(typeof(T2));
+
+            return this.Join(type, expression, join, tableNameFunc);
         }
 
         /// <summary>
@@ -586,51 +625,31 @@ namespace SQLBuilder.Core.Entry
         /// <param name="join">连接类型</param>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Join<T2, T3>(Expression<Func<T2, T3, bool>> expression, string join, Func<string[], string> tableNameFunc = null)
+        public SqlBuilderCore<T> Join<T2, T3>(Expression expression, string join, Func<string[], string> tableNameFunc = null)
             where T2 : class
             where T3 : class
         {
-            var type2 = typeof(T2);
-            var type3 = typeof(T3);
-            var type = type3;
+            var type = this.GetJoinType(typeof(T2), typeof(T3));
 
-            //如果T3已被Join，则选择T2
-            if (this.sqlWrapper.IsJoined(type3))
-            {
-                type = type2;
+            return this.Join(type, expression, join, tableNameFunc);
+        }
 
-                //如果T2也已被Join，则重置为T3
-                if (this.sqlWrapper.IsJoined(type2))
-                    type = type3;
-            }
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="join">连接类型</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2, T3, T4>(Expression expression, string join, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            var type = this.GetJoinType(typeof(T2), typeof(T3), typeof(T4));
 
-            this.sqlWrapper.AddJoinType(type);
-
-            var alias = GetExpressionAlias(expression, type).Last().alias;
-            var tableName = this.sqlWrapper.GetTableName(type);
-
-            /***
-             * 注释Join新增表别名逻辑，此时如果是多表查询，则要求Select方法内必须用lambda表达式显示指明每个表的别名
-             * 此时每个Join内的lambda表达式形参命名可以随意命名
-             * this.sqlWrapper.SetTableAlias(tableName, alias);
-             */
-
-            var tableAlias = this.sqlWrapper.GetTableAlias(tableName, alias);
-
-            //Oracle表别名不支持AS关键字，列别名支持；
-            var @as = this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? " " : " AS ";
-
-            if (tableAlias.IsNullOrEmpty())
-                @as = "";
-
-            if (tableNameFunc.IsNull())
-                this.sqlWrapper.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableName}{@as}{tableAlias} ON ");
-            else
-                this.sqlWrapper.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableNameFunc(new[] { tableName, @as, tableAlias })} ON ");
-
-            SqlExpressionProvider.Join(expression.Body, this.sqlWrapper);
-
-            return this;
+            return this.Join(type, expression, join, tableNameFunc);
         }
 
         /// <summary>
@@ -659,6 +678,53 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
         {
             return this.Join<T2, T3>(expression, "", tableNameFunc);
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3>(expression, "", tableNameFunc);
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2, T3, T4>(Expression<Func<T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "", tableNameFunc);
+        }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Join<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "", tableNameFunc);
         }
 
         /// <summary>
@@ -714,6 +780,53 @@ namespace SQLBuilder.Core.Entry
         }
 
         /// <summary>
+        /// InnerJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> InnerJoin<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3>(expression, "INNER", tableNameFunc);
+        }
+
+        /// <summary>
+        /// InnerJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> InnerJoin<T2, T3, T4>(Expression<Func<T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "INNER", tableNameFunc);
+        }
+
+        /// <summary>
+        /// InnerJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> InnerJoin<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "INNER", tableNameFunc);
+        }
+
+        /// <summary>
         /// LeftJoin
         /// </summary>
         /// <param name="sql">自定义LeftJoin语句</param>
@@ -763,6 +876,53 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
         {
             return this.Join<T2, T3>(expression, "LEFT", tableNameFunc);
+        }
+
+        /// <summary>
+        /// LeftJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> LeftJoin<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3>(expression, "LEFT", tableNameFunc);
+        }
+
+        /// <summary>
+        /// LeftJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> LeftJoin<T2, T3, T4>(Expression<Func<T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "LEFT", tableNameFunc);
+        }
+
+        /// <summary>
+        /// LeftJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> LeftJoin<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "LEFT", tableNameFunc);
         }
 
         /// <summary>
@@ -818,6 +978,53 @@ namespace SQLBuilder.Core.Entry
         }
 
         /// <summary>
+        /// RightJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> RightJoin<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3>(expression, "RIGHT", tableNameFunc);
+        }
+
+        /// <summary>
+        /// RightJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> RightJoin<T2, T3, T4>(Expression<Func<T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "RIGHT", tableNameFunc);
+        }
+
+        /// <summary>
+        /// RightJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> RightJoin<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "RIGHT", tableNameFunc);
+        }
+
+        /// <summary>
         /// FullJoin
         /// </summary>
         /// <param name="sql">自定义FullJoin语句</param>
@@ -867,6 +1074,53 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
         {
             return this.Join<T2, T3>(expression, "FULL", tableNameFunc);
+        }
+
+        /// <summary>
+        /// FullJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> FullJoin<T2, T3>(Expression<Func<T, T2, T3, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3>(expression, "FULL", tableNameFunc);
+        }
+
+        /// <summary>
+        /// FullJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> FullJoin<T2, T3, T4>(Expression<Func<T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "FULL", tableNameFunc);
+        }
+
+        /// <summary>
+        /// FullJoin
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> FullJoin<T2, T3, T4>(Expression<Func<T, T2, T3, T4, bool>> expression, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            return this.Join<T2, T3, T4>(expression, "FULL", tableNameFunc);
         }
         #endregion
 

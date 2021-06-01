@@ -2241,6 +2241,33 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.* FROM Base_UserInfo x WHERE ((x.Email <> :p__1 AND x.Id > :p__2) OR x.Email = :p__3) AND x.Sex = :p__4", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询107
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_107()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo, UserInfo, Account, Student, Class, City, Country>((u, t, a, s, d, e, f) =>
+                                new { u.Id, UId = t.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                            .Join<UserInfo>((x, t) =>
+                                x.Id == t.Id) //注意此处单表多次Join所以要指明具体表别名，否则都会读取第一个表别名
+                            .Join<Account>((x, y) =>
+                                x.Id == y.UserId)
+                            .LeftJoin<Account, Student>((x, y) =>
+                                x.Id == y.AccountId)
+                            .RightJoin<Student, Class>((x, y) =>
+                                x.Id == y.UserId)
+                            .InnerJoin<Class, City>((u, d, e) =>
+                                d.CityId == e.Id && u.Id > e.Id)
+                            .FullJoin<City, Country>((x, y) =>
+                                x.CountryId == y.Id)
+                            .Where(x =>
+                                x.Id != null);
+            Assert.AreEqual("SELECT u.Id,t.Id AS UId,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_UserInfo AS t ON u.Id = t.Id JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id AND u.Id > e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

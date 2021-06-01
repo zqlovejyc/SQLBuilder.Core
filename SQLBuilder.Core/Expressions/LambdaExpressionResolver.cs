@@ -65,6 +65,19 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Join(LambdaExpression expression, SqlWrapper sqlWrapper)
+        {
+            SqlExpressionProvider.Join(expression.Body, sqlWrapper);
+
+            return sqlWrapper;
+        }
         #endregion
     }
 }

@@ -35,7 +35,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.9.0" />
+        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.10.0" />
         <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.15" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
           <PrivateAssets>all</PrivateAssets>

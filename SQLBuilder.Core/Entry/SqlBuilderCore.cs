@@ -639,6 +639,7 @@ namespace SQLBuilder.Core.Entry
         /// </summary>
         /// <typeparam name="T2">泛型类型2</typeparam>
         /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
         /// <param name="expression">表达式树</param>
         /// <param name="join">连接类型</param>
         /// <param name="tableNameFunc">表名自定义委托</param>

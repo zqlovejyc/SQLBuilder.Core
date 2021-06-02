@@ -30,11 +30,7 @@ namespace SQLBuilder.Core.Attributes
         /// 构造函数
         /// </summary>
         /// <param name="name">数据库表名</param>
-        public TableAttribute(string name = null)
-        {
-            if (name != null)
-                this.Name = name;
-        }
+        public TableAttribute(string name = null) => Name = name;
 
         /// <summary>
         /// 数据库表名

@@ -53,7 +53,7 @@ namespace SQLBuilder.Core.Expressions
                     {
                         var tableAlias = sqlWrapper.GetTableAlias(tableName, parameterExpr.Name);
 
-                        if (!tableAlias.IsNullOrEmpty())
+                        if (tableAlias.IsNotNullOrEmpty())
                             tableAlias += ".";
 
                         var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberAssignment.Member).columnName;

@@ -30,16 +30,12 @@ namespace SQLBuilder.Core.Attributes
         /// 构造函数
         /// </summary>
         /// <param name="name"></param>
-        public KeyAttribute(string name = null)
-        {
-            if (name != null)
-                this.Name = name;
-        }
+        public KeyAttribute(string name = null) => Name = name;
 
         /// <summary>
         /// 主键名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// 是否自增列

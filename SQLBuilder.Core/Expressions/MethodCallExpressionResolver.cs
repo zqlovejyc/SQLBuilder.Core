@@ -397,7 +397,7 @@ namespace SQLBuilder.Core.Expressions
                 if (expression.Arguments?.Count > 0)
                 {
                     var trimString = expression.Object.ToObject()?.ToString();
-                    if (!trimString.IsNullOrEmpty())
+                    if (trimString.IsNotNullOrEmpty())
                     {
                         string constant;
                         var argument = expression.Arguments[0].ToObject();
@@ -438,7 +438,7 @@ namespace SQLBuilder.Core.Expressions
                 if (expression.Arguments?.Count > 0)
                 {
                     var trimString = expression.Object.ToObject()?.ToString();
-                    if (!trimString.IsNullOrEmpty())
+                    if (trimString.IsNotNullOrEmpty())
                     {
                         string constant;
                         var argument = expression.Arguments[0].ToObject();
@@ -471,7 +471,7 @@ namespace SQLBuilder.Core.Expressions
                 if (expression.Arguments?.Count > 0)
                 {
                     var trimString = expression.Object.ToObject()?.ToString();
-                    if (!trimString.IsNullOrEmpty())
+                    if (trimString.IsNotNullOrEmpty())
                     {
                         string constant;
                         var argument = expression.Arguments[0].ToObject();
@@ -614,7 +614,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Select(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var field = expression.ToObject()?.ToString();
-            if (!field.IsNullOrEmpty())
+            if (field.IsNotNullOrEmpty())
                 sqlWrapper.AddField(field);
 
             return sqlWrapper;

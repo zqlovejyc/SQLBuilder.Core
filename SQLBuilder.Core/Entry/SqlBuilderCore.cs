@@ -1658,7 +1658,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString().ToUpper();
 
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1698,7 +1698,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString().ToUpper();
 
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1738,7 +1738,7 @@ namespace SQLBuilder.Core.Entry
         {
             var sql = this.sqlWrapper.ToString().ToUpper();
 
-            if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (sql.Contains("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2174,7 +2174,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString().ToUpper();
 
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2214,7 +2214,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString().ToUpper();
 
-            if (str.Contains("WHERE") && !str.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2254,7 +2254,7 @@ namespace SQLBuilder.Core.Entry
         {
             var sql = this.sqlWrapper.ToString();
 
-            if (sql.Contains("WHERE") && !sql.Substring("WHERE").Trim().IsNullOrEmpty())
+            if (sql.Contains("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -3738,13 +3738,13 @@ namespace SQLBuilder.Core.Entry
 
             var sql = this.sqlWrapper.ToString().ToUpper();
 
-            if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
+            if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("此方法只能用于Select、Update、Delete方法！");
 
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
@@ -3753,7 +3753,7 @@ namespace SQLBuilder.Core.Entry
                 for (int i = 0; i < keys.Count; i++)
                 {
                     var (key, property) = keys[i];
-                    if (!key.IsNullOrEmpty())
+                    if (key.IsNotNullOrEmpty())
                     {
                         var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
                         if (keyValue != null)
@@ -3789,13 +3789,13 @@ namespace SQLBuilder.Core.Entry
                 throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
 
             var sql = this.sqlWrapper.ToString().ToUpper();
-            if (!sql.Contains("SELECT") && !sql.Contains("UPDATE") && !sql.Contains("DELETE"))
+            if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("WithKey方法只能用于Select、Update、Delete方法！");
 
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
@@ -3804,7 +3804,7 @@ namespace SQLBuilder.Core.Entry
                 for (int i = 0; i < keys.Count; i++)
                 {
                     var (key, property) = keys[i];
-                    if (!key.IsNullOrEmpty())
+                    if (key.IsNotNullOrEmpty())
                     {
                         this.sqlWrapper += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
                         this.sqlWrapper.AddDbParameter(keyValue[i]);
@@ -4554,7 +4554,7 @@ namespace SQLBuilder.Core.Entry
             var sb = new StringBuilder();
 
             //排序字段
-            if (!orderField.IsNullOrEmpty())
+            if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
@@ -4566,7 +4566,7 @@ namespace SQLBuilder.Core.Entry
                 orderField = "ORDER BY (SELECT 0)";
             }
 
-            if (!sql.IsNullOrEmpty())
+            if (sql.IsNotNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
                 if (parameters != null)
@@ -4629,7 +4629,7 @@ namespace SQLBuilder.Core.Entry
             var sb = new StringBuilder();
 
             //排序字段
-            if (!orderField.IsNullOrEmpty())
+            if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";
@@ -4641,7 +4641,7 @@ namespace SQLBuilder.Core.Entry
                 orderField = "ORDER BY (SELECT 0)";
             }
 
-            if (!sql.IsNullOrEmpty())
+            if (sql.IsNotNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
                 if (parameters != null)

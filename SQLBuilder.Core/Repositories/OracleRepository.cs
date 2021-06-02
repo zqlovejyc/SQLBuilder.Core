@@ -65,7 +65,7 @@ namespace SQLBuilder.Core.Repositories
         public override string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             //排序字段
-            if (!orderField.IsNullOrEmpty())
+            if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
                     orderField = $"ORDER BY {orderField}";

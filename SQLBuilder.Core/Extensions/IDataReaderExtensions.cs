@@ -245,7 +245,7 @@ namespace SQLBuilder.Core.Extensions
                                 continue;
 
                             var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
-                            if (!field.IsNullOrEmpty() && !@this[field].IsNull())
+                            if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
                                 p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
                         }
                         yield return instance;
@@ -344,7 +344,7 @@ namespace SQLBuilder.Core.Extensions
                                         continue;
 
                                     var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
-                                    if (!field.IsNullOrEmpty() && !@this[field].IsNull())
+                                    if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
                                         p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
                                 }
 

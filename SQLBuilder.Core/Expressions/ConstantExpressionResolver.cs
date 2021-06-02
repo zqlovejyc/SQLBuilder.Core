@@ -182,7 +182,7 @@ namespace SQLBuilder.Core.Expressions
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             sqlWrapper += tableAlias + sqlWrapper.GetColumnName(expression.Value.ToString()) + ",";
@@ -214,7 +214,7 @@ namespace SQLBuilder.Core.Expressions
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             var field = expression.Value.ToString();

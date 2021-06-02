@@ -45,7 +45,7 @@ namespace SQLBuilder.Core.Configuration
         {
             var jsonFile = "appsettings.json";
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (!environment.IsNullOrEmpty())
+            if (environment.IsNotNullOrEmpty())
                 jsonFile = $"appsettings.{environment}.json";
 
             SetConfigurationFile(jsonFile);
@@ -61,7 +61,7 @@ namespace SQLBuilder.Core.Configuration
         public static void SetConfigurationFile(string fileName, string basePath = null)
         {
             Configuration = new ConfigurationBuilder()
-                .SetBasePath(string.IsNullOrEmpty(basePath) ? Directory.GetCurrentDirectory() : basePath)
+                .SetBasePath(basePath.IsNullOrEmpty() ? Directory.GetCurrentDirectory() : basePath)
                 .AddJsonFile(fileName, optional: true, reloadOnChange: true)
                 .Build();
         }

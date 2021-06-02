@@ -522,7 +522,7 @@ namespace SQLBuilder.Core.Entry
         {
             if (!this.IsSingleTable)
             {
-                if (!tableAlias.IsNullOrEmpty())
+                if (tableAlias.IsNotNullOrEmpty())
                 {
                     tableAlias = this.GetFormatName(tableAlias);
 
@@ -570,18 +570,18 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.GetFormatName(type.Name);
             if (type.GetFirstOrDefaultAttribute<CusTableAttribute>() is CusTableAttribute cta)
             {
-                if (!cta.Name.IsNullOrEmpty())
+                if (cta.Name.IsNotNullOrEmpty())
                     tableName = this.GetFormatName(cta.Name);
 
-                if (!cta.Schema.IsNullOrEmpty())
+                if (cta.Schema.IsNotNullOrEmpty())
                     tableName = $"{this.GetFormatName(cta.Schema)}.{tableName}";
             }
             else if (type.GetFirstOrDefaultAttribute<SysTableAttribute>() is SysTableAttribute sta)
             {
-                if (!sta.Name.IsNullOrEmpty())
+                if (sta.Name.IsNotNullOrEmpty())
                     tableName = this.GetFormatName(sta.Name);
 
-                if (!sta.Schema.IsNullOrEmpty())
+                if (sta.Schema.IsNotNullOrEmpty())
                     tableName = $"{this.GetFormatName(sta.Schema)}.{tableName}";
             }
             return tableName;
@@ -657,7 +657,7 @@ namespace SQLBuilder.Core.Entry
                     if (cka.Identity)
                         isInsert = false;
 
-                    if (!cka.Name.IsNullOrEmpty() && cka.Name != columnName)
+                    if (cka.Name.IsNotNullOrEmpty() && cka.Name != columnName)
                         columnName = cka.Name;
                 }
                 else if (member.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
@@ -683,7 +683,7 @@ namespace SQLBuilder.Core.Entry
                             if (cus.Identity)
                                 isInsert = false;
 
-                            if (!cus.Name.IsNullOrEmpty() && cus.Name != columnName)
+                            if (cus.Name.IsNotNullOrEmpty() && cus.Name != columnName)
                                 columnName = cus.Name;
                         }
                         else if (p.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)

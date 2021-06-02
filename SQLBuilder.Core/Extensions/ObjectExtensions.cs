@@ -159,6 +159,18 @@ namespace SQLBuilder.Core.Extensions
         }
         #endregion
 
+        #region IsNotNull
+        /// <summary>
+        /// 是否为空
+        /// </summary>
+        /// <param name="this">object对象</param>
+        /// <returns>bool</returns>
+        public static bool IsNotNull(this object @this)
+        {
+            return !@this.IsNull();
+        }
+        #endregion
+
         #region ToJson
         /// <summary>
         /// 对象序列化为json字符串

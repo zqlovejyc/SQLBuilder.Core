@@ -150,7 +150,7 @@ namespace SQLBuilder.Core.Expressions
             var parameter = expression.Expression as ParameterExpression;
             var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
@@ -174,7 +174,7 @@ namespace SQLBuilder.Core.Expressions
             var parameter = expression.Expression as ParameterExpression;
             var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
@@ -291,7 +291,7 @@ namespace SQLBuilder.Core.Expressions
                     var tableAlias = (expression.Expression as ParameterExpression)?.Name;
                     tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
 
-                    if (!tableAlias.IsNullOrEmpty())
+                    if (tableAlias.IsNotNullOrEmpty())
                         tableAlias += ".";
 
                     sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
@@ -359,7 +359,7 @@ namespace SQLBuilder.Core.Expressions
 
             tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             if (expression.Expression.NodeType == ExpressionType.Parameter)
@@ -425,7 +425,7 @@ namespace SQLBuilder.Core.Expressions
                     var tableAlias = (expression.Expression as ParameterExpression)?.Name;
                     tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
 
-                    if (!tableAlias.IsNullOrEmpty())
+                    if (tableAlias.IsNotNullOrEmpty())
                         tableAlias += ".";
 
                     sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
@@ -466,7 +466,7 @@ namespace SQLBuilder.Core.Expressions
 
             tableAlias = sqlWrapper.GetTableAlias(tableName, tableAlias);
 
-            if (!tableAlias.IsNullOrEmpty())
+            if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
             if (expression.Expression.NodeType == ExpressionType.Parameter)

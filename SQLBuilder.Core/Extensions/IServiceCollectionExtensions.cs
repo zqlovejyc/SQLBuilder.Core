@@ -114,7 +114,7 @@ namespace SQLBuilder.Core.Extensions
                             continue;
 
                         var slaveConnectionStringArray = configs[i].Split(';');
-                        var slaveConnectionString = string.Join(";", slaveConnectionStringArray.Where(x => !x.IsNullOrEmpty() && !x.StartsWith("weight", StringComparison.OrdinalIgnoreCase)));
+                        var slaveConnectionString = string.Join(";", slaveConnectionStringArray.Where(x => x.IsNotNullOrEmpty() && !x.StartsWithIgnoreCase("weight")));
                         var weight = int.Parse(slaveConnectionStringArray.FirstOrDefault(x => x.StartsWith("weight", StringComparison.OrdinalIgnoreCase))?.Split('=')[1] ?? "1");
                         slaveConnectionStrings.Add((slaveConnectionString, weight));
                     }

@@ -491,7 +491,7 @@ namespace SQLBuilder.Core.Expressions
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!array[i].ContainsIgnoreCase("ASC") && !array[i].ContainsIgnoreCase("DESC"))
+                            else if (!array[i].ContainsIgnoreCase("ASC", "DESC"))
                                 sqlWrapper += " ASC,";
                             else
                                 sqlWrapper += ",";
@@ -507,7 +507,7 @@ namespace SQLBuilder.Core.Expressions
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!list[i].ContainsIgnoreCase("ASC") && !list[i].ContainsIgnoreCase("DESC"))
+                            else if (!list[i].ContainsIgnoreCase("ASC", "DESC"))
                                 sqlWrapper += " ASC,";
                             else
                                 sqlWrapper += ",";
@@ -518,7 +518,7 @@ namespace SQLBuilder.Core.Expressions
                     if (typeof(string) == type && obj is string str)
                     {
                         SqlExpressionProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlWrapper);
-                        if (!str.ContainsIgnoreCase("ASC") && !str.ContainsIgnoreCase("DESC"))
+                        if (!str.ContainsIgnoreCase("ASC", "DESC"))
                         {
                             if (orders.Length >= 1)
                                 sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";

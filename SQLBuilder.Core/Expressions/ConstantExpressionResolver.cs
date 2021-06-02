@@ -218,7 +218,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             var field = expression.Value.ToString();
-            if (!field.ContainsIgnoreCase(" ASC") && !field.ContainsIgnoreCase(" DESC"))
+            if (!field.ContainsIgnoreCase(" ASC", " DESC"))
                 field = sqlWrapper.GetColumnName(field);
 
             sqlWrapper += tableAlias + field;

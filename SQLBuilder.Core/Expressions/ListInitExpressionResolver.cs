@@ -129,7 +129,7 @@ namespace SQLBuilder.Core.Expressions
 
                     if (i <= orders.Length - 1)
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                    else if (!array[i].ToString().ContainsIgnoreCase("ASC") && !array[i].ToString().ContainsIgnoreCase("DESC"))
+                    else if (!array[i].ToString().ContainsIgnoreCase("ASC", "DESC"))
                         sqlWrapper += " ASC,";
                     else
                         sqlWrapper += ",";

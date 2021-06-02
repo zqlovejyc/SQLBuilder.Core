@@ -113,7 +113,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                 else if (expression.Expressions[i] is ConstantExpression order)
                 {
-                    if (!order.Value.ToString().ContainsIgnoreCase("ASC") && !order.Value.ToString().ContainsIgnoreCase("DESC"))
+                    if (!order.Value.ToString().ContainsIgnoreCase("ASC", "DESC"))
                         sqlWrapper += " ASC,";
                     else
                         sqlWrapper += ",";

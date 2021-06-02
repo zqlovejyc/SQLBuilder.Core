@@ -40,50 +40,52 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Insert(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
             var fields = new List<string>();
-            var array = expression.ToObject() as IEnumerable<object>;
-            for (var i = 0; i < array.Count(); i++)
+            if (expression.ToObject() is IEnumerable<object> array)
             {
-                if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                    sqlWrapper.Append("(");
-
-                if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
-                    sqlWrapper.Append(" UNION ALL SELECT ");
-
-                var properties = array.ElementAt(i)?.GetType().GetProperties();
-                foreach (var p in properties)
+                for (var i = 0; i < array.Count(); i++)
                 {
-                    var type = p.DeclaringType.IsAnonymousType() ?
-                        sqlWrapper.DefaultType :
-                        p.DeclaringType;
+                    if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                        sqlWrapper.Append("(");
 
-                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
-                    if (isInsert)
+                    if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
+                        sqlWrapper.Append(" UNION ALL SELECT ");
+
+                    var properties = array.ElementAt(i)?.GetType().GetProperties();
+                    foreach (var p in properties)
                     {
-                        var value = p.GetValue(array.ElementAt(i), null);
-                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                        var type = p.DeclaringType.IsAnonymousType() ?
+                            sqlWrapper.DefaultType :
+                            p.DeclaringType;
+
+                        var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
+                        if (isInsert)
                         {
-                            sqlWrapper.AddDbParameter(value);
-                            if (!fields.Contains(columnName))
-                                fields.Add(columnName);
-                            sqlWrapper += ",";
+                            var value = p.GetValue(array.ElementAt(i), null);
+                            if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                            {
+                                sqlWrapper.AddDbParameter(value);
+                                if (!fields.Contains(columnName))
+                                    fields.Add(columnName);
+                                sqlWrapper += ",";
+                            }
                         }
+                    }
+
+                    if (sqlWrapper[sqlWrapper.Length - 1] == ',')
+                    {
+                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                        if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
+                            sqlWrapper.Append("),");
+                        else
+                            sqlWrapper.Append(" FROM DUAL");
                     }
                 }
 
                 if (sqlWrapper[sqlWrapper.Length - 1] == ',')
-                {
                     sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
-                    if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
-                        sqlWrapper.Append("),");
-                    else
-                        sqlWrapper.Append(" FROM DUAL");
-                }
+
+                sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
             }
-
-            if (sqlWrapper[sqlWrapper.Length - 1] == ',')
-                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
-
-            sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
 
             return sqlWrapper;
         }
@@ -127,7 +129,7 @@ namespace SQLBuilder.Core.Expressions
 
                     if (i <= orders.Length - 1)
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                    else if (!array[i].ToString().ToUpper().Contains("ASC") && !array[i].ToString().ToUpper().Contains("DESC"))
+                    else if (!array[i].ToString().ContainsIgnoreCase("ASC") && !array[i].ToString().ContainsIgnoreCase("DESC"))
                         sqlWrapper += " ASC,";
                     else
                         sqlWrapper += ",";

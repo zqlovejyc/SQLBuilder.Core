@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SQLBuilder.Core.Extensions
@@ -55,6 +57,40 @@ namespace SQLBuilder.Core.Extensions
         public static bool IsNullOrEmpty(this string @this)
         {
             return string.IsNullOrEmpty(@this);
+        }
+
+        /// <summary>
+        ///     An IEnumerable&lt;T&gt; extension method that queries if a null or is empty.
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="this">The collection to act on.</param>
+        /// <returns>true if a null or is t>, false if not.</returns>
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> @this)
+        {
+            return @this == null || !@this.Any();
+        }
+        #endregion
+
+        #region IsNotNullOrEmpty
+        /// <summary>
+        /// 判断字符串是否为空
+        /// </summary>
+        /// <param name="this">待验证的字符串</param>
+        /// <returns>bool</returns>
+        public static bool IsNotNullOrEmpty(this string @this)
+        {
+            return !@this.IsNullOrEmpty();
+        }
+
+        /// <summary>
+        /// An IEnumerable&lt;T&gt; extension method that queries if a not null or is empty.
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="this">The collection to act on.</param>
+        /// <returns>true if a not null or is t>, false if not.</returns>
+        public static bool IsNotNullOrEmpty<T>(this IEnumerable<T> @this)
+        {
+            return @this != null && @this.Any();
         }
         #endregion
 
@@ -109,6 +145,95 @@ namespace SQLBuilder.Core.Extensions
         public static bool Contains(this string @this, string value, RegexOptions options)
         {
             return Regex.IsMatch(@this, value, options);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串相等比较，判断是否以任意一个待比较字符串相等
+        /// </summary>
+        /// <param name="this">当前字符串</param>
+        /// <param name="strs">待比较字符串数组</param>
+        /// <returns>bool</returns>
+        public static bool EqualIgnoreCase(this string @this, params string[] strs)
+        {
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (string.Equals(@this, item, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串开始比较，判断是否以任意一个待比较字符串开始
+        /// </summary>
+        /// <param name="this">当前字符串</param>
+        /// <param name="strs">待比较字符串数组</param>
+        /// <returns>bool</returns>
+        public static bool StartsWithIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.StartsWith(item, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串结束比较，判断是否以任意一个待比较字符串结束
+        /// </summary>
+        /// <param name="this">当前字符串</param>
+        /// <param name="strs">待比较字符串数组</param>
+        /// <returns>bool</returns>
+        public static bool EndsWithIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.EndsWith(item, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                        return true;
+                }
+            }
+
+            return false;
         }
         #endregion
     }

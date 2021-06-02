@@ -128,8 +128,8 @@ namespace SQLBuilder.Core.Expressions
             //表达式左侧为bool类型常量
             if (expression.NodeType == ExpressionType.Constant && expression.Value is bool b)
             {
-                var sql = sqlWrapper.ToString().ToUpper().Trim();
-                if (!b && (sql.EndsWith("WHERE") || sql.EndsWith("AND") || sql.EndsWith("OR")))
+                var sql = sqlWrapper.ToString().Trim();
+                if (!b && sql.EndsWithIgnoreCase("WHERE", "AND", "OR"))
                     sqlWrapper += " 1 = 0 ";
             }
             else
@@ -149,8 +149,8 @@ namespace SQLBuilder.Core.Expressions
             //表达式左侧为bool类型常量
             if (expression.NodeType == ExpressionType.Constant && expression.Value is bool b)
             {
-                var sql = sqlWrapper.ToString().ToUpper().Trim();
-                if (!b && (sql.EndsWith("AND") || sql.EndsWith("OR")))
+                var sql = sqlWrapper.ToString().Trim();
+                if (!b && sql.EndsWithIgnoreCase("AND", "OR"))
                     sqlWrapper += " 1 = 0 ";
             }
             else
@@ -218,7 +218,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             var field = expression.Value.ToString();
-            if (!field.ToUpper().Contains(" ASC") && !field.ToUpper().Contains(" DESC"))
+            if (!field.ContainsIgnoreCase(" ASC") && !field.ContainsIgnoreCase(" DESC"))
                 field = sqlWrapper.GetColumnName(field);
 
             sqlWrapper += tableAlias + field;

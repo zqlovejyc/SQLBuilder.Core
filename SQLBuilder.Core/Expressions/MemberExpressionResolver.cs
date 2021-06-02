@@ -42,10 +42,11 @@ namespace SQLBuilder.Core.Expressions
             var objectArray = new List<object>();
             var fields = new List<string>();
             var obj = expression.ToObject();
+            var objType = obj.GetType();
 
-            if (obj.GetType().IsArray)
+            if (objType.IsArray)
                 objectArray.AddRange(obj as object[]);
-            else if (obj.GetType().Name == "List`1")
+            else if (objType.AssignableTo(typeof(IEnumerable<>)))
                 objectArray.AddRange(obj as IEnumerable<object>);
             else
                 objectArray.Add(obj);
@@ -369,9 +370,9 @@ namespace SQLBuilder.Core.Expressions
                 var obj = expression.ToObject();
                 if (obj != null)
                 {
-                    var type = obj.GetType().Name;
+                    var type = obj.GetType();
 
-                    if (type == "String[]" && obj is string[] array)
+                    if (typeof(string[]) == type && obj is string[] array)
                     {
                         foreach (var item in array)
                         {
@@ -380,7 +381,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (type == "List`1" && obj is List<string> list)
+                    if (typeof(List<string>) == type && obj is List<string> list)
                     {
                         foreach (var item in list)
                         {
@@ -389,7 +390,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (type == "String" && obj is string str)
+                    if (typeof(string) == type && obj is string str)
                     {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlWrapper);
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
@@ -480,9 +481,9 @@ namespace SQLBuilder.Core.Expressions
                 var obj = expression.ToObject();
                 if (obj != null)
                 {
-                    var type = obj.GetType().Name;
+                    var type = obj.GetType();
 
-                    if (type == "String[]" && obj is string[] array)
+                    if (typeof(string[]) == type && obj is string[] array)
                     {
                         for (var i = 0; i < array.Length; i++)
                         {
@@ -490,7 +491,7 @@ namespace SQLBuilder.Core.Expressions
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!array[i].ToUpper().Contains("ASC") && !array[i].ToUpper().Contains("DESC"))
+                            else if (!array[i].ContainsIgnoreCase("ASC") && !array[i].ContainsIgnoreCase("DESC"))
                                 sqlWrapper += " ASC,";
                             else
                                 sqlWrapper += ",";
@@ -498,7 +499,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (type == "List`1" && obj is List<string> list)
+                    if (typeof(List<string>) == type && obj is List<string> list)
                     {
                         for (var i = 0; i < list.Count; i++)
                         {
@@ -506,7 +507,7 @@ namespace SQLBuilder.Core.Expressions
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!list[i].ToUpper().Contains("ASC") && !list[i].ToUpper().Contains("DESC"))
+                            else if (!list[i].ContainsIgnoreCase("ASC") && !list[i].ContainsIgnoreCase("DESC"))
                                 sqlWrapper += " ASC,";
                             else
                                 sqlWrapper += ",";
@@ -514,11 +515,10 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (type == "String" && obj is string str)
+                    if (typeof(string) == type && obj is string str)
                     {
                         SqlExpressionProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlWrapper);
-                        str = str.ToUpper();
-                        if (!str.Contains("ASC") && !str.Contains("DESC"))
+                        if (!str.ContainsIgnoreCase("ASC") && !str.ContainsIgnoreCase("DESC"))
                         {
                             if (orders.Length >= 1)
                                 sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")},";

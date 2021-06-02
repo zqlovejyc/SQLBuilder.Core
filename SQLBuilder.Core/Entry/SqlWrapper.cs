@@ -337,9 +337,9 @@ namespace SQLBuilder.Core.Entry
         /// </summary>
         /// <param name="value">指定的字符串</param>
         /// <returns></returns>
-        public bool EndsWith(string value)
+        public bool EndsWith(params string[] value)
         {
-            return this.ToString().Trim().EndsWith(value, StringComparison.OrdinalIgnoreCase);
+            return this.ToString().Trim().EndsWithIgnoreCase(value);
         }
         #endregion
 
@@ -368,13 +368,13 @@ namespace SQLBuilder.Core.Entry
 
         #region Contains
         /// <summary>
-        /// 是否包含指定字符串
+        /// 是否包含指定字符串，忽略大小写
         /// </summary>
         /// <param name="value">目标字符串</param>
         /// <returns></returns>
-        public bool Contains(string value)
+        public bool Contains(params string[] value)
         {
-            return this.ToString().Contains(value, RegexOptions.IgnoreCase);
+            return this.ToString().ContainsIgnoreCase(value);
         }
         #endregion
 

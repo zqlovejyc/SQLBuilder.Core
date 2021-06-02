@@ -3736,7 +3736,7 @@ namespace SQLBuilder.Core.Entry
             if (entity == null)
                 throw new ArgumentNullException("实体参数不能为空！");
 
-            var sql = this.sqlWrapper.ToString().ToUpper();
+            var sql = this.sqlWrapper.ToString();
 
             if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("此方法只能用于Select、Update、Delete方法！");
@@ -3758,7 +3758,7 @@ namespace SQLBuilder.Core.Entry
                         var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
                         if (keyValue != null)
                         {
-                            this.sqlWrapper += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                            this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
                             this.sqlWrapper.AddDbParameter(keyValue);
                         }
                         else
@@ -3788,7 +3788,7 @@ namespace SQLBuilder.Core.Entry
             if (!keyValue.Any(o => o.GetType().IsValueType || o.GetType() == typeof(string)))
                 throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
 
-            var sql = this.sqlWrapper.ToString().ToUpper();
+            var sql = this.sqlWrapper.ToString();
             if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("WithKey方法只能用于Select、Update、Delete方法！");
 
@@ -3806,7 +3806,7 @@ namespace SQLBuilder.Core.Entry
                     var (key, property) = keys[i];
                     if (key.IsNotNullOrEmpty())
                     {
-                        this.sqlWrapper += $" {(sql.Contains("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
+                        this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
                         this.sqlWrapper.AddDbParameter(keyValue[i]);
                     }
                 }

@@ -60,7 +60,7 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
-        ///     An IEnumerable&lt;T&gt; extension method that queries if a null or is empty.
+        /// 判断集合是否为空
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
@@ -73,7 +73,7 @@ namespace SQLBuilder.Core.Extensions
 
         #region IsNotNullOrEmpty
         /// <summary>
-        /// 判断字符串是否为空
+        /// 判断字符串是否不为空
         /// </summary>
         /// <param name="this">待验证的字符串</param>
         /// <returns>bool</returns>
@@ -83,7 +83,7 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
-        /// An IEnumerable&lt;T&gt; extension method that queries if a not null or is empty.
+        /// 判断集合是否不为空
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
@@ -135,6 +135,29 @@ namespace SQLBuilder.Core.Extensions
         #endregion
 
         #region Contains
+        /// <summary>
+        /// 判断是否包含目标字符串，区分大小写
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="strs">目标字符串数组"</param>
+        /// <returns></returns>
+        public static bool Contains(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.Contains(item))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// 正则判断是否包含目标字符串
         /// </summary>
@@ -216,8 +239,8 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="strs"></param>
+        /// <param name="this">当前字符串</param>
+        /// <param name="strs">待比较字符串数组</param>
         /// <returns></returns>
         public static bool ContainsIgnoreCase(this string @this, params string[] strs)
         {
@@ -228,7 +251,7 @@ namespace SQLBuilder.Core.Extensions
             {
                 foreach (var item in strs)
                 {
-                    if (item != null && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (item != null && @this.Contains(item, StringComparison.OrdinalIgnoreCase))
                         return true;
                 }
             }

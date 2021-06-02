@@ -2447,7 +2447,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual int Delete<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var keys = Sql.GetPrimaryKey<T>(IsEnableFormat);
+            var keys = Sql.GetPrimaryKey<T>(DatabaseType, IsEnableFormat);
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
@@ -2494,7 +2494,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual int Delete<T>(string propertyName, object propertyValue) where T : class
         {
             var parameterPrefix = new SqlWrapper { DatabaseType = DatabaseType }.DbParameterPrefix;
-            var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName} = {parameterPrefix}PropertyValue";
+            var sql = $"DELETE FROM {Sql.GetTableName<T>(DatabaseType, IsEnableFormat)} WHERE {propertyName} = {parameterPrefix}PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
             return Execute(sql, parameter);
         }
@@ -2592,7 +2592,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<int> DeleteAsync<T>(params object[] keyValues) where T : class
         {
             var result = 0;
-            var keys = Sql.GetPrimaryKey<T>(IsEnableFormat);
+            var keys = Sql.GetPrimaryKey<T>(DatabaseType, IsEnableFormat);
             //多主键或者单主键
             if (keys.Count > 1 || keyValues.Length == 1)
             {
@@ -2639,7 +2639,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<int> DeleteAsync<T>(string propertyName, object propertyValue) where T : class
         {
             var parameterPrefix = new SqlWrapper { DatabaseType = DatabaseType }.DbParameterPrefix;
-            var sql = $"DELETE FROM {Sql.GetTableName<T>(IsEnableFormat)} WHERE {propertyName} = {parameterPrefix}PropertyValue";
+            var sql = $"DELETE FROM {Sql.GetTableName<T>(DatabaseType, IsEnableFormat)} WHERE {propertyName} = {parameterPrefix}PropertyValue";
             var parameter = new { PropertyValue = propertyValue };
             return await ExecuteAsync(sql, parameter);
         }

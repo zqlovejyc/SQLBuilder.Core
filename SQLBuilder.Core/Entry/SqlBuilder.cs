@@ -485,11 +485,14 @@ namespace SQLBuilder.Core.Entry
         /// 获取实体对应的数据库表名
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="databaseType">数据库类型</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <returns>string</returns>
-        public static string GetTableName<T>(bool isEnableFormat = false)
+        public static string GetTableName<T>(
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            bool isEnableFormat = false)
             where T : class =>
-            new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetTableName();
+            new SqlBuilderCore<T>(databaseType, isEnableFormat).GetTableName();
         #endregion
 
         #region GetPrimaryKey
@@ -497,11 +500,14 @@ namespace SQLBuilder.Core.Entry
         /// 获取实体对应的数据库表的主键名(多主键)
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="databaseType">数据库类型</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <returns></returns>
-        public static List<string> GetPrimaryKey<T>(bool isEnableFormat = false)
+        public static List<string> GetPrimaryKey<T>(
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            bool isEnableFormat = false)
             where T : class =>
-            new SqlBuilderCore<T>(DatabaseType.SqlServer, isEnableFormat).GetPrimaryKey();
+            new SqlBuilderCore<T>(databaseType, isEnableFormat).GetPrimaryKey();
         #endregion
     }
 }

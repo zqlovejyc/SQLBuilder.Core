@@ -251,7 +251,7 @@ namespace SQLBuilder.Core.Extensions
             {
                 foreach (var item in strs)
                 {
-                    if (item != null && @this.Contains(item, StringComparison.OrdinalIgnoreCase))
+                    if (item != null && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                         return true;
                 }
             }

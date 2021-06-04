@@ -2314,7 +2314,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Select<Teacher>(x =>
                                 new { x })
                             .Where(x =>
-                                x.Type == TeacherType.A &&
+                                x.Type == (int?)TeacherType.A &&
                                 x.Name != null);
 
             Assert.AreEqual("SELECT x.* FROM Base_Teacher AS x WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
@@ -2326,6 +2326,23 @@ namespace SQLBuilder.Core.UnitTest
         /// </summary>
         [TestMethod]
         public void Test_Select_111()
+        {
+            var type = (int?)TeacherType.A;
+            var builder = SqlBuilder
+                            .Select<Teacher>(x =>
+                                new { x })
+                            .Where(x =>
+                                x.Type == type &&
+                                x.Name != null);
+            Assert.AreEqual("SELECT x.* FROM Base_Teacher AS x WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询112
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_112()
         {
             //Join逻辑：默认取如：“Join<T2,T3,T4>()” 中的最后一个T4，如果T4被Join过，则依次向前递推，如果全部被Join过，则重置为默认的T4
             var builder = SqlBuilder

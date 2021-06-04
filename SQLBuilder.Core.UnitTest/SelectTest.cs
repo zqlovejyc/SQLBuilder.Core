@@ -2,6 +2,7 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.UnitTest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2266,6 +2267,78 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(x =>
                                 x.Id != null);
             Assert.AreEqual("SELECT u.Id,t.Id AS UId,a.Name,s.Name AS StudentName,d.Name AS ClassName,e.City_Name AS CityName,f.Name AS CountryName FROM Base_UserInfo AS u JOIN Base_UserInfo AS t ON u.Id = t.Id JOIN Base_Account AS a ON u.Id = a.UserId LEFT JOIN Base_Student AS s ON a.Id = s.AccountId RIGHT JOIN Base_Class AS d ON s.Id = d.UserId INNER JOIN Base_City AS e ON d.CityId = e.Id AND u.Id > e.Id FULL JOIN Base_Country AS f ON e.CountryId = f.Country_Id WHERE u.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询108
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_108()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>((x, y) =>
+                                 new { x, AccountName = y.Name })
+                            .InnerJoin<UserInfo, Account>((x, y) =>
+                                 x.Id == y.UserId)
+                            .Where(x =>
+                                x.Id != null);
+            Assert.AreEqual("SELECT x.*,y.Name AS AccountName FROM Base_UserInfo AS x INNER JOIN Base_Account AS y ON x.Id = y.UserId WHERE x.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询109
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_109()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo, Account>((x, y) =>
+                                 new { x, AccountName = y.Name })
+                            .InnerJoin<Account, UserInfo>((x, y) =>
+                                 x.UserId == y.Id)
+                            .Where(x =>
+                                x.Id != null);
+            Assert.AreEqual("SELECT x.*,y.Name AS AccountName FROM Base_UserInfo AS x INNER JOIN Base_Account AS y ON y.UserId = x.Id WHERE x.Id IS NOT NULL", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询110
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_110()
+        {
+            var builder = SqlBuilder
+                            .Select<Teacher>(x =>
+                                new { x })
+                            .Where(x =>
+                                x.Type == TeacherType.A &&
+                                x.Name != null);
+
+            Assert.AreEqual("SELECT x.* FROM Base_Teacher AS x WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询111
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_111()
+        {
+            //Join逻辑：默认取如：“Join<T2,T3,T4>()” 中的最后一个T4，如果T4被Join过，则依次向前递推，如果全部被Join过，则重置为默认的T4
+            var builder = SqlBuilder
+                            .Select<UserInfo, UserInfo, Account>((x1, x2, y) =>
+                                new { x1, AccountName = y.Name })
+                            .InnerJoin<UserInfo, Account>((x, y) =>
+                                y.UserId == x.Id)
+                            .InnerJoin<Account, UserInfo>((x1, y, x2) =>
+                                x1.Id == x2.Sex &&
+                                x1.Name == y.Name)
+                            .Where(x =>
+                                x.Id != null);
+            Assert.AreEqual("SELECT x1.*,y.Name AS AccountName FROM Base_UserInfo AS x1 INNER JOIN Base_Account AS y ON y.UserId = x1.Id INNER JOIN Base_UserInfo AS x2 ON x1.Id = x2.Sex AND x1.Name = y.Name WHERE x1.Id IS NOT NULL", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

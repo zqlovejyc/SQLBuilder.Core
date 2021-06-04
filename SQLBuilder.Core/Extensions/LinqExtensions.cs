@@ -1102,89 +1102,79 @@ namespace SQLBuilder.Core.Extensions
         /// <returns></returns>
         public static object ToObject(this Expression @this)
         {
-            object obj = null;
-            switch (@this.NodeType)
-            {
-                case ExpressionType.Constant:
-                    obj = (@this as ConstantExpression)?.Value;
-                    break;
-                case ExpressionType.Convert:
-                    obj = (@this as UnaryExpression)?.Operand?.ToObject();
-                    break;
-                default:
-                    var isNullable = @this.Type.IsNullable();
-                    switch (@this.Type.GetCoreType().Name.ToLower())
-                    {
-                        case "string":
-                            obj = @this.ToLambda<Func<string>>().Compile().Invoke();
-                            break;
-                        case "int16":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<short?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<short>>().Compile().Invoke();
-                            break;
-                        case "int32":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<int?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<int>>().Compile().Invoke();
-                            break;
-                        case "int64":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<long?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<long>>().Compile().Invoke();
-                            break;
-                        case "decimal":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<decimal?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<decimal>>().Compile().Invoke();
-                            break;
-                        case "double":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<double?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<double>>().Compile().Invoke();
-                            break;
-                        case "datetime":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<DateTime?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<DateTime>>().Compile().Invoke();
-                            break;
-                        case "boolean":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<bool?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<bool>>().Compile().Invoke();
-                            break;
-                        case "byte":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<byte?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<byte>>().Compile().Invoke();
-                            break;
-                        case "char":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<char?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<char>>().Compile().Invoke();
-                            break;
-                        case "single":
-                            if (isNullable)
-                                obj = @this.ToLambda<Func<float?>>().Compile().Invoke();
-                            else
-                                obj = @this.ToLambda<Func<float>>().Compile().Invoke();
-                            break;
-                        default:
-                            obj = @this.ToLambda<Func<object>>().Compile().Invoke();
-                            break;
-                    }
-                    break;
-            }
-            return obj;
+            var type = @this.Type;
+            var nodeType = @this.NodeType;
+
+            if (ExpressionType.Constant == nodeType)
+                return (@this as ConstantExpression)?.Value;
+
+            if (ExpressionType.Convert == nodeType)
+                return (@this as UnaryExpression)?.Operand?.ToObject();
+
+            if (typeof(string) == type)
+                return @this.ToLambda<Func<string>>().Compile().Invoke();
+
+            if (typeof(short) == type)
+                return @this.ToLambda<Func<short>>().Compile().Invoke();
+
+            if (typeof(short?) == type)
+                return @this.ToLambda<Func<short?>>().Compile().Invoke();
+
+            if (typeof(int) == type)
+                return @this.ToLambda<Func<int>>().Compile().Invoke();
+
+            if (typeof(int?) == type)
+                return @this.ToLambda<Func<int?>>().Compile().Invoke();
+
+            if (typeof(long) == type)
+                return @this.ToLambda<Func<long>>().Compile().Invoke();
+
+            if (typeof(long?) == type)
+                return @this.ToLambda<Func<long?>>().Compile().Invoke();
+
+            if (typeof(decimal) == type)
+                return @this.ToLambda<Func<decimal>>().Compile().Invoke();
+
+            if (typeof(decimal?) == type)
+                return @this.ToLambda<Func<decimal?>>().Compile().Invoke();
+
+            if (typeof(double) == type)
+                return @this.ToLambda<Func<double>>().Compile().Invoke();
+
+            if (typeof(double?) == type)
+                return @this.ToLambda<Func<double?>>().Compile().Invoke();
+
+            if (typeof(float) == type)
+                return @this.ToLambda<Func<float>>().Compile().Invoke();
+
+            if (typeof(float?) == type)
+                return @this.ToLambda<Func<float?>>().Compile().Invoke();
+
+            if (typeof(DateTime) == type)
+                return @this.ToLambda<Func<DateTime>>().Compile().Invoke();
+
+            if (typeof(DateTime?) == type)
+                return @this.ToLambda<Func<DateTime?>>().Compile().Invoke();
+
+            if (typeof(bool) == type)
+                return @this.ToLambda<Func<bool>>().Compile().Invoke();
+
+            if (typeof(bool?) == type)
+                return @this.ToLambda<Func<bool?>>().Compile().Invoke();
+
+            if (typeof(byte) == type)
+                return @this.ToLambda<Func<byte>>().Compile().Invoke();
+
+            if (typeof(byte?) == type)
+                return @this.ToLambda<Func<byte?>>().Compile().Invoke();
+
+            if (typeof(char) == type)
+                return @this.ToLambda<Func<char>>().Compile().Invoke();
+
+            if (typeof(char?) == type)
+                return @this.ToLambda<Func<char?>>().Compile().Invoke();
+
+            return @this.ToLambda<Func<object>>().Compile().Invoke();
         }
 
         /// <summary>

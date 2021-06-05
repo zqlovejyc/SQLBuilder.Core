@@ -2314,7 +2314,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Select<Teacher>(x =>
                                 new { x })
                             .Where(x =>
-                                x.Type == (int?)TeacherType.A &&
+                                x.Type == TeacherType.A &&
                                 x.Name != null);
 
             Assert.AreEqual("SELECT x.* FROM Base_Teacher AS x WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
@@ -2327,12 +2327,12 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_111()
         {
-            var type = (int?)TeacherType.A;
+            var teacherType = TeacherType.A;
             var builder = SqlBuilder
                             .Select<Teacher>(x =>
                                 new { x })
                             .Where(x =>
-                                x.Type == type &&
+                                x.Type == teacherType &&
                                 x.Name != null);
             Assert.AreEqual("SELECT x.* FROM Base_Teacher AS x WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);

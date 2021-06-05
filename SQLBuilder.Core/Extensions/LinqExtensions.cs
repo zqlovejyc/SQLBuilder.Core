@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace SQLBuilder.Core.Extensions
@@ -1111,70 +1112,88 @@ namespace SQLBuilder.Core.Extensions
             if (ExpressionType.Convert == nodeType)
                 return (@this as UnaryExpression)?.Operand?.ToObject();
 
+            if (@this is MemberExpression memberExpr && memberExpr.Expression is ConstantExpression constantExpr)
+            {
+                var constant = constantExpr.Value;
+                var memberInfo = memberExpr.Member;
+
+                if (MemberTypes.Property == memberInfo.MemberType)
+                {
+                    var propertyInfo = constant?.GetType().GetProperty(memberInfo.Name);
+                    return propertyInfo?.GetValue(constant, null);
+                }
+
+                if (MemberTypes.Field == memberInfo.MemberType)
+                {
+                    var fieldInfo = constant?.GetType().GetField(memberInfo.Name);
+                    return fieldInfo?.GetValue(constant);
+                }
+            }
+
             if (typeof(string) == type)
-                return @this.ToLambda<Func<string>>().Compile().Invoke();
+                return @this.ToLambda<Func<string>>().Compile()();
 
             if (typeof(short) == type)
-                return @this.ToLambda<Func<short>>().Compile().Invoke();
+                return @this.ToLambda<Func<short>>().Compile()();
 
             if (typeof(short?) == type)
-                return @this.ToLambda<Func<short?>>().Compile().Invoke();
+                return @this.ToLambda<Func<short?>>().Compile()();
 
             if (typeof(int) == type)
-                return @this.ToLambda<Func<int>>().Compile().Invoke();
+                return @this.ToLambda<Func<int>>().Compile()();
 
             if (typeof(int?) == type)
-                return @this.ToLambda<Func<int?>>().Compile().Invoke();
+                return @this.ToLambda<Func<int?>>().Compile()();
 
             if (typeof(long) == type)
-                return @this.ToLambda<Func<long>>().Compile().Invoke();
+                return @this.ToLambda<Func<long>>().Compile()();
 
             if (typeof(long?) == type)
-                return @this.ToLambda<Func<long?>>().Compile().Invoke();
+                return @this.ToLambda<Func<long?>>().Compile()();
 
             if (typeof(decimal) == type)
-                return @this.ToLambda<Func<decimal>>().Compile().Invoke();
+                return @this.ToLambda<Func<decimal>>().Compile()();
 
             if (typeof(decimal?) == type)
-                return @this.ToLambda<Func<decimal?>>().Compile().Invoke();
+                return @this.ToLambda<Func<decimal?>>().Compile()();
 
             if (typeof(double) == type)
-                return @this.ToLambda<Func<double>>().Compile().Invoke();
+                return @this.ToLambda<Func<double>>().Compile()();
 
             if (typeof(double?) == type)
-                return @this.ToLambda<Func<double?>>().Compile().Invoke();
+                return @this.ToLambda<Func<double?>>().Compile()();
 
             if (typeof(float) == type)
-                return @this.ToLambda<Func<float>>().Compile().Invoke();
+                return @this.ToLambda<Func<float>>().Compile()();
 
             if (typeof(float?) == type)
-                return @this.ToLambda<Func<float?>>().Compile().Invoke();
+                return @this.ToLambda<Func<float?>>().Compile()();
 
             if (typeof(DateTime) == type)
-                return @this.ToLambda<Func<DateTime>>().Compile().Invoke();
+                return @this.ToLambda<Func<DateTime>>().Compile()();
 
             if (typeof(DateTime?) == type)
-                return @this.ToLambda<Func<DateTime?>>().Compile().Invoke();
+                return @this.ToLambda<Func<DateTime?>>().Compile()();
 
             if (typeof(bool) == type)
-                return @this.ToLambda<Func<bool>>().Compile().Invoke();
+                return @this.ToLambda<Func<bool>>().Compile()();
 
             if (typeof(bool?) == type)
-                return @this.ToLambda<Func<bool?>>().Compile().Invoke();
+                return @this.ToLambda<Func<bool?>>().Compile()();
 
             if (typeof(byte) == type)
-                return @this.ToLambda<Func<byte>>().Compile().Invoke();
+                return @this.ToLambda<Func<byte>>().Compile()();
 
             if (typeof(byte?) == type)
-                return @this.ToLambda<Func<byte?>>().Compile().Invoke();
+                return @this.ToLambda<Func<byte?>>().Compile()();
 
             if (typeof(char) == type)
-                return @this.ToLambda<Func<char>>().Compile().Invoke();
+                return @this.ToLambda<Func<char>>().Compile()();
 
             if (typeof(char?) == type)
-                return @this.ToLambda<Func<char?>>().Compile().Invoke();
+                return @this.ToLambda<Func<char?>>().Compile()();
 
-            return @this.ToLambda<Func<object>>().Compile().Invoke();
+            return @this.ToLambda<Func<object>>().Compile()();
         }
 
         /// <summary>

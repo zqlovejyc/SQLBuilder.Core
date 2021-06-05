@@ -1,6 +1,6 @@
 ﻿using SQLBuilder.Core.Attributes;
 
-namespace SQLBuilder.Core.UnitTest.Models
+namespace SQLBuilder.Core.UnitTest
 {
     [Table("Base_Teacher")]
     public class Teacher

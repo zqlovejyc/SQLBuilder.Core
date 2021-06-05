@@ -2,7 +2,6 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
-using SQLBuilder.Core.UnitTest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

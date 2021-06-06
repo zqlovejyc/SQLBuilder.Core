@@ -9,6 +9,8 @@ namespace SQLBuilder.Core.UnitTest
 
         public int? Age { get; set; }
 
+        public int ClassId { get; set; }
+
         public TeacherType? Type { get; set; }
     }
 
@@ -16,5 +18,11 @@ namespace SQLBuilder.Core.UnitTest
     {
         A = 1,
         B = 2
+    }
+
+    public class TeacherResponse
+    {
+        public string TeacherName { get; set; }
+        public string ClassName { get; set; }
     }
 }

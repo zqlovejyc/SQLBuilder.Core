@@ -42,21 +42,18 @@ namespace SQLBuilder.Core.Expressions
             {
                 foreach (MemberAssignment memberAssignment in expression.Bindings)
                 {
-                    var type = expression.Type != memberAssignment.Member.DeclaringType ?
-                               expression.Type :
-                               memberAssignment.Member.DeclaringType;
-
                     var aliasName = memberAssignment.Member.Name;
-                    var tableName = sqlWrapper.GetTableName(type);
 
-                    if ((memberAssignment.Expression as MemberExpression)?.Expression is ParameterExpression parameterExpr)
+                    if (memberAssignment.Expression is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr)
                     {
+                        var type = parameterExpr.Type;
+                        var tableName = sqlWrapper.GetTableName(type);
                         var tableAlias = sqlWrapper.GetTableAlias(tableName, parameterExpr.Name);
 
                         if (tableAlias.IsNotNullOrEmpty())
                             tableAlias += ".";
 
-                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberAssignment.Member).columnName;
+                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberExpr.Member).columnName;
 
                         sqlWrapper.AddField(fieldName);
                     }

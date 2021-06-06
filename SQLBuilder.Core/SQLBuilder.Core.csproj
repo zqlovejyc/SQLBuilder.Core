@@ -7,18 +7,19 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.2.0.0</AssemblyVersion>
+        <AssemblyVersion>2.2.1.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.2.0</Version>
+        <Version>2.2.1</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.移除IQueryable相关接口及实现，可用FindList替代；
-2.精简优化仓储相关代码；
-3.重载Join语法，支持更加灵活的连接查询；
-4.升级nuget依赖引用包；</PackageReleaseNotes>
-        <FileVersion>2.2.0.0</FileVersion>
+        <PackageReleaseNotes>1.新增部分扩展方法，优化部分代码；
+2.修改GetTableName、GetPrimaryKey添加databaseType参数；
+3.修复部分情况下Join连接查询解析错误bug；
+4.优化ToObject扩展方法，修复Where中enum类型抛异常bug(#I3UBGP)；
+5.修复Select解析强类型实体映射情形时sql解析错误bug；</PackageReleaseNotes>
+        <FileVersion>2.2.1.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>

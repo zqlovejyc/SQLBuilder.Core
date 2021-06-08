@@ -98,7 +98,9 @@ namespace SQLBuilder.Core
             expr = expr.And(o => o.Id > 0);
             expr = expr.Or(o => o.Email != "");
             Print(
-                SqlBuilder.Select<UserInfo>().Where(expr),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(expr),
                 "查询单表所有字段，linq拼接条件"
             );
 
@@ -108,7 +110,9 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id).WithKey(2, 3),
+                SqlBuilder
+                    .Select<UserInfo>(u => u.Id)
+                    .WithKey(2, 3),
                 "根据主键进行查询"
            );
 
@@ -118,27 +122,43 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }).Top(100),
+                SqlBuilder
+                    .Select<UserInfo>(u => new { u.Id, u.Name })
+                    .Top(100),
                 "查询单表多个字段，并返回指定TOP数量的数据"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.MySql).Top(100),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        new { u.Id, u.Name }, DatabaseType.MySql)
+                    .Top(100),
                 "查询单表多个字段，并返回指定TOP数量的数据 MySQL"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }, DatabaseType.Oracle).Top(100),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        new { u.Id, u.Name }, DatabaseType.Oracle)
+                    .Top(100),
                 "查询单表多个字段，并返回指定TOP数量的数据 Oracle"
             );
 
             Print(
-               SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }).Top(100).Distinct(),
+               SqlBuilder
+                    .Select<UserInfo>(u => 
+                        new { u.Id, u.Name })
+                    .Top(100)
+                    .Distinct(),
                "查询单表多个字段，DISTINCT"
             );
 
             Print(
-               SqlBuilder.Select<UserInfo>(u => new { u.Id, u.Name }).Distinct().Top(100),
+               SqlBuilder
+                    .Select<UserInfo>(u =>
+                        new { u.Id, u.Name })
+                    .Distinct()
+                    .Top(100),
                "查询单表多个字段，DISTINCT"
             );
 
@@ -148,130 +168,194 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective.Value && x.IsOnLine),
+                SqlBuilder
+                    .Select<Student>(o => 
+                        new { o.Id, o.Name })
+                    .Where(x =>
+                        x.IsEffective.Value && 
+                        x.IsOnLine),
                 "查询单表，带where bool类型字段"
             );
 
             Print(
-               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => !x.IsEffective.Value && !x.IsOnLine),
+               SqlBuilder
+                    .Select<Student>(o =>
+                        new { o.Id, o.Name })
+                    .Where(x =>
+                        !x.IsEffective.Value && 
+                        !x.IsOnLine),
                "查询单表，带where bool类型字段"
             );
 
             Print(
-               SqlBuilder.Select<Student>(o => new { o.Id, o.Name }).Where(x => x.IsEffective == true && x.IsOnLine == false),
+               SqlBuilder
+                    .Select<Student>(o =>
+                        new { o.Id, o.Name })
+                    .Where(x => 
+                        x.IsEffective == true &&
+                        x.IsOnLine == false),
                "查询单表，带where bool类型字段"
             );
 
             var entity = new { name = "新用户" };
             Print(
-                SqlBuilder.Select<UserInfo>(o => new { o.Id, o.Name })
-                          .Where(u => u.Name.Equals(entity.name)),
+                SqlBuilder
+                    .Select<UserInfo>(o =>
+                        new { o.Id, o.Name })
+                    .Where(u => 
+                        u.Name.Equals(entity.name)),
                 "查询单表，带where 变量"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(o => new { o.Id, o.Name })
-                          .Where(u => 1 == 1)
-                          .AndWhere(u => u.Name == ""),
+                SqlBuilder
+                    .Select<UserInfo>(o =>
+                        new { o.Id, o.Name })
+                    .Where(u => 
+                        1 == 1)
+                    .AndWhere(u =>
+                        u.Name == ""),
                 "查询单表，带where 1==1"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(u => u.Name.Like("张三")),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Id)
+                    .Where(u =>
+                        u.Name.Like("张三")),
                 "查询单表，带where Like条件"
             );
 
             var name = "张三";
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(u => u.Name.NotLike(name)),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Id)
+                    .Where(u => 
+                        u.Name.NotLike(name)),
                 "查询单表，带where Not Like"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(u => u.Name.LikeRight(name)),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Id)
+                    .Where(u => 
+                        u.Name.LikeRight(name)),
                 "查询单表，带where LikeRight条件"
             );
 
             Print(
-              SqlBuilder.Select<UserInfo>(u => u.Name)
-                        .Where(u => !"a,b,c".Split(new[] { ',' }).Contains(u.Name)),
+              SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Name)
+                    .Where(u => 
+                        !"a,b,c".Split(new[] { ',' }).Contains(u.Name)),
               "查询单表，带where contains条件，写法一"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => new string[] { "a", "b" }.Contains(u.Name)),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Name)
+                    .Where(u => 
+                        new string[] { "a", "b" }.Contains(u.Name)),
                 "查询单表，带where contains条件，写法二"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => "*")
-                          .Where(u => !new string[] { "a", "b" }.Contains(u.Name)),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        "*")
+                    .Where(u => 
+                        !new string[] { "a", "b" }.Contains(u.Name)),
                 "查询单表，带where contains条件，写法三"
             );
 
             int[] arrayId = { 1, 2, 3 };
             Print(
-               SqlBuilder.Select<UserInfo>(u => u.Name)
-                         .Where(u => arrayId.Contains(u.Id.Value)),
+               SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Name)
+                    .Where(u =>
+                        arrayId.Contains(u.Id.Value)),
                "查询单表，带where contains条件，写法四"
             );
 
             var user = new UserInfo { Name = "a,b,c" };
             Print(
-              SqlBuilder.Select<UserInfo>(u => u.Name)
-                        .Where(u => user.Name.Split(new[] { ',' }).Contains(u.Name)),
+              SqlBuilder
+                .Select<UserInfo>(u => 
+                    u.Name)
+                .Where(u => 
+                    user.Name.Split(new[] { ',' }).Contains(u.Name)),
               "查询单表，带where contains条件，写法五"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Id.In(1, 2, 3)),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Name)
+                    .Where(u => 
+                        u.Id.In(1, 2, 3)),
                 "查询单表，带where in条件，写法一"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Id.In(arrayId)),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Name)
+                    .Where(u => 
+                        u.Id.In(arrayId)),
                 "查询单表，带where in条件，写法二"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => !u.Name.In(new string[] { "a", "b" })),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Name)
+                    .Where(u => 
+                        !u.Name.In(new string[] { "a", "b" })),
                 "查询单表，带where in条件，写法三"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Id.NotIn(1, 2, 3)),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Name)
+                    .Where(u => 
+                        u.Id.NotIn(1, 2, 3)),
                 "查询单表，带where not in条件，写法一"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Name)
-                          .Where(u => u.Name.Contains("11"))
-                          .AndWhere(u => !string.IsNullOrEmpty(u.Name))
-                          .AndWhere(u => string.IsNullOrEmpty(u.Email)),
+                SqlBuilder
+                    .Select<UserInfo>(u => 
+                        u.Name)
+                    .Where(u =>
+                        u.Name.Contains("11"))
+                    .AndWhere(u => 
+                        !string.IsNullOrEmpty(u.Name))
+                    .AndWhere(u => 
+                        string.IsNullOrEmpty(u.Email)),
                 "查询单表，带where Contains、string.IsNullOrEmpty、!string.IsNullOrEmpty"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(
-                            u => u.Name == "b"
-                                && (u.Id > 2 && u.Name != null)
-                                && u.Id > int.MinValue
-                                && u.Id < int.MaxValue
-                                && u.Id.In(1, 2, 3)
-                                && u.Name.Like("a")
-                                && u.Name.LikeLeft("b")
-                                && u.Name.LikeRight("c")
-                                || u.Id == null
-                          ),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Id)
+                    .Where(u =>
+                        u.Name == "b" &&
+                        (u.Id > 2 && u.Name != null) &&
+                        u.Id > int.MinValue &&
+                        u.Id < int.MaxValue &&
+                        u.Id.In(1, 2, 3) &&
+                        u.Name.Like("a") &&
+                        u.Name.LikeLeft("b") &&
+                        u.Name.LikeRight("c") ||
+                        u.Id == null),
                 "查询单表，带多个where条件"
             );
             #endregion
@@ -279,16 +363,22 @@ namespace SQLBuilder.Core
             #region Join
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                    .Join<Account>((u, a) => u.Id == a.UserId && (u.Email == "111" || u.Email == "222")),
+                    .Select<UserInfo, Account>((u, a) =>
+                        new { u.Id, a.Name })
+                    .Join<Account>((u, a) =>
+                        u.Id == a.UserId &&
+                        (u.Email == "111" ||
+                        u.Email == "222")),
                 "多表Join关联查询",
                 "Join"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                    .InnerJoin<Account>((u, a) => u.Id == a.UserId),
+                    .Select<UserInfo, Account>((u, a) =>
+                        new { u.Id, a.Name })
+                    .InnerJoin<Account>((u, a) =>
+                        u.Id == a.UserId),
                 "多表InnerJoin关联查询"
             );
 
@@ -301,22 +391,35 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                    .RightJoin<Account>((u, a) => u.Id == a.UserId),
+                    .Select<UserInfo, Account>((u, a) =>
+                        new { u.Id, a.Name })
+                    .RightJoin<Account>((u, a) =>
+                        u.Id == a.UserId),
                 "多表RightJoin关联查询"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo, Account>((u, a) => new { u.Id, a.Name })
-                    .FullJoin<Account>((u, a) => u.Id == a.UserId),
+                    .Select<UserInfo, Account>((u, a) =>
+                        new { u.Id, a.Name })
+                    .FullJoin<Account>((u, a) =>
+                        u.Id == a.UserId),
                 "多表FullJoin关联查询"
             );
 
             Print(
                 SqlBuilder
                     .Select<UserInfo, UserInfo, Account, Student, Class, City, Country>((u, t, a, s, d, e, f) =>
-                         new { u.Id, UId = t.Id, a.Name, StudentName = s.Name, ClassName = d.Name, e.CityName, CountryName = f.Name })
+                         new
+                         {
+                             u.Id,
+                             UId = t.Id,
+                             a.Name,
+                             StudentName = s.Name,
+                             ClassName = d.Name,
+                             e.CityName,
+                             CountryName = f.Name
+                         })
                     .Join<UserInfo>((x, t) =>
                         x.Id == t.Id)
                     .Join<Account>((x, y) =>
@@ -336,152 +439,223 @@ namespace SQLBuilder.Core
 
             #region Page
             Print(
-                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySql)
-                          .Where(o => o.Score != null)
-                          .AndWhere(o => o.Name == "")
-                          .OrWhere(o => o.Subject == "")
-                          .Page(3, 2, "Id", "select * from student"),
+                SqlBuilder
+                    .Select<MyStudent>(
+                        databaseType: DatabaseType.MySql)
+                    .Where(o =>
+                        o.Score != null)
+                    .AndWhere(o =>
+                        o.Name == "")
+                    .OrWhere(o =>
+                        o.Subject == "")
+                    .Page(3, 2, "Id", "select * from student"),
                "查询单表，带多个where条件 分页1",
                "Page"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(
-                                u => u.Name == "b" && (u.Id > 2 && u.Name != null && (u.Email == "11" || u.Email == "22" || u.Email == "ee"))
-                          ).Page(10, 1, "Id"),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Id)
+                    .Where(u =>
+                        u.Name == "b" &&
+                        (u.Id > 2 &&
+                        u.Name != null &&
+                        (u.Email == "11" ||
+                        u.Email == "22" ||
+                        u.Email == "ee")))
+                    .Page(10, 1, "Id"),
                 "查询单表，带多个where条件 分页2"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>(u => u.Id)
-                          .Where(
-                                u => u.Name == "b" && (u.Id > 2 && u.Name != null && (u.Email == "11" || u.Email == "22" || u.Email == "ee"))
-                          ).Page(10, 1, "Id"),
+                SqlBuilder
+                    .Select<UserInfo>(u =>
+                        u.Id)
+                    .Where(u =>
+                        u.Name == "b" &&
+                        (u.Id > 2 &&
+                        u.Name != null &&
+                        (u.Email == "11" ||
+                        u.Email == "22" ||
+                        u.Email == "ee")))
+                    .Page(10, 1, "Id"),
                 "查询单表，带多个where条件 分页3"
             );
 
             Print(
-                SqlBuilder.Select<MyStudent>(databaseType: DatabaseType.MySql)
-                          .Where(o => o.Score != null)
-                          .AndWhere(o => o.Name == "")
-                          .OrWhere(o => o.Subject == "")
-                          .Page(3, 2, "Id"),
+                SqlBuilder
+                    .Select<MyStudent>(
+                        databaseType: DatabaseType.MySql)
+                    .Where(o =>
+                        o.Score != null)
+                    .AndWhere(o =>
+                        o.Name == "")
+                    .OrWhere(o =>
+                        o.Subject == "")
+                    .Page(3, 2, "Id"),
               "查询单表，带多个where条件 分页4"
             );
             #endregion
 
             #region GroupBy
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => u.Id),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        u.Id),
                 "GroupBy分组查询 用法1",
                 "GroupBy"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => new { u.Id, u.Email }),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        new { u.Id, u.Email }),
                 "GroupBy分组查询 用法2-1"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => new[] { "Id", "Email" }),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        new[] { "Id", "Email" }),
                 "GroupBy分组查询 用法2-2"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => new List<string> { "Id", "Email" }),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        new List<string> { "Id", "Email" }),
                 "GroupBy分组查询 用法2-3"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => "Id,Email".Split(new[] { ',' })),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        "Id,Email".Split(new[] { ',' })),
                 "GroupBy分组查询 用法2-4"
             );
 
             var groupByField = "Id";
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => groupByField),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        groupByField),
                 "GroupBy分组查询 用法2-5"
             );
 
             var groupFields = "Id,Email".Split(',');
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .Where(o => o.Name == "张强")
-                          .GroupBy(u => groupFields),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .Where(o =>
+                        o.Name == "张强")
+                    .GroupBy(u =>
+                        groupFields),
                 "GroupBy分组查询 用法2-6"
             );
             #endregion
 
             #region OrderBy
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .OrderBy(u => new[] { "Id", "Email" }, OrderType.Ascending, OrderType.Descending),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u =>
+                        new[] { "Id", "Email" },
+                        OrderType.Ascending,
+                        OrderType.Descending),
                 "OrderBy排序 用法1-1",
                 "OrderBy"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .OrderBy(u => new List<string> { "Id", "Email" }, OrderType.Ascending, OrderType.Descending),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u =>
+                        new List<string> { "Id", "Email" },
+                        OrderType.Ascending,
+                        OrderType.Descending),
                 "OrderBy排序 用法1-2"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                         .OrderBy(u => "Id,Email".Split(new[] { ',' }), OrderType.Ascending, OrderType.Descending),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u =>
+                        "Id,Email".Split(new[] { ',' }),
+                        OrderType.Ascending,
+                        OrderType.Descending),
                "OrderBy排序 用法1-3"
             );
 
             var orderByFields = "Id,Email".Split(',').ToList();
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .OrderBy(u => orderByFields, OrderType.Ascending, OrderType.Descending),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u =>
+                        orderByFields,
+                        OrderType.Ascending,
+                        OrderType.Descending),
                "OrderBy排序 用法1-4"
             );
 
             var orderByField = "Id DESC";
             Print(
-                SqlBuilder.Select<UserInfo>()
-                         .OrderBy(u => orderByField),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u => orderByField),
                "OrderBy排序 用法1-4"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                         .OrderBy(u => "Id DESC"),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u => "Id DESC"),
                "OrderBy排序 用法1-5"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .OrderBy(u => new { u.Id, u.Email }, OrderType.Descending, OrderType.Descending),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u =>
+                        new { u.Id, u.Email },
+                        OrderType.Descending,
+                        OrderType.Descending),
                 "OrderBy排序 用法2"
             );
 
             Print(
-                SqlBuilder.Select<UserInfo>()
-                          .OrderBy(u => new { u.Id, u.Email }),
+                SqlBuilder
+                    .Select<UserInfo>()
+                    .OrderBy(u => new { u.Id, u.Email }),
                 "OrderBy排序 用法3"
            );
             #endregion
 
             #region Max
             Print(
-                SqlBuilder.Max<UserInfo>(u => u.Id)
-                          .Where(o => o.Id == 3),
+                SqlBuilder
+                    .Max<UserInfo>(u =>
+                        u.Id)
+                    .Where(o =>
+                        o.Id == 3),
                 "返回一列中的最大值。NULL 值不包括在计算中。",
                 "Max"
             );
@@ -532,23 +706,29 @@ namespace SQLBuilder.Core
             );
             int id = 3;
             Print(
-                SqlBuilder.Delete<UserInfo>()
-                          .Where(u => u.Id == id),
+                SqlBuilder
+                    .Delete<UserInfo>()
+                    .Where(u => u.Id == id),
                 "根据where条件删除指定表记录"
             );
 
             Print(
-                SqlBuilder.Delete<UserInfo>().WithKey(2, 1),
+                SqlBuilder
+                    .Delete<UserInfo>()
+                    .WithKey(2, 1),
                 "根据主键条件删除指定表记录1"
             );
             Print(
-                SqlBuilder.Delete<UserInfo>().WithKey(new UserInfo { Id = 2, Sex = 1 }),
+                SqlBuilder
+                    .Delete<UserInfo>()
+                    .WithKey(new UserInfo { Id = 2, Sex = 1 }),
                 "根据主键条件删除指定表记录2"
             );
 
             Print(
-                SqlBuilder.Delete<UserInfo>()
-                          .Where(u => u.Id > 1 && u.Id < 3),
+                SqlBuilder
+                    .Delete<UserInfo>()
+                    .Where(u => u.Id > 1 && u.Id < 3),
                 "根据where条件删除指定表记录"
             );
             #endregion
@@ -567,8 +747,11 @@ namespace SQLBuilder.Core
             );
 
             Print(
-                SqlBuilder.Update<UserInfo>(() => new UserInfo { Sex = 1, Email = "123456@qq.com" })
-                          .Where(u => u.Id == 1),
+                SqlBuilder
+                    .Update<UserInfo>(() =>
+                        new UserInfo { Sex = 1, Email = "123456@qq.com" })
+                    .Where(u =>
+                        u.Id == 1),
                 "根据where条件更新指定表记录 用法1"
             );
 
@@ -578,39 +761,57 @@ namespace SQLBuilder.Core
                 Sex = 2
             };
             Print(
-                SqlBuilder.Update<UserInfo>(() => userInfo2)
-                          .Where(u => u.Id == 1),
+                SqlBuilder
+                    .Update<UserInfo>(() =>
+                        userInfo2)
+                    .Where(u =>
+                        u.Id == 1),
                 "根据where条件更新指定表记录 用法2-1"
             );
 
             Print(
-                SqlBuilder.Update<UserInfo>(() => userInfo2, isEnableNullValue: false)
-                          .Where(u => u.Id == 1),
+                SqlBuilder
+                    .Update<UserInfo>(() =>
+                        userInfo2, isEnableNullValue: false)
+                    .Where(u =>
+                        u.Id == 1),
                 "根据where条件更新指定表记录 用法2-2"
             );
 
             Print(
-                SqlBuilder.Update<UserInfo>(() => new { Sex = 1, Email = "123456@qq.com" }, DatabaseType.MySql)
-                          .Where(u => u.Id == 1),
+                SqlBuilder
+                    .Update<UserInfo>(() =>
+                        new { Sex = 1, Email = "123456@qq.com" }, DatabaseType.MySql)
+                    .Where(u =>
+                        u.Id == 1),
                 "根据where条件更新指定表记录 用法3"
             );
 
             Print(
-                SqlBuilder.Update<Class>(() => new { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
-                          .Where(u => u.CityId == 1),
+                SqlBuilder
+                    .Update<Class>(() =>
+                        new { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
+                    .Where(u =>
+                        u.CityId == 1),
                 "根据where条件更新指定表记录 用法4"
             );
 
             Print(
-                SqlBuilder.Update<Class>(() => new Class { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
-                          .Where(u => u.CityId == 1),
+                SqlBuilder
+                    .Update<Class>(() =>
+                        new Class { UserId = 1, Name = "123456@qq.com" }, DatabaseType.MySql)
+                    .Where(u =>
+                        u.CityId == 1),
                 "根据where条件更新指定表记录 用法5"
             );
 
             var classData = new { UserId = 1, Name = "123456@qq.com" };
             Print(
-                SqlBuilder.Update<Class>(() => classData, DatabaseType.MySql)
-                          .Where(u => u.CityId == 1),
+                SqlBuilder
+                    .Update<Class>(() =>
+                        classData, DatabaseType.MySql)
+                    .Where(u =>
+                        u.CityId == 1),
                 "根据where条件更新指定表记录 用法6"
             );
             #endregion

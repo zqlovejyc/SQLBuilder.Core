@@ -1940,15 +1940,17 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_76()
         {
+            var list = new[] { new { id = 1 }, new { id = 2 } };
             var id = "100";
             var builder = SqlBuilder
                             .Select<UserInfo>(u =>
                                 u.Name)
                             .Where(u =>
+                                list.Select(k => k.id).Contains(u.Id.Value) &&
                                 u.Id == int.Parse(id) ||
                                 (u.Id < 10 && u.Name.Equals("张三")));
-            Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE u.Id = @p__1 OR (u.Id < @p__2 AND u.Name = @p__3)", builder.Sql);
-            Assert.AreEqual(3, builder.Parameters.Count);
+            Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE (u.Id IN (@p__1) AND u.Id = @p__2) OR (u.Id < @p__3 AND u.Name = @p__4)", builder.Sql);
+            Assert.AreEqual(4, builder.Parameters.Count);
         }
 
         /// <summary>

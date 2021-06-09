@@ -43,6 +43,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
+        /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
         /// <param name="isInjectLoadBalancer">是否注入从库负载均衡，默认注入单例权重轮询方式(WeightRoundRobinLoadBalancer)，可以设置为false实现自定义方式</param>
         /// <param name="lifeTime">生命周期，默认单例</param>
         /// <returns></returns>
@@ -82,6 +83,7 @@ namespace SQLBuilder.Core.Extensions
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             string countSyntax = "COUNT(*)",
+            string connectionSection = "ConnectionStrings",
             bool isInjectLoadBalancer = true,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
@@ -99,7 +101,7 @@ namespace SQLBuilder.Core.Extensions
                 key = key.IsNullOrEmpty() ? defaultName : key;
 
                 //数据库配置
-                var configs = configuration.GetSection($"ConnectionStrings:{key}").Get<List<string>>();
+                var configs = configuration.GetSection($"{connectionSection}:{key}").Get<List<string>>();
 
                 //数据库类型
                 var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), configs[0]);

@@ -13,6 +13,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Delete_01()
         {
             var builder = SqlBuilder.Delete<UserInfo>();
+
             Assert.AreEqual("DELETE FROM Base_UserInfo", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
@@ -28,6 +29,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Delete<UserInfo>()
                             .Where(u =>
                                 u.Id == id);
+
             Assert.AreEqual("DELETE FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -43,6 +45,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(u =>
                                 u.Id > 1 &&
                                 u.Id < 3);
+
             Assert.AreEqual("DELETE FROM Base_UserInfo WHERE Id > @p__1 AND Id < @p__2", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
@@ -54,9 +57,11 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Delete_04()
         {
             var user = new UserInfo { Id = 2 };
+
             var builder = SqlBuilder
                             .Delete<UserInfo>()
                             .WithKey(user);
+
             Assert.AreEqual("DELETE FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
@@ -70,6 +75,7 @@ namespace SQLBuilder.Core.UnitTest
             var builder = SqlBuilder
                             .Delete<UserInfo>()
                             .WithKey(2);
+
             Assert.AreEqual("DELETE FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }

@@ -36,28 +36,29 @@ namespace SQLBuilder.Core.Expressions
         /// <summary>
         /// methods
         /// </summary>
-        private static readonly Dictionary<string, Action<MethodCallExpression, SqlWrapper>> methods = new Dictionary<string, Action<MethodCallExpression, SqlWrapper>>
-        {
-            ["Like"] = Like,
-            ["LikeLeft"] = LikeLeft,
-            ["LikeRight"] = LikeRight,
-            ["NotLike"] = NotLike,
-            ["In"] = SqlIn,
-            ["NotIn"] = NotIn,
-            ["Contains"] = Contains,
-            ["IsNullOrEmpty"] = IsNullOrEmpty,
-            ["Equals"] = Equals,
-            ["ToUpper"] = ToUpper,
-            ["ToLower"] = ToLower,
-            ["Trim"] = Trim,
-            ["TrimStart"] = TrimStart,
-            ["TrimEnd"] = TrimEnd,
-            ["Count"] = SqlCount,
-            ["Sum"] = SqlSum,
-            ["Avg"] = SqlAvg,
-            ["Max"] = SqlMax,
-            ["Min"] = SqlMin,
-        };
+        private static readonly Dictionary<string, Action<MethodCallExpression, SqlWrapper>> methods =
+            new()
+            {
+                ["Like"] = Like,
+                ["LikeLeft"] = LikeLeft,
+                ["LikeRight"] = LikeRight,
+                ["NotLike"] = NotLike,
+                ["In"] = SqlIn,
+                ["NotIn"] = NotIn,
+                ["Contains"] = Contains,
+                ["IsNullOrEmpty"] = IsNullOrEmpty,
+                ["Equals"] = Equals,
+                ["ToUpper"] = ToUpper,
+                ["ToLower"] = ToLower,
+                ["Trim"] = Trim,
+                ["TrimStart"] = TrimStart,
+                ["TrimEnd"] = TrimEnd,
+                ["Count"] = SqlCount,
+                ["Sum"] = SqlSum,
+                ["Avg"] = SqlAvg,
+                ["Max"] = SqlMax,
+                ["Min"] = SqlMin,
+            };
 
         /// <summary>
         /// In
@@ -493,39 +494,6 @@ namespace SQLBuilder.Core.Expressions
         }
 
         /// <summary>
-        /// SqlSelect
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
-        /// <param name="methodFormat">sql方法</param>
-        private static void SqlSelect(MethodCallExpression expression, SqlWrapper sqlWrapper, string methodFormat)
-        {
-            var expr = expression.Arguments[0];
-
-            var memberExpr = expr as MemberExpression;
-            if (memberExpr.IsNull() && expr is UnaryExpression unaryExpr)
-                memberExpr = unaryExpr.Operand as MemberExpression;
-
-            if (memberExpr != null)
-            {
-                var type = memberExpr.Expression.Type != memberExpr.Member.DeclaringType ?
-                           memberExpr.Expression.Type :
-                           memberExpr.Member.DeclaringType;
-
-                var tableName = sqlWrapper.GetTableName(type);
-                var parameter = memberExpr.Expression as ParameterExpression;
-                var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
-
-                if (tableAlias.IsNotNullOrEmpty())
-                    tableAlias += ".";
-
-                var field = string.Format(methodFormat, tableAlias + sqlWrapper.GetColumnInfo(memberExpr.Member.DeclaringType, memberExpr.Member).columnName);
-
-                SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
-            }
-        }
-
-        /// <summary>
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
@@ -634,6 +602,70 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+
+        /// <summary>
+        /// SqlSelect
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="methodFormat">sql方法</param>
+        private static void SqlSelect(MethodCallExpression expression, SqlWrapper sqlWrapper, string methodFormat)
+        {
+            var memberExpr = GetMemberExpression(expression);
+            if (memberExpr != null)
+            {
+                var type = memberExpr.Expression.Type != memberExpr.Member.DeclaringType ?
+                           memberExpr.Expression.Type :
+                           memberExpr.Member.DeclaringType;
+
+                var tableName = sqlWrapper.GetTableName(type);
+                var parameter = memberExpr.Expression as ParameterExpression;
+                var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+
+                if (tableAlias.IsNotNullOrEmpty())
+                    tableAlias += ".";
+
+                var columnName = tableAlias + sqlWrapper.GetColumnInfo(memberExpr.Member.DeclaringType, memberExpr.Member).columnName;
+
+                var field = string.Format(methodFormat, columnName);
+
+                SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
+            }
+        }
+
+        /// <summary>
+        /// 获取方法处理委托
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        private static Action<MethodCallExpression, SqlWrapper> GetMethodHandler(MethodCallExpression expression)
+        {
+            var method = expression.Method;
+            if (method.IsGenericMethod)
+                method = method.GetGenericMethodDefinition();
+
+            //匹配到方法
+            if (methods.TryGetValue(method.Name, out Action<MethodCallExpression, SqlWrapper> handler))
+                return handler;
+
+            return null;
+        }
+
+        /// <summary>
+        /// 获取MemberExpression
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        private static MemberExpression GetMemberExpression(MethodCallExpression expression)
+        {
+            var expr = expression.Arguments[0];
+
+            var memberExpr = expr as MemberExpression;
+            if (memberExpr.IsNull() && expr is UnaryExpression unaryExpr)
+                memberExpr = unaryExpr.Operand as MemberExpression;
+
+            return memberExpr;
+        }
         #endregion
 
         #region Override Base Class Methods
@@ -689,12 +721,8 @@ namespace SQLBuilder.Core.Expressions
             }
             catch
             {
-                var key = expression.Method;
-                if (key.IsGenericMethod)
-                    key = key.GetGenericMethodDefinition();
-
-                //匹配到方法
-                if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> handler))
+                var handler = GetMethodHandler(expression);
+                if (handler != null)
                 {
                     sqlWrapper.IsHavingSyntax = false;
                     handler(expression, sqlWrapper);
@@ -712,30 +740,22 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Where(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            var key = expression.Method;
-            if (key.IsGenericMethod)
-                key = key.GetGenericMethodDefinition();
-
-            //匹配到方法
-            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> handler))
-            {
+            var handler = GetMethodHandler(expression);
+            if (handler != null)
                 handler(expression, sqlWrapper);
-
-                return sqlWrapper;
-            }
             else
             {
                 try
                 {
                     sqlWrapper.AddDbParameter(expression.ToObject());
-
-                    return sqlWrapper;
                 }
                 catch
                 {
                     throw new NotImplementedException("无法解析方法" + expression.Method);
                 }
             }
+
+            return sqlWrapper;
         }
 
         /// <summary>
@@ -824,31 +844,28 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Having(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            var key = expression.Method;
-            if (key.IsGenericMethod)
-                key = key.GetGenericMethodDefinition();
+            var handler = GetMethodHandler(expression);
 
-            //匹配到方法
-            if (methods.TryGetValue(key.Name, out Action<MethodCallExpression, SqlWrapper> handler))
+            var memberExpr = GetMemberExpression(expression);
+
+            if (memberExpr?.Expression is ParameterExpression && handler != null)
             {
                 sqlWrapper.IsHavingSyntax = true;
                 handler(expression, sqlWrapper);
-
-                return sqlWrapper;
             }
             else
             {
                 try
                 {
                     sqlWrapper.AddDbParameter(expression.ToObject());
-
-                    return sqlWrapper;
                 }
                 catch
                 {
                     throw new NotImplementedException("无法解析方法" + expression.Method);
                 }
             }
+
+            return sqlWrapper;
         }
 
         /// <summary>

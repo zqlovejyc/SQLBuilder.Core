@@ -396,7 +396,7 @@ namespace SQLBuilder.Core.UnitTest
 
         #region Having
         /// <summary>
-        /// Having1
+        /// Having01
         /// </summary>
         [TestMethod]
         public void Test_Having_01()
@@ -414,6 +414,82 @@ namespace SQLBuilder.Core.UnitTest
                                 x.Name);
 
             Assert.AreEqual("SELECT x.Name,COUNT(x.Name) AS NameCount FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// Having02
+        /// </summary>
+        [TestMethod]
+        public void Test_Having_02()
+        {
+            var count = 3;
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(x =>
+                                new { x.Name, NameCount = x.Name.Count<int>() })
+                            .Where(o =>
+                                o.Id > 1)
+                            .GroupBy(u =>
+                                u.Name)
+                            .Having(x =>
+                                x.Name.Count<int>() > count)
+                            .OrderBy(x =>
+                                x.Name);
+
+            Assert.AreEqual("SELECT x.Name,COUNT(x.Name) AS NameCount FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// Having03
+        /// </summary>
+        [TestMethod]
+        public void Test_Having_03()
+        {
+            var list = new List<int> { 1, 2, 3 };
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(x =>
+                                new { x.Name, NameCount = x.Name.Count<int>() })
+                            .Where(o =>
+                                o.Id > 1)
+                            .GroupBy(u =>
+                                u.Name)
+                            .Having(x =>
+                                x.Name.Count<int>() > list.Last())
+                            .OrderBy(x =>
+                                x.Name);
+
+            Assert.AreEqual("SELECT x.Name,COUNT(x.Name) AS NameCount FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// Having04
+        /// </summary>
+        [TestMethod]
+        public void Test_Having_04()
+        {
+            var input = new[]
+            {
+                new { Id = 1 },
+                new { Id = 2 }
+            };
+
+            var builder = SqlBuilder
+                            .Select<Teacher, Class>((x, y) =>
+                                new { x.ClassId })
+                            .InnerJoin<Class>((x, y) =>
+                                x.ClassId == y.Id)
+                            .Where<Class>((x, y) =>
+                                input.Select(k => k.Id).Contains(x.ClassId))
+                            .GroupBy<Class>((x, y) =>
+                                x.ClassId)
+                            .Having(x =>
+                                x.ClassId.Count<int>() == input.Length);
+
+            Assert.AreEqual("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.ClassId IN (@p__1) GROUP BY x.ClassId HAVING COUNT(x.ClassId) = @p__2", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
         #endregion

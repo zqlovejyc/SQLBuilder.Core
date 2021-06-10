@@ -19,6 +19,7 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,9 +41,10 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Insert(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
             var fields = new List<string>();
-            if (expression.ToObject() is IEnumerable<object> array)
+            if (expression.ToObject() is IEnumerable collection)
             {
-                for (var i = 0; i < array.Count(); i++)
+                var i = 0;
+                foreach (var item in collection)
                 {
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                         sqlWrapper.Append("(");
@@ -50,7 +52,7 @@ namespace SQLBuilder.Core.Expressions
                     if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
                         sqlWrapper.Append(" UNION ALL SELECT ");
 
-                    var properties = array.ElementAt(i)?.GetType().GetProperties();
+                    var properties = item?.GetType().GetProperties();
                     foreach (var p in properties)
                     {
                         var type = p.DeclaringType.IsAnonymousType() ?
@@ -60,7 +62,7 @@ namespace SQLBuilder.Core.Expressions
                         var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
                         if (isInsert)
                         {
-                            var value = p.GetValue(array.ElementAt(i), null);
+                            var value = p.GetValue(item, null);
                             if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                             {
                                 sqlWrapper.AddDbParameter(value);
@@ -79,6 +81,8 @@ namespace SQLBuilder.Core.Expressions
                         else
                             sqlWrapper.Append(" FROM DUAL");
                     }
+
+                    i++;
                 }
 
                 if (sqlWrapper[sqlWrapper.Length - 1] == ',')
@@ -98,13 +102,13 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper GroupBy(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
-            var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
-            if (array != null)
+            if (expression.ToObject() is IEnumerable collection)
             {
-                for (var i = 0; i < array.Count; i++)
+                foreach (var item in collection)
                 {
-                    SqlExpressionProvider.GroupBy(Expression.Constant(array[i]), sqlWrapper);
+                    SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
                 }
+
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 
@@ -120,20 +124,24 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper OrderBy(ListInitExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
-            var array = (expression.ToObject() as IEnumerable<object>)?.ToList();
-            if (array != null)
+            if (expression.ToObject() is IEnumerable collection)
             {
-                for (var i = 0; i < array.Count; i++)
+                var i = 0;
+
+                foreach (var item in collection)
                 {
-                    SqlExpressionProvider.OrderBy(Expression.Constant(array[i]), sqlWrapper);
+                    SqlExpressionProvider.OrderBy(Expression.Constant(item), sqlWrapper);
 
                     if (i <= orders.Length - 1)
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                    else if (!array[i].ToString().ContainsIgnoreCase("ASC", "DESC"))
+                    else if (!item.ToString().ContainsIgnoreCase("ASC", "DESC"))
                         sqlWrapper += " ASC,";
                     else
                         sqlWrapper += ",";
+
+                    i++;
                 }
+
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 

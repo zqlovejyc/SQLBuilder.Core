@@ -41,15 +41,15 @@ namespace SQLBuilder.Core.Expressions
         {
             var objectArray = new List<object>();
             var fields = new List<string>();
-            var obj = expression.ToObject();
+            var convertRes = expression.ToObject();
 
-            if (obj is IEnumerable array)
-                foreach (var item in array)
+            if (convertRes is IEnumerable collection)
+                foreach (var item in collection)
                 {
                     objectArray.Add(item);
                 }
             else
-                objectArray.Add(obj);
+                objectArray.Add(convertRes);
 
             for (var i = 0; i < objectArray.Count; i++)
             {
@@ -106,8 +106,8 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Update(MemberExpression expression, SqlWrapper sqlWrapper)
         {
-            var obj = expression.ToObject();
-            var properties = obj?.GetType().GetProperties();
+            var convertRes = expression.ToObject();
+            var properties = convertRes?.GetType().GetProperties();
 
             if (properties.IsNotNullOrEmpty())
             {
@@ -120,7 +120,7 @@ namespace SQLBuilder.Core.Expressions
                     var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, item);
                     if (isUpdate)
                     {
-                        var value = item.GetValue(obj, null);
+                        var value = item.GetValue(convertRes, null);
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
                             sqlWrapper += columnName + " = ";
@@ -318,11 +318,11 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper In(MemberExpression expression, SqlWrapper sqlWrapper)
         {
-            var obj = expression.ToObject();
-            if (obj is IEnumerable array)
+            var convertRes = expression.ToObject();
+            if (convertRes is IEnumerable collection)
             {
                 sqlWrapper += "(";
-                foreach (var item in array)
+                foreach (var item in collection)
                 {
                     SqlExpressionProvider.In(Expression.Constant(item), sqlWrapper);
                     sqlWrapper += ",";
@@ -370,12 +370,12 @@ namespace SQLBuilder.Core.Expressions
 
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
-                var obj = expression.ToObject();
-                if (obj != null)
+                var convertRes = expression.ToObject();
+                if (convertRes != null)
                 {
-                    var type = obj.GetType();
+                    var type = convertRes.GetType();
 
-                    if (typeof(string[]) == type && obj is string[] array)
+                    if (typeof(string[]) == type && convertRes is string[] array)
                     {
                         foreach (var item in array)
                         {
@@ -384,7 +384,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(List<string>) == type && obj is List<string> list)
+                    if (typeof(List<string>) == type && convertRes is List<string> list)
                     {
                         foreach (var item in list)
                         {
@@ -393,7 +393,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(string) == type && obj is string str)
+                    if (typeof(string) == type && convertRes is string str)
                     {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str), sqlWrapper);
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
@@ -481,12 +481,12 @@ namespace SQLBuilder.Core.Expressions
 
             if (expression.Expression.NodeType == ExpressionType.Constant)
             {
-                var obj = expression.ToObject();
-                if (obj != null)
+                var convertRes = expression.ToObject();
+                if (convertRes != null)
                 {
-                    var type = obj.GetType();
+                    var type = convertRes.GetType();
 
-                    if (typeof(string[]) == type && obj is string[] array)
+                    if (typeof(string[]) == type && convertRes is string[] array)
                     {
                         for (var i = 0; i < array.Length; i++)
                         {
@@ -502,7 +502,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(List<string>) == type && obj is List<string> list)
+                    if (typeof(List<string>) == type && convertRes is List<string> list)
                     {
                         for (var i = 0; i < list.Count; i++)
                         {
@@ -518,7 +518,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(string) == type && obj is string str)
+                    if (typeof(string) == type && convertRes is string str)
                     {
                         SqlExpressionProvider.OrderBy(Expression.Constant(str), sqlWrapper);
                         if (!str.ContainsIgnoreCase("ASC", "DESC"))

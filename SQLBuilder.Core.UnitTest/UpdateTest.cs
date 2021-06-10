@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
+using System.Linq;
 
 namespace SQLBuilder.Core.UnitTest
 {
@@ -191,6 +192,28 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("UPDATE `Base_UserInfo` SET `Sex` = ?p__1,`Name` = ?p__2 WHERE `Id` = ?p__3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 修改10
+        /// </summary>
+        [TestMethod]
+        public void Test_Update_10()
+        {
+            var ids = new[] { 1, 2, 3, 4, 5 };
+
+            var builder = SqlBuilder
+                            .Update<UserInfo>(() =>
+                                new UserInfo
+                                {
+                                    Sex = 1,
+                                    Email = "123456@qq.com"
+                                })
+                            .Where(u =>
+                                ids.Contains(u.Id.Value));
+
+            Assert.AreEqual("UPDATE Base_UserInfo SET Sex = @p__1,Email = @p__2 WHERE Id IN (@p__3,@p__4,@p__5,@p__6,@p__7)", builder.Sql);
+            Assert.AreEqual(7, builder.Parameters.Count);
         }
     }
 }

@@ -21,7 +21,6 @@ using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
@@ -40,10 +39,11 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Insert(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
-            var fields = new List<string>();
             if (expression.ToObject() is IEnumerable collection)
             {
                 var i = 0;
+                var fields = new List<string>();
+
                 foreach (var item in collection)
                 {
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)

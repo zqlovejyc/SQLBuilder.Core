@@ -373,27 +373,17 @@ namespace SQLBuilder.Core.Expressions
                 var convertRes = expression.ToObject();
                 if (convertRes != null)
                 {
-                    var type = convertRes.GetType();
-
-                    if (typeof(string[]) == type && convertRes is string[] array)
+                    if (convertRes is IList collection)
                     {
-                        foreach (var item in array)
+                        foreach (var item in collection)
                         {
                             SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
                         }
+
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(List<string>) == type && convertRes is List<string> list)
-                    {
-                        foreach (var item in list)
-                        {
-                            SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
-                        }
-                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
-                    }
-
-                    if (typeof(string) == type && convertRes is string str)
+                    if (typeof(string) == convertRes.GetType() && convertRes is string str)
                     {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str), sqlWrapper);
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
@@ -484,43 +474,31 @@ namespace SQLBuilder.Core.Expressions
                 var convertRes = expression.ToObject();
                 if (convertRes != null)
                 {
-                    var type = convertRes.GetType();
-
-                    if (typeof(string[]) == type && convertRes is string[] array)
+                    if (convertRes is IList collection)
                     {
-                        for (var i = 0; i < array.Length; i++)
+                        var i = 0;
+
+                        foreach (var item in collection)
                         {
-                            SqlExpressionProvider.OrderBy(Expression.Constant(array[i]), sqlWrapper);
+                            SqlExpressionProvider.OrderBy(Expression.Constant(item), sqlWrapper);
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!array[i].ContainsIgnoreCase("ASC", "DESC"))
+                            else if (item.ToString().ContainsIgnoreCase("ASC", "DESC") == false)
                                 sqlWrapper += " ASC,";
                             else
                                 sqlWrapper += ",";
+
+                            i++;
                         }
+
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
-                    if (typeof(List<string>) == type && convertRes is List<string> list)
-                    {
-                        for (var i = 0; i < list.Count; i++)
-                        {
-                            SqlExpressionProvider.OrderBy(Expression.Constant(list[i]), sqlWrapper);
-
-                            if (i <= orders.Length - 1)
-                                sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
-                            else if (!list[i].ContainsIgnoreCase("ASC", "DESC"))
-                                sqlWrapper += " ASC,";
-                            else
-                                sqlWrapper += ",";
-                        }
-                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
-                    }
-
-                    if (typeof(string) == type && convertRes is string str)
+                    if (typeof(string) == convertRes.GetType() && convertRes is string str)
                     {
                         SqlExpressionProvider.OrderBy(Expression.Constant(str), sqlWrapper);
+
                         if (!str.ContainsIgnoreCase("ASC", "DESC"))
                         {
                             if (orders.Length >= 1)

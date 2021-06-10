@@ -35,19 +35,19 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Insert(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var objectArray = new List<object>();
             var fields = new List<string>();
             var obj = expression.ToObject();
-            var objType = obj.GetType();
 
-            if (objType.IsArray)
-                objectArray.AddRange(obj as object[]);
-            else if (objType.AssignableTo(typeof(IEnumerable<>)))
-                objectArray.AddRange(obj as IEnumerable<object>);
+            if (obj is IEnumerable array)
+                foreach (var item in array)
+                {
+                    objectArray.Add(item);
+                }
             else
                 objectArray.Add(obj);
 
@@ -102,28 +102,31 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Update(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var obj = expression.ToObject();
             var properties = obj?.GetType().GetProperties();
 
-            foreach (var item in properties)
+            if (properties.IsNotNullOrEmpty())
             {
-                var type = item.DeclaringType.IsAnonymousType() ?
-                    sqlWrapper.DefaultType :
-                    item.DeclaringType;
-
-                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, item);
-                if (isUpdate)
+                foreach (var item in properties)
                 {
-                    var value = item.GetValue(obj, null);
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    var type = item.DeclaringType.IsAnonymousType() ?
+                        sqlWrapper.DefaultType :
+                        item.DeclaringType;
+
+                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, item);
+                    if (isUpdate)
                     {
-                        sqlWrapper += columnName + " = ";
-                        sqlWrapper.AddDbParameter(value);
-                        sqlWrapper += ",";
+                        var value = item.GetValue(obj, null);
+                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                        {
+                            sqlWrapper += columnName + " = ";
+                            sqlWrapper.AddDbParameter(value);
+                            sqlWrapper += ",";
+                        }
                     }
                 }
             }
@@ -138,7 +141,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -162,7 +165,7 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Join(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -186,7 +189,7 @@ namespace SQLBuilder.Core.Expressions
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -203,7 +206,7 @@ namespace SQLBuilder.Core.Expressions
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -220,7 +223,7 @@ namespace SQLBuilder.Core.Expressions
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -237,7 +240,7 @@ namespace SQLBuilder.Core.Expressions
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -254,7 +257,7 @@ namespace SQLBuilder.Core.Expressions
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -271,7 +274,7 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Where(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -311,7 +314,7 @@ namespace SQLBuilder.Core.Expressions
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper In(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -338,7 +341,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper GroupBy(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -376,7 +379,7 @@ namespace SQLBuilder.Core.Expressions
                     {
                         foreach (var item in array)
                         {
-                            SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
+                            SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
                         }
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
@@ -385,14 +388,14 @@ namespace SQLBuilder.Core.Expressions
                     {
                         foreach (var item in list)
                         {
-                            SqlExpressionProvider.GroupBy(Expression.Constant(item, item.GetType()), sqlWrapper);
+                            SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
                         }
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (typeof(string) == type && obj is string str)
                     {
-                        SqlExpressionProvider.GroupBy(Expression.Constant(str, str.GetType()), sqlWrapper);
+                        SqlExpressionProvider.GroupBy(Expression.Constant(str), sqlWrapper);
                         sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
                 }
@@ -405,7 +408,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Having(MemberExpression expression, SqlWrapper sqlWrapper)
         {
@@ -445,7 +448,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper OrderBy(MemberExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
@@ -487,7 +490,7 @@ namespace SQLBuilder.Core.Expressions
                     {
                         for (var i = 0; i < array.Length; i++)
                         {
-                            SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
+                            SqlExpressionProvider.OrderBy(Expression.Constant(array[i]), sqlWrapper);
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
@@ -503,7 +506,7 @@ namespace SQLBuilder.Core.Expressions
                     {
                         for (var i = 0; i < list.Count; i++)
                         {
-                            SqlExpressionProvider.OrderBy(Expression.Constant(list[i], list[i].GetType()), sqlWrapper);
+                            SqlExpressionProvider.OrderBy(Expression.Constant(list[i]), sqlWrapper);
 
                             if (i <= orders.Length - 1)
                                 sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
@@ -517,7 +520,7 @@ namespace SQLBuilder.Core.Expressions
 
                     if (typeof(string) == type && obj is string str)
                     {
-                        SqlExpressionProvider.OrderBy(Expression.Constant(str, str.GetType()), sqlWrapper);
+                        SqlExpressionProvider.OrderBy(Expression.Constant(str), sqlWrapper);
                         if (!str.ContainsIgnoreCase("ASC", "DESC"))
                         {
                             if (orders.Length >= 1)

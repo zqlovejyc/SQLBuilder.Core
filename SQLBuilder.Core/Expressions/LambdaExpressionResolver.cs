@@ -31,7 +31,7 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Where(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
@@ -44,7 +44,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Having(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
@@ -57,7 +57,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(LambdaExpression expression, SqlWrapper sqlWrapper)
         {
@@ -70,7 +70,7 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Join(LambdaExpression expression, SqlWrapper sqlWrapper)
         {

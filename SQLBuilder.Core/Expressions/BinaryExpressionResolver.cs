@@ -34,7 +34,7 @@ namespace SQLBuilder.Core.Expressions
         /// </summary>
         /// <param name="expressionNodeType">表达式树节点类型</param>
         /// <param name="operatorIndex">操作符索引</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="useIs">是否使用is</param>
         public static void OperatorResolver(ExpressionType expressionNodeType, int operatorIndex, SqlWrapper sqlWrapper, bool useIs = false)
         {
@@ -91,6 +91,60 @@ namespace SQLBuilder.Core.Expressions
                     throw new NotImplementedException("NotImplemented ExpressionType " + expressionNodeType);
             }
         }
+
+        /// <summary>
+        /// BinaryExpression嵌套解析
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <param name="isJoin">是否为Join逻辑</param>
+        public static int ExpressionNestedResolver(BinaryExpression expression, SqlWrapper sqlWrapper, bool isJoin)
+        {
+            //左侧嵌套
+            var lExpr = expression.Left as BinaryExpression;
+
+            var llIsBinaryExpr = lExpr?.Left is BinaryExpression;
+            var llIsBoolMethod = typeof(bool) == (lExpr?.Left as MethodCallExpression)?.Method.ReturnType;
+
+            var lrIsBinaryExpr = lExpr?.Right is BinaryExpression;
+            var lrIsBoolMethod = typeof(bool) == (lExpr?.Right as MethodCallExpression)?.Method.ReturnType;
+
+            var lNested = (llIsBinaryExpr || llIsBoolMethod) && (lrIsBinaryExpr || lrIsBoolMethod);
+
+            if (lNested)
+                sqlWrapper += "(";
+
+            if (isJoin)
+                SqlExpressionProvider.Join(expression.Left, sqlWrapper);
+            else
+                SqlExpressionProvider.Where(expression.Left, sqlWrapper);
+
+            if (lNested)
+                sqlWrapper += ")";
+
+            var operatorIndex = sqlWrapper.Length;
+
+            //右侧嵌套
+            var rExpr = expression.Right as BinaryExpression;
+
+            var rlIsBinaryExpr = rExpr?.Left is BinaryExpression;
+            var rlIsBoolMethod = typeof(bool) == (rExpr?.Left as MethodCallExpression)?.Method.ReturnType;
+
+            var rrIsBinaryExpr = rExpr?.Right is BinaryExpression;
+            var rrIsBoolMethod = typeof(bool) == (rExpr?.Right as MethodCallExpression)?.Method.ReturnType;
+
+            var rNested = (rlIsBinaryExpr || rlIsBoolMethod) && (rrIsBinaryExpr || rrIsBoolMethod);
+
+            if (rNested)
+                sqlWrapper += "(";
+
+            SqlExpressionProvider.Where(expression.Right, sqlWrapper);
+
+            if (rNested)
+                sqlWrapper += ")";
+
+            return operatorIndex;
+        }
         #endregion
 
         #region Override Base Class Methods
@@ -98,7 +152,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
@@ -113,43 +167,12 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Join(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
-            //左侧嵌套
-            var leftBinary = expression.Left as BinaryExpression;
-            var isBinaryLeft = leftBinary?.Left is BinaryExpression;
-            var isBoolMethodCallLeft = (leftBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var isBinaryRight = leftBinary?.Right is BinaryExpression;
-            var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
-
-            if (leftNested)
-                sqlWrapper += "(";
-
-            SqlExpressionProvider.Join(expression.Left, sqlWrapper);
-
-            if (leftNested)
-                sqlWrapper += ")";
-
-            var operatorIndex = sqlWrapper.Length;
-
-            //右侧嵌套
-            var rightBinary = expression.Right as BinaryExpression;
-            isBinaryLeft = rightBinary?.Left is BinaryExpression;
-            isBoolMethodCallLeft = (rightBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            isBinaryRight = rightBinary?.Right is BinaryExpression;
-            isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
-
-            if (rightNested)
-                sqlWrapper += "(";
-
-            SqlExpressionProvider.Where(expression.Right, sqlWrapper);
-
-            if (rightNested)
-                sqlWrapper += ")";
+            //嵌套解析
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, true);
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
@@ -170,57 +193,26 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Where(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
             var startIndex = sqlWrapper.Length;
 
-            //左侧嵌套
-            var leftBinary = expression.Left as BinaryExpression;
-            var isBinaryLeft = leftBinary?.Left is BinaryExpression;
-            var isBoolMethodCallLeft = (leftBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var isBinaryRight = leftBinary?.Right is BinaryExpression;
-            var isBoolMethodCallRight = (leftBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var leftNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
-
-            if (leftNested)
-                sqlWrapper += "(";
-
-            SqlExpressionProvider.Where(expression.Left, sqlWrapper);
-
-            if (leftNested)
-                sqlWrapper += ")";
-
-            var operatorIndex = sqlWrapper.Length;
-
-            //右侧嵌套
-            var rightBinary = expression.Right as BinaryExpression;
-            isBinaryLeft = rightBinary?.Left is BinaryExpression;
-            isBoolMethodCallLeft = (rightBinary?.Left as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            isBinaryRight = rightBinary?.Right is BinaryExpression;
-            isBoolMethodCallRight = (rightBinary?.Right as MethodCallExpression)?.Method.ReturnType == typeof(bool);
-            var rightNested = (isBinaryLeft || isBoolMethodCallLeft) && (isBinaryRight || isBoolMethodCallRight);
-
-            if (rightNested)
-                sqlWrapper += "(";
-
-            SqlExpressionProvider.Where(expression.Right, sqlWrapper);
-
-            if (rightNested)
-                sqlWrapper += ")";
+            //嵌套解析
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, false);
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
-            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
+            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool left && left))
             {
                 //若表达式右侧为bool类型，且为false时，条件取非
-                if ((expression.Right.NodeType == ExpressionType.Constant
-                    || (expression.Right.NodeType == ExpressionType.Convert
-                    && expression.Right is UnaryExpression unary
-                    && unary.Operand.NodeType == ExpressionType.Constant))
-                    && expression.Right.ToObject() is bool r)
+                if ((expression.Right.NodeType == ExpressionType.Constant ||
+                    (expression.Right.NodeType == ExpressionType.Convert &&
+                    expression.Right is UnaryExpression unary &&
+                    unary.Operand.NodeType == ExpressionType.Constant)) &&
+                    expression.Right.ToObject() is bool res)
                 {
-                    if (!r)
+                    if (!res)
                     {
                         var subString = sqlWrapper.Substring(startIndex, sqlWrapper.Length - startIndex);
 
@@ -326,8 +318,8 @@ namespace SQLBuilder.Core.Expressions
                 else
                 {
                     OperatorResolver(
-                        expression.NodeType, 
-                        operatorIndex, 
+                        expression.NodeType,
+                        operatorIndex,
                         sqlWrapper,
                         sqlWrapper.EndsWith("NULL"));
                 }
@@ -340,7 +332,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
@@ -351,12 +343,12 @@ namespace SQLBuilder.Core.Expressions
             SqlExpressionProvider.Having(expression.Right, sqlWrapper);
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
-            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
+            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool res && res))
             {
                 OperatorResolver(
                     expression.NodeType,
                     operatorIndex,
-                    sqlWrapper, 
+                    sqlWrapper,
                     sqlWrapper.EndsWith("NULL"));
             }
 

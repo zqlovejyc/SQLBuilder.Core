@@ -32,7 +32,7 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Update(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Insert(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -52,7 +52,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper Select(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -62,7 +62,7 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper Join(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -72,7 +72,7 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper Where(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -82,7 +82,7 @@ namespace SQLBuilder.Core.Expressions
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper In(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -92,7 +92,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper GroupBy(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -102,7 +102,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns></returns>
         SqlWrapper Having(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -112,7 +112,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序类型</param>
         /// <returns></returns>
         SqlWrapper OrderBy(Expression expression, SqlWrapper sqlWrapper, params OrderType[] orders);
@@ -123,7 +123,7 @@ namespace SQLBuilder.Core.Expressions
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Max(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -133,7 +133,7 @@ namespace SQLBuilder.Core.Expressions
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Min(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -143,7 +143,7 @@ namespace SQLBuilder.Core.Expressions
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Avg(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -153,7 +153,7 @@ namespace SQLBuilder.Core.Expressions
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Count(Expression expression, SqlWrapper sqlWrapper);
         #endregion
@@ -163,7 +163,7 @@ namespace SQLBuilder.Core.Expressions
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         SqlWrapper Sum(Expression expression, SqlWrapper sqlWrapper);
         #endregion

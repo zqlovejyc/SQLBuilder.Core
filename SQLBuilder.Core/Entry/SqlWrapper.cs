@@ -187,7 +187,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 操作符
         /// </summary>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="sql">sql语句</param>
         /// <returns>SqlWrapper</returns>
         public static SqlWrapper operator +(SqlWrapper sqlWrapper, string sql)
@@ -199,7 +199,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 操作符
         /// </summary>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="sql">sql语句</param>
         /// <returns>SqlWrapper</returns>
         public static SqlWrapper operator +(SqlWrapper sqlWrapper, object sql)

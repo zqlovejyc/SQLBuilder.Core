@@ -35,7 +35,7 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Update(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -69,7 +69,7 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Insert(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -116,7 +116,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -196,7 +196,7 @@ namespace SQLBuilder.Core.Expressions
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Count(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -220,7 +220,7 @@ namespace SQLBuilder.Core.Expressions
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Sum(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -240,7 +240,7 @@ namespace SQLBuilder.Core.Expressions
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Max(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -260,7 +260,7 @@ namespace SQLBuilder.Core.Expressions
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Min(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -280,7 +280,7 @@ namespace SQLBuilder.Core.Expressions
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Avg(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -300,7 +300,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper GroupBy(NewExpression expression, SqlWrapper sqlWrapper)
         {
@@ -319,7 +319,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper OrderBy(NewExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)

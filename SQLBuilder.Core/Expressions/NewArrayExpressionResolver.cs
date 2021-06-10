@@ -33,7 +33,7 @@ namespace SQLBuilder.Core.Expressions
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper In(NewArrayExpression expression, SqlWrapper sqlWrapper)
         {
@@ -56,11 +56,11 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Insert(NewArrayExpression expression, SqlWrapper sqlWrapper)
         {
-            foreach (Expression expressionItem in expression.Expressions)
+            foreach (var expressionItem in expression.Expressions)
             {
                 SqlExpressionProvider.Insert(expressionItem, sqlWrapper);
                 if (sqlWrapper.DatabaseType == DatabaseType.Oracle)
@@ -82,7 +82,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper GroupBy(NewArrayExpression expression, SqlWrapper sqlWrapper)
         {
@@ -100,7 +100,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper OrderBy(NewArrayExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)

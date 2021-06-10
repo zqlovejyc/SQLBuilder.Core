@@ -34,7 +34,7 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Update(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Update");
 
@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Insert(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Insert");
 
@@ -50,7 +50,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Select(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Select");
 
@@ -58,7 +58,7 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Join(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Join");
 
@@ -66,7 +66,7 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Where(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Where");
 
@@ -74,7 +74,7 @@ namespace SQLBuilder.Core.Expressions
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper In(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression In");
 
@@ -82,7 +82,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper GroupBy(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression GroupBy");
 
@@ -90,7 +90,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Having(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Having");
 
@@ -98,7 +98,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper OrderBy(T expression, SqlWrapper sqlWrapper, params OrderType[] orders) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression OrderBy");
@@ -107,7 +107,7 @@ namespace SQLBuilder.Core.Expressions
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Max(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Max");
 
@@ -115,7 +115,7 @@ namespace SQLBuilder.Core.Expressions
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Min(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Min");
 
@@ -123,7 +123,7 @@ namespace SQLBuilder.Core.Expressions
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Avg(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Avg");
 
@@ -131,7 +131,7 @@ namespace SQLBuilder.Core.Expressions
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Count(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Count");
 
@@ -139,7 +139,7 @@ namespace SQLBuilder.Core.Expressions
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public virtual SqlWrapper Sum(T expression, SqlWrapper sqlWrapper) => throw new NotImplementedException("NotImplemented " + typeof(T).Name + "IExpression Sum");
         #endregion
@@ -149,7 +149,7 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Update(Expression expression, SqlWrapper sqlWrapper) => this.Update((T)expression, sqlWrapper);
 
@@ -157,7 +157,7 @@ namespace SQLBuilder.Core.Expressions
         /// Update
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Insert(Expression expression, SqlWrapper sqlWrapper) => this.Insert((T)expression, sqlWrapper);
 
@@ -165,7 +165,7 @@ namespace SQLBuilder.Core.Expressions
         /// Select
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Select(Expression expression, SqlWrapper sqlWrapper) => this.Select((T)expression, sqlWrapper);
 
@@ -173,7 +173,7 @@ namespace SQLBuilder.Core.Expressions
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Join(Expression expression, SqlWrapper sqlWrapper) => this.Join((T)expression, sqlWrapper);
 
@@ -181,7 +181,7 @@ namespace SQLBuilder.Core.Expressions
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Where(Expression expression, SqlWrapper sqlWrapper) => this.Where((T)expression, sqlWrapper);
 
@@ -189,7 +189,7 @@ namespace SQLBuilder.Core.Expressions
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper In(Expression expression, SqlWrapper sqlWrapper) => this.In((T)expression, sqlWrapper);
 
@@ -197,7 +197,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper GroupBy(Expression expression, SqlWrapper sqlWrapper) => this.GroupBy((T)expression, sqlWrapper);
 
@@ -205,7 +205,7 @@ namespace SQLBuilder.Core.Expressions
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Having(Expression expression, SqlWrapper sqlWrapper) => this.Having((T)expression, sqlWrapper);
 
@@ -213,7 +213,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper OrderBy(Expression expression, SqlWrapper sqlWrapper, params OrderType[] orders) => this.OrderBy((T)expression, sqlWrapper, orders);
@@ -222,7 +222,7 @@ namespace SQLBuilder.Core.Expressions
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Max(Expression expression, SqlWrapper sqlWrapper) => this.Max((T)expression, sqlWrapper);
 
@@ -230,7 +230,7 @@ namespace SQLBuilder.Core.Expressions
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Min(Expression expression, SqlWrapper sqlWrapper) => this.Min((T)expression, sqlWrapper);
 
@@ -238,7 +238,7 @@ namespace SQLBuilder.Core.Expressions
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Avg(Expression expression, SqlWrapper sqlWrapper) => this.Avg((T)expression, sqlWrapper);
 
@@ -246,7 +246,7 @@ namespace SQLBuilder.Core.Expressions
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Count(Expression expression, SqlWrapper sqlWrapper) => this.Count((T)expression, sqlWrapper);
 
@@ -254,7 +254,7 @@ namespace SQLBuilder.Core.Expressions
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public SqlWrapper Sum(Expression expression, SqlWrapper sqlWrapper) => this.Sum((T)expression, sqlWrapper);
         #endregion

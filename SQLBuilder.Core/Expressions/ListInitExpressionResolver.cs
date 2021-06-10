@@ -35,7 +35,7 @@ namespace SQLBuilder.Core.Expressions
         /// Insert
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Insert(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
@@ -94,7 +94,7 @@ namespace SQLBuilder.Core.Expressions
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
 		public override SqlWrapper GroupBy(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
@@ -103,7 +103,7 @@ namespace SQLBuilder.Core.Expressions
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlExpressionProvider.GroupBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
+                    SqlExpressionProvider.GroupBy(Expression.Constant(array[i]), sqlWrapper);
                 }
                 sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
@@ -115,7 +115,7 @@ namespace SQLBuilder.Core.Expressions
         /// OrderBy
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql打包对象</param>
+        /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper OrderBy(ListInitExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
@@ -125,7 +125,7 @@ namespace SQLBuilder.Core.Expressions
             {
                 for (var i = 0; i < array.Count; i++)
                 {
-                    SqlExpressionProvider.OrderBy(Expression.Constant(array[i], array[i].GetType()), sqlWrapper);
+                    SqlExpressionProvider.OrderBy(Expression.Constant(array[i]), sqlWrapper);
 
                     if (i <= orders.Length - 1)
                         sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";

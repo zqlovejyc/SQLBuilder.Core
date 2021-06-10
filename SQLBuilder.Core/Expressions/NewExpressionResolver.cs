@@ -128,14 +128,16 @@ namespace SQLBuilder.Core.Expressions
                     var member = expression.Members[i];
                     SqlExpressionProvider.Select(argument, sqlWrapper);
 
-                    var fieldName = sqlWrapper
-                        .SelectFields[sqlWrapper.FieldCount - 1]
-                        .Split('.')
-                        .LastOrDefault()?
-                        .Replace("[", "")
-                        .Replace("]", "")
-                        .Replace("\"", "")
-                        .Replace("`", "");
+                    var fieldName = sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1];
+
+                    if (fieldName.IsNotNullOrEmpty() && !fieldName.Contains("(", ")") && fieldName.Contains("."))
+                        fieldName = fieldName
+                            .Split('.')
+                            .LastOrDefault()?
+                            .Replace("[", "")
+                            .Replace("]", "")
+                            .Replace("\"", "")
+                            .Replace("`", "");
 
                     //添加字段别名
                     if (argument is MemberExpression memberExpression)
@@ -160,7 +162,9 @@ namespace SQLBuilder.Core.Expressions
                     }
                     else if (argument is MethodCallExpression methodCallExpression)
                     {
-                        var agrumentName = methodCallExpression.ToObject()?.ToString();
+                        var agrumentName = methodCallExpression.ToObject<string>(out var res);
+                        if (!res)
+                            agrumentName = sqlWrapper.SelectFields.LastOrDefault();
 
                         if (agrumentName != member.Name)
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(member.Name)}";

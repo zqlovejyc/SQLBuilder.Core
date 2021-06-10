@@ -403,7 +403,7 @@ namespace SQLBuilder.Core.UnitTest
         {
             var builder = SqlBuilder
                             .Select<UserInfo>(x =>
-                                x.Name)
+                                new { x.Name, NameCount = x.Name.Count<int>() })
                             .Where(o =>
                                 o.Id > 1)
                             .GroupBy(u =>
@@ -413,7 +413,7 @@ namespace SQLBuilder.Core.UnitTest
                             .OrderBy(x =>
                                 x.Name);
 
-            Assert.AreEqual("SELECT x.Name FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
+            Assert.AreEqual("SELECT x.Name,COUNT(x.Name) AS NameCount FROM Base_UserInfo AS x WHERE x.Id > @p__1 GROUP BY x.Name HAVING COUNT(x.Name) > @p__2 ORDER BY x.Name", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
         #endregion
@@ -740,7 +740,7 @@ namespace SQLBuilder.Core.UnitTest
         public void Test_Select_Top_03()
         {
             var builder = SqlBuilder
-                            .Select<UserInfo>(u => 
+                            .Select<UserInfo>(u =>
                                 new { u.Id, u.Name }, DatabaseType.Oracle)
                             .OrderBy(x =>
                                 x.Name)
@@ -1005,7 +1005,7 @@ namespace SQLBuilder.Core.UnitTest
                                 new { u.Id, a.Name })
                             .Join<Account>((u, a) =>
                                 u.Id == a.UserId &&
-                                (u.Email == "111" || 
+                                (u.Email == "111" ||
                                 u.Email == "222"));
 
             Assert.AreEqual("SELECT u.Id,a.Name FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId AND (u.Email = @p__1 OR u.Email = @p__2)", builder.Sql);
@@ -1951,7 +1951,7 @@ namespace SQLBuilder.Core.UnitTest
                                 new { u })
                             .Join<Account>((u, a) =>
                                 u.Id == a.UserId &&
-                                (u.Email == "111" || 
+                                (u.Email == "111" ||
                                 u.Email == "222"));
 
             Assert.AreEqual("SELECT u.* FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId AND (u.Email = @p__1 OR u.Email = @p__2)", builder.Sql);
@@ -1969,7 +1969,7 @@ namespace SQLBuilder.Core.UnitTest
                                 "u.*")
                             .Join<Account>((u, a) =>
                                 u.Id == a.UserId &&
-                                (u.Email == "111" || 
+                                (u.Email == "111" ||
                                 u.Email == "222"));
 
             Assert.AreEqual("SELECT u.* FROM Base_UserInfo AS u JOIN Base_Account AS a ON u.Id = a.UserId AND (u.Email = @p__1 OR u.Email = @p__2)", builder.Sql);
@@ -2055,7 +2055,7 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Name)
                             .Where(u =>
                                 u.Id > 1000 ||
-                                (u.Id < 10 && 
+                                (u.Id < 10 &&
                                 u.Name.Equals("张三")));
 
             Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE u.Id > @p__1 OR (u.Id < @p__2 AND u.Name = @p__3)", builder.Sql);
@@ -2072,7 +2072,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Select<UserInfo>(u =>
                                 u.Name)
                             .Where(u =>
-                                (u.Id < 10 && 
+                                (u.Id < 10 &&
                                 u.Name.Equals("张三")) ||
                                 u.Id > 1000);
 
@@ -2091,7 +2091,7 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Name)
                             .Where(u =>
                                 u.Id.Equals(1000) ||
-                                (u.Id < 10 && 
+                                (u.Id < 10 &&
                                 u.Name.Equals("张三")));
 
             Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE u.Id = @p__1 OR (u.Id < @p__2 AND u.Name = @p__3)", builder.Sql);
@@ -2114,7 +2114,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(u =>
                                 list.Select(k => k.id).Contains(u.Id.Value) &&
                                 u.Id == int.Parse(id) ||
-                                (u.Id < 10 && 
+                                (u.Id < 10 &&
                                 u.Name.Equals("张三")));
 
             Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE (u.Id IN (@p__1) AND u.Id = @p__2) OR (u.Id < @p__3 AND u.Name = @p__4)", builder.Sql);
@@ -2134,7 +2134,7 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Name)
                             .Where(u =>
                                 u.Id == int.Parse(id) ||
-                                (u.Id < 10 && 
+                                (u.Id < 10 &&
                                 u.Name.Equals(Const.Name)));
 
             Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE u.Id = @p__1 OR (u.Id < @p__2 AND u.Name = @p__3)", builder.Sql);
@@ -2625,8 +2625,8 @@ namespace SQLBuilder.Core.UnitTest
 
             var builder = SqlBuilder
                             .Select<UserInfo>(u =>
-                                new UserInfo 
-                                { 
+                                new UserInfo
+                                {
                                     Id = u.Id,
                                     Name = $"'张三'",
                                     Email = $"'{email}'"
@@ -2646,10 +2646,10 @@ namespace SQLBuilder.Core.UnitTest
             var email = "123@qq.com";
 
             var builder = SqlBuilder
-                            .Select<UserInfo>(u => 
-                                new UserInfo 
-                                { 
-                                    Id = u.Id, 
+                            .Select<UserInfo>(u =>
+                                new UserInfo
+                                {
+                                    Id = u.Id,
                                     Name = $"'张三'",
                                     Email = $"'{email}'"
                                 });
@@ -3050,10 +3050,10 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Id, isEnableFormat: true)
                             .Where(u =>
                                 u.Name == "b" &&
-                                (u.Id > 2 && 
+                                (u.Id > 2 &&
                                 u.Name != null &&
                                 (u.Email == "11" ||
-                                u.Email == "22" && 
+                                u.Email == "22" &&
                                 u.Email == "ee")))
                             .Page(10, 1, "[Id]");
 

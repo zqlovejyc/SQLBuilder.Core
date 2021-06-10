@@ -152,6 +152,11 @@ namespace SQLBuilder.Core.Entry
         /// 已Join的表实体类型
         /// </summary>
         public List<Type> JoinTypes { get; set; }
+
+        /// <summary>
+        /// 是否为Having语法
+        /// </summary>
+        public bool IsHavingSyntax { get; set; }
         #endregion
 
         #region Constructor

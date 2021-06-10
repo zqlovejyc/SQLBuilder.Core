@@ -38,9 +38,9 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper In(NewArrayExpression expression, SqlWrapper sqlWrapper)
         {
             sqlWrapper += "(";
-            foreach (Expression expressionItem in expression.Expressions)
+            foreach (var item in expression.Expressions)
             {
-                SqlExpressionProvider.In(expressionItem, sqlWrapper);
+                SqlExpressionProvider.In(item, sqlWrapper);
                 sqlWrapper += ",";
             }
 

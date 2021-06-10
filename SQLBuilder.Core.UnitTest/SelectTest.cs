@@ -489,8 +489,8 @@ namespace SQLBuilder.Core.UnitTest
                             .Having(x =>
                                 x.ClassId.Count<int>() == input.Length);
 
-            Assert.AreEqual("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.ClassId IN (@p__1) GROUP BY x.ClassId HAVING COUNT(x.ClassId) = @p__2", builder.Sql);
-            Assert.AreEqual(2, builder.Parameters.Count);
+            Assert.AreEqual("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.ClassId IN (@p__1,@p__2) GROUP BY x.ClassId HAVING COUNT(x.ClassId) = @p__3", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
         }
         #endregion
 
@@ -2193,8 +2193,8 @@ namespace SQLBuilder.Core.UnitTest
                                 (u.Id < 10 &&
                                 u.Name.Equals("张三")));
 
-            Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE (u.Id IN (@p__1) AND u.Id = @p__2) OR (u.Id < @p__3 AND u.Name = @p__4)", builder.Sql);
-            Assert.AreEqual(4, builder.Parameters.Count);
+            Assert.AreEqual("SELECT u.Name FROM Base_UserInfo AS u WHERE (u.Id IN (@p__1,@p__2) AND u.Id = @p__3) OR (u.Id < @p__4 AND u.Name = @p__5)", builder.Sql);
+            Assert.AreEqual(5, builder.Parameters.Count);
         }
 
         /// <summary>

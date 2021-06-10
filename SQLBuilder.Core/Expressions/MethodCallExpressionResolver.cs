@@ -677,24 +677,23 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper In(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            var val = expression?.ToObject();
-            if (val != null)
+            var obj = expression?.ToObject();
+            if (obj != null)
             {
                 sqlWrapper += "(";
-                if (val.GetType().IsArray || typeof(IList).IsAssignableFrom(val.GetType()))
+
+                if (obj is IEnumerable array)
                 {
-                    var list = val as IList;
-                    if (list?.Count > 0)
+                    foreach (var item in array)
                     {
-                        foreach (var item in list)
-                        {
-                            SqlExpressionProvider.In(Expression.Constant(item, item.GetType()), sqlWrapper);
-                            sqlWrapper += ",";
-                        }
+                        SqlExpressionProvider.In(Expression.Constant(item), sqlWrapper);
+                        sqlWrapper += ",";
                     }
                 }
                 else
-                    SqlExpressionProvider.In(Expression.Constant(val, val.GetType()), sqlWrapper);
+                {
+                    SqlExpressionProvider.In(Expression.Constant(obj), sqlWrapper);
+                }
 
                 if (sqlWrapper[sqlWrapper.Length - 1] == ',')
                     sqlWrapper.Remove(sqlWrapper.Length - 1, 1);

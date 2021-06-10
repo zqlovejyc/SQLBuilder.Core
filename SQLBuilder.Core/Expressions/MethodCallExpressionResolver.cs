@@ -501,7 +501,12 @@ namespace SQLBuilder.Core.Expressions
         private static void SqlSelect(MethodCallExpression expression, SqlWrapper sqlWrapper, string methodFormat)
         {
             var expr = expression.Arguments[0];
-            if (expr is MemberExpression memberExpr)
+
+            var memberExpr = expr as MemberExpression;
+            if (memberExpr.IsNull() && expr is UnaryExpression unaryExpr)
+                memberExpr = unaryExpr.Operand as MemberExpression;
+
+            if (memberExpr != null)
             {
                 var type = memberExpr.Expression.Type != memberExpr.Member.DeclaringType ?
                            memberExpr.Expression.Type :

@@ -138,14 +138,15 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Where(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             //表达式左侧为bool类型常量
-            if (expression.NodeType == ExpressionType.Constant && expression.Value is bool b)
+            if (expression.NodeType == ExpressionType.Constant && expression.Value is bool res)
             {
-                var sql = sqlWrapper.ToString().Trim();
-                if (!b && sql.EndsWithIgnoreCase("WHERE", "AND", "OR"))
+                if (!res && sqlWrapper.EndsWith("WHERE", "AND", "OR"))
                     sqlWrapper += " 1 = 0 ";
             }
             else
+            {
                 sqlWrapper.AddDbParameter(expression.Value);
+            }
 
             return sqlWrapper;
         }
@@ -218,7 +219,16 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Having(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
-            sqlWrapper.AddDbParameter(expression.Value);
+            //表达式左侧为bool类型常量
+            if (expression.NodeType == ExpressionType.Constant && expression.Value is bool res)
+            {
+                if (!res && sqlWrapper.EndsWith("AND", "OR"))
+                    sqlWrapper += " 1 = 0 ";
+            }
+            else
+            {
+                sqlWrapper.AddDbParameter(expression.Value);
+            }
 
             return sqlWrapper;
         }

@@ -28,9 +28,89 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class BinaryExpressionResolver : BaseExpression<BinaryExpression>
     {
+        #region Select
+        /// <summary>
+        /// Select
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Select(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            var field = expression?.ToObject();
+            if (field != null)
+                SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
+
+            return sqlWrapper;
+        }
+        #endregion
+
+        #region Join
+        /// <summary>
+        /// Join
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Join(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            var startIndex = sqlWrapper.Length;
+
+            //嵌套解析
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Join");
+
+            //取非解析
+            ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
+
+            return sqlWrapper;
+        }
+        #endregion
+
+        #region Where
+        /// <summary>
+        /// Where
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Where(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            var startIndex = sqlWrapper.Length;
+
+            //嵌套解析
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Where");
+
+            //取非解析
+            ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
+
+            return sqlWrapper;
+        }
+        #endregion
+
+        #region Having
+        /// <summary>
+        /// Having
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
+        {
+            var startIndex = sqlWrapper.Length;
+
+            //嵌套解析
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Having");
+
+            //取非解析
+            ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
+
+            return sqlWrapper;
+        }
+        #endregion
+
         #region OperatorResolver
         /// <summary>
-        /// OperatorResolver
+        /// Expression操作符解析
         /// </summary>
         /// <param name="expressionNodeType">表达式树节点类型</param>
         /// <param name="operatorIndex">操作符索引</param>
@@ -95,12 +175,12 @@ namespace SQLBuilder.Core.Expressions
 
         #region ExpressionNestedResolver
         /// <summary>
-        /// BinaryExpression嵌套解析
+        /// Expression嵌套解析
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
-        /// <param name="isJoin">是否为Join逻辑</param>
-        public static int ExpressionNestedResolver(BinaryExpression expression, SqlWrapper sqlWrapper, bool isJoin)
+        /// <param name="keyWord">sql关键字，不区分大小写，可选值：Join、Having、Where</param>
+        public static int ExpressionNestedResolver(BinaryExpression expression, SqlWrapper sqlWrapper, string keyWord)
         {
             //左侧嵌套
             var lExpr = expression.Left as BinaryExpression;
@@ -114,15 +194,19 @@ namespace SQLBuilder.Core.Expressions
             var lNested = (llIsBinaryExpr || llIsBoolMethod) && (lrIsBinaryExpr || lrIsBoolMethod);
 
             if (lNested)
-                sqlWrapper += "(";
+                sqlWrapper.Append("(");
 
-            if (isJoin)
+            if (keyWord.EqualIgnoreCase("Join"))
                 SqlExpressionProvider.Join(expression.Left, sqlWrapper);
+
+            else if (keyWord.EqualIgnoreCase("Having"))
+                SqlExpressionProvider.Having(expression.Left, sqlWrapper);
+
             else
                 SqlExpressionProvider.Where(expression.Left, sqlWrapper);
 
             if (lNested)
-                sqlWrapper += ")";
+                sqlWrapper.Append(")");
 
             var operatorIndex = sqlWrapper.Length;
 
@@ -138,84 +222,40 @@ namespace SQLBuilder.Core.Expressions
             var rNested = (rlIsBinaryExpr || rlIsBoolMethod) && (rrIsBinaryExpr || rrIsBoolMethod);
 
             if (rNested)
-                sqlWrapper += "(";
+                sqlWrapper.Append("(");
 
-            SqlExpressionProvider.Where(expression.Right, sqlWrapper);
+            if (keyWord.EqualIgnoreCase("Having"))
+                SqlExpressionProvider.Having(expression.Right, sqlWrapper);
+
+            else
+                SqlExpressionProvider.Where(expression.Right, sqlWrapper);
 
             if (rNested)
-                sqlWrapper += ")";
+                sqlWrapper.Append(")");
 
             return operatorIndex;
         }
         #endregion
 
-        #region Select
+        #region ExpressionNotResolver
         /// <summary>
-        /// Select
+        /// Expression表达式取非解析
         /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql包装器</param>
-        /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Select(BinaryExpression expression, SqlWrapper sqlWrapper)
+        /// <param name="expression"></param>
+        /// <param name="sqlWrapper"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="operatorIndex"></param>
+        /// <returns></returns>
+        public static void ExpressionNotResolver(BinaryExpression expression, SqlWrapper sqlWrapper, int startIndex, int operatorIndex)
         {
-            var field = expression?.ToObject();
-            if (field != null)
-                SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
-
-            return sqlWrapper;
-        }
-        #endregion
-
-        #region Join
-        /// <summary>
-        /// Join
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql包装器</param>
-        /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Join(BinaryExpression expression, SqlWrapper sqlWrapper)
-        {
-            //嵌套解析
-            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, true);
-
-            //表达式左侧为bool类型常量且为true时，不进行sql拼接
-            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool res && res))
-            {
-                var sqlLength = sqlWrapper.Length;
-                OperatorResolver(
-                    expression.NodeType,
-                    operatorIndex,
-                    sqlWrapper,
-                    sqlLength - operatorIndex == 5 &&
-                    sqlWrapper.EndsWith("NULL"));
-            }
-
-            return sqlWrapper;
-        }
-        #endregion
-
-        #region Where
-        /// <summary>
-        /// Where
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql包装器</param>
-        /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Where(BinaryExpression expression, SqlWrapper sqlWrapper)
-        {
-            var startIndex = sqlWrapper.Length;
-
-            //嵌套解析
-            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, false);
-
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
             if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool left && left))
             {
                 //若表达式右侧为bool类型，且为false时，条件取非
-                if ((expression.Right.NodeType == ExpressionType.Constant ||
-                    (expression.Right.NodeType == ExpressionType.Convert &&
+                if ((ExpressionType.Constant == expression.Right.NodeType ||
+                    (ExpressionType.Convert == expression.Right.NodeType &&
                     expression.Right is UnaryExpression unary &&
-                    unary.Operand.NodeType == ExpressionType.Constant)) &&
+                    ExpressionType.Constant == unary.Operand.NodeType)) &&
                     expression.Right.ToObject() is bool res)
                 {
                     if (!res)
@@ -330,37 +370,6 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.EndsWith("NULL"));
                 }
             }
-
-            return sqlWrapper;
-        }
-        #endregion
-
-        #region Having
-        /// <summary>
-        /// Having
-        /// </summary>
-        /// <param name="expression">表达式树</param>
-        /// <param name="sqlWrapper">sql包装器</param>
-        /// <returns>SqlWrapper</returns>
-        public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
-        {
-            SqlExpressionProvider.Having(expression.Left, sqlWrapper);
-
-            var operatorIndex = sqlWrapper.Length;
-
-            SqlExpressionProvider.Having(expression.Right, sqlWrapper);
-
-            //表达式左侧为bool类型常量且为true时，不进行sql拼接
-            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool res && res))
-            {
-                OperatorResolver(
-                    expression.NodeType,
-                    operatorIndex,
-                    sqlWrapper,
-                    sqlWrapper.EndsWith("NULL"));
-            }
-
-            return sqlWrapper;
         }
         #endregion
     }

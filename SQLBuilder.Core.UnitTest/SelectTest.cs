@@ -528,6 +528,37 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.ClassId IN (@p__1,@p__2) GROUP BY x.ClassId HAVING COUNT(x.ClassId) = @p__3", builder.Sql);
             Assert.AreEqual(3, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// Having05
+        /// </summary>
+        [TestMethod]
+        public void Test_Having_05()
+        {
+            var input = new[]
+            {
+                new { Id = 1 },
+                new { Id = 2 }
+            };
+
+            var builder = SqlBuilder
+                            .Select<Teacher, Class>((x, y) =>
+                                new { x.ClassId })
+                            .InnerJoin<Class>((x, y) =>
+                                x.ClassId == y.Id && y.Name.IsNullOrEmpty() == false)
+                            .Where<Class>((x, y) =>
+                                !(x.ClassId == 0))
+                            .GroupBy<Class>((x, y) =>
+                                x.ClassId)
+                            .Having(x =>
+                                x.ClassId.Count<int>() == input.Length &&
+                                (x.ClassId == 1 || x.ClassId == 2) &&
+                                !(x.ClassId > 10) &&
+                                (x.ClassId > 10) == false);
+
+            Assert.AreEqual("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id AND (y.Name IS NOT NULL AND y.Name <> '') WHERE x.ClassId <> @p__1 GROUP BY x.ClassId HAVING (COUNT(x.ClassId) = @p__2 AND (x.ClassId = @p__3 OR x.ClassId = @p__4)) AND x.ClassId <= @p__5 AND x.ClassId <= @p__6", builder.Sql);
+            Assert.AreEqual(6, builder.Parameters.Count);
+        }
         #endregion
 
         #region Order By

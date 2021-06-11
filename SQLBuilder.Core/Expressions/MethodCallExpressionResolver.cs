@@ -22,7 +22,6 @@ using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
@@ -32,7 +31,8 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class MethodCallExpressionResolver : BaseExpression<MethodCallExpression>
     {
-        #region Private Static Methods
+        #region Methods
+        #region Field
         /// <summary>
         /// methods
         /// </summary>
@@ -59,7 +59,9 @@ namespace SQLBuilder.Core.Expressions
                 ["Max"] = SqlMax,
                 ["Min"] = SqlMin,
             };
+        #endregion
 
+        #region SqlIn
         /// <summary>
         /// In
         /// </summary>
@@ -71,7 +73,9 @@ namespace SQLBuilder.Core.Expressions
             sqlWrapper += " IN ";
             SqlExpressionProvider.In(expression.Arguments[1], sqlWrapper);
         }
+        #endregion
 
+        #region NotIn
         /// <summary>
         /// Not In
         /// </summary>
@@ -83,7 +87,9 @@ namespace SQLBuilder.Core.Expressions
             sqlWrapper += " NOT IN ";
             SqlExpressionProvider.In(expression.Arguments[1], sqlWrapper);
         }
+        #endregion
 
+        #region Like
         /// <summary>
         /// Like
         /// </summary>
@@ -130,7 +136,9 @@ namespace SQLBuilder.Core.Expressions
                     break;
             }
         }
+        #endregion
 
+        #region LikeLeft
         /// <summary>
         /// LikeLeft
         /// </summary>
@@ -169,7 +177,9 @@ namespace SQLBuilder.Core.Expressions
                     break;
             }
         }
+        #endregion
 
+        #region LikeRight
         /// <summary>
         /// LikeRight
         /// </summary>
@@ -214,7 +224,9 @@ namespace SQLBuilder.Core.Expressions
                     break;
             }
         }
+        #endregion
 
+        #region NotLike
         /// <summary>
         /// NotLike
         /// </summary>
@@ -260,7 +272,9 @@ namespace SQLBuilder.Core.Expressions
                     break;
             }
         }
+        #endregion
 
+        #region Contains
         /// <summary>
         /// Contains
         /// </summary>
@@ -321,7 +335,9 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.In(expression.Arguments[0], sqlWrapper);
             }
         }
+        #endregion
 
+        #region IsNullOrEmpty
         /// <summary>
         /// IsNullOrEmpty
         /// </summary>
@@ -336,7 +352,9 @@ namespace SQLBuilder.Core.Expressions
             sqlWrapper += " = ''";
             sqlWrapper += ")";
         }
+        #endregion
 
+        #region Equals
         /// <summary>
         /// Equals
         /// </summary>
@@ -355,7 +373,9 @@ namespace SQLBuilder.Core.Expressions
             else
                 sqlWrapper.Insert(signIndex, " = ");
         }
+        #endregion
 
+        #region ToUpper
         /// <summary>
         /// ToUpper
         /// </summary>
@@ -370,7 +390,9 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper += ")";
             }
         }
+        #endregion
 
+        #region ToLower
         /// <summary>
         /// ToLower
         /// </summary>
@@ -385,7 +407,9 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper += ")";
             }
         }
+        #endregion
 
+        #region Trim
         /// <summary>
         /// Trim
         /// </summary>
@@ -426,7 +450,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region TrimStart
         /// <summary>
         /// TrimStart
         /// </summary>
@@ -459,7 +485,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region TrimEnd
         /// <summary>
         /// TrimEnd
         /// </summary>
@@ -492,7 +520,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlCount
         /// <summary>
         /// Count
         /// </summary>
@@ -514,7 +544,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlSum
         /// <summary>
         /// Sum
         /// </summary>
@@ -536,7 +568,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlAvg
         /// <summary>
         /// Avg
         /// </summary>
@@ -558,7 +592,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlMax
         /// <summary>
         /// Max
         /// </summary>
@@ -580,7 +616,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlMin
         /// <summary>
         /// Min
         /// </summary>
@@ -602,7 +640,9 @@ namespace SQLBuilder.Core.Expressions
                 }
             }
         }
+        #endregion
 
+        #region SqlSelect
         /// <summary>
         /// SqlSelect
         /// </summary>
@@ -632,7 +672,9 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.Select(Expression.Constant(field), sqlWrapper);
             }
         }
+        #endregion
 
+        #region GetMethodHandler
         /// <summary>
         /// 获取方法处理委托
         /// </summary>
@@ -650,7 +692,9 @@ namespace SQLBuilder.Core.Expressions
 
             return null;
         }
+        #endregion
 
+        #region GetMemberExpression
         /// <summary>
         /// 获取MemberExpression
         /// </summary>
@@ -667,8 +711,9 @@ namespace SQLBuilder.Core.Expressions
             return memberExpr;
         }
         #endregion
+        #endregion
 
-        #region Override Base Class Methods
+        #region In
         /// <summary>
         /// In
         /// </summary>
@@ -703,7 +748,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -730,7 +777,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
@@ -756,7 +805,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Insert
         /// <summary>
         /// Insert
         /// </summary>
@@ -819,14 +870,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper GroupBy(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper GroupBy(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.ToObject() is IEnumerable collection)
             {
@@ -840,14 +893,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Having(MethodCallExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Having(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
             var handler = GetMethodHandler(expression);
 
@@ -872,7 +927,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>

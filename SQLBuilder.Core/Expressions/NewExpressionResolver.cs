@@ -30,7 +30,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class NewExpressionResolver : BaseExpression<NewExpression>
     {
-        #region Override Base Class Methods
+        #region Update
         /// <summary>
         /// Update
         /// </summary>
@@ -64,7 +64,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Insert
         /// <summary>
         /// Insert
         /// </summary>
@@ -111,7 +113,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -191,7 +195,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Count
         /// <summary>
         /// Count
         /// </summary>
@@ -215,7 +221,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Sum
         /// <summary>
         /// Sum
         /// </summary>
@@ -235,7 +243,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Max
         /// <summary>
         /// Max
         /// </summary>
@@ -255,7 +265,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Min
         /// <summary>
         /// Min
         /// </summary>
@@ -275,7 +287,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Avg
         /// <summary>
         /// Avg
         /// </summary>
@@ -295,7 +309,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
@@ -314,7 +330,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>

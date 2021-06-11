@@ -26,7 +26,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
     public class ParameterExpressionResolver : BaseExpression<ParameterExpression>
     {
-        #region Override Base Class Methods
+        #region Select
         /// <summary>
         /// Select
         /// </summary>

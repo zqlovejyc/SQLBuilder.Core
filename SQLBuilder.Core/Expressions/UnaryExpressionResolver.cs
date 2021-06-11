@@ -27,7 +27,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class UnaryExpressionResolver : BaseExpression<UnaryExpression>
     {
-        #region Override Base Class Methods
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -40,7 +40,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Insert 
         /// <summary>
         /// Insert
         /// </summary>
@@ -53,7 +55,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Update
         /// <summary>
         /// Update
         /// </summary>
@@ -66,7 +70,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
@@ -184,7 +190,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
@@ -197,7 +205,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
@@ -210,7 +220,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>
@@ -224,7 +236,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Max
         /// <summary>
         /// Max
         /// </summary>
@@ -237,7 +251,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Min
         /// <summary>
         /// Min
         /// </summary>
@@ -250,7 +266,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Avg
         /// <summary>
         /// Avg
         /// </summary>
@@ -263,7 +281,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Count
         /// <summary>
         /// Count
         /// </summary>
@@ -276,7 +296,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Sum
         /// <summary>
         /// Sum
         /// </summary>
@@ -289,7 +311,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Join
         /// <summary>
         /// Join
         /// </summary>

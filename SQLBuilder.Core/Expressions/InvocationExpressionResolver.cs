@@ -26,7 +26,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
     public class InvocationExpressionResolver : BaseExpression<InvocationExpression>
     {
-        #region Override Base Class Methods
+        #region Where
         /// <summary>
         /// Where
         /// </summary>

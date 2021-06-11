@@ -30,7 +30,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
     public class ListInitExpressionResolver : BaseExpression<ListInitExpression>
     {
-        #region Override Base Class Methods
+        #region Insert
         /// <summary>
         /// Insert
         /// </summary>
@@ -93,14 +93,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper GroupBy(ListInitExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper GroupBy(ListInitExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression.ToObject() is IEnumerable collection)
             {
@@ -114,7 +116,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>

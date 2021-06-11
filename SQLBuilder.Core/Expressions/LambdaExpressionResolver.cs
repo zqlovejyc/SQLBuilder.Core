@@ -26,7 +26,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
     public class LambdaExpressionResolver : BaseExpression<LambdaExpression>
     {
-        #region Override Base Class Methods
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
@@ -39,7 +39,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
@@ -52,7 +54,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -65,7 +69,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Join
         /// <summary>
         /// Join
         /// </summary>

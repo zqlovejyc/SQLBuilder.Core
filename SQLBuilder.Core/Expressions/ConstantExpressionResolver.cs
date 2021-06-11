@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class ConstantExpressionResolver : BaseExpression<ConstantExpression>
     {
-        #region Override Base Class Methods
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -44,7 +44,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Count
         /// <summary>
         /// Count
         /// </summary>
@@ -60,7 +62,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Sum
         /// <summary>
         /// Sum
         /// </summary>
@@ -74,7 +78,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Max
         /// <summary>
         /// Max
         /// </summary>
@@ -88,7 +94,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Min
         /// <summary>
         /// Min
         /// </summary>
@@ -102,7 +110,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Avg
         /// <summary>
         /// Avg
         /// </summary>
@@ -116,7 +126,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
@@ -137,7 +149,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Join
         /// <summary>
         /// Join
         /// </summary>
@@ -158,27 +172,31 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region In
         /// <summary>
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper In(ConstantExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper In(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             sqlWrapper.AddDbParameter(expression.Value);
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper GroupBy(ConstantExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper GroupBy(ConstantExpression expression, SqlWrapper sqlWrapper)
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);
@@ -189,7 +207,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
@@ -202,7 +222,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>
@@ -210,7 +232,7 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper OrderBy(ConstantExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
+        public override SqlWrapper OrderBy(ConstantExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             var tableName = sqlWrapper.GetTableName(sqlWrapper.DefaultType);
             var tableAlias = sqlWrapper.GetTableAlias(tableName);

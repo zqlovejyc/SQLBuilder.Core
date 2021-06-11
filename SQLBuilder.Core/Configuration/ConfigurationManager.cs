@@ -34,7 +34,7 @@ namespace SQLBuilder.Core.Configuration
         /// <summary>
         /// app配置
         /// </summary>
-        public static IConfigurationRoot Configuration { get; private set; }
+        public static IConfiguration Configuration { get; set; }
         #endregion
 
         #region Constructor

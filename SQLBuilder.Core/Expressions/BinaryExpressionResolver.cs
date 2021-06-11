@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class BinaryExpressionResolver : BaseExpression<BinaryExpression>
     {
-        #region Public Static Methods
+        #region OperatorResolver
         /// <summary>
         /// OperatorResolver
         /// </summary>
@@ -91,7 +91,9 @@ namespace SQLBuilder.Core.Expressions
                     throw new NotImplementedException("NotImplemented ExpressionType " + expressionNodeType);
             }
         }
+        #endregion
 
+        #region ExpressionNestedResolver
         /// <summary>
         /// BinaryExpression嵌套解析
         /// </summary>
@@ -147,7 +149,7 @@ namespace SQLBuilder.Core.Expressions
         }
         #endregion
 
-        #region Override Base Class Methods
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -162,7 +164,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Join
         /// <summary>
         /// Join
         /// </summary>
@@ -175,7 +179,7 @@ namespace SQLBuilder.Core.Expressions
             var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, true);
 
             //表达式左侧为bool类型常量且为true时，不进行sql拼接
-            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool b && b))
+            if (!(expression.Left.NodeType == ExpressionType.Constant && expression.Left.ToObject() is bool res && res))
             {
                 var sqlLength = sqlWrapper.Length;
                 OperatorResolver(
@@ -188,14 +192,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Where(BinaryExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Where(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
             var startIndex = sqlWrapper.Length;
 
@@ -327,14 +333,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Having(BinaryExpression expression, SqlWrapper sqlWrapper)
         {
             SqlExpressionProvider.Having(expression.Left, sqlWrapper);
 

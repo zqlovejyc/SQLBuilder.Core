@@ -28,7 +28,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class NewArrayExpressionResolver : BaseExpression<NewArrayExpression>
     {
-        #region Override Base Class Methods
+        #region In
         /// <summary>
         /// In
         /// </summary>
@@ -51,7 +51,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Insert
         /// <summary>
         /// Insert
         /// </summary>
@@ -77,14 +79,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper GroupBy(NewArrayExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper GroupBy(NewArrayExpression expression, SqlWrapper sqlWrapper)
         {
             for (var i = 0; i < expression.Expressions.Count; i++)
             {
@@ -95,7 +99,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>

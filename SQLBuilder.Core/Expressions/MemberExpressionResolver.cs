@@ -30,7 +30,7 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
 	public class MemberExpressionResolver : BaseExpression<MemberExpression>
     {
-        #region Override Base Class Methods
+        #region Insert
         /// <summary>
         /// Insert
         /// </summary>
@@ -97,7 +97,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Update
         /// <summary>
         /// Update
         /// </summary>
@@ -136,7 +138,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Select
         /// <summary>
         /// Select
         /// </summary>
@@ -160,14 +164,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Join
         /// <summary>
         /// Join
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Join(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Join(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
@@ -184,14 +190,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Max
         /// <summary>
         /// Max
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Max(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression?.Member != null)
             {
@@ -201,14 +209,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Min
         /// <summary>
         /// Min
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Min(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression?.Member != null)
             {
@@ -218,14 +228,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Avg
         /// <summary>
         /// Avg
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Avg(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression?.Member != null)
             {
@@ -235,14 +247,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Count
         /// <summary>
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Count(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression?.Member != null)
             {
@@ -252,14 +266,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Sum
         /// <summary>
         /// Sum
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Sum(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             if (expression?.Member != null)
             {
@@ -269,14 +285,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Where
         /// <summary>
         /// Where
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper Where(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper Where(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             //此处判断expression的Member是否是可空值类型
             if (expression.Expression?.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType.IsNullable())
@@ -309,14 +327,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region In
         /// <summary>
         /// In
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper In(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper In(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var convertRes = expression.ToObject();
             if (convertRes is IEnumerable collection)
@@ -336,14 +356,16 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region GroupBy
         /// <summary>
         /// GroupBy
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper GroupBy(MemberExpression expression, SqlWrapper sqlWrapper)
+        public override SqlWrapper GroupBy(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var tableAlias = string.Empty;
             var tableName = string.Empty;
@@ -393,7 +415,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region Having
         /// <summary>
         /// Having
         /// </summary>
@@ -433,7 +457,9 @@ namespace SQLBuilder.Core.Expressions
 
             return sqlWrapper;
         }
+        #endregion
 
+        #region OrderBy
         /// <summary>
         /// OrderBy
         /// </summary>
@@ -441,7 +467,7 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="sqlWrapper">sql包装器</param>
         /// <param name="orders">排序方式</param>
         /// <returns>SqlWrapper</returns>
-		public override SqlWrapper OrderBy(MemberExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
+        public override SqlWrapper OrderBy(MemberExpression expression, SqlWrapper sqlWrapper, params OrderType[] orders)
         {
             var tableAlias = string.Empty;
             var tableName = string.Empty;

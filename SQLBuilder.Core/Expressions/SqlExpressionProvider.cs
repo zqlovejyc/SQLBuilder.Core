@@ -61,7 +61,7 @@ namespace SQLBuilder.Core.Expressions
                 SwitchExpression => throw new NotImplementedException($"NotImplemented {nameof(SwitchExpression)}"),
                 TryExpression => throw new NotImplementedException($"NotImplemented {nameof(TryExpression)}"),
                 TypeBinaryExpression => throw new NotImplementedException($"NotImplemented {nameof(TypeBinaryExpression)}"),
-                RuntimeVariablesExpression => throw new NotImplementedException($"NotImplemented {nameof(LoopExpression)}"),
+                RuntimeVariablesExpression => throw new NotImplementedException($"NotImplemented {nameof(RuntimeVariablesExpression)}"),
                 _ => throw new NotImplementedException($"NotImplemented {nameof(Expression)}")
             };
         #endregion

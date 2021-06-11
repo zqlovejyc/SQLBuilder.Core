@@ -392,6 +392,42 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT [x].[Email],[y].[Name] FROM [Base_UserInfo] AS [x] INNER JOIN [Base_Student] AS [y] ON [x].[Id] = [y].[UserId] WHERE [x].[Name] = @p__1 GROUP BY [x].[Email],[y].[Name]", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 分组9
+        /// </summary>
+        [TestMethod]
+        public void Test_GroupBy_09()
+        {
+            var builder = SqlBuilder
+                            .Select<UserInfo>()
+                            .Where(o =>
+                                o.Name == "张强")
+                            .GroupBy(u =>
+                                "Id");
+
+            Assert.AreEqual("SELECT * FROM Base_UserInfo AS t WHERE t.Name = @p__1 GROUP BY t.Id", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 分组10
+        /// </summary>
+        [TestMethod]
+        public void Test_GroupBy_10()
+        {
+            var groupField = "Id";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>()
+                            .Where(o =>
+                                o.Name == "张强")
+                            .GroupBy(u =>
+                                groupField);
+
+            Assert.AreEqual("SELECT * FROM Base_UserInfo AS t WHERE t.Name = @p__1 GROUP BY t.Id", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Having

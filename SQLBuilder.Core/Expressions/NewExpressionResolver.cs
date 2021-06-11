@@ -326,7 +326,8 @@ namespace SQLBuilder.Core.Expressions
                 sqlWrapper += ",";
             }
 
-            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+            if (sqlWrapper[^1] == ',')
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }
@@ -352,7 +353,8 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += " ASC,";
             }
 
-            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+            if (sqlWrapper[^1] == ',')
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }

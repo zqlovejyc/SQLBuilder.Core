@@ -886,9 +886,12 @@ namespace SQLBuilder.Core.Expressions
                 foreach (var item in collection)
                 {
                     SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
+
+                    sqlWrapper += ",";
                 }
 
-                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                if (sqlWrapper[^1] == ',')
+                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 
             return sqlWrapper;
@@ -957,7 +960,8 @@ namespace SQLBuilder.Core.Expressions
                     i++;
                 }
 
-                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                if (sqlWrapper[^1] == ',')
+                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
             }
 
             return sqlWrapper;

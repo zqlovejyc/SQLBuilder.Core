@@ -400,16 +400,16 @@ namespace SQLBuilder.Core.Expressions
                         foreach (var item in collection)
                         {
                             SqlExpressionProvider.GroupBy(Expression.Constant(item), sqlWrapper);
+
+                            sqlWrapper += ",";
                         }
 
-                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                        if (sqlWrapper[^1] == ',')
+                            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (typeof(string) == convertRes.GetType() && convertRes is string str)
-                    {
                         SqlExpressionProvider.GroupBy(Expression.Constant(str), sqlWrapper);
-                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
-                    }
                 }
             }
 
@@ -518,7 +518,8 @@ namespace SQLBuilder.Core.Expressions
                             i++;
                         }
 
-                        sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                        if (sqlWrapper[^1] == ',')
+                            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                     }
 
                     if (typeof(string) == convertRes.GetType() && convertRes is string str)
@@ -532,7 +533,8 @@ namespace SQLBuilder.Core.Expressions
                             else
                                 sqlWrapper += " ASC,";
 
-                            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                            if (sqlWrapper[^1] == ',')
+                                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
                         }
                     }
                 }

@@ -93,9 +93,12 @@ namespace SQLBuilder.Core.Expressions
             for (var i = 0; i < expression.Expressions.Count; i++)
             {
                 SqlExpressionProvider.GroupBy(expression.Expressions[i], sqlWrapper);
+
+                sqlWrapper += ",";
             }
 
-            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+            if (sqlWrapper[^1] == ',')
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }
@@ -128,7 +131,8 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += " ASC,";
             }
 
-            sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+            if (sqlWrapper[^1] == ',')
+                sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
 
             return sqlWrapper;
         }

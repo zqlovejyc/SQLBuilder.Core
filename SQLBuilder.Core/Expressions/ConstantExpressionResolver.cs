@@ -203,7 +203,7 @@ namespace SQLBuilder.Core.Expressions
             if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
-            sqlWrapper += tableAlias + sqlWrapper.GetColumnName(expression.Value.ToString()) + ",";
+            sqlWrapper += tableAlias + sqlWrapper.GetColumnName(expression.Value.ToString());
 
             return sqlWrapper;
         }

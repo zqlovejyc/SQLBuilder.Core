@@ -27,7 +27,7 @@ namespace SQLBuilder.Core.Extensions
     /// </summary>
     public static class MemberInfoExtensions
     {
-        #region Attribute
+        #region GetAttribute
         /// <summary>
         /// 获取首个指定特性
         /// </summary>
@@ -38,7 +38,9 @@ namespace SQLBuilder.Core.Extensions
         {
             return @this.GetFirstOrDefaultAttribute<T>() as T;
         }
+        #endregion
 
+        #region GetAttributes
         /// <summary>
         /// 获取指定特性集合
         /// </summary>
@@ -49,7 +51,9 @@ namespace SQLBuilder.Core.Extensions
         {
             return @this?.GetCustomAttributes(typeof(T), false);
         }
+        #endregion
 
+        #region GetFirstOrDefaultAttribute
         /// <summary>
         /// 获取首个指定特性
         /// </summary>
@@ -60,7 +64,9 @@ namespace SQLBuilder.Core.Extensions
         {
             return @this.GetAttributes<T>()?.FirstOrDefault();
         }
+        #endregion
 
+        #region ContainsAttribute
         /// <summary>
         /// 是否包含指定特性
         /// </summary>

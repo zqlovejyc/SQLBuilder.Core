@@ -85,8 +85,7 @@ namespace SQLBuilder.Core.Expressions
                     i++;
                 }
 
-                if (sqlWrapper[^1] == ',')
-                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.RemoveLast(',');
 
                 sqlWrapper.Reset(string.Format(sqlWrapper.ToString(), string.Join(",", fields).TrimEnd(',')));
             }
@@ -113,8 +112,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += ",";
                 }
 
-                if (sqlWrapper[^1] == ',')
-                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.RemoveLast(',');
             }
 
             return sqlWrapper;
@@ -149,8 +147,7 @@ namespace SQLBuilder.Core.Expressions
                     i++;
                 }
 
-                if (sqlWrapper[^1] == ',')
-                    sqlWrapper.Remove(sqlWrapper.Length - 1, 1);
+                sqlWrapper.RemoveLast(',');
             }
 
             return sqlWrapper;

@@ -221,6 +221,19 @@ namespace SQLBuilder.Core.Entry
             this.Sql.Remove(startIndex, length);
             return this;
         }
+
+        /// <summary>
+        /// 判断当前SqlWrapper最后一个字符是否为目标字符，如果是则进行移除，否则不进行任何处理
+        /// </summary>
+        /// <param name="target">目标字符</param>
+        /// <returns></returns>
+        public SqlWrapper RemoveLast(char target)
+        {
+            if (this[^1] == target)
+                this.Remove(this.Length - 1, 1);
+
+            return this;
+        }
         #endregion
 
         #region Replace

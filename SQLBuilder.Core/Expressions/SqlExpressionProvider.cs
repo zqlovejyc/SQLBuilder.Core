@@ -33,7 +33,7 @@ namespace SQLBuilder.Core.Expressions
         /// GetExpressionResolver
         /// </summary>
         /// <param name="expression">表达式树</param>
-        /// <returns>ISqlBuilder</returns>
+        /// <returns>IExpression</returns>
         private static IExpression GetExpressionResolver(Expression expression) =>
             expression switch
             {

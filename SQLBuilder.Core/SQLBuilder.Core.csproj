@@ -7,19 +7,19 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.2.1.0</AssemblyVersion>
+        <AssemblyVersion>2.2.2.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.2.1</Version>
+        <Version>2.2.2</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.新增部分扩展方法，优化部分代码；
-2.修改GetTableName、GetPrimaryKey添加databaseType参数；
-3.修复部分情况下Join连接查询解析错误bug；
-4.优化ToObject扩展方法，修复Where中enum类型抛异常bug(#I3UBGP)；
-5.修复Select解析强类型实体映射情形时sql解析错误bug；</PackageReleaseNotes>
-        <FileVersion>2.2.1.0</FileVersion>
+        <PackageReleaseNotes>1.优化AddSqlBuilder，添加connectionSection参数，支持动态配置数据库连接字符串；
+2.优化Select解析，支持Select Lambda表达式中聚合函数；
+3.优化Having解析；
+4.优化IN语法解析，修复了部分情况下Dapper执行异常bug；
+5.优化Join、Having嵌套条件解析；</PackageReleaseNotes>
+        <FileVersion>2.2.2.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>
@@ -58,7 +58,7 @@
         </PackageReference>
         <PackageReference Include="MySqlConnector" Version="1.3.9" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="Npgsql" Version="5.0.5" />
+        <PackageReference Include="Npgsql" Version="5.0.7" />
         <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.1" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />

@@ -565,14 +565,13 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public string GetFormatName(string name)
         {
-            if (
-                this.IsEnableFormat == true &&
-                name?.StartsWith("[") == false &&
-                name?.StartsWith("`") == false &&
-                name?.StartsWith("\"") == false)
-            {
+            if (this.IsEnableFormat &&
+                !name.IsNullOrEmpty() &&
+                !name.StartsWith("[") &&
+                !name.StartsWith("`") &&
+                !name.StartsWith("\""))
                 name = string.Format(this.FormatTemplate, name);
-            }
+
             return name;
         }
         #endregion

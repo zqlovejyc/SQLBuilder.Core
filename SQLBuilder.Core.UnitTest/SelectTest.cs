@@ -2776,7 +2776,7 @@ namespace SQLBuilder.Core.UnitTest
                                 },
                                 isEnableFormat: true);
 
-            Assert.AreEqual("SELECT [u].[Id] AS [Id],'张三' AS [Name],'123@qq.com' AS [Email] FROM [Base_UserInfo] AS [u]", builder.Sql);
+            Assert.AreEqual("SELECT [u].[Id],'张三' AS [Name],'123@qq.com' AS [Email] FROM [Base_UserInfo] AS [u]", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -2797,7 +2797,7 @@ namespace SQLBuilder.Core.UnitTest
                                     Email = $"'{email}'"
                                 });
 
-            Assert.AreEqual("SELECT u.Id AS Id,'张三' AS Name,'123@qq.com' AS Email FROM Base_UserInfo AS u", builder.Sql);
+            Assert.AreEqual("SELECT u.Id,'张三' AS Name,'123@qq.com' AS Email FROM Base_UserInfo AS u", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 

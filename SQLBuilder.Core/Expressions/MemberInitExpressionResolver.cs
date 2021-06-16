@@ -20,6 +20,7 @@ using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SQLBuilder.Core.Expressions
@@ -64,7 +65,14 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.AddField(fieldName);
                     }
 
-                    sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {sqlWrapper.GetFormatName(aliasName)}";
+                    var field = sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1];
+                    if (field.IsNotNullOrEmpty() && field.Contains("."))
+                        field = field.Split('.').LastOrDefault();
+
+                    aliasName = sqlWrapper.GetFormatName(aliasName);
+
+                    if (!field.EqualIgnoreCase(aliasName))
+                        sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {aliasName}";
                 }
             }
             else

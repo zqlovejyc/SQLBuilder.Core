@@ -235,32 +235,24 @@ namespace SQLBuilder.Core.Extensions
                 var targetType = typeof(T);
 
                 if (@this.GetType() == targetType)
-                {
                     return (T)@this;
-                }
 
                 var converter = TypeDescriptor.GetConverter(@this);
                 if (converter != null)
                 {
                     if (converter.CanConvertTo(targetType))
-                    {
                         return (T)converter.ConvertTo(@this, targetType);
-                    }
                 }
 
                 converter = TypeDescriptor.GetConverter(targetType);
                 if (converter != null)
                 {
                     if (converter.CanConvertFrom(@this.GetType()))
-                    {
                         return (T)converter.ConvertFrom(@this);
-                    }
                 }
 
                 if (@this == DBNull.Value)
-                {
                     return (T)(object)null;
-                }
             }
 
             return (T)@this;

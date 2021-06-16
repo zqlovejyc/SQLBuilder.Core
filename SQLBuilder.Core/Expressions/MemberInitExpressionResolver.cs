@@ -66,7 +66,7 @@ namespace SQLBuilder.Core.Expressions
                     }
 
                     var field = sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1];
-                    if (field.IsNotNullOrEmpty() && field.Contains("."))
+                    if (field.IsNotNullOrEmpty() && field.Contains(".") && !field.Contains("(", ")"))
                         field = field.Split('.').LastOrDefault();
 
                     aliasName = sqlWrapper.GetFormatName(aliasName);

@@ -134,7 +134,7 @@ namespace SQLBuilder.Core.Expressions
                     SqlExpressionProvider.Select(argument, sqlWrapper);
 
                     var fieldName = sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1];
-                    if (fieldName.IsNotNullOrEmpty() && !fieldName.Contains("(", ")") && fieldName.Contains("."))
+                    if (fieldName.IsNotNullOrEmpty() && fieldName.Contains(".") && !fieldName.Contains("(", ")"))
                         fieldName = fieldName.Split('.').LastOrDefault();
 
                     //添加字段别名

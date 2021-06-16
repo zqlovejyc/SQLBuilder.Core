@@ -43,8 +43,6 @@ namespace SQLBuilder.Core.Expressions
             {
                 foreach (MemberAssignment memberAssignment in expression.Bindings)
                 {
-                    var aliasName = memberAssignment.Member.Name;
-
                     if (memberAssignment.Expression is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr)
                     {
                         var type = parameterExpr.Type;
@@ -65,11 +63,12 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.AddField(fieldName);
                     }
 
+                    var aliasName = sqlWrapper.GetColumnName(memberAssignment.Member.Name);
+
                     var field = sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1];
+
                     if (field.IsNotNullOrEmpty() && field.Contains(".") && !field.Contains("(", ")"))
                         field = field.Split('.').LastOrDefault();
-
-                    aliasName = sqlWrapper.GetFormatName(aliasName);
 
                     if (!field.EqualIgnoreCase(aliasName))
                         sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {aliasName}";

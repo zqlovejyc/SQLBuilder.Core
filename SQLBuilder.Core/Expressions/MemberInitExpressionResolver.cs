@@ -70,7 +70,7 @@ namespace SQLBuilder.Core.Expressions
                     if (field.IsNotNullOrEmpty() && field.Contains(".") && !field.Contains("(", ")"))
                         field = field.Split('.').LastOrDefault();
 
-                    if (!field.EqualIgnoreCase(aliasName))
+                    if (!field.Equals(!sqlWrapper.IsEnableFormat, aliasName))
                         sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {aliasName}";
                 }
             }

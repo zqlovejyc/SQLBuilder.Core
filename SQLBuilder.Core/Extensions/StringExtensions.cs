@@ -169,7 +169,65 @@ namespace SQLBuilder.Core.Extensions
         {
             return Regex.IsMatch(@this, value, options);
         }
+        #endregion
 
+        #region ContainsIgnoreCase
+        /// <summary>
+        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// </summary>
+        /// <param name="this">当前字符串</param>
+        /// <param name="strs">待比较字符串数组</param>
+        /// <returns></returns>
+        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Equals
+        /// <summary>
+        /// 字符串相等比较，判断是否以任意一个待比较字符串相等
+        /// </summary>
+        /// <param name="this">当前字符串</param>
+        /// <param name="ignoreCase">是否忽略大小写</param>
+        /// <param name="strs">待比较字符串数组</param>
+        /// <returns></returns>
+        public static bool Equals(this string @this, bool ignoreCase, params string[] strs)
+        {
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (ignoreCase)
+                    {
+                        if (string.Equals(@this, item, StringComparison.OrdinalIgnoreCase))
+                            return true;
+                    }
+                    else
+                    {
+                        if (string.Equals(@this, item))
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region EqualIgnoreCase
         /// <summary>
         /// 忽略大小写的字符串相等比较，判断是否以任意一个待比较字符串相等
         /// </summary>
@@ -189,7 +247,9 @@ namespace SQLBuilder.Core.Extensions
 
             return false;
         }
+        #endregion
 
+        #region StartsWithIgnoreCase
         /// <summary>
         /// 忽略大小写的字符串开始比较，判断是否以任意一个待比较字符串开始
         /// </summary>
@@ -212,7 +272,9 @@ namespace SQLBuilder.Core.Extensions
 
             return false;
         }
+        #endregion
 
+        #region EndsWithIgnoreCase
         /// <summary>
         /// 忽略大小写的字符串结束比较，判断是否以任意一个待比较字符串结束
         /// </summary>
@@ -229,29 +291,6 @@ namespace SQLBuilder.Core.Extensions
                 foreach (var item in strs)
                 {
                     if (item != null && @this.EndsWith(item, StringComparison.OrdinalIgnoreCase))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
-        /// </summary>
-        /// <param name="this">当前字符串</param>
-        /// <param name="strs">待比较字符串数组</param>
-        /// <returns></returns>
-        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
-        {
-            if (@this.IsNullOrEmpty())
-                return false;
-
-            if (strs.IsNotNullOrEmpty())
-            {
-                foreach (var item in strs)
-                {
-                    if (item != null && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                         return true;
                 }
             }

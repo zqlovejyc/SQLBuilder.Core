@@ -2482,14 +2482,14 @@ namespace SQLBuilder.Core.UnitTest
         {
             var query = from a in SqlBuilder.Select<UserInfo>()
                         where a.Id != null && a.Name.Contains("1")
-                        orderby new { a.Id } descending
                         group a by a.Id into g
+                        orderby g.Id descending
                         select new
                         {
                             g.Id
                         };
 
-            Assert.AreEqual("SELECT g.Id FROM Base_UserInfo AS g WHERE g.Id IS NOT NULL AND g.Name LIKE '%' + @p__1 + '%' ORDER BY g.Id DESC GROUP BY g.Id", query.Sql);
+            Assert.AreEqual("SELECT g.Id FROM Base_UserInfo AS g WHERE g.Id IS NOT NULL AND g.Name LIKE '%' + @p__1 + '%' GROUP BY g.Id ORDER BY g.Id DESC", query.Sql);
             Assert.AreEqual(1, query.Parameters.Count);
         }
 

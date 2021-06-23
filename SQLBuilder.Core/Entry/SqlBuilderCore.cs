@@ -4574,7 +4574,7 @@ namespace SQLBuilder.Core.Entry
             if (sql.IsNotNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
-                if (parameters != null)
+                if (parameters.IsNotNullOrEmpty())
                     this.sqlWrapper.DbParameters = parameters;
             }
 
@@ -4649,7 +4649,7 @@ namespace SQLBuilder.Core.Entry
             if (sql.IsNotNullOrEmpty())
             {
                 this.sqlWrapper.DbParameters.Clear();
-                if (parameters != null)
+                if (parameters.IsNotNullOrEmpty())
                     this.sqlWrapper.DbParameters = parameters;
             }
 

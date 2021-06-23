@@ -41,5 +41,10 @@ namespace SQLBuilder.Core.Attributes
         /// 数据库模式
         /// </summary>
         public string Schema { get; set; }
+
+        /// <summary>
+        /// 是否启用格式化，用于全局不启用格式化时，该表名为数据库关键字，此时需要单独启用格式化
+        /// </summary>
+        public bool Format { get; set; }
     }
 }

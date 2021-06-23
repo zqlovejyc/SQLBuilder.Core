@@ -3137,6 +3137,21 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.Name AS TeacherName,y.Name AS ClassName FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询114
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_114()
+        {
+            var builder = SqlBuilder
+                            .Select<TestTable>(x =>
+                                new { x.Id, x.Name, x.OtherName, OrderName = x.Order, GroupName = x.Group })
+                            .Where(x => x.Id == 1);
+
+            Assert.AreEqual("SELECT x.Id,x.Name,x.OtherName,x.[Order] AS OrderName,x.[Group] AS GroupName FROM [Base_Test] AS x WHERE x.Id = @p__1", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

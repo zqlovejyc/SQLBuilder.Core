@@ -46,5 +46,10 @@ namespace SQLBuilder.Core.Attributes
         /// 更新是否有效
         /// </summary>
         public bool Update { get; set; } = true;
+
+        /// <summary>
+        /// 是否启用格式化，用于全局不启用格式化时，该列名为数据库关键字，此时需要单独启用格式化
+        /// </summary>
+        public bool Format { get; set; }
     }
 }

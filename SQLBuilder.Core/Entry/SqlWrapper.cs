@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations.Schema;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.Enums;
@@ -51,7 +50,12 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 表别名字典
         /// </summary>
-        private readonly Dictionary<string, string> aliasDictionary;
+        private readonly Dictionary<string, string> _aliasDictionary;
+
+        /// <summary>
+        /// 格式化列名缓存，多用于以数据库关键字命名的列
+        /// </summary>
+        private readonly List<string> _formatColumns;
         #endregion
 
         #region Public Property
@@ -165,11 +169,12 @@ namespace SQLBuilder.Core.Entry
         /// </summary>
         public SqlWrapper()
         {
-            this.Sql = new StringBuilder();
-            this.SelectFields = new List<string>();
-            this.DbParameters = new Dictionary<string, object>();
-            this.aliasDictionary = new Dictionary<string, string>();
-            this.JoinTypes = new List<Type>();
+            this.Sql = new();
+            this.SelectFields = new();
+            this.DbParameters = new();
+            this.JoinTypes = new();
+            this._aliasDictionary = new();
+            this._formatColumns = new();
         }
         #endregion
 
@@ -405,7 +410,8 @@ namespace SQLBuilder.Core.Entry
             this.Sql.Clear();
             this.DbParameters.Clear();
             this.SelectFields.Clear();
-            this.aliasDictionary.Clear();
+            this._aliasDictionary.Clear();
+            this._formatColumns.Clear();
         }
         #endregion
 
@@ -493,13 +499,13 @@ namespace SQLBuilder.Core.Entry
             else if (parameterKey.IsNullOrEmpty())
             {
                 var name = this.DbParameterPrefix + "p__" + (this.DbParameters.Count + 1);
-                this.DbParameters.Add(name, parameterValue);
+                this.DbParameters.TryAdd(name, parameterValue);
                 this.Sql.Append(name);
             }
             else
             {
                 var name = this.DbParameterPrefix + parameterKey;
-                this.DbParameters.Add(name, parameterValue);
+                this.DbParameters.TryAdd(name, parameterValue);
                 this.Sql.Append(name);
             }
         }
@@ -519,9 +525,9 @@ namespace SQLBuilder.Core.Entry
 
             tableAlias = this.GetFormatName(tableAlias);
 
-            if (!this.aliasDictionary.Keys.Contains(tableAlias))
+            if (!this._aliasDictionary.Keys.Contains(tableAlias))
             {
-                this.aliasDictionary.Add(tableAlias, tableName);
+                this._aliasDictionary.Add(tableAlias, tableName);
                 return true;
             }
 
@@ -545,13 +551,13 @@ namespace SQLBuilder.Core.Entry
                     tableAlias = this.GetFormatName(tableAlias);
 
                     //表别名+表名 同时满足
-                    if (aliasDictionary.Keys.Contains(tableAlias) && aliasDictionary[tableAlias] == tableName)
+                    if (_aliasDictionary.Keys.Contains(tableAlias) && _aliasDictionary[tableAlias] == tableName)
                         return tableAlias;
                 }
 
                 //根据表名获取别名
-                if (aliasDictionary.Values.Contains(tableName))
-                    return aliasDictionary.FirstOrDefault(x => x.Value == tableName).Key;
+                if (_aliasDictionary.Values.Contains(tableName))
+                    return _aliasDictionary.FirstOrDefault(x => x.Value == tableName).Key;
             }
             return string.Empty;
         }
@@ -561,11 +567,12 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 获取格式化名称
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">待格式化的原始名称</param>
+        /// <param name="format">是否强制指定格式化</param>
         /// <returns></returns>
-        public string GetFormatName(string name)
+        public string GetFormatName(string name, bool format = false)
         {
-            if (this.IsEnableFormat &&
+            if ((format || this.IsEnableFormat) &&
                 !name.IsNullOrEmpty() &&
                 !name.StartsWith("[") &&
                 !name.StartsWith("`") &&
@@ -585,13 +592,14 @@ namespace SQLBuilder.Core.Entry
         public string GetTableName(Type type)
         {
             var tableName = this.GetFormatName(type.Name);
+
             if (type.GetFirstOrDefaultAttribute<CusTableAttribute>() is CusTableAttribute cta)
             {
                 if (cta.Name.IsNotNullOrEmpty())
-                    tableName = this.GetFormatName(cta.Name);
+                    tableName = this.GetFormatName(cta.Name, cta.Format);
 
                 if (cta.Schema.IsNotNullOrEmpty())
-                    tableName = $"{this.GetFormatName(cta.Schema)}.{tableName}";
+                    tableName = $"{this.GetFormatName(cta.Schema, cta.Format)}.{tableName}";
             }
             else if (type.GetFirstOrDefaultAttribute<SysTableAttribute>() is SysTableAttribute sta)
             {
@@ -601,6 +609,7 @@ namespace SQLBuilder.Core.Entry
                 if (sta.Schema.IsNotNullOrEmpty())
                     tableName = $"{this.GetFormatName(sta.Schema)}.{tableName}";
             }
+
             return tableName;
         }
         #endregion
@@ -611,7 +620,12 @@ namespace SQLBuilder.Core.Entry
         /// </summary>
         /// <param name="columnName">列名</param>
         /// <returns></returns>
-        public string GetColumnName(string columnName) => this.GetFormatName(columnName);
+        public string GetColumnName(string columnName)
+        {
+            var format = _formatColumns.Any(x => x.EqualIgnoreCase(columnName));
+
+            return this.GetFormatName(columnName, format);
+        }
         #endregion
 
         #region GetColumnInfo
@@ -626,6 +640,7 @@ namespace SQLBuilder.Core.Entry
             string columnName = null;
             var isInsert = true;
             var isUpdate = true;
+            var format = false;
             var props = type.GetProperties();
 
             //判断列是否包含Column特性
@@ -641,6 +656,7 @@ namespace SQLBuilder.Core.Entry
                     columnName = cca.Name;
                     isInsert = cca.Insert;
                     isUpdate = cca.Update;
+                    format = cca.Format;
                 }
                 else if (member.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
                     columnName = sca.Name;
@@ -654,6 +670,7 @@ namespace SQLBuilder.Core.Entry
                             columnName = cus.Name;
                             isInsert = cus.Insert;
                             isUpdate = cus.Update;
+                            format = cus.Format;
                         }
                         else if (p.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
                             columnName = sys.Name;
@@ -670,6 +687,7 @@ namespace SQLBuilder.Core.Entry
                 if (member.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
                 {
                     isUpdate = false;
+                    format = cka.Format;
 
                     if (cka.Identity)
                         isInsert = false;
@@ -696,6 +714,7 @@ namespace SQLBuilder.Core.Entry
                         if (p.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
                         {
                             isUpdate = false;
+                            format = cus.Format;
 
                             if (cus.Identity)
                                 isInsert = false;
@@ -717,6 +736,9 @@ namespace SQLBuilder.Core.Entry
                     }
                 }
             }
+
+            if (format)
+                _formatColumns.Add(columnName);
 
             return (this.GetColumnName(columnName), isInsert, isUpdate);
         }
@@ -749,9 +771,15 @@ namespace SQLBuilder.Core.Entry
                     string keyName = null;
 
                     if (property?.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
+                    {
                         keyName = cka.Name ?? propertyName;
+                        if (cka.Format)
+                            _formatColumns.Add(keyName);
+                    }
                     else if (property?.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
+                    {
                         keyName = propertyName;
+                    }
 
                     result.Add((this.GetColumnName(keyName), propertyName));
                 }

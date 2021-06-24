@@ -2445,7 +2445,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回计数结果</returns>
         public virtual async Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Count<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
+            var builder = Sql.Count<T>(databaseType: DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
             var res = await FindObjectAsync(builder.Sql, builder.DynamicParameters);
 
             return res.To<long>();
@@ -2460,7 +2460,7 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回计数结果</returns>
         public virtual async Task<long> CountAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
-            var builder = Sql.Count<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
+            var builder = Sql.Count<T>(selector, DatabaseType, null, IsEnableFormat).Where(predicate);
             var res = await FindObjectAsync(builder.Sql, builder.DynamicParameters);
 
             return res.To<long>();

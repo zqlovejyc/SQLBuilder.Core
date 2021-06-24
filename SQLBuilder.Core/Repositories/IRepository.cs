@@ -23,7 +23,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -574,6 +573,68 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entity">要更新的实体</param>
         /// <returns>返回受影响行数</returns>
         Task<int> UpdateAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<object>> entity) where T : class;
+        #endregion
+        #endregion
+
+        #region Any
+        #region Sync
+        /// <summary>
+        /// 是否存在任意一个满足查询条件的实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回查询结果</returns>
+        bool Any<T>(Expression<Func<T, bool>> predicate) where T : class;
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 是否存在任意一个满足查询条件的实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回查询结果</returns>
+        Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
+        #endregion
+        #endregion
+
+        #region Count
+        #region Sync
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        long Count<T>(Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        long Count<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        Task<long> CountAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
         #endregion
         #endregion
 

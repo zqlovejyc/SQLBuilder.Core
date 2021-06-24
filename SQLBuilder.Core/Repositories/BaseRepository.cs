@@ -1808,428 +1808,6 @@ namespace SQLBuilder.Core.Repositories
         #endregion
         #endregion
 
-        #region FindObject
-        #region Sync
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual object FindObject(string sql)
-        {
-            return FindObject(sql, null);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual object FindObject(string sql, object parameter)
-        {
-            return ExecuteScalar(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual object FindObject(string sql, params DbParameter[] dbParameter)
-        {
-            return ExecuteScalar(false, sql, dbParameter.ToDynamicParameters());
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual async Task<object> FindObjectAsync(string sql)
-        {
-            return await FindObjectAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual async Task<object> FindObjectAsync(string sql, object parameter)
-        {
-            return await ExecuteScalarAsync(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 查询单个对象
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果对象</returns>
-        public virtual async Task<object> FindObjectAsync(string sql, params DbParameter[] dbParameter)
-        {
-            return await ExecuteScalarAsync(false, sql, dbParameter.ToDynamicParameters());
-        }
-        #endregion
-        #endregion
-
-        #region FindTable
-        #region Sync
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTable(string sql)
-        {
-            return FindTable(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTable(string sql, object parameter)
-        {
-            return Query(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTable(string sql, params DbParameter[] dbParameter)
-        {
-            return Query(false, sql, dbParameter.ToDynamicParameters());
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return PageQuery(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return PageQuery(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTableByWith(string sql)
-        {
-            return FindTableByWith(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTableByWith(string sql, object parameter)
-        {
-            return Query(true, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual DataTable FindTableByWith(string sql, params DbParameter[] dbParameter)
-        {
-            return Query(true, sql, dbParameter.ToDynamicParameters());
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return PageQuery(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return PageQuery(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableAsync(string sql)
-        {
-            return await FindTableAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableAsync(string sql, object parameter)
-        {
-            return await QueryAsync(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableAsync(string sql, params DbParameter[] dbParameter)
-        {
-            return await QueryAsync(false, sql, dbParameter.ToDynamicParameters());
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await PageQueryAsync(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await PageQueryAsync(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableByWithAsync(string sql)
-        {
-            return await FindTableByWithAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableByWithAsync(string sql, object parameter)
-        {
-            return await QueryAsync(true, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回DataTable</returns>
-        public virtual async Task<DataTable> FindTableByWithAsync(string sql, params DbParameter[] dbParameter)
-        {
-            return await QueryAsync(true, sql, dbParameter.ToDynamicParameters());
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await PageQueryAsync(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
-        }
-
-        /// <summary>
-        /// with语法分页查询
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="isAscending">是否升序</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
-        /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
-        {
-            return await PageQueryAsync(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
-        }
-        #endregion
-        #endregion
-
-        #region FindMultiple
-        #region Sync
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql)
-        {
-            return FindMultiple(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql, object parameter)
-        {
-            return QueryMultiple(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql, params DbParameter[] dbParameter)
-        {
-            return QueryMultiple(false, sql, dbParameter.ToDynamicParameters());
-        }
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql)
-        {
-            return await FindMultipleAsync(sql, null);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="parameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, object parameter)
-        {
-            return await QueryMultipleAsync(false, sql, parameter);
-        }
-
-        /// <summary>
-        /// 根据sql语句查询返回多个结果集
-        /// </summary>
-        /// <param name="sql">sql语句</param>
-        /// <param name="dbParameter">对应参数</param>
-        /// <returns>返回查询结果集</returns>
-        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter)
-        {
-            return await QueryMultipleAsync(false, sql, dbParameter.ToDynamicParameters());
-        }
-        #endregion
-        #endregion
-
         #region Insert
         #region Sync
         /// <summary>
@@ -2792,6 +2370,170 @@ namespace SQLBuilder.Core.Repositories
         {
             var builder = Sql.Update<T>(entity, DatabaseType, IsEnableNullValue, SqlIntercept, IsEnableFormat).Where(predicate);
             return await ExecuteAsync(builder);
+        }
+        #endregion
+        #endregion
+
+        #region Any
+        #region Sync
+        /// <summary>
+        /// 是否存在任意一个满足查询条件的实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回查询结果</returns>
+        public virtual bool Any<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            return Count(predicate) > 0;
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 是否存在任意一个满足查询条件的实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回查询结果</returns>
+        public virtual async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            return await CountAsync(predicate) > 0;
+        }
+
+
+        #endregion
+        #endregion
+
+        #region Count
+        #region Sync
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        public virtual long Count<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            var builder = Sql.Count<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
+            var res = FindObject(builder.Sql, builder.DynamicParameters);
+
+            return res.To<long>();
+        }
+
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        public virtual long Count<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
+        {
+            var builder = Sql.Count<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
+            var res = FindObject(builder.Sql, builder.DynamicParameters);
+
+            return res.To<long>();
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        public virtual async Task<long> CountAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            var builder = Sql.Count<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate);
+            var res = await FindObjectAsync(builder.Sql, builder.DynamicParameters);
+
+            return res.To<long>();
+        }
+
+        /// <summary>
+        /// 根据条件计数
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <returns>返回计数结果</returns>
+        public virtual async Task<long> CountAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
+        {
+            var builder = Sql.Count<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
+            var res = await FindObjectAsync(builder.Sql, builder.DynamicParameters);
+
+            return res.To<long>();
+        }
+        #endregion
+        #endregion
+
+        #region FindObject
+        #region Sync
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual object FindObject(string sql)
+        {
+            return FindObject(sql, null);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual object FindObject(string sql, object parameter)
+        {
+            return ExecuteScalar(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual object FindObject(string sql, params DbParameter[] dbParameter)
+        {
+            return ExecuteScalar(false, sql, dbParameter.ToDynamicParameters());
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual async Task<object> FindObjectAsync(string sql)
+        {
+            return await FindObjectAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual async Task<object> FindObjectAsync(string sql, object parameter)
+        {
+            return await ExecuteScalarAsync(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual async Task<object> FindObjectAsync(string sql, params DbParameter[] dbParameter)
+        {
+            return await ExecuteScalarAsync(false, sql, dbParameter.ToDynamicParameters());
         }
         #endregion
         #endregion
@@ -3534,6 +3276,358 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             return await PageQueryAsync<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+        #endregion
+        #endregion
+
+        #region FindTable
+        #region Sync
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTable(string sql)
+        {
+            return FindTable(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTable(string sql, object parameter)
+        {
+            return Query(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTable(string sql, params DbParameter[] dbParameter)
+        {
+            return Query(false, sql, dbParameter.ToDynamicParameters());
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return PageQuery(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return PageQuery(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTableByWith(string sql)
+        {
+            return FindTableByWith(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTableByWith(string sql, object parameter)
+        {
+            return Query(true, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTableByWith(string sql, params DbParameter[] dbParameter)
+        {
+            return Query(true, sql, dbParameter.ToDynamicParameters());
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return PageQuery(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return PageQuery(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableAsync(string sql)
+        {
+            return await FindTableAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableAsync(string sql, object parameter)
+        {
+            return await QueryAsync(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableAsync(string sql, params DbParameter[] dbParameter)
+        {
+            return await QueryAsync(false, sql, dbParameter.ToDynamicParameters());
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return await PageQueryAsync(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return await PageQueryAsync(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableByWithAsync(string sql)
+        {
+            return await FindTableByWithAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableByWithAsync(string sql, object parameter)
+        {
+            return await QueryAsync(true, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableByWithAsync(string sql, params DbParameter[] dbParameter)
+        {
+            return await QueryAsync(true, sql, dbParameter.ToDynamicParameters());
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return await PageQueryAsync(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+        }
+
+        /// <summary>
+        /// with语法分页查询
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>        
+        /// <returns>返回DataTable和总记录数</returns>
+        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            return await PageQueryAsync(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+        }
+        #endregion
+        #endregion
+
+        #region FindMultiple
+        #region Sync
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql)
+        {
+            return FindMultiple(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql, object parameter)
+        {
+            return QueryMultiple(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual List<IEnumerable<dynamic>> FindMultiple(string sql, params DbParameter[] dbParameter)
+        {
+            return QueryMultiple(false, sql, dbParameter.ToDynamicParameters());
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql)
+        {
+            return await FindMultipleAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="parameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, object parameter)
+        {
+            return await QueryMultipleAsync(false, sql, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">sql语句</param>
+        /// <param name="dbParameter">对应参数</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter)
+        {
+            return await QueryMultipleAsync(false, sql, dbParameter.ToDynamicParameters());
         }
         #endregion
         #endregion

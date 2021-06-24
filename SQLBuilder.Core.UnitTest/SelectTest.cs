@@ -3152,6 +3152,20 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT x.Id,x.Name,x.OtherName,x.[Order] AS OrderName,x.[Group] AS GroupName FROM [Base_Test] AS x WHERE x.Id = @p__1", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询115
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_115()
+        {
+            var field = "u.Name";
+
+            var builder = SqlBuilder.Select<UserInfo>(u => new { u.Id, UserName = field });
+
+            Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

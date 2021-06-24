@@ -147,18 +147,26 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Select(MemberExpression expression, SqlWrapper sqlWrapper)
         {
-            var type = expression.Expression.Type != expression.Member.DeclaringType ?
+            if (expression.Expression.NodeType != ExpressionType.Constant)
+            {
+                var type = expression.Expression.Type != expression.Member.DeclaringType ?
                        expression.Expression.Type :
                        expression.Member.DeclaringType;
 
-            var tableName = sqlWrapper.GetTableName(type);
-            var parameter = expression.Expression as ParameterExpression;
-            var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
+                var tableName = sqlWrapper.GetTableName(type);
+                var parameter = expression.Expression as ParameterExpression;
+                var tableAlias = sqlWrapper.GetTableAlias(tableName, parameter?.Name);
 
-            if (tableAlias.IsNotNullOrEmpty())
-                tableAlias += ".";
+                if (tableAlias.IsNotNullOrEmpty())
+                    tableAlias += ".";
 
-            sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+                sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+            }
+            else
+            {
+                var field = expression.ToObject()?.ToString();
+                sqlWrapper.AddField(field);
+            }
 
             return sqlWrapper;
         }

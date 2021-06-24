@@ -150,8 +150,8 @@ namespace SQLBuilder.Core.Expressions
             if (expression.Expression.NodeType != ExpressionType.Constant)
             {
                 var type = expression.Expression.Type != expression.Member.DeclaringType ?
-                       expression.Expression.Type :
-                       expression.Member.DeclaringType;
+                           expression.Expression.Type :
+                           expression.Member.DeclaringType;
 
                 var tableName = sqlWrapper.GetTableName(type);
                 var parameter = expression.Expression as ParameterExpression;

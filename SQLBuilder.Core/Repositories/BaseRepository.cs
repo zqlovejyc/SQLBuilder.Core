@@ -2630,6 +2630,35 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
             return QueryFirstOrDefault<T>(builder);
         }
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        public virtual T FindEntity<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes).Top(1);
+            return QueryFirstOrDefault<T>(builder);
+        }
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        public virtual T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes).Top(1);
+            return QueryFirstOrDefault<T>(builder);
+        }
         #endregion
 
         #region Async
@@ -2723,6 +2752,35 @@ namespace SQLBuilder.Core.Repositories
             var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
             return await QueryFirstOrDefaultAsync(builder);
         }
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        public virtual async Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes).Top(1);
+            return await QueryFirstOrDefaultAsync(builder);
+        }
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        public virtual async Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes).Top(1);
+            return await QueryFirstOrDefaultAsync(builder);
+        }
         #endregion
         #endregion
 
@@ -2752,20 +2810,6 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询指定列并排序
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">选择指定列，null选择全部</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="orderTypes">排序类型，默认正序排序</param>
-        /// <returns>返回集合</returns>
-        public virtual IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
-        {
-            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            return Query<T>(builder);
-        }
-
-        /// <summary>
         /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -2787,6 +2831,34 @@ namespace SQLBuilder.Core.Repositories
         public virtual IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
+            return Query<T>(builder);
+        }
+
+        /// <summary>
+        /// 查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public virtual IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
+            return Query<T>(builder);
+        }
+
+        /// <summary>
+        /// 根据条件查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public virtual IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             return Query<T>(builder);
         }
 
@@ -3028,20 +3100,6 @@ namespace SQLBuilder.Core.Repositories
         }
 
         /// <summary>
-        /// 查询指定列并排序
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">选择指定列，null选择全部</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="orderTypes">排序类型，默认正序排序</param>
-        /// <returns>返回集合</returns>
-        public virtual async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
-        {
-            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
-            return await QueryAsync<T>(builder);
-        }
-
-        /// <summary>
         /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -3063,6 +3121,34 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).Where(predicate);
+            return await QueryAsync<T>(builder);
+        }
+
+        /// <summary>
+        /// 查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public virtual async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(selector, DatabaseType, SqlIntercept, IsEnableFormat).OrderBy(orderField, orderTypes);
+            return await QueryAsync<T>(builder);
+        }
+
+        /// <summary>
+        /// 根据条件查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        public virtual async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            var builder = Sql.Select<T>(databaseType: DatabaseType, sqlIntercept: SqlIntercept, isEnableFormat: IsEnableFormat).Where(predicate).OrderBy(orderField, orderTypes);
             return await QueryAsync<T>(builder);
         }
 

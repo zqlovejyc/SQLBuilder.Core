@@ -16,10 +16,10 @@
 */
 #endregion
 
+using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Repositories;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -1315,12 +1315,13 @@ namespace SQLBuilder.Core.Extensions
         #endregion
 
         #region ToEntity
+        #region Sync
         /// <summary>
         /// 查询单个实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
         /// <returns></returns>
         public static T ToEntity<T>(this Expression<Func<T, bool>> @this, IRepository repository) where T : class
         {
@@ -1330,23 +1331,111 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// 查询单个实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <returns></returns>
+        public static T ToEntity<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector) where T : class
+        {
+            return repository.FindEntity(selector, @this);
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static T ToEntity<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return repository.FindEntity(@this, orderField, orderTypes);
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static T ToEntity<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return repository.FindEntity(selector, @this, orderField, orderTypes);
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
         /// <returns></returns>
         public static async Task<T> ToEntityAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository) where T : class
         {
             return await repository.FindEntityAsync(@this);
         }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <returns></returns>
+        public static async Task<T> ToEntityAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector) where T : class
+        {
+            return await repository.FindEntityAsync(selector, @this);
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static async Task<T> ToEntityAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return await repository.FindEntityAsync(@this, orderField, orderTypes);
+        }
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static async Task<T> ToEntityAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return await repository.FindEntityAsync(selector, @this, orderField, orderTypes);
+        }
+        #endregion
         #endregion
 
         #region ToList
+        #region Sync
         /// <summary>
         /// 查询集合
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
         /// <returns></returns>
         public static List<T> ToList<T>(this Expression<Func<T, bool>> @this, IRepository repository) where T : class
         {
@@ -1356,27 +1445,115 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// 查询集合
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector) where T : class
+        {
+            return repository.FindList(selector, @this)?.ToList();
+        }
+
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return repository.FindList(@this, orderField, orderTypes)?.ToList();
+        }
+
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return repository.FindList(selector, @this, orderField, orderTypes)?.ToList();
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
         /// <returns></returns>
         public static async Task<List<T>> ToListAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository) where T : class
         {
             return (await repository.FindListAsync(@this))?.ToList();
         }
+
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <returns></returns>
+        public static async Task<List<T>> ToListAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector) where T : class
+        {
+            return (await repository.FindListAsync(selector, @this))?.ToList();
+        }
+
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static async Task<List<T>> ToListAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return (await repository.FindListAsync(@this, orderField, orderTypes))?.ToList();
+        }
+
+        /// <summary>
+        /// 查询集合
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns></returns>
+        public static async Task<List<T>> ToListAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class
+        {
+            return (await repository.FindListAsync(selector, @this, orderField, orderTypes))?.ToList();
+        }
+        #endregion
         #endregion
 
         #region ToPage
+        #region Sync
         /// <summary>
         /// 分页
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
-        /// <param name="orderField"></param>
-        /// <param name="isAscending"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageIndex"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param> 
         /// <returns></returns>
         public static (List<T> list, long total) ToPage<T>(this Expression<Func<T, bool>> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
@@ -1388,13 +1565,34 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// 分页
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="repository"></param>
-        /// <param name="orderField"></param>
-        /// <param name="isAscending"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageIndex"></param>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param> 
+        /// <returns></returns>
+        public static (List<T> list, long total) ToPage<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        {
+            var (list, total) = repository.FindList(selector, @this, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param> 
         /// <returns></returns>
         public static async Task<(List<T> list, long total)> ToPageAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
         {
@@ -1402,6 +1600,26 @@ namespace SQLBuilder.Core.Extensions
 
             return (list?.ToList(), total);
         }
+
+        /// <summary>
+        /// 分页
+        /// </summary>
+        /// <typeparam name="T">表实体类型</typeparam>
+        /// <param name="this">条件</param>
+        /// <param name="repository">仓储</param>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param> 
+        /// <returns></returns>
+        public static async Task<(List<T> list, long total)> ToPageAsync<T>(this Expression<Func<T, bool>> @this, IRepository repository, Expression<Func<T, object>> selector, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        {
+            var (list, total) = await repository.FindListAsync(selector, @this, orderField, isAscending, pageSize, pageIndex);
+
+            return (list?.ToList(), total);
+        }
+        #endregion
         #endregion
     }
 }

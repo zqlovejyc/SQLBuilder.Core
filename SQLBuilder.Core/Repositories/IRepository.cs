@@ -751,6 +751,27 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
         #endregion
 
         #region Async
@@ -813,6 +834,27 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回实体</returns>
         Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>        
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
+
+        /// <summary>
+        /// 根据条件、排序查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
         #endregion
         #endregion
 
@@ -834,16 +876,6 @@ namespace SQLBuilder.Core.Repositories
         IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
-        /// 查询指定列并排序
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">选择指定列，null选择全部</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="orderTypes">排序类型，默认正序排序</param>
-        /// <returns>返回集合</returns>
-        IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
-
-        /// <summary>
         /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -859,6 +891,26 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
+
+        /// <summary>
+        /// 根据条件查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindList<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
 
         /// <summary>
         /// 根据条件查询指定列并排序
@@ -1041,16 +1093,6 @@ namespace SQLBuilder.Core.Repositories
         Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector) where T : class;
 
         /// <summary>
-        /// 查询指定列并排序
-        /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
-        /// <param name="selector">选择指定列，null选择全部</param>
-        /// <param name="orderField">排序字段</param>
-        /// <param name="orderTypes">排序类型，默认正序排序</param>
-        /// <returns>返回集合</returns>
-        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
-
-        /// <summary>
         /// 根据条件查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>        
@@ -1066,6 +1108,26 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="predicate">查询条件</param>
         /// <returns>返回集合</returns>
         Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate) where T : class;
+
+        /// <summary>
+        /// 查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="selector">选择指定列，null选择全部</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
+
+        /// <summary>
+        /// 根据条件查询指定列并排序
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="predicate">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="orderTypes">排序类型，默认正序排序</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderField, params OrderType[] orderTypes) where T : class;
 
         /// <summary>
         /// 根据条件查询指定列并排序

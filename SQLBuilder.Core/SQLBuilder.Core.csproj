@@ -7,17 +7,18 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.2.3.0</AssemblyVersion>
+        <AssemblyVersion>2.2.4.0</AssemblyVersion>
         <Authors>张强</Authors>
-        <Version>2.2.3</Version>
+        <Version>2.2.4</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化查询字段别名解析；
-2.Table、Key、Column特性新增Format属性，用于某些与数据库关键字重名的表名、列名单独进行格式化；
-3.升级MySqlConnector版本；</PackageReleaseNotes>
-        <FileVersion>2.2.3.0</FileVersion>
+        <PackageReleaseNotes>1.仓储新增Any、Count接口及其实现；
+2.修复Select中自定义字符串解析错误bug；
+3.重载仓储FindEntity、FindList方法；
+4.重载LinqExtensions扩展方法ToEntity、ToList、ToPage；</PackageReleaseNotes>
+        <FileVersion>2.2.4.0</FileVersion>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageIcon>sql.png</PackageIcon>

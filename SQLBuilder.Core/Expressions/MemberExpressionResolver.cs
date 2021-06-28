@@ -395,7 +395,8 @@ namespace SQLBuilder.Core.Expressions
             if (expression.Expression.NodeType == ExpressionType.Parameter)
                 sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
 
-            if (expression.Expression.NodeType == ExpressionType.Constant)
+            if (expression.Expression.NodeType == ExpressionType.Constant ||
+                expression.Expression.NodeType == ExpressionType.MemberAccess)
             {
                 var convertRes = expression.ToObject();
                 if (convertRes != null)
@@ -499,7 +500,8 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }
 
-            if (expression.Expression.NodeType == ExpressionType.Constant)
+            if (expression.Expression.NodeType == ExpressionType.Constant ||
+                expression.Expression.NodeType == ExpressionType.MemberAccess)
             {
                 var convertRes = expression.ToObject();
                 if (convertRes != null)

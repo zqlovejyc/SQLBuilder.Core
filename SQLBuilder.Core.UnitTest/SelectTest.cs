@@ -428,6 +428,25 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT * FROM Base_UserInfo AS t WHERE t.Name = @p__1 GROUP BY t.Id", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 分组11
+        /// </summary>
+        [TestMethod]
+        public void Test_GroupBy_11()
+        {
+            var user = new UserInfo { Name = "Id" };
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>()
+                            .Where(o =>
+                                o.Name == "张强")
+                            .GroupBy(u =>
+                                user.Name);
+
+            Assert.AreEqual("SELECT * FROM Base_UserInfo AS t WHERE t.Name = @p__1 GROUP BY t.Id", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Having
@@ -842,6 +861,24 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("SELECT [x].[Email],[y].[Name] FROM [Base_UserInfo] AS [x] INNER JOIN [Base_Student] AS [y] ON [x].[Id] = [y].[UserId] WHERE [x].[Name] = @p__1 GROUP BY [x].[Email],[y].[Name] ORDER BY [y].[Name]", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 排序18
+        /// </summary>
+        [TestMethod]
+        public void Test_OrderBy_18()
+        {
+            var user = new UserInfo { Name = "Name" };
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>()
+                            .OrderBy(u =>
+                                user.Name,
+                                OrderType.Descending);
+
+            Assert.AreEqual("SELECT * FROM Base_UserInfo AS t ORDER BY t.Name DESC", builder.Sql);
+            Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion
 

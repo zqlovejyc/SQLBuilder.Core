@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System.ComponentModel;
+
 namespace SQLBuilder.Core.Enums
 {
     /// <summary>
@@ -26,26 +28,26 @@ namespace SQLBuilder.Core.Enums
         /// <summary>
         /// SqlServer数据库类型
         /// </summary>
-        SqlServer,
+        [Description("SqlServer")] SqlServer,
 
         /// <summary>
         /// MySql数据库类型
         /// </summary>
-        MySql,
+        [Description("MySql")] MySql,
 
         /// <summary>
         /// Oracle数据库类型
         /// </summary>
-        Oracle,
+        [Description("Oracle")] Oracle,
 
         /// <summary>
         /// Sqlite数据库类型
         /// </summary>
-        Sqlite,
+        [Description("Sqlite")] Sqlite,
 
         /// <summary>
         /// PostgreSql数据库类型
         /// </summary>
-        PostgreSql
+        [Description("PostgreSql")] PostgreSql
     }
 }

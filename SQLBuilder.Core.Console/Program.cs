@@ -242,8 +242,8 @@ namespace SQLBuilder.Core
                     .Select<UserInfo>(u => 
                         u.Id)
                     .Where(u => 
-                        u.Name.LikeRight(name)),
-                "查询单表，带where LikeRight条件"
+                        u.Name.StartsWith(name)),
+                "查询单表，带where StartsWith条件"
             );
 
             Print(
@@ -353,8 +353,8 @@ namespace SQLBuilder.Core
                         u.Id < int.MaxValue &&
                         u.Id.In(1, 2, 3) &&
                         u.Name.Like("a") &&
-                        u.Name.LikeLeft("b") &&
-                        u.Name.LikeRight("c") ||
+                        u.Name.EndsWith("b") &&
+                        u.Name.StartsWith("c") ||
                         u.Id == null),
                 "查询单表，带多个where条件"
             );

@@ -133,5 +133,23 @@ namespace SQLBuilder.Core.Expressions
             return sqlWrapper;
         }
         #endregion
+
+        #region Where
+        /// <summary>
+        /// Where
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper Where(NewArrayExpression expression, SqlWrapper sqlWrapper)
+        {
+            foreach (var item in expression.Expressions)
+            {
+                SqlExpressionProvider.Where(item, sqlWrapper);
+            }
+
+            return sqlWrapper;
+        }
+        #endregion
     }
 }

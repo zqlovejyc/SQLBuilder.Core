@@ -1078,7 +1078,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Select<UserInfo>(u =>
                                 u.Id)
                             .Where(u =>
-                                u.Name.LikeRight(name));
+                                u.Name.StartsWith(name));
 
             Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE u.Name LIKE @p__1 + '%'", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
@@ -1166,8 +1166,8 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Id < int.MaxValue &&
                                 u.Id.In(1, 2, 3) &&
                                 u.Name.Like("a") &&
-                                u.Name.LikeLeft("b") &&
-                                u.Name.LikeRight("c") ||
+                                u.Name.EndsWith("b") &&
+                                u.Name.StartsWith("c") ||
                                 u.Id == null);
 
             Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE (((((((u.Name = @p__1 AND (u.Id > @p__2 AND u.Name IS NOT NULL)) AND u.Id > @p__3) AND u.Id < @p__4) AND u.Id IN (@p__5,@p__6,@p__7)) AND u.Name LIKE '%' + @p__8 + '%') AND u.Name LIKE '%' + @p__9) AND u.Name LIKE @p__10 + '%') OR u.Id IS NULL", builder.Sql);
@@ -3202,6 +3202,96 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("SELECT u.Id,u.Name AS UserName FROM Base_UserInfo AS u", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询116
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_116()
+        {
+            var name = "张三";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                u.Name.StartsWithIgnoreCase(name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE UPPER(@p__1) + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询117
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_117()
+        {
+            var name = "张三";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                u.Name.EndsWithIgnoreCase(name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE '%' + UPPER(@p__1)", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询118
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_118()
+        {
+            var user = new UserInfo { Name = "张" };
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                u.Name.StartsWithIgnoreCase(user.Name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE UPPER(@p__1) + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询119
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_119()
+        {
+            var user = new UserInfo { Name = "张" };
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                u.Name.ContainsIgnoreCase(user.Name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 查询120
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_120()
+        {
+            var name = "张";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                u.Name.ContainsIgnoreCase(name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
         }
         #endregion
 

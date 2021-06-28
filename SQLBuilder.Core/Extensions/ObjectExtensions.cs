@@ -38,26 +38,6 @@ namespace SQLBuilder.Core.Extensions
         public static bool Like(this object @this, string value) => true;
         #endregion
 
-        #region LikeLeft
-        /// <summary>
-        /// LIKE '% _ _ _'
-        /// </summary>
-        /// <param name="this">扩展对象自身</param>
-        /// <param name="value">包含的字符串</param>
-        /// <returns>bool</returns>
-        public static bool LikeLeft(this object @this, string value) => true;
-        #endregion
-
-        #region LikeRight
-        /// <summary>
-        /// LIKE '_ _ _ %'
-        /// </summary>
-        /// <param name="this">扩展对象自身</param>
-        /// <param name="value">包含的字符串</param>
-        /// <returns>bool</returns>
-        public static bool LikeRight(this object @this, string value) => true;
-        #endregion
-
         #region NotLike
         /// <summary>
         /// NOT LIKE

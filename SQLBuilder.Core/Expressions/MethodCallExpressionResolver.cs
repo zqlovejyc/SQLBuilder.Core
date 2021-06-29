@@ -60,7 +60,7 @@ namespace SQLBuilder.Core.Expressions
                 ["Sum"] = SqlSum,
                 ["Avg"] = SqlAvg,
                 ["Max"] = SqlMax,
-                ["Min"] = SqlMin,
+                ["Min"] = SqlMin
             };
         #endregion
 

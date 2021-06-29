@@ -196,10 +196,10 @@ namespace SQLBuilder.Core.Expressions
             if (lNested)
                 sqlWrapper.Append("(");
 
-            if (method.EqualIgnoreCase("Join"))
+            if (method.EqualIgnoreCase(nameof(Join)))
                 SqlExpressionProvider.Join(expression.Left, sqlWrapper);
 
-            else if (method.EqualIgnoreCase("Having"))
+            else if (method.EqualIgnoreCase(nameof(Having)))
                 SqlExpressionProvider.Having(expression.Left, sqlWrapper);
 
             else
@@ -224,7 +224,7 @@ namespace SQLBuilder.Core.Expressions
             if (rNested)
                 sqlWrapper.Append("(");
 
-            if (method.EqualIgnoreCase("Having"))
+            if (method.EqualIgnoreCase(nameof(Having)))
                 SqlExpressionProvider.Having(expression.Right, sqlWrapper);
 
             else

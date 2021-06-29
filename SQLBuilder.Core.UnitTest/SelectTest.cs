@@ -3293,6 +3293,24 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
             Assert.AreEqual(1, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 查询121
+        /// </summary>
+        [TestMethod]
+        public void Test_Select_121()
+        {
+            var name = "张";
+
+            var builder = SqlBuilder
+                            .Select<UserInfo>(u =>
+                                u.Id)
+                            .Where(u =>
+                                !u.Name.ContainsIgnoreCase(name));
+
+            Assert.AreEqual("SELECT u.Id FROM Base_UserInfo AS u WHERE UPPER(u.Name) NOT LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
+            Assert.AreEqual(1, builder.Parameters.Count);
+        }
         #endregion
 
         #region Page

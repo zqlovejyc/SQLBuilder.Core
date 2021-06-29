@@ -57,7 +57,7 @@ namespace SQLBuilder.Core.Expressions
             var startIndex = sqlWrapper.Length;
 
             //嵌套解析
-            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Join");
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, nameof(Join));
 
             //取非解析
             ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
@@ -78,7 +78,7 @@ namespace SQLBuilder.Core.Expressions
             var startIndex = sqlWrapper.Length;
 
             //嵌套解析
-            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Where");
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, nameof(Where));
 
             //取非解析
             ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
@@ -99,7 +99,7 @@ namespace SQLBuilder.Core.Expressions
             var startIndex = sqlWrapper.Length;
 
             //嵌套解析
-            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, "Having");
+            var operatorIndex = ExpressionNestedResolver(expression, sqlWrapper, nameof(Having));
 
             //取非解析
             ExpressionNotResolver(expression, sqlWrapper, startIndex, operatorIndex);
@@ -179,8 +179,8 @@ namespace SQLBuilder.Core.Expressions
         /// </summary>
         /// <param name="expression">表达式树</param>
         /// <param name="sqlWrapper">sql包装器</param>
-        /// <param name="keyWord">sql关键字，不区分大小写，可选值：Join、Having、Where</param>
-        public static int ExpressionNestedResolver(BinaryExpression expression, SqlWrapper sqlWrapper, string keyWord)
+        /// <param name="method">方法名，可选值：Join、Having、Where</param>
+        public static int ExpressionNestedResolver(BinaryExpression expression, SqlWrapper sqlWrapper, string method)
         {
             //左侧嵌套
             var lExpr = expression.Left as BinaryExpression;
@@ -196,10 +196,10 @@ namespace SQLBuilder.Core.Expressions
             if (lNested)
                 sqlWrapper.Append("(");
 
-            if (keyWord.EqualIgnoreCase("Join"))
+            if (method.EqualIgnoreCase("Join"))
                 SqlExpressionProvider.Join(expression.Left, sqlWrapper);
 
-            else if (keyWord.EqualIgnoreCase("Having"))
+            else if (method.EqualIgnoreCase("Having"))
                 SqlExpressionProvider.Having(expression.Left, sqlWrapper);
 
             else
@@ -224,7 +224,7 @@ namespace SQLBuilder.Core.Expressions
             if (rNested)
                 sqlWrapper.Append("(");
 
-            if (keyWord.EqualIgnoreCase("Having"))
+            if (method.EqualIgnoreCase("Having"))
                 SqlExpressionProvider.Having(expression.Right, sqlWrapper);
 
             else

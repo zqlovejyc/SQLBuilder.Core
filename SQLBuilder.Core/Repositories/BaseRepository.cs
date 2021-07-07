@@ -142,7 +142,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public virtual DatabaseType DatabaseType { get; }
+        public virtual DatabaseType DatabaseType { get; set; }
         #endregion
 
         #region Constructor

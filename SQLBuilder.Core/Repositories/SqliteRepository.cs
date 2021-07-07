@@ -33,7 +33,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public override DatabaseType DatabaseType => DatabaseType.Sqlite;
+        public override DatabaseType DatabaseType { get; set; } = DatabaseType.Sqlite;
         #endregion
 
         #region Constructor

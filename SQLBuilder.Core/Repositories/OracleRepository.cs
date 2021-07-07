@@ -39,7 +39,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public override DatabaseType DatabaseType => DatabaseType.Oracle;
+        public override DatabaseType DatabaseType { get; set; } = DatabaseType.Oracle;
         #endregion
 
         #region Constructor

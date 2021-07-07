@@ -92,7 +92,7 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 数据库类型
         /// </summary>
-        DatabaseType DatabaseType { get; set; }
+        DatabaseType DatabaseType { get; }
         #endregion
 
         #region UseMasterOrSlave

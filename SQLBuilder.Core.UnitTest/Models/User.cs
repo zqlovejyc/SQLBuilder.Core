@@ -16,6 +16,15 @@ namespace SQLBuilder.Core.UnitTest
         public string Email { get; set; }
     }
 
+    /// <summary>
+    /// 查询转换实体
+    /// </summary>
+    public class UserDto
+    {
+        public int Sex { get; set; }
+        public string Name { get; set; }
+    }
+
     public class Const
     {
         public static string Name = "张三";

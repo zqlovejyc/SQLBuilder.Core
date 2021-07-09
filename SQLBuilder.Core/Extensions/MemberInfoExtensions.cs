@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -50,6 +51,28 @@ namespace SQLBuilder.Core.Extensions
         public static object[] GetAttributes<T>(this MemberInfo @this) where T : Attribute
         {
             return @this?.GetCustomAttributes(typeof(T), false);
+        }
+
+        /// <summary>
+        /// 获取指定特性集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static object[] GetAttributes(this MemberInfo @this, params Type[] attributeTypes)
+        {
+            if (attributeTypes.IsNullOrEmpty())
+                return null;
+
+            var res = new List<object>();
+            foreach (var type in attributeTypes)
+            {
+                var attributes = @this?.GetCustomAttributes(type, false);
+                if (attributes?.Length > 0)
+                    res.AddRange(attributes);
+            }
+
+            return res.ToArray();
         }
         #endregion
 

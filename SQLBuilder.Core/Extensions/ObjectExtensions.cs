@@ -18,8 +18,13 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SQLBuilder.Core.Attributes;
+using SQLBuilder.Core.Enums;
 using System;
 using System.ComponentModel;
+using System.Reflection;
+using System.Text;
+using SysColumnAttribute = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
 
 namespace SQLBuilder.Core.Extensions
 {
@@ -236,6 +241,99 @@ namespace SQLBuilder.Core.Extensions
             }
 
             return (T)@this;
+        }
+        #endregion
+
+        #region ToColumns
+        /// <summary>
+        /// 根据实体类型获取所有列的查询字符串
+        /// </summary>
+        /// <param name="this">实体Type类型</param>
+        /// <param name="format">是否启用格式化</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <returns></returns>
+        public static string ToColumns(this Type @this, bool format, DatabaseType databaseType)
+        {
+            var properties = @this.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+            if (properties.IsNullOrEmpty())
+                return "*";
+
+            var columns = new StringBuilder();
+
+            //遍历属性
+            foreach (var property in properties)
+            {
+                var select = true;
+                var propertyName = property.Name;
+                var columnName = string.Empty;
+
+                //获取特性
+                var attributes = property.GetAttributes(
+                    typeof(KeyAttribute),
+                    typeof(ColumnAttribute),
+                    typeof(SysColumnAttribute));
+
+                if (attributes.IsNotNullOrEmpty())
+                {
+                    foreach (var attribute in attributes)
+                    {
+                        var (name, res) = attribute switch
+                        {
+                            KeyAttribute keyAttr => (keyAttr.Name, true),
+                            ColumnAttribute columnAttr => (columnAttr.Name, !(!columnAttr.Update && !columnAttr.Insert)),
+                            SysColumnAttribute sysColumnAttr => (sysColumnAttr.Name, true),
+                            _ => (null, true)
+                        };
+
+                        //判断是否要进行查询
+                        if (!res)
+                        {
+                            select = res;
+                            continue;
+                        }
+
+                        //只匹配第一个name不为空的特性
+                        if (columnName.IsNullOrEmpty() && name.IsNotNullOrEmpty())
+                            columnName = name;
+                    }
+                }
+
+                //判断是否要进行查询
+                if (!select)
+                    continue;
+
+                //格式化
+                if (format)
+                {
+                    //格式化模板
+                    var template = databaseType switch
+                    {
+                        DatabaseType.Sqlite => "\"{0}\"",
+                        DatabaseType.SqlServer => "[{0}]",
+                        DatabaseType.MySql => "`{0}`",
+                        DatabaseType.Oracle => "\"{0}\"",
+                        DatabaseType.PostgreSql => "\"{0}\"",
+                        _ => "{0}",
+                    };
+
+                    columns.Append(columnName.IsNullOrEmpty()
+                        ? string.Format(template, propertyName)
+                        : $"{string.Format(template, columnName)} AS {string.Format(template, propertyName)}");
+                }
+                //非格式化
+                else
+                {
+                    columns.Append(columnName.IsNullOrEmpty()
+                        ? propertyName
+                        : $"{columnName} AS {propertyName}");
+                }
+
+                columns.Append(",");
+            }
+
+            columns.Remove(columns.Length - 1, 1);
+
+            return columns.ToString();
         }
         #endregion
     }

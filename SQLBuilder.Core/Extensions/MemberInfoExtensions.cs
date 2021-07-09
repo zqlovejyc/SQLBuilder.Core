@@ -56,8 +56,8 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// 获取指定特性集合
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
+        /// <param name="attributeTypes"></param>
         /// <returns></returns>
         public static object[] GetAttributes(this MemberInfo @this, params Type[] attributeTypes)
         {

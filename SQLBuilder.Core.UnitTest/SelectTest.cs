@@ -3318,7 +3318,7 @@ namespace SQLBuilder.Core.UnitTest
         [TestMethod]
         public void Test_Select_122()
         {
-            var format = true;
+            var format = false;
             var databaseType = DatabaseType.SqlServer;
 
             var builder = SqlBuilder.Select<UserInfo>(
@@ -3326,7 +3326,7 @@ namespace SQLBuilder.Core.UnitTest
                 databaseType,
                 isEnableFormat: format);
 
-            Assert.AreEqual("SELECT [Sex],[Name] FROM [Base_UserInfo] AS [t]", builder.Sql);
+            Assert.AreEqual("SELECT [Sex],Name FROM Base_UserInfo AS t", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

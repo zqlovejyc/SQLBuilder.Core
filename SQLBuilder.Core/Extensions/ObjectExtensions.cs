@@ -264,6 +264,7 @@ namespace SQLBuilder.Core.Extensions
             foreach (var property in properties)
             {
                 var select = true;
+                var columnFormat = false;
                 var propertyName = property.Name;
                 var columnName = string.Empty;
 
@@ -277,12 +278,12 @@ namespace SQLBuilder.Core.Extensions
                 {
                     foreach (var attribute in attributes)
                     {
-                        var (name, res) = attribute switch
+                        var (name, res, colFormat) = attribute switch
                         {
-                            KeyAttribute keyAttr => (keyAttr.Name, true),
-                            ColumnAttribute columnAttr => (columnAttr.Name, !(!columnAttr.Update && !columnAttr.Insert)),
-                            SysColumnAttribute sysColumnAttr => (sysColumnAttr.Name, true),
-                            _ => (null, true)
+                            KeyAttribute key => (key.Name, true, key.Format),
+                            ColumnAttribute column => (column.Name, !(!column.Update && !column.Insert), column.Format),
+                            SysColumnAttribute sys => (sys.Name, true, false),
+                            _ => (null, true, false)
                         };
 
                         //判断是否要进行查询
@@ -295,6 +296,10 @@ namespace SQLBuilder.Core.Extensions
                         //只匹配第一个name不为空的特性
                         if (columnName.IsNullOrEmpty() && name.IsNotNullOrEmpty())
                             columnName = name;
+
+                        //判断是否单独启用格式化
+                        if (colFormat)
+                            columnFormat = colFormat;
                     }
                 }
 
@@ -302,8 +307,8 @@ namespace SQLBuilder.Core.Extensions
                 if (!select)
                     continue;
 
-                //格式化
-                if (format)
+                //全局格式化、单独格式化
+                if (format || columnFormat)
                 {
                     //格式化模板
                     var template = databaseType switch

@@ -323,14 +323,18 @@ namespace SQLBuilder.Core.Extensions
 
                     columns.Append(columnName.IsNullOrEmpty()
                         ? string.Format(template, propertyName)
-                        : $"{string.Format(template, columnName)} AS {string.Format(template, propertyName)}");
+                        : (columnName.EqualIgnoreCase(propertyName)
+                        ? string.Format(template, columnName)
+                        : $"{string.Format(template, columnName)} AS {string.Format(template, propertyName)}"));
                 }
                 //非格式化
                 else
                 {
                     columns.Append(columnName.IsNullOrEmpty()
                         ? propertyName
-                        : $"{columnName} AS {propertyName}");
+                        : (columnName.EqualIgnoreCase(propertyName)
+                        ? columnName
+                        : $"{columnName} AS {propertyName}"));
                 }
 
                 columns.Append(",");

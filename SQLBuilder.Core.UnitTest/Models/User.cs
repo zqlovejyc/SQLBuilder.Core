@@ -21,7 +21,7 @@ namespace SQLBuilder.Core.UnitTest
     /// </summary>
     public class UserDto
     {
-        [Column(Format = true)]
+        [Column("SEX", Format = true)]
         public int Sex { get; set; }
         public string Name { get; set; }
     }

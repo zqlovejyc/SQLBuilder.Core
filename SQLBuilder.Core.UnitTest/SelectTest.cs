@@ -3326,7 +3326,7 @@ namespace SQLBuilder.Core.UnitTest
                 databaseType,
                 isEnableFormat: format);
 
-            Assert.AreEqual("SELECT [Sex],Name FROM Base_UserInfo AS t", builder.Sql);
+            Assert.AreEqual("SELECT [SEX],Name FROM Base_UserInfo AS t", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
         #endregion

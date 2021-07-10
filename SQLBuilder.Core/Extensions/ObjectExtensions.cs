@@ -128,10 +128,8 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this">object对象</param>
         /// <param name="type">type</param>
         /// <returns>object</returns>
-        public static object ToSafeValue(this object @this, Type type)
-        {
-            return @this == null ? null : Convert.ChangeType(@this, type.GetCoreType());
-        }
+        public static object ToSafeValue(this object @this, Type type) =>
+            @this == null ? null : Convert.ChangeType(@this, type.GetCoreType());
         #endregion
 
         #region IsNull
@@ -140,10 +138,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">object对象</param>
         /// <returns>bool</returns>
-        public static bool IsNull(this object @this)
-        {
-            return @this == null || @this == DBNull.Value;
-        }
+        public static bool IsNull(this object @this) =>
+            @this == null || @this == DBNull.Value;
         #endregion
 
         #region IsNotNull
@@ -152,10 +148,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">object对象</param>
         /// <returns>bool</returns>
-        public static bool IsNotNull(this object @this)
-        {
-            return !@this.IsNull();
-        }
+        public static bool IsNotNull(this object @this) =>
+            !@this.IsNull();
         #endregion
 
         #region ToJson
@@ -164,10 +158,8 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">待序列化的对象</param>
         /// <returns>string</returns>
-        public static string ToJson(this object @this)
-        {
-            return JsonConvert.SerializeObject(@this);
-        }
+        public static string ToJson(this object @this) =>
+            JsonConvert.SerializeObject(@this);
 
         /// <summary>
         /// 对象序列化为json字符串
@@ -175,10 +167,8 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this">待序列化的对象</param>
         /// <param name="settings">JsonSerializerSettings配置</param>
         /// <returns></returns>
-        public static string ToJson(this object @this, JsonSerializerSettings settings)
-        {
-            return JsonConvert.SerializeObject(@this, settings ?? new JsonSerializerSettings());
-        }
+        public static string ToJson(this object @this, JsonSerializerSettings settings) =>
+            JsonConvert.SerializeObject(@this, settings ?? new JsonSerializerSettings());
 
         /// <summary>
         /// 对象序列化为json字符串
@@ -252,10 +242,8 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this">实体Type类型</param>
         /// <param name="repository">仓储</param>
         /// <returns></returns>
-        public static string ToColumns(this Type @this, IRepository repository)
-        {
-            return @this.ToColumns(repository.IsEnableFormat, repository.DatabaseType);
-        }
+        public static string ToColumns(this Type @this, IRepository repository) =>
+            @this.ToColumns(repository.IsEnableFormat, repository.DatabaseType);
 
         /// <summary>
         /// 根据实体类型获取所有列的查询字符串

@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Repositories;
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -245,6 +246,17 @@ namespace SQLBuilder.Core.Extensions
         #endregion
 
         #region ToColumns
+        /// <summary>
+        /// 根据实体类型获取所有列的查询字符串
+        /// </summary>
+        /// <param name="this">实体Type类型</param>
+        /// <param name="repository">仓储</param>
+        /// <returns></returns>
+        public static string ToColumns(this Type @this, IRepository repository)
+        {
+            return @this.ToColumns(repository.IsEnableFormat, repository.DatabaseType);
+        }
+
         /// <summary>
         /// 根据实体类型获取所有列的查询字符串
         /// </summary>

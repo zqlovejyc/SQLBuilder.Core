@@ -128,7 +128,6 @@ namespace SQLBuilder.Core.Expressions
                 for (var i = 0; i < expression.Members.Count; i++)
                 {
                     var argument = expression.Arguments[i];
-                    var member = expression.Members[i];
 
                     SqlExpressionProvider.Select(argument, sqlWrapper);
 
@@ -136,11 +135,12 @@ namespace SQLBuilder.Core.Expressions
                     if (fieldName.IsNotNullOrEmpty() && fieldName.Contains(".") && !fieldName.Contains("(", ")"))
                         fieldName = fieldName.Split('.').LastOrDefault();
 
+                    var memberName = sqlWrapper.GetColumnName(expression.Members[i].Name);
+
                     //添加字段别名
                     if (argument is MemberExpression memberExpression)
                     {
                         var agrumentName = sqlWrapper.GetColumnName(memberExpression.Member.Name);
-                        var memberName = sqlWrapper.GetColumnName(member.Name);
 
                         if (!agrumentName.Equals(!sqlWrapper.IsEnableFormat, memberName))
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {memberName}";
@@ -151,7 +151,6 @@ namespace SQLBuilder.Core.Expressions
                     else if (argument is ConstantExpression constantExpression)
                     {
                         var agrumentName = sqlWrapper.GetColumnName(constantExpression.Value?.ToString());
-                        var memberName = sqlWrapper.GetColumnName(member.Name);
 
                         if (!agrumentName.Equals(!sqlWrapper.IsEnableFormat, memberName))
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {memberName}";
@@ -166,7 +165,6 @@ namespace SQLBuilder.Core.Expressions
                             agrumentName = sqlWrapper.SelectFields.LastOrDefault();
 
                         agrumentName = sqlWrapper.GetColumnName(agrumentName);
-                        var memberName = sqlWrapper.GetColumnName(member.Name);
 
                         if (!agrumentName.Equals(!sqlWrapper.IsEnableFormat, memberName))
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {memberName}";
@@ -177,7 +175,6 @@ namespace SQLBuilder.Core.Expressions
                     else if (argument is BinaryExpression binaryExpression)
                     {
                         var agrumentName = sqlWrapper.GetColumnName(binaryExpression.ToObject()?.ToString());
-                        var memberName = sqlWrapper.GetColumnName(member.Name);
 
                         if (!agrumentName.Equals(!sqlWrapper.IsEnableFormat, memberName))
                             sqlWrapper.SelectFields[sqlWrapper.FieldCount - 1] += $" AS {memberName}";

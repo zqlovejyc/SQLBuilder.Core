@@ -267,7 +267,12 @@ services.AddSqlBuilder(Configuration, "Base", (sql, parameter) =>
   "Cap": [
     "MySql",
     "Server=127.0.0.1;Database=db;Uid=root;Pwd=123456;SslMode=None;"
-  ]
+  ],
+  "Oracle": [ "Oracle", "数据库连接字符串" ],
+  "MySql": [ "MySql", "数据库连接字符串" ],
+  "Sqlserver": [ "SqlServer", "数据库连接字符串" ],
+  "Sqlite": [ "Sqlite", "数据库连接字符串" ],
+  "Pgsql": [ "PostgreSql", "数据库连接字符串" ]
 }
 ```
 

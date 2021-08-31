@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SQLBuilder.Core.UnitTest
@@ -21,7 +22,7 @@ namespace SQLBuilder.Core.UnitTest
                                     Name = "",
                                     Sex = 1,
                                     Email = "123456@qq.com"
-                                }, 
+                                },
                                 isEnableFormat: true);
 
             Assert.AreEqual("UPDATE [Base_UserInfo] SET [Name] = @p__1,[Sex] = @p__2,[Email] = @p__3", builder.Sql);
@@ -41,7 +42,7 @@ namespace SQLBuilder.Core.UnitTest
                                     Sex = 1,
                                     Email = "123456@qq.com"
                                 })
-                            .Where(u => 
+                            .Where(u =>
                                 u.Id == 1);
 
             Assert.AreEqual("UPDATE Base_UserInfo SET Sex = @p__1,Email = @p__2 WHERE Id = @p__3", builder.Sql);
@@ -214,6 +215,27 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.AreEqual("UPDATE Base_UserInfo SET Sex = @p__1,Email = @p__2 WHERE Id IN (@p__3,@p__4,@p__5,@p__6,@p__7)", builder.Sql);
             Assert.AreEqual(7, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 修改11
+        /// </summary>
+        [TestMethod]
+        public void Test_Update_11()
+        {
+            var dic = new Dictionary<string, object>
+            {
+                ["Sex"] = 1,
+                ["Email"] = "123456@qq.com"
+            };
+
+            var builder = SqlBuilder
+                            .Update<UserInfo>(() => dic)
+                            .Where(u =>
+                                u.Id == 1);
+
+            Assert.AreEqual("UPDATE Base_UserInfo SET Sex = @p__1,Email = @p__2 WHERE Id = @p__3", builder.Sql);
+            Assert.AreEqual(3, builder.Parameters.Count);
         }
     }
 }

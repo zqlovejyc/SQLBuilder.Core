@@ -121,6 +121,25 @@ namespace SQLBuilder.Core.UnitTest
             Assert.AreEqual("INSERT INTO Base_Account (UserId,Name) VALUES (@p__1,@p__2)", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
+
+        /// <summary>
+        /// 单个新增7
+        /// </summary>
+        [TestMethod]
+        public void Test_Insert_07()
+        {
+            var dic = new Dictionary<string, object>
+            {
+                ["Name"] = "张三",
+                ["Sex"] = 2
+            };
+
+            var builder = SqlBuilder
+                            .Insert<UserInfo>(() => dic);
+
+            Assert.AreEqual("INSERT INTO Base_UserInfo (Sex,Name) VALUES (@p__1,@p__2)", builder.Sql);
+            Assert.AreEqual(2, builder.Parameters.Count);
+        }
         #endregion
 
         #region 批量新增
@@ -327,7 +346,7 @@ namespace SQLBuilder.Core.UnitTest
                                 {
                                     new UserInfo{ Name = "张三", Sex = 2 },
                                     new UserInfo { Name = "张三", Sex = 2 }
-                                }, 
+                                },
                                 isEnableNullValue: true);
 
             Assert.AreEqual("INSERT INTO Base_UserInfo (Id,Sex,Name,Email) VALUES (NULL,@p__1,@p__2,NULL),(NULL,@p__3,@p__4,NULL)", builder.Sql);
@@ -349,6 +368,34 @@ namespace SQLBuilder.Core.UnitTest
                                 });
 
             Assert.AreEqual("INSERT INTO Base_UserInfo (Name,Sex) VALUES (@p__1,@p__2),(@p__3,@p__4)", builder.Sql);
+            Assert.AreEqual(4, builder.Parameters.Count);
+        }
+
+        /// <summary>
+        /// 批量新增13
+        /// </summary>
+        [TestMethod]
+        public void Test_Batch_Insert_13()
+        {
+            var dics = new[]
+            {
+                new Dictionary<string,object>
+                {
+                    ["Name"] = "张三",
+                    ["Sex"] = 2
+                },
+                new Dictionary<string,object>
+                {
+                    ["Name"] = "张三",
+                    ["Sex"] = 2
+                }
+            };
+            var builder = SqlBuilder
+                            .Insert<UserInfo>(() =>
+                                dics,
+                                DatabaseType.Oracle);
+
+            Assert.AreEqual("INSERT INTO Base_UserInfo (Sex,Name) SELECT :p__1,:p__2 FROM DUAL UNION ALL SELECT :p__3,:p__4 FROM DUAL", builder.Sql);
             Assert.AreEqual(4, builder.Parameters.Count);
         }
         #endregion

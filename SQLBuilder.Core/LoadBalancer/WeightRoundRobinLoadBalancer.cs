@@ -28,17 +28,7 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class WeightRoundRobin
     {
-        #region 属性
-        /// <summary>
-        /// 权重集合
-        /// </summary>
-        public int[] Weights { get; set; }
-
-        /// <summary>
-        /// 最小权重
-        /// </summary>
-        private readonly int minWeight;
-
+        #region 字段
         /// <summary>
         /// 状态值
         /// </summary>
@@ -48,6 +38,16 @@ namespace SQLBuilder.Core.LoadBalancer
         /// 次数
         /// </summary>
         private readonly int[] _times;
+
+        /// <summary>
+        /// 权重集合
+        /// </summary>
+        private readonly int[] _weights;
+
+        /// <summary>
+        /// 最小权重
+        /// </summary>
+        private readonly int _minWeight;
         #endregion
 
         #region 构造
@@ -57,10 +57,8 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <param name="weights"></param>
         public WeightRoundRobin(int[] weights)
         {
-            Weights = weights;
-
-            minWeight = weights.Min();
-
+            _weights = weights;
+            _minWeight = weights.Min();
             _states = new int[weights.Length];
             _times = new int[weights.Length];
         }
@@ -70,23 +68,24 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <summary>
         /// 获取最大状态
         /// </summary>
-        /// <param name="ds"></param>
-        /// <param name="idx"></param>
+        /// <param name="states"></param>
+        /// <param name="index"></param>
         /// <returns></returns>
-        private int GetMaxState(int[] ds, out int idx)
+        private static int GetMaxState(int[] states, out int index)
         {
-            var n = int.MinValue;
-            idx = 0;
-            for (var i = 0; i < ds.Length; i++)
+            index = 0;
+            var state = int.MinValue;
+
+            for (var i = 0; i < states.Length; i++)
             {
-                if (ds[i] > n)
+                if (states[i] > state)
                 {
-                    n = ds[i];
-                    idx = i;
+                    state = states[i];
+                    index = i;
                 }
             }
 
-            return n;
+            return state;
         }
 
         /// <summary>
@@ -96,27 +95,25 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public int Get(out int times)
         {
-            // 选择状态最大值
-            var cur = GetMaxState(_states, out var idx);
+            //选择状态最大值
+            var state = GetMaxState(_states, out var index);
 
-            // 如果所有状态都不达标，则集体加盐
-            if (cur < minWeight)
+            //如果所有状态都不达标，则集体加盐
+            if (state < _minWeight)
             {
-                for (var i = 0; i < Weights.Length; i++)
-                {
-                    _states[i] += Weights[i];
-                }
+                for (var i = 0; i < _weights.Length; i++)
+                    _states[i] += _weights[i];
 
-                // 重新选择状态最大值
-                cur = GetMaxState(_states, out idx);
+                //重新选择状态最大值
+                GetMaxState(_states, out index);
             }
 
-            // 已选择，减状态
-            _states[idx] -= minWeight;
+            //已选择，减状态
+            _states[index] -= _minWeight;
 
-            times = ++_times[idx];
+            times = ++_times[index];
 
-            return idx;
+            return index;
         }
 
         /// <summary>
@@ -168,7 +165,9 @@ namespace SQLBuilder.Core.LoadBalancer
                 }
 
                 //初始化权重算法
-                var weightRoundRobin = _weightRoundRobins.GetOrAdd($"{key}_{weightList.Count}", new WeightRoundRobin(weightList.ToArray()));
+                var weightRoundRobin = _weightRoundRobins.GetOrAdd(
+                    $"{key}_{weightList.Count}",
+                    new WeightRoundRobin(weightList.ToArray()));
 
                 //获取索引值
                 var index = weightRoundRobin.Get();

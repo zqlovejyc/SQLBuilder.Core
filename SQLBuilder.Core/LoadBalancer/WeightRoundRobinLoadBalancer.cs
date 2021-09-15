@@ -19,7 +19,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace SQLBuilder.Core.LoadBalancer
 {
@@ -129,7 +128,7 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class WeightRoundRobinLoadBalancer : ILoadBalancer
     {
-        private readonly SemaphoreSlim _lock = new(1, 1);
+        private static readonly object _lock = new();
 
         private static readonly ConcurrentDictionary<string, WeightRoundRobin> _weightRoundRobins = new();
 
@@ -143,41 +142,41 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
-            try
+            var count = data.Count();
+            var weightList = new List<int>();
+
+            if (weights == null)
+                data.ToList().ForEach(x => weightList.Add(1));
+            else
             {
-                _lock.Wait();
-
-                //初始化权重数组
-                var count = data.Count();
-                var weightList = new List<int>();
-
-                if (weights == null)
-                    data.ToList().ForEach(x => weightList.Add(1));
-                else
+                for (int i = 0; i < count; i++)
                 {
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (i < weights.Length)
-                            weightList.Add(weights[i]);
-                        else
-                            weightList.Add(1);
-                    }
+                    if (i < weights.Length)
+                        weightList.Add(weights[i]);
+                    else
+                        weightList.Add(1);
                 }
-
-                //初始化权重算法
-                var weightRoundRobin = _weightRoundRobins.GetOrAdd(
-                    $"{key}_{weightList.Count}",
-                    new WeightRoundRobin(weightList.ToArray()));
-
-                //获取索引值
-                var index = weightRoundRobin.Get();
-
-                return data.ElementAt(index);
             }
-            finally
+
+            key = $"{key}_{string.Join("_", weightList)}";
+
+            WeightRoundRobin weightRoundRobin;
+
+            if (_weightRoundRobins.ContainsKey(key))
+                weightRoundRobin = _weightRoundRobins[key];
+            else
             {
-                _lock.Release();
+                lock (_lock)
+                {
+                    weightRoundRobin = new WeightRoundRobin(weightList.ToArray());
+                    _weightRoundRobins[key] = weightRoundRobin;
+                }
             }
+
+            //获取索引值
+            var index = weightRoundRobin.Get();
+
+            return data.ElementAt(index);
         }
     }
 }

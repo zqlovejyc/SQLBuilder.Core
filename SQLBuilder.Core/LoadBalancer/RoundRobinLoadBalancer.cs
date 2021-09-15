@@ -19,7 +19,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace SQLBuilder.Core.LoadBalancer
 {
@@ -28,7 +27,7 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class RoundRobinLoadBalancer : ILoadBalancer
     {
-        private readonly SemaphoreSlim _lock = new(1, 1);
+        private static readonly object _lock = new();
 
         private static readonly ConcurrentDictionary<string, int> _serviceIndexs = new();
 
@@ -42,29 +41,22 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
-            try
+            var count = data.Count();
+            key = $"{key}_{count}";
+
+            var index = _serviceIndexs.GetOrAdd(key, 0);
+            var retval = data.ElementAt(index);
+
+            lock (_lock)
             {
-                _lock.Wait();
-
-                var count = data.Count();
-                key = $"{key}_{count}";
-
-                var index = _serviceIndexs.GetOrAdd(key, 0);
-
-                var retval = data.ElementAt(index);
-
                 index++;
                 if (index >= count)
                     index = 0;
 
                 _serviceIndexs[key] = index;
+            }
 
-                return retval;
-            }
-            finally
-            {
-                _lock.Release();
-            }
+            return retval;
         }
     }
 }

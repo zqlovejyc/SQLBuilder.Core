@@ -16,6 +16,7 @@
  */
 #endregion
 
+using Microsoft.Extensions.Configuration;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
@@ -41,7 +42,9 @@ namespace SQLBuilder.Core.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
-        public NpgsqlRepository(string connectionString) : base(connectionString) { }
+        /// <param name="configuration">数据库连接配置，默认：null，为null时则使用ConfigurationManager.Configuration</param>
+        public NpgsqlRepository(string connectionString, IConfiguration configuration = null)
+            : base(connectionString, configuration) { }
         #endregion
 
         #region Page

@@ -125,7 +125,7 @@ namespace SQLBuilder.Core.Extensions
                 //实例化仓储
                 return databaseType switch
                 {
-                    DatabaseType.SqlServer => new SqlRepository(configs[1])
+                    DatabaseType.SqlServer => new SqlRepository(configs[1], configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
@@ -133,7 +133,7 @@ namespace SQLBuilder.Core.Extensions
                         LoadBalancer = loadBalancer,
                         SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.MySql => new MySqlRepository(configs[1])
+                    DatabaseType.MySql => new MySqlRepository(configs[1], configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
@@ -141,7 +141,7 @@ namespace SQLBuilder.Core.Extensions
                         LoadBalancer = loadBalancer,
                         SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.Oracle => new OracleRepository(configs[1])
+                    DatabaseType.Oracle => new OracleRepository(configs[1], configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
@@ -149,7 +149,7 @@ namespace SQLBuilder.Core.Extensions
                         LoadBalancer = loadBalancer,
                         SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.Sqlite => new SqliteRepository(configs[1])
+                    DatabaseType.Sqlite => new SqliteRepository(configs[1], configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
@@ -157,7 +157,7 @@ namespace SQLBuilder.Core.Extensions
                         LoadBalancer = loadBalancer,
                         SlaveConnectionStrings = slaveConnectionStrings.ToArray()
                     },
-                    DatabaseType.PostgreSql => new NpgsqlRepository(configs[1])
+                    DatabaseType.PostgreSql => new NpgsqlRepository(configs[1], configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,

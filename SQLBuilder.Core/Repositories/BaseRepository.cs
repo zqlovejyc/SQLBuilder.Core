@@ -19,6 +19,7 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
@@ -150,13 +151,17 @@ namespace SQLBuilder.Core.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">主库连接字符串，或者链接字符串名称</param>
-        public BaseRepository(string connectionString)
+        /// <param name="configuration">数据库连接配置，默认：null，为null时则使用ConfigurationManager.Configuration</param>
+        public BaseRepository(string connectionString, IConfiguration configuration = null)
         {
+            //数据库连接配置
+            configuration ??= ConfigurationManager.Configuration;
+
             //判断是链接字符串，还是链接字符串名称
             if (connectionString?.Contains(":") == true)
-                MasterConnectionString = ConfigurationManager.GetValue<string>(connectionString);
+                MasterConnectionString = configuration.GetValue<string>(connectionString);
             else
-                MasterConnectionString = ConfigurationManager.GetConnectionString(connectionString);
+                MasterConnectionString = configuration.GetConnectionString(connectionString);
 
             if (MasterConnectionString.IsNullOrEmpty())
                 MasterConnectionString = connectionString;

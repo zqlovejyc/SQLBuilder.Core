@@ -53,17 +53,17 @@ namespace SQLBuilder.Core.Configuration
             if (!env.IsNullOrWhiteSpace())
                 jsonFile = $"appsettings.{env}.json";
 
-            SetConfigurationFile(jsonFile);
+            SetConfiguration(jsonFile);
         }
         #endregion
 
-        #region SetConfigurationFile
+        #region SetConfiguration
         /// <summary>
         /// 设置app配置
         /// </summary>
         /// <param name="fileName">文件名</param>
         /// <param name="basePath">文件路径，默认：Directory.GetCurrentDirectory()</param>
-        public static void SetConfigurationFile(string fileName, string basePath = null)
+        public static void SetConfiguration(string fileName, string basePath = null)
         {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath.IsNullOrEmpty() ? Directory.GetCurrentDirectory() : basePath)

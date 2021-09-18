@@ -16,12 +16,12 @@
  */
 #endregion
 
-using System;
-using System.IO;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SQLBuilder.Core.Extensions;
+using System;
+using System.IO;
 
 namespace SQLBuilder.Core.Configuration
 {
@@ -47,6 +47,11 @@ namespace SQLBuilder.Core.Configuration
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (environment.IsNotNullOrEmpty())
                 jsonFile = $"appsettings.{environment}.json";
+
+            //添加appsettings自定义环境变量
+            var env = Environment.GetEnvironmentVariable("APPSETTINGS_ENVIRONMENT");
+            if (!env.IsNullOrWhiteSpace())
+                jsonFile = $"appsettings.{env}.json";
 
             SetConfigurationFile(jsonFile);
         }

@@ -28,26 +28,26 @@ namespace SQLBuilder.Core.Enums
         /// <summary>
         /// SqlServer数据库类型
         /// </summary>
-        [Description("SqlServer")] SqlServer,
+        [Description("SqlServer")] SqlServer = 0,
 
         /// <summary>
         /// MySql数据库类型
         /// </summary>
-        [Description("MySql")] MySql,
+        [Description("MySql")] MySql = 1,
 
         /// <summary>
         /// Oracle数据库类型
         /// </summary>
-        [Description("Oracle")] Oracle,
+        [Description("Oracle")] Oracle = 2,
 
         /// <summary>
         /// Sqlite数据库类型
         /// </summary>
-        [Description("Sqlite")] Sqlite,
+        [Description("Sqlite")] Sqlite = 3,
 
         /// <summary>
         /// PostgreSql数据库类型
         /// </summary>
-        [Description("PostgreSql")] PostgreSql
+        [Description("PostgreSql")] PostgreSql = 4
     }
 }

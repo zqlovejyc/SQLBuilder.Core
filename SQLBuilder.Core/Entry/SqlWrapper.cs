@@ -117,40 +117,30 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 数据参数化前缀
         /// </summary>
-        public string DbParameterPrefix
-        {
-            get
+        public string DbParameterPrefix =>
+            this.DatabaseType switch
             {
-                return this.DatabaseType switch
-                {
-                    DatabaseType.Sqlite => "@",
-                    DatabaseType.SqlServer => "@",
-                    DatabaseType.MySql => "?",
-                    DatabaseType.Oracle => ":",
-                    DatabaseType.PostgreSql => ":",
-                    _ => "",
-                };
-            }
-        }
+                DatabaseType.Sqlite => "@",
+                DatabaseType.SqlServer => "@",
+                DatabaseType.MySql => "?",
+                DatabaseType.Oracle => ":",
+                DatabaseType.PostgreSql => ":",
+                _ => "",
+            };
 
         /// <summary>
         /// 格式化模板
         /// </summary>
-        public string FormatTemplate
-        {
-            get
+        public string FormatTemplate =>
+            this.DatabaseType switch
             {
-                return this.DatabaseType switch
-                {
-                    DatabaseType.Sqlite => "\"{0}\"",
-                    DatabaseType.SqlServer => "[{0}]",
-                    DatabaseType.MySql => "`{0}`",
-                    DatabaseType.Oracle => "\"{0}\"",
-                    DatabaseType.PostgreSql => "\"{0}\"",
-                    _ => "{0}",
-                };
-            }
-        }
+                DatabaseType.Sqlite => "\"{0}\"",
+                DatabaseType.SqlServer => "[{0}]",
+                DatabaseType.MySql => "`{0}`",
+                DatabaseType.Oracle => "\"{0}\"",
+                DatabaseType.PostgreSql => "\"{0}\"",
+                _ => "{0}",
+            };
 
         /// <summary>
         /// 已Join的表实体类型

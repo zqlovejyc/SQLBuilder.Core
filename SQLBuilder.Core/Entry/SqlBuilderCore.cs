@@ -76,21 +76,16 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// SQL格式化参数
         /// </summary>
-        public DbParameter[] DbParameters
-        {
-            get
+        public DbParameter[] DbParameters =>
+            this.sqlWrapper.DatabaseType switch
             {
-                return this.sqlWrapper.DatabaseType switch
-                {
-                    DatabaseType.SqlServer => this.sqlWrapper.DbParameters.ToSqlParameters(),
-                    DatabaseType.MySql => this.sqlWrapper.DbParameters.ToMySqlParameters(),
-                    DatabaseType.Sqlite => this.sqlWrapper.DbParameters.ToSqliteParameters(),
-                    DatabaseType.Oracle => this.sqlWrapper.DbParameters.ToOracleParameters(),
-                    DatabaseType.PostgreSql => this.sqlWrapper.DbParameters.ToNpgsqlParameters(),
-                    _ => null
-                };
-            }
-        }
+                DatabaseType.SqlServer => this.sqlWrapper.DbParameters.ToSqlParameters(),
+                DatabaseType.MySql => this.sqlWrapper.DbParameters.ToMySqlParameters(),
+                DatabaseType.Sqlite => this.sqlWrapper.DbParameters.ToSqliteParameters(),
+                DatabaseType.Oracle => this.sqlWrapper.DbParameters.ToOracleParameters(),
+                DatabaseType.PostgreSql => this.sqlWrapper.DbParameters.ToNpgsqlParameters(),
+                _ => null
+            };
         #endregion
 
         #region Constructor

@@ -43,8 +43,8 @@ namespace SQLBuilder.Core.Parameters
         /// </summary>
         public OracleDynamicParameters()
         {
-            DynamicParameters = new DynamicParameters();
-            OracleParameters = new List<OracleParameter>();
+            DynamicParameters = new();
+            OracleParameters = new();
         }
 
         /// <summary>
@@ -81,10 +81,12 @@ namespace SQLBuilder.Core.Parameters
         public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction, object value = null, int? size = null)
         {
             OracleParameter oracleParameter;
+
             if (size.HasValue)
-                oracleParameter = new OracleParameter(name, oracleDbType, size.Value, value, direction);
+                oracleParameter = new(name, oracleDbType, size.Value, value, direction);
             else
-                oracleParameter = new OracleParameter(name, oracleDbType, value, direction);
+                oracleParameter = new(name, oracleDbType, value, direction);
+
             OracleParameters.Add(oracleParameter);
         }
 
@@ -96,6 +98,7 @@ namespace SQLBuilder.Core.Parameters
         public void AddParameters(IDbCommand command, SqlMapper.Identity identity)
         {
             ((SqlMapper.IDynamicParameters)DynamicParameters).AddParameters(command, identity);
+
             if (command is OracleCommand oracleCommand)
                 oracleCommand.Parameters.AddRange(OracleParameters.ToArray());
         }

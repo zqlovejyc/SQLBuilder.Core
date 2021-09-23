@@ -28,11 +28,11 @@ namespace SQLBuilder.Core.Enums
         /// <summary>
         /// 升序
         /// </summary>
-        [Description("Ascending")] Ascending,
+        [Description("Ascending")] Ascending = 0,
 
         /// <summary>
         /// 降序
         /// </summary>
-        [Description("Descending")] Descending
+        [Description("Descending")] Descending = 1
     }
 }

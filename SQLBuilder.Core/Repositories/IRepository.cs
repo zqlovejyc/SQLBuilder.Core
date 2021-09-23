@@ -229,6 +229,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 执行sql语句
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回受影响行数</returns>
+        int ExecuteBySql(FormattableString sql);
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
@@ -248,6 +255,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="procName">存储过程名称</param>
         /// <returns>返回受影响行数</returns>
         int ExecuteByProc(string procName);
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procSql">内插存储过程sql</param>
+        /// <returns>返回受影响行数</returns>
+        int ExecuteByProc(FormattableString procSql);
 
         /// <summary>
         /// 执行sql存储过程
@@ -286,6 +300,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 执行sql语句
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回受影响行数</returns>
+        Task<int> ExecuteBySqlAsync(FormattableString sql);
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
@@ -305,6 +326,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="procName">存储过程名称</param>
         /// <returns>返回受影响行数</returns>
         Task<int> ExecuteByProcAsync(string procName);
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procSql">内插存储过程sql</param>
+        /// <returns>返回受影响行数</returns>
+        Task<int> ExecuteByProcAsync(FormattableString procSql);
 
         /// <summary>
         /// 执行sql存储过程
@@ -650,6 +678,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 查询单个对象
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        object FindObject(FormattableString sql);
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回查询结果对象</returns>
@@ -671,6 +706,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回查询结果对象</returns>
         Task<object> FindObjectAsync(string sql);
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        Task<object> FindObjectAsync(FormattableString sql);
 
         /// <summary>
         /// 查询单个对象
@@ -707,6 +749,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回实体</returns>
         T FindEntity<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回实体</returns>
+        T FindEntity<T>(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询单个实体
@@ -790,6 +840,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回实体</returns>
         Task<T> FindEntityAsync<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回实体</returns>
+        Task<T> FindEntityAsync<T>(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询单个实体
@@ -935,6 +993,14 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindList<T>(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -1030,6 +1096,14 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回集合</returns>
         IEnumerable<T> FindListByWith<T>(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        IEnumerable<T> FindListByWith<T>(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询
@@ -1152,6 +1226,14 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListAsync<T>(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -1252,6 +1334,14 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        Task<IEnumerable<T>> FindListByWithAsync<T>(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -1302,6 +1392,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回DataTable</returns>
         DataTable FindTable(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        DataTable FindTable(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询
@@ -1364,6 +1461,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        DataTable FindTableByWith(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回DataTable</returns>
@@ -1409,6 +1513,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回DataTable</returns>
         Task<DataTable> FindTableAsync(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        Task<DataTable> FindTableAsync(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询
@@ -1471,6 +1582,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        Task<DataTable> FindTableByWithAsync(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回DataTable</returns>
@@ -1522,6 +1640,13 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询返回多个结果集
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        List<IEnumerable<dynamic>> FindMultiple(FormattableString sql);
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回查询结果集</returns>
@@ -1543,6 +1668,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="sql">sql语句</param>
         /// <returns>返回查询结果集</returns>
         Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql);
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        Task<List<IEnumerable<dynamic>>> FindMultipleAsync(FormattableString sql);
 
         /// <summary>
         /// 根据sql语句查询返回多个结果集

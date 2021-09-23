@@ -66,6 +66,9 @@ namespace SQLBuilder.Core
 
             //DiagnosticSourceTest();
 
+            //FormattableString sql = $"select * from user where id={1}";
+            //var (sqlFormat, parameters) = sql.ToParameter(DatabaseType.Oracle);
+
             var hostBuilder = CreateHostBuilder(args);
 
             await hostBuilder.RunConsoleAsync();
@@ -138,7 +141,7 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         new { u.Id, u.Name }, DatabaseType.Oracle)
                     .Top(100),
                 "查询单表多个字段，并返回指定TOP数量的数据 Oracle"
@@ -146,7 +149,7 @@ namespace SQLBuilder.Core
 
             Print(
                SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         new { u.Id, u.Name })
                     .Top(100)
                     .Distinct(),
@@ -169,10 +172,10 @@ namespace SQLBuilder.Core
 
             Print(
                 SqlBuilder
-                    .Select<Student>(o => 
+                    .Select<Student>(o =>
                         new { o.Id, o.Name })
                     .Where(x =>
-                        x.IsEffective.Value && 
+                        x.IsEffective.Value &&
                         x.IsOnLine),
                 "查询单表，带where bool类型字段"
             );
@@ -182,7 +185,7 @@ namespace SQLBuilder.Core
                     .Select<Student>(o =>
                         new { o.Id, o.Name })
                     .Where(x =>
-                        !x.IsEffective.Value && 
+                        !x.IsEffective.Value &&
                         !x.IsOnLine),
                "查询单表，带where bool类型字段"
             );
@@ -191,7 +194,7 @@ namespace SQLBuilder.Core
                SqlBuilder
                     .Select<Student>(o =>
                         new { o.Id, o.Name })
-                    .Where(x => 
+                    .Where(x =>
                         x.IsEffective == true &&
                         x.IsOnLine == false),
                "查询单表，带where bool类型字段"
@@ -202,7 +205,7 @@ namespace SQLBuilder.Core
                 SqlBuilder
                     .Select<UserInfo>(o =>
                         new { o.Id, o.Name })
-                    .Where(u => 
+                    .Where(u =>
                         u.Name.Equals(entity.name)),
                 "查询单表，带where 变量"
             );
@@ -211,7 +214,7 @@ namespace SQLBuilder.Core
                 SqlBuilder
                     .Select<UserInfo>(o =>
                         new { o.Id, o.Name })
-                    .Where(u => 
+                    .Where(u =>
                         1 == 1)
                     .AndWhere(u =>
                         u.Name == ""),
@@ -232,25 +235,25 @@ namespace SQLBuilder.Core
                 SqlBuilder
                     .Select<UserInfo>(u =>
                         u.Id)
-                    .Where(u => 
+                    .Where(u =>
                         u.Name.NotLike(name)),
                 "查询单表，带where Not Like"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Id)
-                    .Where(u => 
+                    .Where(u =>
                         u.Name.StartsWith(name)),
                 "查询单表，带where StartsWith条件"
             );
 
             Print(
               SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         !"a,b,c".Split(new[] { ',' }).Contains(u.Name)),
               "查询单表，带where contains条件，写法一"
             );
@@ -259,16 +262,16 @@ namespace SQLBuilder.Core
                 SqlBuilder
                     .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         new string[] { "a", "b" }.Contains(u.Name)),
                 "查询单表，带where contains条件，写法二"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         "*")
-                    .Where(u => 
+                    .Where(u =>
                         !new string[] { "a", "b" }.Contains(u.Name)),
                 "查询单表，带where contains条件，写法三"
             );
@@ -286,36 +289,36 @@ namespace SQLBuilder.Core
             var user = new UserInfo { Name = "a,b,c" };
             Print(
               SqlBuilder
-                .Select<UserInfo>(u => 
+                .Select<UserInfo>(u =>
                     u.Name)
-                .Where(u => 
+                .Where(u =>
                     user.Name.Split(new[] { ',' }).Contains(u.Name)),
               "查询单表，带where contains条件，写法五"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         u.Id.In(1, 2, 3)),
                 "查询单表，带where in条件，写法一"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         u.Id.In(arrayId)),
                 "查询单表，带where in条件，写法二"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         !u.Name.In(new string[] { "a", "b" })),
                 "查询单表，带where in条件，写法三"
             );
@@ -324,20 +327,20 @@ namespace SQLBuilder.Core
                 SqlBuilder
                     .Select<UserInfo>(u =>
                         u.Name)
-                    .Where(u => 
+                    .Where(u =>
                         u.Id.NotIn(1, 2, 3)),
                 "查询单表，带where not in条件，写法一"
             );
 
             Print(
                 SqlBuilder
-                    .Select<UserInfo>(u => 
+                    .Select<UserInfo>(u =>
                         u.Name)
                     .Where(u =>
                         u.Name.Contains("11"))
-                    .AndWhere(u => 
+                    .AndWhere(u =>
                         !string.IsNullOrEmpty(u.Name))
-                    .AndWhere(u => 
+                    .AndWhere(u =>
                         string.IsNullOrEmpty(u.Email)),
                 "查询单表，带where Contains、string.IsNullOrEmpty、!string.IsNullOrEmpty"
             );

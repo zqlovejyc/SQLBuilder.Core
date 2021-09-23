@@ -1672,6 +1672,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 执行sql语句
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回受影响行数</returns>
+        public virtual int ExecuteBySql(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return Execute(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
@@ -1699,6 +1711,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual int ExecuteByProc(string procName)
         {
             return Execute(procName, null, CommandType.StoredProcedure);
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procSql">内插存储过程sql</param>
+        /// <returns>返回受影响行数</returns>
+        public virtual int ExecuteByProc(FormattableString procSql)
+        {
+            var (sqlFormat, parameter) = procSql.ToDynamicParameter(this.DatabaseType);
+
+            return Execute(sqlFormat, parameter, CommandType.StoredProcedure);
         }
 
         /// <summary>
@@ -1749,6 +1773,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 执行sql语句
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回受影响行数</returns>
+        public virtual async Task<int> ExecuteBySqlAsync(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await ExecuteAsync(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 执行sql语句
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回受影响行数</returns>
@@ -1776,6 +1812,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<int> ExecuteByProcAsync(string procName)
         {
             return await ExecuteAsync(procName, null, CommandType.StoredProcedure);
+        }
+
+        /// <summary>
+        /// 执行sql存储过程
+        /// </summary>
+        /// <param name="procSql">内插存储过程sql</param>
+        /// <returns>返回受影响行数</returns>
+        public virtual async Task<int> ExecuteByProcAsync(FormattableString procSql)
+        {
+            var (sqlFormat, parameter) = procSql.ToDynamicParameter(this.DatabaseType);
+
+            return await ExecuteAsync(sqlFormat, parameter, CommandType.StoredProcedure);
         }
 
         /// <summary>
@@ -2488,6 +2536,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 查询单个对象
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual object FindObject(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindObject(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回查询结果对象</returns>
@@ -2517,6 +2577,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<object> FindObjectAsync(string sql)
         {
             return await FindObjectAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 查询单个对象
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果对象</returns>
+        public virtual async Task<object> FindObjectAsync(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindObjectAsync(sqlFormat, parameter);
         }
 
         /// <summary>
@@ -2569,6 +2641,19 @@ namespace SQLBuilder.Core.Repositories
         public virtual T FindEntity<T>(string sql)
         {
             return QueryFirstOrDefault<T>(false, sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回实体</returns>
+        public virtual T FindEntity<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return QueryFirstOrDefault<T>(false, sqlFormat, parameter);
         }
 
         /// <summary>
@@ -2691,6 +2776,19 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<T> FindEntityAsync<T>(string sql)
         {
             return await QueryFirstOrDefaultAsync<T>(false, sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询单个实体
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回实体</returns>
+        public virtual async Task<T> FindEntityAsync<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await QueryFirstOrDefaultAsync<T>(false, sqlFormat, parameter);
         }
 
         /// <summary>
@@ -2897,6 +2995,19 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        public virtual IEnumerable<T> FindList<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindList<T>(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -3021,6 +3132,19 @@ namespace SQLBuilder.Core.Repositories
         public virtual IEnumerable<T> FindListByWith<T>(string sql)
         {
             return FindListByWith<T>(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        public virtual IEnumerable<T> FindListByWith<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindListByWith<T>(sqlFormat, parameter);
         }
 
         /// <summary>
@@ -3187,6 +3311,19 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        public virtual async Task<IEnumerable<T>> FindListAsync<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindListAsync<T>(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -3317,6 +3454,19 @@ namespace SQLBuilder.Core.Repositories
         /// 根据sql语句查询
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回集合</returns>
+        public virtual async Task<IEnumerable<T>> FindListByWithAsync<T>(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindListByWithAsync<T>(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回集合</returns>
@@ -3381,6 +3531,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual DataTable FindTable(string sql)
         {
             return FindTable(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTable(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindTable(sqlFormat, parameter);
         }
 
         /// <summary>
@@ -3462,6 +3624,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual DataTable FindTableByWith(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindTableByWith(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回DataTable</returns>
@@ -3521,6 +3695,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<DataTable> FindTableAsync(string sql)
         {
             return await FindTableAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableAsync(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindTableAsync(sqlFormat, parameter);
         }
 
         /// <summary>
@@ -3602,6 +3788,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回DataTable</returns>
+        public virtual async Task<DataTable> FindTableByWithAsync(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindTableByWithAsync(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回DataTable</returns>
@@ -3668,6 +3866,18 @@ namespace SQLBuilder.Core.Repositories
         /// <summary>
         /// 根据sql语句查询返回多个结果集
         /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual List<IEnumerable<dynamic>> FindMultiple(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return FindMultiple(sqlFormat, parameter);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
         /// <param name="sql">sql语句</param>
         /// <param name="parameter">对应参数</param>
         /// <returns>返回查询结果集</returns>
@@ -3697,6 +3907,18 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql)
         {
             return await FindMultipleAsync(sql, null);
+        }
+
+        /// <summary>
+        /// 根据sql语句查询返回多个结果集
+        /// </summary>
+        /// <param name="sql">内插sql语句</param>
+        /// <returns>返回查询结果集</returns>
+        public virtual async Task<List<IEnumerable<dynamic>>> FindMultipleAsync(FormattableString sql)
+        {
+            var (sqlFormat, parameter) = sql.ToDynamicParameter(this.DatabaseType);
+
+            return await FindMultipleAsync(sqlFormat, parameter);
         }
 
         /// <summary>

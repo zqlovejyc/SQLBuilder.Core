@@ -37,15 +37,15 @@ namespace SQLBuilder.Core.Extensions
         /// <returns></returns>
         public static (string sqlFormat, DbParameter[] parameters) ToDbParameter(this FormattableString sql, DatabaseType databaseType)
         {
-            var (sqlFormat, parameters) = sql.ToParameter(databaseType);
+            var (sqlFormat, parameter) = sql.ToParameter(databaseType);
 
             return (sqlFormat, databaseType switch
             {
-                DatabaseType.SqlServer => parameters.ToSqlParameters(),
-                DatabaseType.MySql => parameters.ToMySqlParameters(),
-                DatabaseType.Sqlite => parameters.ToSqliteParameters(),
-                DatabaseType.Oracle => parameters.ToOracleParameters(),
-                DatabaseType.PostgreSql => parameters.ToNpgsqlParameters(),
+                DatabaseType.SqlServer => parameter.ToSqlParameters(),
+                DatabaseType.MySql => parameter.ToMySqlParameters(),
+                DatabaseType.Sqlite => parameter.ToSqliteParameters(),
+                DatabaseType.Oracle => parameter.ToOracleParameters(),
+                DatabaseType.PostgreSql => parameter.ToNpgsqlParameters(),
                 _ => null
             });
         }
@@ -56,11 +56,11 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="sql">内插sql字符串</param>
         /// <param name="databaseType">数据库类型</param>
         /// <returns></returns>
-        public static (string sqlFormat, DynamicParameters parameters) ToDynamicParameter(this FormattableString sql, DatabaseType databaseType)
+        public static (string sqlFormat, DynamicParameters parameter) ToDynamicParameter(this FormattableString sql, DatabaseType databaseType)
         {
-            var (sqlFormat, parameters) = sql.ToParameter(databaseType);
+            var (sqlFormat, parameter) = sql.ToParameter(databaseType);
 
-            return (sqlFormat, parameters.ToDynamicParameters());
+            return (sqlFormat, parameter.ToDynamicParameters());
         }
 
         /// <summary>
@@ -69,13 +69,13 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="sql">内插sql字符串</param>
         /// <param name="databaseType">数据库类型</param>
         /// <returns></returns>
-        public static (string sqlFormat, Dictionary<string, object> parameters) ToParameter(this FormattableString sql, DatabaseType databaseType)
+        public static (string sqlFormat, Dictionary<string, object> parameter) ToParameter(this FormattableString sql, DatabaseType databaseType)
         {
             if (sql == null)
                 throw new ArgumentNullException(nameof(sql));
 
             var sqlFormat = sql.Format;
-            var dic = new Dictionary<string, object>();
+            var parameter = new Dictionary<string, object>();
             var arguments = sql.GetArguments();
 
             var prefix = databaseType switch
@@ -94,10 +94,10 @@ namespace SQLBuilder.Core.Extensions
 
                 sqlFormat = sqlFormat.Replace($"{{{i}}}", pName);
 
-                dic[pName] = arguments[i];
+                parameter[pName] = arguments[i];
             }
 
-            return (sqlFormat, dic);
+            return (sqlFormat, parameter);
         }
     }
 }

@@ -61,6 +61,15 @@ namespace SQLBuilder.Core.Configuration
         /// <summary>
         /// 设置app配置
         /// </summary>
+        /// <param name="configuration">配置</param>
+        public static void SetConfiguration(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        /// <summary>
+        /// 设置app配置
+        /// </summary>
         /// <param name="fileName">文件名</param>
         /// <param name="basePath">文件路径，默认：Directory.GetCurrentDirectory()</param>
         public static void SetConfiguration(string fileName, string basePath = null)

@@ -97,73 +97,52 @@ namespace SQLBuilder.Core.Extensions
             //自定义仓储委托
             Func<string, IRepository> @delegate = key =>
             {
-                //数据库标识键值
-                key = key.IsNullOrEmpty() ? defaultName : key;
-
-                //数据库配置
-                var configs = configuration.GetSection($"{connectionSection}:{key}").Get<List<string>>();
-
-                //数据库类型
-                var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), configs[0]);
-
-                //从库连接集合
-                var slaveConnectionStrings = new List<(string connectionString, int weight)>();
-                if (configs.Count > 2)
-                {
-                    for (int i = 2; i < configs.Count; i++)
-                    {
-                        if (configs[i].IsNullOrEmpty() || !configs[i].Contains(";"))
-                            continue;
-
-                        var slaveConnectionStringArray = configs[i].Split(';');
-                        var slaveConnectionString = string.Join(";", slaveConnectionStringArray.Where(x => x.IsNotNullOrEmpty() && !x.StartsWithIgnoreCase("weight")));
-                        var weight = int.Parse(slaveConnectionStringArray.FirstOrDefault(x => x.StartsWithIgnoreCase("weight"))?.Split('=')[1] ?? "1");
-                        slaveConnectionStrings.Add((slaveConnectionString, weight));
-                    }
-                }
+                //获取数据库连接信息
+                var (databaseType, masterConnectionString, slaveConnectionStrings) =
+                    GetDbConnectionInformation(configuration, defaultName, connectionSection, key);
 
                 //实例化仓储
                 return databaseType switch
                 {
-                    DatabaseType.SqlServer => new SqlRepository(configs[1], configuration)
+                    DatabaseType.SqlServer => new SqlRepository(masterConnectionString, configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
                         CountSyntax = countSyntax,
                         LoadBalancer = loadBalancer,
-                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
+                        SlaveConnectionStrings = slaveConnectionStrings
                     },
-                    DatabaseType.MySql => new MySqlRepository(configs[1], configuration)
+                    DatabaseType.MySql => new MySqlRepository(masterConnectionString, configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
                         CountSyntax = countSyntax,
                         LoadBalancer = loadBalancer,
-                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
+                        SlaveConnectionStrings = slaveConnectionStrings
                     },
-                    DatabaseType.Oracle => new OracleRepository(configs[1], configuration)
+                    DatabaseType.Oracle => new OracleRepository(masterConnectionString, configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
                         CountSyntax = countSyntax,
                         LoadBalancer = loadBalancer,
-                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
+                        SlaveConnectionStrings = slaveConnectionStrings
                     },
-                    DatabaseType.Sqlite => new SqliteRepository(configs[1], configuration)
+                    DatabaseType.Sqlite => new SqliteRepository(masterConnectionString, configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
                         CountSyntax = countSyntax,
                         LoadBalancer = loadBalancer,
-                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
+                        SlaveConnectionStrings = slaveConnectionStrings
                     },
-                    DatabaseType.PostgreSql => new NpgsqlRepository(configs[1], configuration)
+                    DatabaseType.PostgreSql => new NpgsqlRepository(masterConnectionString, configuration)
                     {
                         SqlIntercept = sqlIntercept,
                         IsEnableFormat = isEnableFormat,
                         CountSyntax = countSyntax,
                         LoadBalancer = loadBalancer,
-                        SlaveConnectionStrings = slaveConnectionStrings.ToArray()
+                        SlaveConnectionStrings = slaveConnectionStrings
                     },
                     _ => throw new ArgumentException("数据库类型配置有误！"),
                 };
@@ -185,6 +164,52 @@ namespace SQLBuilder.Core.Extensions
                     break;
             }
             return @this;
+        }
+
+        /// <summary>
+        /// 获取数据库连接信息
+        /// </summary>
+        /// <param name="configuration">服务配置</param>
+        /// <param name="defaultName">默认数据库名称</param>
+        /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
+        /// <param name="key">数据库json配置key</param>
+        /// <returns></returns>
+        public static (
+            DatabaseType databaseType,
+            string masterConnectionString,
+            (string connectionString, int weight)[] slaveConnectionStrings)
+            GetDbConnectionInformation(
+            IConfiguration configuration,
+            string defaultName,
+            string connectionSection,
+            string key)
+        {
+            //数据库标识键值
+            key = key.IsNullOrEmpty() ? defaultName : key;
+
+            //数据库配置
+            var configs = configuration.GetSection($"{connectionSection}:{key}").Get<List<string>>();
+
+            //数据库类型
+            var databaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), configs[0]);
+
+            //从库连接集合
+            var slaveConnectionStrings = new List<(string connectionString, int weight)>();
+            if (configs.Count > 2)
+            {
+                for (int i = 2; i < configs.Count; i++)
+                {
+                    if (configs[i].IsNullOrEmpty() || !configs[i].Contains(";"))
+                        continue;
+
+                    var slaveConnectionStringArray = configs[i].Split(';');
+                    var slaveConnectionString = string.Join(";", slaveConnectionStringArray.Where(x => x.IsNotNullOrEmpty() && !x.StartsWithIgnoreCase("weight")));
+                    var weight = int.Parse(slaveConnectionStringArray.FirstOrDefault(x => x.StartsWithIgnoreCase("weight"))?.Split('=')[1] ?? "1");
+                    slaveConnectionStrings.Add((slaveConnectionString, weight));
+                }
+            }
+
+            return (databaseType, configs[1], slaveConnectionStrings.ToArray());
         }
         #endregion
     }

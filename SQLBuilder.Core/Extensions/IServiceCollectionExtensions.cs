@@ -47,7 +47,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="isInjectLoadBalancer">是否注入从库负载均衡，默认注入单例权重轮询方式(WeightRoundRobinLoadBalancer)，可以设置为false实现自定义方式</param>
         /// <param name="lifeTime">生命周期，默认单例</param>
         /// <returns></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///     //appsetting.json
         ///     {
@@ -75,7 +75,7 @@ namespace SQLBuilder.Core.Extensions
         ///         _repository = handler("Sqlserver");
         ///     }
         ///     </code>
-        /// </example>
+        /// </remarks>
         public static IServiceCollection AddSqlBuilder(
             this IServiceCollection @this,
             IConfiguration configuration,

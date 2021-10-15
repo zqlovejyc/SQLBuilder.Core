@@ -31,7 +31,7 @@ namespace SQLBuilder.Core.Repositories
     /// <summary>
     /// 数据操作仓储接口
     /// </summary>
-    public interface IRepository : IDisposable, IAsyncDisposable
+    public interface IRepository : IDisposable, IAsyncDisposable, INameService
     {
         #region Property
         /// <summary>

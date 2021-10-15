@@ -95,7 +95,7 @@ namespace SQLBuilder.Core.Repositories
         DatabaseType DatabaseType { get; }
 
         /// <summary>
-        /// 非事务的情况下，数据库连接是否自动释放
+        /// 非事务的情况下，数据库连接是否自动释放，默认：true
         /// </summary>
         bool AutoDispose { get; set; }
         #endregion

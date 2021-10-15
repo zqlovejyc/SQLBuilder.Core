@@ -226,7 +226,6 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <param name="this">依赖注入服务集合</param>
         /// <param name="configuration">服务配置</param>
-        /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
@@ -266,7 +265,6 @@ namespace SQLBuilder.Core.Extensions
         public static IServiceCollection AddSqlBuilderByIdleBus(
             this IServiceCollection @this,
             IConfiguration configuration,
-            string defaultName,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
             string countSyntax = "COUNT(*)",
@@ -295,7 +293,7 @@ namespace SQLBuilder.Core.Extensions
                         idleBus.TryRegister(key, () => CreateRepository(
                             key,
                             configuration,
-                            defaultName,
+                            null,
                             x.GetService<ILoadBalancer>(),
                             sqlIntercept,
                             isEnableFormat,

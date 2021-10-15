@@ -55,7 +55,7 @@ namespace SQLBuilder.Core.Repositories
         (string connectionString, int weight)[] SlaveConnectionStrings { get; set; }
 
         /// <summary>
-        /// 数据库连接对象
+        /// 数据库连接对象<para>关于数据库连接池详情，参考：https://docs.microsoft.com/zh-cn/dotnet/framework/data/adonet/sql-server-connection-pooling</para>
         /// </summary>
         DbConnection Connection { get; }
 
@@ -93,6 +93,11 @@ namespace SQLBuilder.Core.Repositories
         /// 数据库类型
         /// </summary>
         DatabaseType DatabaseType { get; }
+
+        /// <summary>
+        /// 非事务的情况下，数据库连接是否自动释放
+        /// </summary>
+        bool AutoDispose { get; set; }
         #endregion
 
         #region UseMasterOrSlave
@@ -103,6 +108,15 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="master">是否使用主库，默认使用主库</param>
         /// <returns></returns>
         IRepository UseMasterOrSlave(bool master = true);
+        #endregion
+
+        #region UseAutoDispose
+        /// <summary>
+        /// 非事务情况下，使用数据库连接自动释放；若不启用自动释放，需要调用IRepository的Dispose进行数据库连接释放
+        /// </summary>
+        /// <param name="auto">自动释放，默认：true</param>
+        /// <returns></returns>
+        IRepository UseAutoDispose(bool auto = true);
         #endregion
 
         #region Queue
@@ -1691,22 +1705,6 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="dbParameter">对应参数</param>
         /// <returns>返回查询结果集</returns>
         Task<List<IEnumerable<dynamic>>> FindMultipleAsync(string sql, params DbParameter[] dbParameter);
-        #endregion
-        #endregion
-
-        #region Close
-        #region Sync
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        void Close();
-        #endregion
-
-        #region Async
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        ValueTask CloseAsync();
         #endregion
         #endregion
     }

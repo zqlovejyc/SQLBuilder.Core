@@ -104,7 +104,7 @@ namespace SQLBuilder.Core.Repositories
                 //从库
                 if (!Master && SlaveConnectionStrings?.Length > 0 && LoadBalancer != null)
                 {
-                    var key = $"{ServiceName}__{MasterConnectionString.GetHashCode()}";
+                    var key = $"{SlaveConnectionStrings.Length}__{MasterConnectionString.GetHashCode()}";
 
                     var connectionStrings = SlaveConnectionStrings.Select(x => x.connectionString);
 
@@ -171,14 +171,14 @@ namespace SQLBuilder.Core.Repositories
         /// 非事务的情况下，数据库连接是否自动释放，默认：true
         /// </summary>
         public virtual bool AutoDispose { get; set; } = true;
-
-        /// <summary>
-        /// 用于标识当前仓储实例名称
-        /// </summary>
-        public virtual string ServiceName { get; set; }
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public BaseRepository() { }
+
         /// <summary>
         /// 构造函数
         /// </summary>

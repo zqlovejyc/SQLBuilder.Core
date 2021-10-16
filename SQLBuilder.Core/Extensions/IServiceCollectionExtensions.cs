@@ -32,70 +32,130 @@ namespace SQLBuilder.Core.Extensions
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        #region GetNameService
+        #region AddRepository
         /// <summary>
-        /// 根据ServiceName获取服务，改服务必须继承于<see cref="INameService"/>
+        /// 注入泛型仓储
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="serviceName">服务实例名称</param>
+        /// <typeparam name="T">仓储类型</typeparam>
+        /// <param name="this">依赖注入服务集合</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="autoDispose">非事务的情况下，数据库连接是否自动释放，默认：是</param>
+        /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
+        /// <param name="lifeTime">生命周期，默认：Transient</param>
         /// <returns></returns>
-        public static T GetNameService<T>(
-            this IServiceProvider @this,
-            string serviceName)
-            where T : INameService
+        public static IServiceCollection AddRepository<T>(
+            this IServiceCollection @this,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            bool autoDispose = true,
+            string countSyntax = "COUNT(*)",
+            ServiceLifetime lifeTime = ServiceLifetime.Transient)
+            where T : class, IRepository, new()
         {
-            var services = @this.GetServices<T>();
+            Func<IServiceProvider, T> @delegate = x => new()
+            {
+                AutoDispose = autoDispose,
+                SqlIntercept = sqlIntercept,
+                IsEnableFormat = isEnableFormat,
+                CountSyntax = countSyntax,
+                LoadBalancer = x.GetService<ILoadBalancer>()
+            };
 
-            if (services.IsNotNullOrEmpty())
-                return services.FirstOrDefault(x => x.ServiceName == serviceName);
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(@delegate);
+                    break;
 
-            return default;
-        }
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(@delegate);
+                    break;
 
-        /// <summary>
-        /// 根据ServiceName获取服务，改服务必须继承于<see cref="INameService"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="this"></param>
-        /// <param name="serviceName">服务实例名称</param>
-        /// <returns></returns>
-        public static T GetRequiredNameService<T>(
-            this IServiceProvider @this,
-            string serviceName)
-            where T : INameService
-        {
-            var services = @this.GetServices<T>();
+                default:
+                    throw new ArgumentException($"IRepository not allowed regist of `{lifeTime}`.");
+            }
 
-            if (services.IsNotNullOrEmpty() && services.Any(x => x.ServiceName == serviceName))
-                return services.First(x => x.ServiceName == serviceName);
-
-            throw new InvalidOperationException($"No service for type `{typeof(T)}` has been registered.");
+            return @this;
         }
         #endregion
 
-        #region CreateRepository
+        #region AddAllRepository
         /// <summary>
-        /// 创建IRepository
+        /// 按需注入所有程序依赖的数据库仓储 <para>注意：仓储没有初始化MasterConnectionString和SlaveConnectionStrings</para>
         /// </summary>
-        /// <param name="key">数据库json配置key</param>
+        /// <param name="this">依赖注入服务集合</param>
         /// <param name="configuration">服务配置</param>
-        /// <param name="defaultName">默认数据库名称</param>
-        /// <param name="loadBalancer">从库负载均衡获取算法</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="autoDispose">非事务的情况下，数据库连接是否自动释放，默认：是</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
+        /// <param name="lifeTime">生命周期，默认：Transient</param>
         /// <returns></returns>
-        public static IRepository CreateRepository(
-            string key,
+        public static IServiceCollection AddAllRepository(
+            this IServiceCollection @this,
             IConfiguration configuration,
-            string defaultName,
-            ILoadBalancer loadBalancer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
+            bool autoDispose = true,
             string countSyntax = "COUNT(*)",
-            string connectionSection = "ConnectionStrings")
+            string connectionSection = "ConnectionStrings",
+            ServiceLifetime lifeTime = ServiceLifetime.Transient)
+        {
+            //数据库配置
+            var configs = configuration.GetSection(connectionSection).Get<Dictionary<string, List<string>>>();
+
+            //注入所有数据库
+            if (configs.IsNotNull() && configs.Values.IsNotNull() && configs.Values.Any(x => x.IsNotNullOrEmpty()))
+            {
+                var databaseTypes = configs.Values.Where(x => x.IsNotNullOrEmpty()).Select(x => x[0].ToLower()).Distinct();
+                foreach (var databaseType in databaseTypes)
+                {
+                    //SqlServer
+                    if (databaseType.EqualIgnoreCase("SqlServer"))
+                        @this.AddRepository<SqlRepository>(sqlIntercept, isEnableFormat, autoDispose, countSyntax, lifeTime);
+
+                    //MySql
+                    if (databaseType.EqualIgnoreCase("MySql"))
+                        @this.AddRepository<MySqlRepository>(sqlIntercept, isEnableFormat, autoDispose, countSyntax, lifeTime);
+
+                    //Oracle
+                    if (databaseType.EqualIgnoreCase("Oracle"))
+                        @this.AddRepository<OracleRepository>(sqlIntercept, isEnableFormat, autoDispose, countSyntax, lifeTime);
+
+                    //Sqlite
+                    if (databaseType.EqualIgnoreCase("Sqlite"))
+                        @this.AddRepository<SqliteRepository>(sqlIntercept, isEnableFormat, autoDispose, countSyntax, lifeTime);
+
+                    //PostgreSql
+                    if (databaseType.EqualIgnoreCase("PostgreSql"))
+                        @this.AddRepository<NpgsqlRepository>(sqlIntercept, isEnableFormat, autoDispose, countSyntax, lifeTime);
+                }
+            }
+
+            return @this;
+        }
+        #endregion
+
+        #region GetConnectionInformation
+        /// <summary>
+        /// 获取数据库连接信息
+        /// </summary>
+        /// <param name="configuration">服务配置</param>
+        /// <param name="key">数据库标识键值</param>
+        /// <param name="defaultName">默认数据库名称</param>
+        /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
+        /// <returns></returns>
+        public static (
+            DatabaseType databaseType,
+            string masterConnectionString,
+            (string connectionString, int weight)[] SlaveConnectionStrings)
+            GetConnectionInformation(
+            IConfiguration configuration,
+            string key,
+            string defaultName,
+            string connectionSection)
         {
             //数据库标识键值
             key = key.IsNullOrEmpty() ? defaultName : key;
@@ -122,69 +182,47 @@ namespace SQLBuilder.Core.Extensions
                 }
             }
 
-            //实例化仓储
-            return databaseType switch
-            {
-                DatabaseType.SqlServer => new SqlRepository(configs[1], configuration)
-                {
-                    ServiceName = key,
-                    SqlIntercept = sqlIntercept,
-                    IsEnableFormat = isEnableFormat,
-                    CountSyntax = countSyntax,
-                    LoadBalancer = loadBalancer,
-                    SlaveConnectionStrings = slaveConnectionStrings.ToArray()
-                },
-                DatabaseType.MySql => new MySqlRepository(configs[1], configuration)
-                {
-                    ServiceName = key,
-                    SqlIntercept = sqlIntercept,
-                    IsEnableFormat = isEnableFormat,
-                    CountSyntax = countSyntax,
-                    LoadBalancer = loadBalancer,
-                    SlaveConnectionStrings = slaveConnectionStrings.ToArray()
-                },
-                DatabaseType.Oracle => new OracleRepository(configs[1], configuration)
-                {
-                    ServiceName = key,
-                    SqlIntercept = sqlIntercept,
-                    IsEnableFormat = isEnableFormat,
-                    CountSyntax = countSyntax,
-                    LoadBalancer = loadBalancer,
-                    SlaveConnectionStrings = slaveConnectionStrings.ToArray()
-                },
-                DatabaseType.Sqlite => new SqliteRepository(configs[1], configuration)
-                {
-                    ServiceName = key,
-                    SqlIntercept = sqlIntercept,
-                    IsEnableFormat = isEnableFormat,
-                    CountSyntax = countSyntax,
-                    LoadBalancer = loadBalancer,
-                    SlaveConnectionStrings = slaveConnectionStrings.ToArray()
-                },
-                DatabaseType.PostgreSql => new NpgsqlRepository(configs[1], configuration)
-                {
-                    ServiceName = key,
-                    SqlIntercept = sqlIntercept,
-                    IsEnableFormat = isEnableFormat,
-                    CountSyntax = countSyntax,
-                    LoadBalancer = loadBalancer,
-                    SlaveConnectionStrings = slaveConnectionStrings.ToArray()
-                },
-                _ => throw new ArgumentException($"Invalid database type `{databaseType}`."),
-            };
+            return (databaseType, configs[1], slaveConnectionStrings.ToArray());
         }
+        #endregion
 
+        #region CreateRepositoryFactory
         /// <summary>
-        /// 创建IRepository委托
+        /// 创建IRepository委托，依赖AddAllRepository注入不同类型仓储
         /// </summary>
         /// <param name="provider">服务驱动</param>
+        /// <param name="configuration"></param>
         /// <param name="defaultName">默认数据库名称</param>
+        /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
         /// <returns></returns>
-        public static Func<string, IRepository> CreateRepositoryDelegate(
+        public static Func<string, IRepository> CreateRepositoryFactory(
             IServiceProvider provider,
-            string defaultName)
+            IConfiguration configuration,
+            string defaultName,
+            string connectionSection = "ConnectionStrings")
         {
-            return key => provider.GetRequiredNameService<IRepository>(key.IsNullOrEmpty() ? defaultName : key);
+            return key =>
+            {
+                //获取数据库连接信息
+                var (databaseType, masterConnectionStrings, slaveConnectionStrings) =
+                    GetConnectionInformation(configuration, key, defaultName, connectionSection);
+
+                //获取对应数据库类型的仓储
+                IRepository repository = databaseType switch
+                {
+                    DatabaseType.SqlServer => provider.GetService<SqlRepository>(),
+                    DatabaseType.MySql => provider.GetService<MySqlRepository>(),
+                    DatabaseType.Oracle => provider.GetService<OracleRepository>(),
+                    DatabaseType.Sqlite => provider.GetService<SqliteRepository>(),
+                    DatabaseType.PostgreSql => provider.GetService<NpgsqlRepository>(),
+                    _ => throw new ArgumentException($"Invalid database type `{databaseType}`."),
+                };
+
+                repository.MasterConnectionString = masterConnectionStrings;
+                repository.SlaveConnectionStrings = slaveConnectionStrings;
+
+                return repository;
+            };
         }
         #endregion
 
@@ -198,6 +236,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="defaultName">默认数据库名称</param>
         /// <param name="sqlIntercept">sql拦截委托</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="autoDispose">非事务的情况下，数据库连接是否自动释放，默认：是</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
         /// <param name="isInjectLoadBalancer">是否注入从库负载均衡，默认注入单例权重轮询方式(WeightRoundRobinLoadBalancer)，可以设置为false实现自定义方式</param>
@@ -238,6 +277,7 @@ namespace SQLBuilder.Core.Extensions
             string defaultName,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
+            bool autoDispose = true,
             string countSyntax = "COUNT(*)",
             string connectionSection = "ConnectionStrings",
             bool isInjectLoadBalancer = true,
@@ -247,40 +287,24 @@ namespace SQLBuilder.Core.Extensions
             if (isInjectLoadBalancer)
                 @this.AddSingleton<ILoadBalancer, WeightRoundRobinLoadBalancer>();
 
-            //数据库配置
-            var configs = configuration.GetSection(connectionSection).Get<Dictionary<string, List<string>>>();
-
-            //注入所有数据库
-            if (configs.IsNotNullOrEmpty() && configs.Keys.Any(x => x.IsNotNullOrEmpty()))
-            {
-                var keys = configs.Keys.Where(x => x.IsNotNullOrEmpty()).Distinct();
-                foreach (var key in keys)
-                {
-                    //注入IRepository
-                    @this.AddTransient(x => CreateRepository(
-                        key,
-                        configuration,
-                        defaultName,
-                        x.GetService<ILoadBalancer>(),
-                        sqlIntercept,
-                        isEnableFormat,
-                        countSyntax,
-                        connectionSection));
-                }
-            }
+            //按需注入所有依赖的仓储
+            @this.AddAllRepository(configuration, sqlIntercept, isEnableFormat, autoDispose, countSyntax, connectionSection);
 
             //根据生命周期类型注入服务
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(x => CreateRepositoryDelegate(x, defaultName));
+                    @this.AddSingleton(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
                     break;
+
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => CreateRepositoryDelegate(x, defaultName));
+                    @this.AddTransient(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
                     break;
+
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => CreateRepositoryDelegate(x, defaultName));
+                    @this.AddScoped(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
                     break;
+
                 default:
                     break;
             }

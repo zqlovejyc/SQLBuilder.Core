@@ -210,11 +210,11 @@ namespace SQLBuilder.Core.Extensions
                 //获取对应数据库类型的仓储
                 IRepository repository = databaseType switch
                 {
-                    DatabaseType.SqlServer => provider.GetService<SqlRepository>(),
-                    DatabaseType.MySql => provider.GetService<MySqlRepository>(),
-                    DatabaseType.Oracle => provider.GetService<OracleRepository>(),
-                    DatabaseType.Sqlite => provider.GetService<SqliteRepository>(),
-                    DatabaseType.PostgreSql => provider.GetService<NpgsqlRepository>(),
+                    DatabaseType.SqlServer => provider.GetRequiredService<SqlRepository>(),
+                    DatabaseType.MySql => provider.GetRequiredService<MySqlRepository>(),
+                    DatabaseType.Oracle => provider.GetRequiredService<OracleRepository>(),
+                    DatabaseType.Sqlite => provider.GetRequiredService<SqliteRepository>(),
+                    DatabaseType.PostgreSql => provider.GetRequiredService<NpgsqlRepository>(),
                     _ => throw new ArgumentException($"Invalid database type `{databaseType}`."),
                 };
 
@@ -288,7 +288,7 @@ namespace SQLBuilder.Core.Extensions
                 @this.AddSingleton<ILoadBalancer, WeightRoundRobinLoadBalancer>();
 
             //按需注入所有依赖的仓储
-            @this.AddAllRepository(configuration, sqlIntercept, isEnableFormat, autoDispose, countSyntax, connectionSection);
+            @this.AddAllRepository(configuration, sqlIntercept, isEnableFormat, autoDispose, countSyntax, connectionSection, lifeTime);
 
             //根据生命周期类型注入服务
             switch (lifeTime)

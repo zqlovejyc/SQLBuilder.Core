@@ -219,7 +219,7 @@ namespace SQLBuilder.Core.Extensions
                     DatabaseType.Oracle => provider.GetRequiredService<OracleRepository>(),
                     DatabaseType.Sqlite => provider.GetRequiredService<SqliteRepository>(),
                     DatabaseType.PostgreSql => provider.GetRequiredService<NpgsqlRepository>(),
-                    _ => throw new ArgumentException($"Invalid database type `{databaseType}`."),
+                    _ => throw new ArgumentException($"Invalid database type `{databaseType}`.")
                 };
 
                 repository.MasterConnectionString = masterConnectionStrings;

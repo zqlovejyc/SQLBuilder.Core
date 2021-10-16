@@ -42,7 +42,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <param name="autoDispose">非事务的情况下，数据库连接是否自动释放，默认：是</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
-        /// <param name="lifeTime">生命周期，默认：Transient</param>
+        /// <param name="lifeTime">生命周期，默认：Transient，不建议Singleton</param>
         /// <returns></returns>
         public static IServiceCollection AddRepository<T>(
             this IServiceCollection @this,
@@ -64,6 +64,10 @@ namespace SQLBuilder.Core.Extensions
 
             switch (lifeTime)
             {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(@delegate);
+                    break;
+
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(@delegate);
                     break;
@@ -73,7 +77,7 @@ namespace SQLBuilder.Core.Extensions
                     break;
 
                 default:
-                    throw new ArgumentException($"IRepository not allowed regist of `{lifeTime}`.");
+                    break;
             }
 
             return @this;
@@ -91,7 +95,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="autoDispose">非事务的情况下，数据库连接是否自动释放，默认：是</param>
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
-        /// <param name="lifeTime">生命周期，默认：Transient</param>
+        /// <param name="lifeTime">生命周期，默认：Transient，不建议Singleton</param>
         /// <returns></returns>
         public static IServiceCollection AddAllRepository(
             this IServiceCollection @this,
@@ -240,7 +244,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="countSyntax">分页计数语法，默认：COUNT(*)</param>
         /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
         /// <param name="isInjectLoadBalancer">是否注入从库负载均衡，默认注入单例权重轮询方式(WeightRoundRobinLoadBalancer)，可以设置为false实现自定义方式</param>
-        /// <param name="lifeTime">生命周期，默认：Transient</param>
+        /// <param name="lifeTime">生命周期，默认：Transient，不建议Singleton</param>
         /// <returns></returns>
         /// <remarks>
         ///     <code>

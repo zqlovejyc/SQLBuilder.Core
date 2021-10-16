@@ -78,6 +78,9 @@ namespace SQLBuilder.Core.Extensions
             var parameter = new Dictionary<string, object>();
             var arguments = sql.GetArguments();
 
+            if (sql.ArgumentCount <= 0)
+                return (sqlFormat, parameter);
+
             var prefix = databaseType switch
             {
                 DatabaseType.Sqlite => "@",

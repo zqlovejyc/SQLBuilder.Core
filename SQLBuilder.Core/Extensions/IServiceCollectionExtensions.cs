@@ -53,7 +53,16 @@ namespace SQLBuilder.Core.Extensions
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
             where T : class, IRepository, new()
         {
-            Func<IServiceProvider, T> @delegate = x => new()
+            T TFactory(IServiceProvider x) => new()
+            {
+                AutoDispose = autoDispose,
+                SqlIntercept = sqlIntercept,
+                IsEnableFormat = isEnableFormat,
+                CountSyntax = countSyntax,
+                LoadBalancer = x.GetService<ILoadBalancer>()
+            };
+
+            IRepository IRepositoryFactory(IServiceProvider x) => new T
             {
                 AutoDispose = autoDispose,
                 SqlIntercept = sqlIntercept,
@@ -65,15 +74,15 @@ namespace SQLBuilder.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(@delegate);
+                    @this.AddSingleton(TFactory).AddSingleton(IRepositoryFactory);
                     break;
 
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(@delegate);
+                    @this.AddScoped(TFactory).AddScoped(IRepositoryFactory);
                     break;
 
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(@delegate);
+                    @this.AddTransient(TFactory).AddTransient(IRepositoryFactory);
                     break;
 
                 default:
@@ -156,7 +165,7 @@ namespace SQLBuilder.Core.Extensions
             string masterConnectionString,
             (string connectionString, int weight)[] SlaveConnectionStrings)
             GetConnectionInformation(
-            IConfiguration configuration,
+            this IConfiguration configuration,
             string key,
             string defaultName,
             string connectionSection)
@@ -200,7 +209,7 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="connectionSection">连接字符串配置Section，默认：ConnectionStrings</param>
         /// <returns></returns>
         public static Func<string, IRepository> CreateRepositoryFactory(
-            IServiceProvider provider,
+            this IServiceProvider provider,
             IConfiguration configuration,
             string defaultName,
             string connectionSection = "ConnectionStrings")
@@ -209,7 +218,7 @@ namespace SQLBuilder.Core.Extensions
             {
                 //获取数据库连接信息
                 var (databaseType, masterConnectionStrings, slaveConnectionStrings) =
-                    GetConnectionInformation(configuration, key, defaultName, connectionSection);
+                    configuration.GetConnectionInformation(key, defaultName, connectionSection);
 
                 //获取对应数据库类型的仓储
                 IRepository repository = databaseType switch
@@ -298,15 +307,15 @@ namespace SQLBuilder.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
+                    @this.AddSingleton(x => x.CreateRepositoryFactory(configuration, defaultName, connectionSection));
                     break;
 
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
+                    @this.AddTransient(x => x.CreateRepositoryFactory(configuration, defaultName, connectionSection));
                     break;
 
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => CreateRepositoryFactory(x, configuration, defaultName, connectionSection));
+                    @this.AddScoped(x => x.CreateRepositoryFactory(configuration, defaultName, connectionSection));
                     break;
 
                 default:

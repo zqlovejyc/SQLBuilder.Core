@@ -203,22 +203,22 @@ namespace SQLBuilder.Core.Repositories
         #region Queue
         #region Sync
         /// <summary>
-        /// 同步委托队列(Queue)
+        /// 同步委托队列(SyncQueue)
         /// </summary>
-        public virtual ConcurrentQueue<Func<IRepository, bool>> Queue { get; } = new();
+        public virtual ConcurrentQueue<Func<IRepository, bool>> SyncQueue { get; } = new();
 
         /// <summary>
-        /// 加入同步委托队列(Queue)
+        /// 加入同步委托队列(SyncQueue)
         /// </summary>
         /// <param name="func">自定义委托</param>
         /// <returns></returns>
         public virtual void AddQueue(Func<IRepository, bool> func)
         {
-            Queue.Enqueue(func);
+            SyncQueue.Enqueue(func);
         }
 
         /// <summary>
-        /// 保存同步委托队列(Queue)
+        /// 保存同步委托队列(SyncQueue)
         /// </summary>
         /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>
@@ -226,7 +226,7 @@ namespace SQLBuilder.Core.Repositories
         {
             try
             {
-                if (Queue.IsEmpty)
+                if (SyncQueue.IsEmpty)
                     return false;
 
                 if (transaction)
@@ -234,7 +234,7 @@ namespace SQLBuilder.Core.Repositories
 
                 var res = true;
 
-                while (!Queue.IsEmpty && Queue.TryDequeue(out var func))
+                while (!SyncQueue.IsEmpty && SyncQueue.TryDequeue(out var func))
                     res = res && func(this);
 
                 if (transaction)

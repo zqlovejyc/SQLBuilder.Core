@@ -122,19 +122,19 @@ namespace SQLBuilder.Core.Repositories
         #region Queue
         #region Sync
         /// <summary>
-        /// 同步委托队列(Queue)
+        /// 同步委托队列(SyncQueue)
         /// </summary>
-        ConcurrentQueue<Func<IRepository, bool>> Queue { get; }
+        ConcurrentQueue<Func<IRepository, bool>> SyncQueue { get; }
 
         /// <summary>
-        /// 加入同步委托队列(Queue)
+        /// 加入同步委托队列(SyncQueue)
         /// </summary>
         /// <param name="func">自定义委托</param>
         /// <returns></returns>
         void AddQueue(Func<IRepository, bool> func);
 
         /// <summary>
-        /// 保存同步委托队列(Queue)
+        /// 保存同步委托队列(SyncQueue)
         /// </summary>
         /// <param name="transaction">是否开启事务</param>
         /// <returns></returns>

@@ -1,76 +1,74 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-        <AssemblyVersion>2.2.7.0</AssemblyVersion>
-        <Authors>张强</Authors>
-        <Version>2.2.7</Version>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
-        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
-        <PackageId>Zq.SQLBuilder.Core</PackageId>
-        <PackageReleaseNotes>1.优化ConfigurationManager，支持appsettings自定义环境变量“APPSETTINGS_ENVIRONMENT”；
-2.优化仓储构造函数，添加“configuration”可选参数，用于支持自定义IConfiguration；
-3.重命名SetConfigurationFile -&gt; SetConfiguration，重载SetConfiguration；
-4.新增FormattableString扩展类；
-5.重载IRepository部分接口并实现，支持FormattableString内插sql语句；
-6.移除IRepository的Close方法，以Dispose方法替代；新增AutoDispose属性、UseAutoDispose方法；
-7.优化仓储数据库连接释放逻辑，支持共享连接模式；
-8.优化AddSqlBuilder扩展，新增AddRepository、AddAllRepository、GetConnectionInformation、CreateRepositoryFactory扩展方法；
-9.升级nuget依赖引用包到最新版本；</PackageReleaseNotes>
-        <FileVersion>2.2.7.0</FileVersion>
-        <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
-        <PackageLicenseUrl></PackageLicenseUrl>
-        <PackageIcon>sql.png</PackageIcon>
-        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.xml</DocumentationFile>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<AssemblyVersion>2.2.7.0</AssemblyVersion>
+		<Authors>张强</Authors>
+		<Version>2.2.7</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
+		<Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
+		<PackageId>Zq.SQLBuilder.Core</PackageId>
+		<PackageReleaseNotes>
+			1.优化ConfigurationManager，支持appsettings自定义环境变量“APPSETTINGS_ENVIRONMENT”；
+			2.优化仓储构造函数，添加“configuration”可选参数，用于支持自定义IConfiguration；
+			3.重命名SetConfigurationFile -&gt; SetConfiguration，重载SetConfiguration；
+			4.新增FormattableString扩展类；
+			5.重载IRepository部分接口并实现，支持FormattableString内插sql语句；
+			6.移除IRepository的Close方法，以Dispose方法替代；新增AutoDispose属性、UseAutoDispose方法；
+			7.优化仓储数据库连接释放逻辑，支持共享连接模式；
+			8.优化AddSqlBuilder扩展，新增AddRepository、AddAllRepository、GetConnectionInformation、CreateRepositoryFactory扩展方法；
+			9.升级nuget依赖引用包到最新版本；
+		</PackageReleaseNotes>
+		<FileVersion>2.2.7.0</FileVersion>
+		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
+		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageIcon>sql.png</PackageIcon>
+		<!--<PackageReadmeFile>readme.md</PackageReadmeFile>-->
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.xml</DocumentationFile>
-    </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.xml</DocumentationFile>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <None Remove="Expressions\MemberExpressionResolver.cs~RF15da049a.TMP" />
-    </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.xml</DocumentationFile>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.90" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.11" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
-        <PackageReference Include="MySqlConnector" Version="1.3.13" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="Npgsql" Version="5.0.10" />
-        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.3" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
-	    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
 
-    <ItemGroup>
-        <None Include="Icon\sql.png">
-            <Pack>True</Pack>
-            <PackagePath></PackagePath>
-        </None>
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.0.90" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+		<PackageReference Include="MySqlConnector" Version="1.3.13" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Npgsql" Version="5.0.10" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.3" />
+		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Icon\sql.png" Pack="true" PackagePath="\"/>
+		<None Include="Docs\readme.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
 
 </Project>

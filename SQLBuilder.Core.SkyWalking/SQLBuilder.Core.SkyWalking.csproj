@@ -8,7 +8,6 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>2.2.7</Version>
         <Authors>张强</Authors>
         <Company>张强</Company>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
@@ -22,17 +21,15 @@
         <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
-        <FileVersion>2.2.7.0</FileVersion>
-        <AssemblyVersion>2.2.7.0</AssemblyVersion>
+        <Version>2.2.7</Version>
+		<FileVersion>2.2.7.0</FileVersion>
+		<AssemblyVersion>2.2.7.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
+	    <DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -47,11 +44,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="1.3.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="1.3.0" />
     </ItemGroup>
 
 </Project>

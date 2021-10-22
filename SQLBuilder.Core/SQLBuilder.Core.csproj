@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+	
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -7,9 +7,10 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-		<AssemblyVersion>2.2.7.0</AssemblyVersion>
 		<Authors>张强</Authors>
 		<Version>2.2.7</Version>
+		<FileVersion>2.2.7.0</FileVersion>
+		<AssemblyVersion>2.2.7.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
@@ -25,7 +26,6 @@
 			8.优化AddSqlBuilder扩展，新增AddRepository、AddAllRepository、GetConnectionInformation、CreateRepositoryFactory扩展方法；
 			9.升级nuget依赖引用包到最新版本；
 		</PackageReleaseNotes>
-		<FileVersion>2.2.7.0</FileVersion>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>
@@ -40,12 +40,8 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.xml</DocumentationFile>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.xml</DocumentationFile>
 	</PropertyGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.90" />
@@ -67,8 +63,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="Icon\sql.png" Pack="true" PackagePath="\"/>
-		<None Include="Docs\readme.md" Pack="true" PackagePath="\"/>
+		<None Include="Icon\sql.png" Pack="true" PackagePath="\" />
+		<None Include="Docs\readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>

@@ -23,7 +23,6 @@ using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
-using SQLBuilder.Core.Configuration;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
@@ -42,6 +41,8 @@ using Sql = SQLBuilder.Core.Entry.SqlBuilder;
 
 namespace SQLBuilder.Core.Repositories
 {
+    using SQLBuilder.Core.Configuration;
+
     /// <summary>
     /// 数据操作仓储抽象基类
     /// </summary>

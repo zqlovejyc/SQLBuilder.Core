@@ -1,35 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;net5.0;net6.0</TargetFrameworks>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.2.7</Version>
-		<FileVersion>2.2.7.0</FileVersion>
-		<AssemblyVersion>2.2.7.0</AssemblyVersion>
+		<Version>2.2.8</Version>
+		<FileVersion>2.2.8.0</FileVersion>
+		<AssemblyVersion>2.2.8.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>
-			1.优化ConfigurationManager，支持appsettings自定义环境变量“APPSETTINGS_ENVIRONMENT”；
-			2.优化仓储构造函数，添加“configuration”可选参数，用于支持自定义IConfiguration；
-			3.重命名SetConfigurationFile -&gt; SetConfiguration，重载SetConfiguration；
-			4.新增FormattableString扩展类；
-			5.重载IRepository部分接口并实现，支持FormattableString内插sql语句；
-			6.移除IRepository的Close方法，以Dispose方法替代；新增AutoDispose属性、UseAutoDispose方法；
-			7.优化仓储数据库连接释放逻辑，支持共享连接模式；
-			8.优化AddSqlBuilder扩展，新增AddRepository、AddAllRepository、GetConnectionInformation、CreateRepositoryFactory扩展方法；
-			9.升级nuget依赖引用包到最新版本；
-		</PackageReleaseNotes>
+		<PackageReleaseNotes>1.重命名仓储同步委托队列：Queue -&gt; SyncQueue；
+2.优化Dispose释放异常，日志诊断写入数据格式；
+3.新增数据库连接释放日志诊断监听事件；
+4.升级nuget依赖引用包到最新版本；
+5.支持.net6.0；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>
-		<!--<PackageReadmeFile>readme.md</PackageReadmeFile>-->
+		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
@@ -41,6 +35,15 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net6.0\SQLBuilder.Core.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
+	  <WarningLevel>5</WarningLevel>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
+	  <WarningLevel>5</WarningLevel>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -56,7 +59,7 @@
 		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.4" />
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
 		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

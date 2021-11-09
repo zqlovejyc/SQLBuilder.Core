@@ -49,9 +49,9 @@ namespace SQLBuilder.Core.Diagnostics
         public const string ErrorExecute = Prefix + "ExecuteError";
 
         /// <summary>
-        /// 数据库连接释放
+        /// 执行数据库连接释放
         /// </summary>
-        public const string Dispose = Prefix + "Dispose";
+        public const string DisposeExecute = Prefix + "ExecuteDispose";
 
         /// <summary>
         /// 数据库连接释放异常

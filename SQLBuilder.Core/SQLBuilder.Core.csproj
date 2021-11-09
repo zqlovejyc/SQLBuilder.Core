@@ -13,7 +13,7 @@
 		<AssemblyVersion>2.2.8.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
-		<Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
+		<Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
 		<PackageReleaseNotes>1.重命名仓储同步委托队列：Queue -&gt; SyncQueue；
 2.优化Dispose释放异常，日志诊断写入数据格式；

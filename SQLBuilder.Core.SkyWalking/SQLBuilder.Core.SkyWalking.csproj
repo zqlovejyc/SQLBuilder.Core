@@ -10,7 +10,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>张强</Authors>
         <Company>张强</Company>
-        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
         <Description>SkyWalking扩展，实现sql链路追踪；</Description>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>

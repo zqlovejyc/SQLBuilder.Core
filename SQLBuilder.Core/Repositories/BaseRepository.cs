@@ -4148,6 +4148,14 @@ namespace SQLBuilder.Core.Repositories
                     _salveConnection.Dispose();
 
                 Transaction = null;
+
+                if (_diagnosticListener.IsEnabled(DiagnosticStrings.Dispose))
+                    _diagnosticListener.Write(DiagnosticStrings.Dispose,
+                        new
+                        {
+                            masterConnection = _masterConnection,
+                            salveConnection = _salveConnection
+                        });
             }
             catch (Exception exception)
             {
@@ -4175,6 +4183,14 @@ namespace SQLBuilder.Core.Repositories
                     await _salveConnection.DisposeAsync();
 
                 Transaction = null;
+
+                if (_diagnosticListener.IsEnabled(DiagnosticStrings.Dispose))
+                    _diagnosticListener.Write(DiagnosticStrings.Dispose,
+                        new
+                        {
+                            masterConnection = _masterConnection,
+                            salveConnection = _salveConnection
+                        });
             }
             catch (Exception exception)
             {

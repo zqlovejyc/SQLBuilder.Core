@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;net5.0;net6.0;</TargetFrameworks>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>张强</Authors>
+		<Company>张强</Company>
+		<Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
+		<Description>SqlBuilder自定义Diagnostics扩展，实现sql自定义追踪监控；</Description>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
+		<PackageIcon>sql.png</PackageIcon>
+		<RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>sqlbuilder;diagnostics</PackageTags>
+		<PackageReleaseNotes>1.新增SqlBuilder自定义Diagnostics扩展</PackageReleaseNotes>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageId>Zq.SQLBuilder.Core.Diagnostics</PackageId>
+		<Version>2.2.8</Version>
+		<FileVersion>2.2.8.0</FileVersion>
+		<AssemblyVersion>2.2.8.0</AssemblyVersion>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net6.0\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\SQLBuilder.Core\SQLBuilder.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="Icon\sql.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.21" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+</Project>

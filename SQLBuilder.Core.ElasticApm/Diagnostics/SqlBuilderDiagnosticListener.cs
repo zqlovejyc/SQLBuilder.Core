@@ -94,7 +94,8 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
                 sql?.Split(' ').FirstOrDefault(),
                 ApiConstants.TypeDb,
                 databaseType.ToString(),
-                DiagnosticStrings.BeforeExecute);
+                DiagnosticStrings.BeforeExecute,
+                false);
 
             if (span == null)
                 return;

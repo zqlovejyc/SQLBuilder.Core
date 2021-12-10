@@ -18,6 +18,7 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Oracle.ManagedDataAccess.Client;
 using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Repositories;
@@ -343,6 +344,28 @@ namespace SQLBuilder.Core.Extensions
             columns.Remove(columns.Length - 1, 1);
 
             return columns.ToString();
+        }
+        #endregion
+
+        #region GetOracleDbType
+        /// <summary>
+        /// 获取OracelDbType类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static OracleDbType GetOracleDbType(this object @this)
+        {
+            return @this switch
+            {
+                string => OracleDbType.NVarchar2,
+                DateTime => OracleDbType.Date,
+                int => OracleDbType.Int32,
+                byte => OracleDbType.Int16,
+                long => OracleDbType.Long,
+                decimal => OracleDbType.Decimal,
+                double => OracleDbType.Double,
+                _ => OracleDbType.NVarchar2,
+            };
         }
         #endregion
     }

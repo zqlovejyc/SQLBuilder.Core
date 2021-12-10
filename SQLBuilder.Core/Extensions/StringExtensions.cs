@@ -46,6 +46,45 @@ namespace SQLBuilder.Core.Extensions
             var length = @this.Length - startIndex;
             return @this.Substring(startIndex, length);
         }
+
+        /// <summary>
+        /// 根据开始和结束字符串截取字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="begin">开始字符串</param>
+        /// <param name="end">结束字符串</param>
+        /// <param name="beginIsIndexOf">开始字符串是否是IndexOf，默认true，否则LastIndexOf</param>
+        /// <param name="endIsIndexOf">结束字符串是否是IndexOf，默认true，否则LastIndexOf</param>
+        /// <returns>string</returns>
+        public static string Substring(this string @this, string begin, string end, bool beginIsIndexOf = true, bool endIsIndexOf = true)
+        {
+            if (string.IsNullOrEmpty(@this))
+                return "";
+            if (string.IsNullOrEmpty(begin))
+                return "";
+            if (string.IsNullOrEmpty(end))
+                return "";
+
+            int li;
+            if (beginIsIndexOf)
+                li = @this.IndexOf(begin);
+            else
+                li = @this.LastIndexOf(begin);
+            if (li == -1)
+                return "";
+
+            li += begin.Length;
+
+            int ri;
+            if (endIsIndexOf)
+                ri = @this.IndexOf(end, li);
+            else
+                ri = @this.LastIndexOf(end);
+            if (ri == -1)
+                return "";
+
+            return @this.Substring(li, ri - li);
+        }
         #endregion
 
         #region IsNullOrEmpty

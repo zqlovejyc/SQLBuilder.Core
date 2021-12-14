@@ -168,8 +168,8 @@ namespace SQLBuilder.Core.LoadBalancer
             {
                 lock (_lock)
                 {
-                    weightRoundRobin = new WeightRoundRobin(weightList.ToArray());
-                    _weightRoundRobins[key] = weightRoundRobin;
+                    weightRoundRobin = _weightRoundRobins.GetOrAdd(key, key =>
+                        _weightRoundRobins[key] = new WeightRoundRobin(weightList.ToArray()));
                 }
             }
 

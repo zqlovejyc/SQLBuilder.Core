@@ -18,12 +18,11 @@
         <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>sqlbuilder;elastic;apm</PackageTags>
-        <PackageReleaseNotes>1.升级SQLBuilder引用版本；
-2.支持.net6.0；</PackageReleaseNotes>
+        <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
-		<Version>2.2.8</Version>
-		<FileVersion>2.2.8.0</FileVersion>
-		<AssemblyVersion>2.2.8.0</AssemblyVersion>
+		<Version>2.2.9</Version>
+		<FileVersion>2.2.9.0</FileVersion>
+		<AssemblyVersion>2.2.9.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 

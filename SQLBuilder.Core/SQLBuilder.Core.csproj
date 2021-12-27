@@ -8,18 +8,18 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.2.8</Version>
-		<FileVersion>2.2.8.0</FileVersion>
-		<AssemblyVersion>2.2.8.0</AssemblyVersion>
+		<Version>2.2.9</Version>
+		<FileVersion>2.2.9.0</FileVersion>
+		<AssemblyVersion>2.2.9.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.重命名仓储同步委托队列：Queue -&gt; SyncQueue；
-2.优化Dispose释放异常，日志诊断写入数据格式；
-3.新增数据库连接释放日志诊断监听事件；
-4.升级nuget依赖引用包到最新版本；
-5.支持.net6.0；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.新增SqlBuilder自定义Diagnostics扩展类库；
+2.优化StartSpan创建，显示传递isExitSpan参数；
+3.新增OracleDynamicParameters参数类型的Oracle Insert和Update扩展方法；
+4.优化WeightRoundRobinLoadBalancer；
+5.升级nuget依赖引用包到最新版本；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>

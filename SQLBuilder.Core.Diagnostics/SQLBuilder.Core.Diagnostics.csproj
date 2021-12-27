@@ -18,12 +18,12 @@
 		<RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>sqlbuilder;diagnostics</PackageTags>
-		<PackageReleaseNotes>1.新增SqlBuilder自定义Diagnostics扩展</PackageReleaseNotes>
+		<PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<PackageId>Zq.SQLBuilder.Core.Diagnostics</PackageId>
-		<Version>2.2.8</Version>
-		<FileVersion>2.2.8.0</FileVersion>
-		<AssemblyVersion>2.2.8.0</AssemblyVersion>
+		<Version>2.2.9</Version>
+		<FileVersion>2.2.9.0</FileVersion>
+		<AssemblyVersion>2.2.9.0</AssemblyVersion>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 

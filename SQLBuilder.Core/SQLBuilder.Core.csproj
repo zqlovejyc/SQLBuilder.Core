@@ -8,18 +8,16 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.2.9</Version>
-		<FileVersion>2.2.9.0</FileVersion>
-		<AssemblyVersion>2.2.9.0</AssemblyVersion>
+		<Version>2.3.0</Version>
+		<FileVersion>2.3.0.0</FileVersion>
+		<AssemblyVersion>2.3.0.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.新增SqlBuilder自定义Diagnostics扩展类库；
-2.优化StartSpan创建，显示传递isExitSpan参数；
-3.新增OracleDynamicParameters参数类型的Oracle Insert和Update扩展方法；
-4.优化WeightRoundRobinLoadBalancer；
-5.升级nuget依赖引用包到最新版本；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.优化OracleRepository支持Oracle12c及以上版本最新FETCH NEXT分页语法；
+2.统一仓储分页语法OrderField位置，修复部分情况下分页必须查询出排序字段的bug；
+3.注意MySql、PostgreSql、Sqlite、SqlServer分页排序逻辑已修改，修复排序字段必须在查询结果中的bug，需注意多表连接查询分页时，必要时需指明排序字段的表别名；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>

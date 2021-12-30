@@ -82,21 +82,30 @@ namespace SQLBuilder.Core.Repositories
             }
 
             string sqlQuery;
+            var next = pageSize;
+            var offset = pageSize * (pageIndex - 1);
             var rowStart = pageSize * (pageIndex - 1) + 1;
             var rowEnd = pageSize * pageIndex;
+            var serverVersion = int.Parse(Connection.ServerVersion.Split('.')[0]);
 
             //判断是否with语法
             if (isWithSyntax)
             {
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS \"TOTAL\" FROM T;";
 
-                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {rowEnd}) SELECT * FROM R WHERE ROWNUMBER>={rowStart}";
+                if (serverVersion > 11)
+                    sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}) SELECT * FROM T OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY";
+                else
+                    sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}),R AS (SELECT ROWNUM AS ROWNUMBER,T.* FROM T WHERE ROWNUM <= {rowEnd}) SELECT * FROM R WHERE ROWNUMBER>={rowStart}";
             }
             else
             {
                 sqlQuery = $"SELECT {CountSyntax} AS \"TOTAL\" FROM ({sql}) T;";
 
-                sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {rowEnd}) T WHERE \"ROWNUMBER\" >= {rowStart}";
+                if (serverVersion > 11)
+                    sqlQuery += $"SELECT * FROM ({sql} {orderField}) T OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY";
+                else
+                    sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {rowEnd}) T WHERE \"ROWNUMBER\" >= {rowStart}";
             }
 
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;

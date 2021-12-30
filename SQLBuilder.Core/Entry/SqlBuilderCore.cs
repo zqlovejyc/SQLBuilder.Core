@@ -4601,21 +4601,11 @@ namespace SQLBuilder.Core.Entry
 
             //MySQL，注意8.0版本才支持WITH语法
             if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
-            {
                 sb.Append($"SELECT {countSyntax} AS `TOTAL` FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
 
-            //PostgreSQL
-            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
-            {
+            //PostgreSQL、SQLite
+            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql || this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
                 sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
-
-            //SQLite
-            if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
-            {
-                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
 
             this.sqlWrapper.Reset(sb);
 
@@ -4669,13 +4659,9 @@ namespace SQLBuilder.Core.Entry
             if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
                 if (dbVersion > 10)
-                {
                     sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {(orderField.IsNotNullOrEmpty() ? order : "")}) SELECT * FROM T OFFSET {(pageIndex - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
-                }
                 else
-                {
                     sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {(pageIndex - 1) * pageSize + 1} AND {pageIndex * pageSize};");
-                }
             }
 
             //Oracle，注意Oracle需要分开查询总条数和分页数据，此方法仅包含分页语句
@@ -4689,21 +4675,11 @@ namespace SQLBuilder.Core.Entry
 
             //MySQL，注意8.0版本才支持WITH语法
             if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
-            {
                 sb.Append($"{sql} SELECT {countSyntax} AS `TOTAL` FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
 
-            //PostgreSQL
-            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
-            {
+            //PostgreSQL、SQLite
+            if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql || this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
                 sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
-
-            //SQLite
-            if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
-            {
-                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
-            }
 
             this.sqlWrapper.Reset(sb);
 

@@ -84,13 +84,13 @@ namespace SQLBuilder.Core.Repositories
             {
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS `TOTAL` FROM T;";
 
-                sqlQuery += $"{sql} SELECT * FROM T {orderField} LIMIT {limit} OFFSET {offset};";
+                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}) SELECT * FROM T LIMIT {limit} OFFSET {offset};";
             }
             else
             {
                 sqlQuery = $"SELECT {CountSyntax} AS `TOTAL` FROM ({sql}) AS T;";
 
-                sqlQuery += $"SELECT * FROM ({sql}) AS T {orderField} LIMIT {limit} OFFSET {offset};";
+                sqlQuery += $"{sql} {orderField} LIMIT {limit} OFFSET {offset};";
             }
 
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;

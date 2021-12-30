@@ -103,7 +103,7 @@ namespace SQLBuilder.Core.Repositories
                 sqlQuery = $"SELECT {CountSyntax} AS \"TOTAL\" FROM ({sql}) T;";
 
                 if (serverVersion > 11)
-                    sqlQuery += $"SELECT * FROM ({sql} {orderField}) T OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY";
+                    sqlQuery += $"{sql} {orderField} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY";
                 else
                     sqlQuery += $"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {orderField}) X WHERE ROWNUM <= {rowEnd}) T WHERE \"ROWNUMBER\" >= {rowStart}";
             }

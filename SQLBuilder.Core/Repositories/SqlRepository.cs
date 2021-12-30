@@ -67,16 +67,17 @@ namespace SQLBuilder.Core.Repositories
         public override string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
         {
             //排序字段
+            string order;
             if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
+                    order = $"ORDER BY {orderField}";
                 else
-                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+                    order = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
             }
             else
             {
-                orderField = "ORDER BY (SELECT 0)";
+                order = "ORDER BY (SELECT 0)";
             }
 
             string sqlQuery;
@@ -92,18 +93,18 @@ namespace SQLBuilder.Core.Repositories
                 sqlQuery = $"{sql} SELECT {CountSyntax} AS [TOTAL] FROM T;";
 
                 if (serverVersion > 10)
-                    sqlQuery += $"{sql} SELECT * FROM T {orderField} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
+                    sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {(orderField.IsNotNullOrEmpty() ? order : "")}) SELECT * FROM T OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
                 else
-                    sqlQuery += $"{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
+                    sqlQuery += $"{sql},R AS (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
             }
             else
             {
                 sqlQuery = $"SELECT {CountSyntax} AS [TOTAL] FROM ({sql}) AS T;";
 
                 if (serverVersion > 10)
-                    sqlQuery += $"SELECT * FROM ({sql}) AS T {orderField} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
+                    sqlQuery += $"{sql} {(orderField.IsNotNullOrEmpty() ? order : "")} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
                 else
-                    sqlQuery += $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
+                    sqlQuery += $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
             }
 
             sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;

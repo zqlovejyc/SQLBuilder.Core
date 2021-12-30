@@ -4547,23 +4547,24 @@ namespace SQLBuilder.Core.Entry
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
         /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
-        /// <param name="sqlserverVersionGt10">sqlserver版本是否大于10，10版本以上采用ROWS FETCH NEXT最新语法</param>
+        /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", bool sqlserverVersionGt10 = false)
+        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();
 
             //排序字段
+            var order = string.Empty;
             if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
+                    order = $"ORDER BY {orderField}";
                 else
-                    orderField = $"ORDER BY {orderField} ASC";
+                    order = $"ORDER BY {orderField} ASC";
             }
             else if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
-                orderField = "ORDER BY (SELECT 0)";
+                order = "ORDER BY (SELECT 0)";
             }
 
             if (sql.IsNotNullOrEmpty())
@@ -4575,37 +4576,45 @@ namespace SQLBuilder.Core.Entry
 
             sql = sql.IsNullOrEmpty() ? this.sqlWrapper.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
+            //数据库版本
+            var dbVersion = 0;
+            if (serverVersion.IsNotNullOrEmpty())
+                dbVersion = int.Parse(serverVersion.Split('.')[0]);
+
             //SQLServer
             if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
-                if (sqlserverVersionGt10)
-                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} OFFSET {((pageIndex - 1) * pageSize)} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
+                if (dbVersion > 10)
+                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;{sql} {(orderField.IsNotNullOrEmpty() ? order : "")} OFFSET {(pageIndex - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
                 else
-                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};");
+                    sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {(pageIndex - 1) * pageSize + 1} AND {pageIndex * pageSize};");
             }
 
-            //Oracle，注意Oracle需要分开查询总条数和分页数据
+            //Oracle，注意Oracle需要分开查询总条数和分页数据，此方法仅包含分页语句
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
-                sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} ORDER BY {orderField}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}");
+                if (dbVersion > 11)
+                    sb.Append($"{sql} {order} OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
+                else
+                    sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {order}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
             if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
             {
-                sb.Append($"SELECT {countSyntax}  AS `TOTAL` FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"SELECT {countSyntax} AS `TOTAL` FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             //PostgreSQL
             if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
             {
-                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             //SQLite
             if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
             {
-                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;SELECT * FROM ({sql}) AS T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) AS T;{sql} {order} LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             this.sqlWrapper.Reset(sb);
@@ -4622,23 +4631,24 @@ namespace SQLBuilder.Core.Entry
         /// <param name="sql">自定义sql语句</param>
         /// <param name="parameters">自定义sql格式化参数</param>
         /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
-        /// <param name="sqlserverVersionGt10">sqlserver版本是否大于10，10版本以上采用ROWS FETCH NEXT最新语法</param>
+        /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", bool sqlserverVersionGt10 = false)
+        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();
 
             //排序字段
+            var order = string.Empty;
             if (orderField.IsNotNullOrEmpty())
             {
                 if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
-                    orderField = $"ORDER BY {orderField}";
+                    order = $"ORDER BY {orderField}";
                 else
-                    orderField = $"ORDER BY {orderField} ASC";
+                    order = $"ORDER BY {orderField} ASC";
             }
             else if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
-                orderField = "ORDER BY (SELECT 0)";
+                order = "ORDER BY (SELECT 0)";
             }
 
             if (sql.IsNotNullOrEmpty())
@@ -4650,41 +4660,49 @@ namespace SQLBuilder.Core.Entry
 
             sql = sql.IsNullOrEmpty() ? this.sqlWrapper.ToString().TrimEnd(';') : sql.TrimEnd(';');
 
+            //数据库版本
+            var dbVersion = 0;
+            if (serverVersion.IsNotNullOrEmpty())
+                dbVersion = int.Parse(serverVersion.Split('.')[0]);
+
             //SQLServer
             if (this.sqlWrapper.DatabaseType == DatabaseType.SqlServer)
             {
-                if (sqlserverVersionGt10)
+                if (dbVersion > 10)
                 {
-                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql} SELECT * FROM T {orderField} OFFSET {((pageIndex - 1) * pageSize)} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
+                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {(orderField.IsNotNullOrEmpty() ? order : "")}) SELECT * FROM T OFFSET {(pageIndex - 1) * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY;");
                 }
                 else
                 {
-                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({orderField}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {((pageIndex - 1) * pageSize + 1)} AND {(pageIndex * pageSize)};");
+                    sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {(pageIndex - 1) * pageSize + 1} AND {pageIndex * pageSize};");
                 }
             }
 
-            //Oracle，注意Oracle需要分开查询总条数和分页数据
+            //Oracle，注意Oracle需要分开查询总条数和分页数据，此方法仅包含分页语句
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
-                sb.Append($"{sql},R AS (SELECT ROWNUM AS \"ROWNUMBER\",T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex} ORDER BY {orderField}) SELECT * FROM R WHERE \"ROWNUMBER\">={pageSize * (pageIndex - 1) + 1}");
+                if (dbVersion > 11)
+                    sb.Append($"{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
+                else
+                    sb.Append($"{sql.Remove(sql.LastIndexOf(")"), 1)} {order}),R AS (SELECT ROWNUM AS \"ROWNUMBER\",T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE \"ROWNUMBER\">={pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
             if (this.sqlWrapper.DatabaseType == DatabaseType.MySql)
             {
-                sb.Append($"{sql} SELECT {countSyntax} AS `TOTAL` FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS `TOTAL` FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             //PostgreSQL
             if (this.sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
             {
-                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             //SQLite
             if (this.sqlWrapper.DatabaseType == DatabaseType.Sqlite)
             {
-                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql} SELECT * FROM T {orderField} LIMIT {pageSize} OFFSET {(pageSize * (pageIndex - 1))};");
+                sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T LIMIT {pageSize} OFFSET {pageSize * (pageIndex - 1)};");
             }
 
             this.sqlWrapper.Reset(sb);

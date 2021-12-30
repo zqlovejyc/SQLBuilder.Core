@@ -3349,7 +3349,7 @@ namespace SQLBuilder.Core.UnitTest
                                 o.Subject == "")
                             .Page(3, 2, "Id", "select * from student");
 
-            Assert.AreEqual(@"SELECT COUNT(*)  AS `TOTAL` FROM (select * from student) AS T;SELECT * FROM (select * from student) AS T ORDER BY Id ASC LIMIT 3 OFFSET 3;", builder.Sql);
+            Assert.AreEqual(@"SELECT COUNT(*) AS `TOTAL` FROM (select * from student) AS T;select * from student ORDER BY Id ASC LIMIT 3 OFFSET 3;", builder.Sql);
             Assert.AreEqual(0, builder.Parameters.Count);
         }
 
@@ -3370,7 +3370,7 @@ namespace SQLBuilder.Core.UnitTest
                                 o.Subject == "")
                             .Page(3, 2, "`Id`");
 
-            Assert.AreEqual(@"SELECT COUNT(*)  AS `TOTAL` FROM (SELECT * FROM `student` AS `t` WHERE `t`.`Score` IS NOT NULL AND (`t`.`Name` = ?p__1) OR (`t`.`Subject` = ?p__2)) AS T;SELECT * FROM (SELECT * FROM `student` AS `t` WHERE `t`.`Score` IS NOT NULL AND (`t`.`Name` = ?p__1) OR (`t`.`Subject` = ?p__2)) AS T ORDER BY `Id` ASC LIMIT 3 OFFSET 3;", builder.Sql);
+            Assert.AreEqual(@"SELECT COUNT(*) AS `TOTAL` FROM (SELECT * FROM `student` AS `t` WHERE `t`.`Score` IS NOT NULL AND (`t`.`Name` = ?p__1) OR (`t`.`Subject` = ?p__2)) AS T;SELECT * FROM `student` AS `t` WHERE `t`.`Score` IS NOT NULL AND (`t`.`Name` = ?p__1) OR (`t`.`Subject` = ?p__2) ORDER BY `Id` ASC LIMIT 3 OFFSET 3;", builder.Sql);
             Assert.AreEqual(2, builder.Parameters.Count);
         }
 

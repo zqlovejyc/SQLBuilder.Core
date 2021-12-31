@@ -4549,6 +4549,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
         /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
+        /// <remarks>注意：Oracle需要Split(';')分开单独查询总条数和分页数据</remarks>
         public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();
@@ -4623,6 +4624,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="countSyntax">分页计数语法，默认COUNT(*)</param>
         /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
+        /// <remarks>注意：Oracle需要Split(';')分开单独查询总条数和分页数据</remarks>
         public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();

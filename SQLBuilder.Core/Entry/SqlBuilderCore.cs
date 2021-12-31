@@ -4590,13 +4590,13 @@ namespace SQLBuilder.Core.Entry
                     sb.Append($"SELECT {countSyntax} AS [TOTAL] FROM ({sql}) AS T;SELECT * FROM (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {(pageIndex - 1) * pageSize + 1} AND {pageIndex * pageSize};");
             }
 
-            //Oracle，注意Oracle需要分开查询总条数和分页数据，此方法仅包含分页语句
+            //Oracle，注意Oracle需要Split(';')分开单独查询总条数和分页数据
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
                 if (dbVersion > 11)
-                    sb.Append($"{sql} {order} OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
+                    sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) T;{sql} {order} OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
                 else
-                    sb.Append($"SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {order}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}");
+                    sb.Append($"SELECT {countSyntax} AS \"TOTAL\" FROM ({sql}) T;SELECT * FROM (SELECT X.*,ROWNUM AS \"ROWNUMBER\" FROM ({sql} {order}) X WHERE ROWNUM <= {pageSize * pageIndex}) T WHERE \"ROWNUMBER\" >= {pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法
@@ -4664,13 +4664,13 @@ namespace SQLBuilder.Core.Entry
                     sb.Append($"{sql} SELECT {countSyntax} AS [TOTAL] FROM T;{sql},R AS (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {(pageIndex - 1) * pageSize + 1} AND {pageIndex * pageSize};");
             }
 
-            //Oracle，注意Oracle需要分开查询总条数和分页数据，此方法仅包含分页语句
+            //Oracle，注意Oracle需要Split(';')分开单独查询总条数和分页数据
             if (this.sqlWrapper.DatabaseType == DatabaseType.Oracle)
             {
                 if (dbVersion > 11)
-                    sb.Append($"{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
+                    sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}) SELECT * FROM T OFFSET {pageSize * (pageIndex - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY");
                 else
-                    sb.Append($"{sql.Remove(sql.LastIndexOf(")"), 1)} {order}),R AS (SELECT ROWNUM AS \"ROWNUMBER\",T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE \"ROWNUMBER\">={pageSize * (pageIndex - 1) + 1}");
+                    sb.Append($"{sql} SELECT {countSyntax} AS \"TOTAL\" FROM T;{sql.Remove(sql.LastIndexOf(")"), 1)} {order}),R AS (SELECT ROWNUM AS \"ROWNUMBER\",T.* FROM T WHERE ROWNUM <= {pageSize * pageIndex}) SELECT * FROM R WHERE \"ROWNUMBER\">={pageSize * (pageIndex - 1) + 1}");
             }
 
             //MySQL，注意8.0版本才支持WITH语法

@@ -454,8 +454,269 @@ namespace SQLBuilder.Core.Entry
             DatabaseType databaseType = DatabaseType.SqlServer,
             Func<string, object, string> sqlIntercept = null,
             bool isEnableFormat = false,
-            Func<string, string> tableNameFunc = null)
+            Func<string[], string> tableNameFunc = null)
             where T : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2>(
+            Expression<Func<T, T2, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3>(
+            Expression<Func<T, T2, T3, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4>(
+            Expression<Func<T, T2, T3, T4, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5>(
+            Expression<Func<T, T2, T3, T4, T5, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5, T6>(
+            Expression<Func<T, T2, T3, T4, T5, T6, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5, T6, T7>(
+            Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5, T6, T7, T8>(
+            Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5, T6, T7, T8, T9>(
+            Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class =>
+            new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="databaseType">数据库类型</param>
+        /// <param name="sqlIntercept">sql拦截委托</param>
+        /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public static SqlBuilderCore<T> Count<T, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
+            Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression = null,
+            DatabaseType databaseType = DatabaseType.SqlServer,
+            Func<string, object, string> sqlIntercept = null,
+            bool isEnableFormat = false,
+            Func<string[], string> tableNameFunc = null)
+            where T : class
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class =>
             new SqlBuilderCore<T>(databaseType, sqlIntercept, isEnableFormat).Count(expression, tableNameFunc);
         #endregion
 

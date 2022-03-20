@@ -221,12 +221,14 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// Select
         /// </summary>
+        /// <param name="aggregateSyntax">聚合函数</param>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <param name="array">可变数量参数</param>
         /// <returns>string</returns>
-        private string Select(Func<string[], string> tableNameFunc = null, params (Type type, string alias)[] array)
+        private string Select(string aggregateSyntax = null, Func<string[], string> tableNameFunc = null, params (Type type, string alias)[] array)
         {
-            this.sqlWrapper.IsSingleTable = false;
+            this.sqlWrapper.IsSingleTable = !(array?.Length > 1);
+
             if (array?.Length > 0)
             {
                 foreach (var (type, alias) in array)
@@ -246,9 +248,9 @@ namespace SQLBuilder.Core.Entry
                 @as = "";
 
             if (tableNameFunc.IsNull())
-                return $"SELECT {{0}} FROM {tableName}{@as}{tableAlias}";
+                return $"SELECT {(aggregateSyntax.IsNullOrEmpty() ? "{0}" : aggregateSyntax)} FROM {tableName}{@as}{tableAlias}";
             else
-                return $"SELECT {{0}} FROM {tableNameFunc(new[] { tableName, @as, tableAlias })}";
+                return $"SELECT {(aggregateSyntax.IsNullOrEmpty() ? "{0}" : aggregateSyntax)} FROM {tableNameFunc(new[] { tableName, @as, tableAlias })}";
         }
 
         /// <summary>
@@ -265,7 +267,7 @@ namespace SQLBuilder.Core.Entry
             var tableAlias = this.GetExpressionAlias(expression, typeof(T)).FirstOrDefault().alias;
 
             if (sql == null)
-                sql = this.Select(tableNameFunc, (typeof(T), tableAlias));
+                sql = this.Select(null, tableNameFunc, (typeof(T), tableAlias));
 
             var selectFields = "*";
             if (expression != null)
@@ -276,7 +278,7 @@ namespace SQLBuilder.Core.Entry
                 //移除默认的查询语句
                 if (len > 0)
                 {
-                    var sqlReplace = string.Format(this.Select(tableNameFunc, (typeof(T), null)), "*");
+                    var sqlReplace = string.Format(this.Select(null, tableNameFunc, (typeof(T), null)), "*");
                     var sqlNew = this.sqlWrapper.Replace(sqlReplace, "").ToString();
                     this.sqlWrapper.Reset(sqlNew);
                 }
@@ -320,7 +322,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select<T2>(Expression<Func<T, T2, object>> expression = null, Func<string[], string> tableNameFunc = null)
             where T2 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -336,7 +338,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -354,7 +356,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -374,7 +376,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -396,7 +398,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -420,7 +422,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -446,7 +448,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -474,7 +476,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
 
@@ -504,7 +506,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            var sql = this.Select(tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+            var sql = this.Select(null, tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
             return this.Select(expression?.Body, sql, tableNameFunc);
         }
         #endregion
@@ -4826,24 +4828,252 @@ namespace SQLBuilder.Core.Entry
         /// <param name="expression">表达式树</param>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> Count(Expression<Func<T, object>> expression = null, Func<string, string> tableNameFunc = null)
+        public SqlBuilderCore<T> Count(Expression expression = null, string sql = null, Func<string[], string> tableNameFunc = null)
         {
-            this.Clear();
-            this.sqlWrapper.IsSingleTable = true;
+            var tableAlias = this.GetExpressionAlias(expression, typeof(T)).FirstOrDefault().alias;
 
-            var field = "*";
-            var tableName = this.sqlWrapper.GetTableName(typeof(T));
-            var sql = $"SELECT COUNT({{0}}) FROM {tableNameFunc?.Invoke(tableName) ?? tableName}";
+            if (sql == null)
+                sql = this.Select("COUNT({0})", tableNameFunc, (typeof(T), tableAlias));
 
+            var selectFields = "*";
             if (expression != null)
             {
-                SqlExpressionProvider.Count(expression.Body, this.sqlWrapper);
-                field = this.sqlWrapper.SelectFieldsString;
+                SqlExpressionProvider.Select(expression, this.sqlWrapper);
+                selectFields = this.sqlWrapper.SelectFieldsString;
             }
 
-            this.sqlWrapper.AppendFormat(sql, field);
+            this.sqlWrapper += string.Format(sql, selectFields);
 
             return this;
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count(Expression<Func<T, object>> expression = null, Func<string[], string> tableNameFunc = null)
+        {
+            this.sqlWrapper.IsSingleTable = true;
+
+            var expr = expression?.Body;
+            if (expr?.NodeType == ExpressionType.Constant ||
+                expr?.NodeType == ExpressionType.Parameter ||
+                expr?.NodeType == ExpressionType.MemberInit ||
+                expr?.NodeType == ExpressionType.New)
+                expr = expression;
+
+            this.Count(expr, null, tableNameFunc);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2>(Expression<Func<T, T2, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3>(Expression<Func<T, T2, T3, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4>(Expression<Func<T, T2, T3, T4, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5>(Expression<Func<T, T2, T3, T4, T5, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5, T6>(Expression<Func<T, T2, T3, T4, T5, T6, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5, T6, T7>(Expression<Func<T, T2, T3, T4, T5, T6, T7, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5, T6, T7, T8>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5, T6, T7, T8, T9>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
+        }
+
+        /// <summary>
+        /// Count
+        /// </summary>
+        /// <typeparam name="T2">泛型类型2</typeparam>
+        /// <typeparam name="T3">泛型类型3</typeparam>
+        /// <typeparam name="T4">泛型类型4</typeparam>
+        /// <typeparam name="T5">泛型类型5</typeparam>
+        /// <typeparam name="T6">泛型类型6</typeparam>
+        /// <typeparam name="T7">泛型类型7</typeparam>
+        /// <typeparam name="T8">泛型类型8</typeparam>
+        /// <typeparam name="T9">泛型类型9</typeparam>
+        /// <typeparam name="T10">泛型类型10</typeparam>
+        /// <param name="expression">表达式树</param>
+        /// <param name="tableNameFunc">表名自定义委托</param>
+        /// <returns>SqlBuilderCore</returns>
+        public SqlBuilderCore<T> Count<T2, T3, T4, T5, T6, T7, T8, T9, T10>(Expression<Func<T, T2, T3, T4, T5, T6, T7, T8, T9, T10, object>> expression = null, Func<string[], string> tableNameFunc = null)
+            where T2 : class
+            where T3 : class
+            where T4 : class
+            where T5 : class
+            where T6 : class
+            where T7 : class
+            where T8 : class
+            where T9 : class
+            where T10 : class
+        {
+            var sql = this.Select("COUNT({0})", tableNameFunc, this.GetExpressionAlias(expression, typeof(T), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10)));
+
+            return this.Count(expression?.Body, sql, tableNameFunc);
         }
         #endregion
 

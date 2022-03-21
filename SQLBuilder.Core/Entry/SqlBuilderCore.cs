@@ -4826,6 +4826,7 @@ namespace SQLBuilder.Core.Entry
         /// Count
         /// </summary>
         /// <param name="expression">表达式树</param>
+        /// <param name="sql">sql语句</param>
         /// <param name="tableNameFunc">表名自定义委托</param>
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Count(Expression expression = null, string sql = null, Func<string[], string> tableNameFunc = null)

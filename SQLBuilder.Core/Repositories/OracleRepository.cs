@@ -58,6 +58,14 @@ namespace SQLBuilder.Core.Repositories
             : base(connectionString, configuration) { }
         #endregion
 
+        #region Any
+        /// <summary>
+        /// 获取Any对应的sql语句
+        /// </summary>
+        /// <returns></returns>
+        public override string GetAnySql() => "SELECT CASE WHEN EXISTS ({0}) THEN 1 ELSE 0 END FROM DUAL";
+        #endregion
+
         #region Page
         /// <summary>
         /// 获取分页语句

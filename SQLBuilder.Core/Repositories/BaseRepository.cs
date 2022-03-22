@@ -2615,6 +2615,12 @@ namespace SQLBuilder.Core.Repositories
         #region Any
         #region Sync
         /// <summary>
+        /// 获取Any对应的sql语句
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetAnySql() => "SELECT CASE WHEN EXISTS ({0}) THEN 1 ELSE 0 END;";
+
+        /// <summary>
         /// 是否存在任意一个满足查询条件的实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -2622,7 +2628,10 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果</returns>
         public virtual bool Any<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return Count(predicate) > 0;
+            var builder = Sql.Select<T>(x => "1", DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
+            var res = FindObject(string.Format(GetAnySql(), builder.Sql), builder.DynamicParameters);
+
+            return res.To<int>() == 1;
         }
         #endregion
 
@@ -2635,7 +2644,10 @@ namespace SQLBuilder.Core.Repositories
         /// <returns>返回查询结果</returns>
         public virtual async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            return await CountAsync(predicate) > 0;
+            var builder = Sql.Select<T>(x => "1", DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
+            var res = await FindObjectAsync(string.Format(GetAnySql(), builder.Sql), builder.DynamicParameters);
+
+            return res.To<int>() == 1;
         }
         #endregion
         #endregion

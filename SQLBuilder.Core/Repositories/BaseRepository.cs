@@ -2637,8 +2637,6 @@ namespace SQLBuilder.Core.Repositories
         {
             return await CountAsync(predicate) > 0;
         }
-
-
         #endregion
         #endregion
 

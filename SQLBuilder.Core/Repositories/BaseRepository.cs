@@ -2618,7 +2618,7 @@ namespace SQLBuilder.Core.Repositories
         /// 获取Any对应的sql语句
         /// </summary>
         /// <returns></returns>
-        public virtual string GetAnySql() => "SELECT CASE WHEN EXISTS ({0}) THEN 1 ELSE 0 END;";
+        public virtual string GetAnySql() => "SELECT CASE WHEN EXISTS ({0}) THEN 1 ELSE 0 END";
 
         /// <summary>
         /// 是否存在任意一个满足查询条件的实体

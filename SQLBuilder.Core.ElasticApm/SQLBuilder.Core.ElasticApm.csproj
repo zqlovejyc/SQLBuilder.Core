@@ -11,7 +11,7 @@
         <Authors>张强</Authors>
         <Company>张强</Company>
         <Description>ElasticApm扩展，实现sql链路追踪；</Description>
-        <Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2025 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
         <PackageIcon>sql.png</PackageIcon>
@@ -20,9 +20,9 @@
         <PackageTags>sqlbuilder;elastic;apm</PackageTags>
         <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
-		<Version>2.3.2</Version>
-		<FileVersion>2.3.2.0</FileVersion>
-		<AssemblyVersion>2.3.2.0</AssemblyVersion>
+		<Version>2.3.3</Version>
+		<FileVersion>2.3.3.0</FileVersion>
+		<AssemblyVersion>2.3.3.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 

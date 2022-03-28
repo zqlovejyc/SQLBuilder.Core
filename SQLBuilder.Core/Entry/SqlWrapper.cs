@@ -632,15 +632,21 @@ namespace SQLBuilder.Core.Entry
             var isInsert = true;
             var isUpdate = true;
             var format = false;
+
+            //判断列成员信息是否为空
+            if (member == null)
+                return (columnName, isInsert, isUpdate);
+
+            //反射获取属性
             var props = type.GetProperties();
 
-            //判断列是否包含Column特性
-            var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
-            if (!isHaveColumnAttribute)
-                isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
+            //判断列是否含有Column特性
+            var hasColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
+            if (!hasColumnAttribute)
+                hasColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
 
-            //包含Column特性
-            if (isHaveColumnAttribute && member != null)
+            //含有Column特性
+            if (hasColumnAttribute)
             {
                 if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
                 {
@@ -653,27 +659,32 @@ namespace SQLBuilder.Core.Entry
                     columnName = sca.Name;
                 else
                 {
-                    var p = props.Where(x => x.Name == member.Name).FirstOrDefault();
-                    if (p != null)
+                    var prop = props.Where(x => x.Name == member.Name).FirstOrDefault();
+                    if (prop != null)
                     {
-                        if (p.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
+                        if (prop.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
                         {
                             columnName = cus.Name;
                             isInsert = cus.Insert;
                             isUpdate = cus.Update;
                             format = cus.Format;
                         }
-                        else if (p.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
+                        else if (prop.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
                             columnName = sys.Name;
                     }
                 }
             }
 
             //列名
-            columnName ??= member?.Name;
+            columnName ??= member.Name;
 
-            //判断列是否是Key
-            if (member != null)
+            //判断列是否含有key特性
+            var hasKeyAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
+            if (!hasKeyAttribute)
+                hasKeyAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
+
+            //含有Key特性
+            if (hasKeyAttribute)
             {
                 if (member.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
                 {
@@ -699,10 +710,10 @@ namespace SQLBuilder.Core.Entry
                 }
                 else
                 {
-                    var p = props.Where(x => x.Name == member.Name).FirstOrDefault();
-                    if (p != null)
+                    var prop = props.Where(x => x.Name == member.Name).FirstOrDefault();
+                    if (prop != null)
                     {
-                        if (p.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
+                        if (prop.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
                         {
                             isUpdate = false;
                             format = cus.Format;
@@ -713,12 +724,12 @@ namespace SQLBuilder.Core.Entry
                             if (cus.Name.IsNotNullOrEmpty() && cus.Name != columnName)
                                 columnName = cus.Name;
                         }
-                        else if (p.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                        else if (prop.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
                         {
                             isUpdate = false;
 
                             //判断是否自增
-                            if (p.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dg)
+                            if (prop.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dg)
                             {
                                 if (dg.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
                                     isInsert = false;
@@ -746,11 +757,11 @@ namespace SQLBuilder.Core.Entry
             var result = new List<(string key, string property)>();
             var props = type.GetProperties();
 
-            var isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
-            if (!isHaveColumnAttribute)
-                isHaveColumnAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
+            var hasColumnAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
+            if (!hasColumnAttribute)
+                hasColumnAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
 
-            if (isHaveColumnAttribute)
+            if (hasColumnAttribute)
             {
                 var properties = props.Where(x => x.ContainsAttribute<CusKeyAttribute>()).ToList();
                 if (properties.Count() == 0)

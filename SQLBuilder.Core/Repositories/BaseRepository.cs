@@ -181,11 +181,6 @@ namespace SQLBuilder.Core.Repositories
 
         #region Constructor
         /// <summary>
-        /// 析构函数
-        /// </summary>
-        ~BaseRepository() => Dispose(false);
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         public BaseRepository() { }

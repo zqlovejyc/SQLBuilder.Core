@@ -181,6 +181,11 @@ namespace SQLBuilder.Core.Repositories
 
         #region Constructor
         /// <summary>
+        /// 析构函数
+        /// </summary>
+        ~BaseRepository() => Dispose(false);
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public BaseRepository() { }
@@ -4152,7 +4157,18 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public virtual void Dispose()
         {
-            if (_disposed)
+            Dispose(true);
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 释放资源，关闭数据库连接
+        /// </summary>
+        /// <param name="disposing"></param>
+        public virtual void Dispose(bool disposing)
+        {
+            if (_disposed || !disposing)
                 return;
 
             try
@@ -4194,7 +4210,18 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async ValueTask DisposeAsync()
         {
-            if (_disposed)
+            await DisposeAsync(true);
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 释放资源，关闭数据库连接
+        /// </summary>
+        /// <returns></returns>
+        public virtual async ValueTask DisposeAsync(bool disposing)
+        {
+            if (_disposed || !disposing)
                 return;
 
             try

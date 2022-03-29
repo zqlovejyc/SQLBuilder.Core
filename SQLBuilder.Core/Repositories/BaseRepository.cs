@@ -64,6 +64,11 @@ namespace SQLBuilder.Core.Repositories
         /// 从库数据库连接
         /// </summary>
         private DbConnection _salveConnection;
+
+        /// <summary>
+        /// 是否已释放
+        /// </summary>
+        private bool _disposed;
         #endregion
 
         #region Property
@@ -4147,6 +4152,9 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public virtual void Dispose()
         {
+            if (_disposed)
+                return;
+
             try
             {
                 //主库
@@ -4172,6 +4180,10 @@ namespace SQLBuilder.Core.Repositories
                 if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeException))
                     _diagnosticListener.Write(DiagnosticStrings.DisposeException, new { exception });
             }
+            finally
+            {
+                _disposed = true;
+            }
         }
         #endregion
 
@@ -4182,6 +4194,9 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async ValueTask DisposeAsync()
         {
+            if (_disposed)
+                return;
+
             try
             {
                 //主库
@@ -4206,6 +4221,10 @@ namespace SQLBuilder.Core.Repositories
             {
                 if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeException))
                     _diagnosticListener.Write(DiagnosticStrings.DisposeException, new { exception });
+            }
+            finally
+            {
+                _disposed = true;
             }
         }
         #endregion

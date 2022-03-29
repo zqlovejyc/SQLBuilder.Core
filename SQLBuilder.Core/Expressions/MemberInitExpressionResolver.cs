@@ -102,13 +102,13 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
+                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, m.Member);
                 if (isInsert)
                 {
                     var value = m.Expression.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlWrapper.AddDbParameter(value);
+                        sqlWrapper.AddDbParameter(value, dbType);
                         if (!fields.Contains(columnName))
                             fields.Add(columnName);
                         sqlWrapper += ",";
@@ -145,14 +145,14 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, m.Member);
+                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, m.Member);
                 if (isUpdate)
                 {
                     var value = m.Expression.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
                         sqlWrapper += columnName + " = ";
-                        sqlWrapper.AddDbParameter(value);
+                        sqlWrapper.AddDbParameter(value, dbType);
                         sqlWrapper += ",";
                     }
                 }

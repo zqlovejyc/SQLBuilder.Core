@@ -59,13 +59,13 @@ namespace SQLBuilder.Core.Expressions
                             sqlWrapper.DefaultType :
                             p.DeclaringType;
 
-                        var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, p);
+                        var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, p);
                         if (isInsert)
                         {
                             var value = p.GetValue(item, null);
                             if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                             {
-                                sqlWrapper.AddDbParameter(value);
+                                sqlWrapper.AddDbParameter(value, dbType);
                                 if (!fields.Contains(columnName))
                                     fields.Add(columnName);
                                 sqlWrapper += ",";

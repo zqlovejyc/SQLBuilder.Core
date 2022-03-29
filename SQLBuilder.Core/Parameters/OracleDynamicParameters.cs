@@ -53,7 +53,7 @@ namespace SQLBuilder.Core.Parameters
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <param name="oracleDbType"></param>
-        public void Add(string name, object value, OracleDbType oracleDbType)
+        public void Add(string name, object value, OracleDbType? oracleDbType)
         {
             this.Add(name, oracleDbType, ParameterDirection.Input, value);
         }
@@ -62,11 +62,31 @@ namespace SQLBuilder.Core.Parameters
         /// 新增参数
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="oracleDbType"></param>
+        /// <param name="size"></param>
+        public void Add(string name, object value, OracleDbType? oracleDbType, int? size)
+        {
+            this.Add(name, oracleDbType, ParameterDirection.Input, value, size);
+        }
+
+        /// <summary>
+        /// 新增参数
+        /// </summary>
+        /// <param name="name"></param>
         /// <param name="oracleDbType"></param>
         /// <param name="direction"></param>
-        public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction)
+        public void Add(string name, OracleDbType? oracleDbType, ParameterDirection direction)
         {
-            var oracleParameter = new OracleParameter(name, oracleDbType, direction);
+            var oracleParameter = new OracleParameter
+            {
+                ParameterName = name,
+                Direction = direction
+            };
+
+            if (oracleDbType != null)
+                oracleParameter.OracleDbType = oracleDbType.Value;
+
             OracleParameters.Add(oracleParameter);
         }
 
@@ -78,14 +98,20 @@ namespace SQLBuilder.Core.Parameters
         /// <param name="direction"></param>
         /// <param name="value"></param>
         /// <param name="size"></param>
-        public void Add(string name, OracleDbType oracleDbType, ParameterDirection direction, object value = null, int? size = null)
+        public void Add(string name, OracleDbType? oracleDbType, ParameterDirection direction, object value = null, int? size = null)
         {
-            OracleParameter oracleParameter;
+            var oracleParameter = new OracleParameter
+            {
+                ParameterName = name,
+                Value = value,
+                Direction = direction
+            };
 
-            if (size.HasValue)
-                oracleParameter = new(name, oracleDbType, size.Value, value, direction);
-            else
-                oracleParameter = new(name, oracleDbType, value, direction);
+            if (oracleDbType != null)
+                oracleParameter.OracleDbType = oracleDbType.Value;
+
+            if (size != null)
+                oracleParameter.Size = size.Value;
 
             OracleParameters.Add(oracleParameter);
         }

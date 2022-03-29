@@ -22,9 +22,12 @@ using Microsoft.Data.Sqlite;
 using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
+using SQLBuilder.Core.Attributes;
+using SQLBuilder.Core.Parameters;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using static Dapper.SqlMapper;
 
 namespace SQLBuilder.Core.Extensions
 {
@@ -95,6 +98,50 @@ namespace SQLBuilder.Core.Extensions
 
             return args;
         }
+
+        /// <summary>
+        ///  IDictionary转换为DynamicParameters
+        /// </summary>
+        /// <param name="this"></param>        
+        /// <returns></returns>
+        public static IDynamicParameters ToDynamicParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this.IsNull() || @this.Count == 0)
+                return null;
+
+            //OracleDbType
+            if (@this.Values.Any(x => x.type?.IsOracleDbType == true))
+            {
+                var parameter = new OracleDynamicParameters();
+
+                foreach (var item in @this)
+                    parameter.Add(item.Key, item.Value.data,
+                        item.Value.type?.IsOracleDbType == true
+                            ? item.Value.type.OracleDbType
+                            : null,
+                        item.Value.type?.IsFixedLength == true
+                            ? item.Value.type.FixedLength
+                            : null);
+
+                return parameter;
+            }
+            //DbType
+            else
+            {
+                var parameter = new DynamicParameters();
+
+                foreach (var item in @this)
+                    parameter.Add(item.Key, item.Value.data,
+                        item.Value.type?.IsDbType == true
+                            ? item.Value.type.DbType
+                            : null,
+                        size: item.Value.type?.IsFixedLength == true
+                            ? item.Value.type.FixedLength
+                            : null);
+
+                return parameter;
+            }
+        }
         #endregion
 
         #region ToDbParameters
@@ -153,6 +200,37 @@ namespace SQLBuilder.Core.Extensions
 
             return @this.Select(x => new SqlParameter(x.Key.Replace("?", "@").Replace(":", "@"), x.Value)).ToArray();
         }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts the @this to a SQL parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>        
+        /// <returns>@this as a SqlParameter[].</returns>
+        public static SqlParameter[] ToSqlParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = new SqlParameter(x.Key.Replace("?", "@").Replace(":", "@"), x.Value.data);
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsSqlDbType)
+                    parameter.SqlDbType = x.Value.type.SqlDbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
+            }).ToArray();
+        }
         #endregion
 
         #region ToMySqlParameters
@@ -167,6 +245,37 @@ namespace SQLBuilder.Core.Extensions
                 return null;
 
             return @this.Select(x => new MySqlParameter(x.Key.Replace("@", "?").Replace(":", "?"), x.Value)).ToArray();
+        }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts the @this to a MySQL parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>        
+        /// <returns>@this as a MySqlParameter[].</returns>
+        public static MySqlParameter[] ToMySqlParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = new MySqlParameter(x.Key.Replace("@", "?").Replace(":", "?"), x.Value.data);
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsMySqlDbType)
+                    parameter.MySqlDbType = x.Value.type.MySqlDbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
+            }).ToArray();
         }
         #endregion
 
@@ -183,6 +292,37 @@ namespace SQLBuilder.Core.Extensions
 
             return @this.Select(x => new SqliteParameter(x.Key.Replace("?", "@").Replace(":", "@"), x.Value)).ToArray();
         }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts the @this to a Sqlite parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>        
+        /// <returns>@this as a SQLiteParameter[].</returns>
+        public static SqliteParameter[] ToSqliteParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = new SqliteParameter(x.Key.Replace("?", "@").Replace(":", "@"), x.Value.data);
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsSqliteType)
+                    parameter.SqliteType = x.Value.type.SqliteType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
+            }).ToArray();
+        }
         #endregion
 
         #region ToOracleParameters
@@ -198,6 +338,37 @@ namespace SQLBuilder.Core.Extensions
 
             return @this.Select(x => new OracleParameter(x.Key.Replace("?", ":").Replace("@", ":"), x.Value)).ToArray();
         }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts the @this to a Oracle parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>        
+        /// <returns>@this as a OracleParameter[].</returns>
+        public static OracleParameter[] ToOracleParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = new OracleParameter(x.Key.Replace("?", ":").Replace("@", ":"), x.Value.data);
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsOracleDbType)
+                    parameter.OracleDbType = x.Value.type.OracleDbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
+            }).ToArray();
+        }
         #endregion
 
         #region ToNpgsqlParameters
@@ -212,6 +383,37 @@ namespace SQLBuilder.Core.Extensions
                 return null;
 
             return @this.Select(x => new NpgsqlParameter(x.Key.Replace("?", ":").Replace("@", ":"), x.Value)).ToArray();
+        }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts the @this to a PostgreSQL parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>        
+        /// <returns>@this as a NpgsqlParameter[].</returns>
+        public static NpgsqlParameter[] ToNpgsqlParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = new NpgsqlParameter(x.Key.Replace("?", ":").Replace("@", ":"), x.Value.data);
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsNpgsqlDbType)
+                    parameter.NpgsqlDbType = x.Value.type.NpgsqlDbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
+            }).ToArray();
         }
         #endregion
     }

@@ -1,4 +1,5 @@
 ﻿using SQLBuilder.Core.Attributes;
+using System.Data;
 
 namespace SQLBuilder.Core.UnitTest
 {
@@ -9,6 +10,7 @@ namespace SQLBuilder.Core.UnitTest
 
         public int? Age { get; set; }
 
+        [DataType(IsDbType = true, DbType = DbType.Int32)]
         public int ClassId { get; set; }
 
         public TeacherType? Type { get; set; }

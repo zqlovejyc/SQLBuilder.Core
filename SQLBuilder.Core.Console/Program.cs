@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DiagnosticAdapter;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Diagnostics;
 using SQLBuilder.Core.ElasticApm.Diagnostics;
 using SQLBuilder.Core.ElasticApm.Extensions;
@@ -45,7 +46,7 @@ namespace SQLBuilder.Core
                 Console.WriteLine(builder.Sql);
                 if (builder.Parameters != null)
                 {
-                    foreach (KeyValuePair<string, object> item in builder.Parameters)
+                    foreach (KeyValuePair<string, (object data,DataTypeAttribute type)> item in builder.Parameters)
                     {
                         Console.WriteLine(item.ToString());
                     }

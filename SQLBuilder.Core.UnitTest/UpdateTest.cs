@@ -1,6 +1,7 @@
 ﻿using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Xunit;
 
@@ -46,6 +47,13 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("UPDATE Base_UserInfo SET Sex = @p__1,Email = @p__2 WHERE Id = @p__3", builder.Sql);
             Assert.Equal(3, builder.Parameters.Count);
+
+            Assert.True(builder.Parameters["@p__2"].type.IsDbType);
+            Assert.True(builder.Parameters["@p__2"].type.IsFixedLength);
+            Assert.True(builder.Parameters["@p__3"].type.IsDbType);
+
+            Assert.Equal(DbType.AnsiStringFixedLength, builder.Parameters["@p__2"].type.DbType);
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__3"].type.DbType);
         }
 
         /// <summary>

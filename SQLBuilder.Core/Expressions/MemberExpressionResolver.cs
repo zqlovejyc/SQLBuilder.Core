@@ -87,7 +87,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.DefaultType :
                         property.DeclaringType;
 
-                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, property);
+                    var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, property);
                     if (isInsert)
                     {
                         object value;
@@ -99,7 +99,7 @@ namespace SQLBuilder.Core.Expressions
 
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlWrapper.AddDbParameter(value);
+                            sqlWrapper.AddDbParameter(value, dbType);
 
                             if (!fields.Contains(columnName))
                                 fields.Add(columnName);
@@ -165,7 +165,7 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.DefaultType :
                         item.DeclaringType;
 
-                    var (columnName, isInsert, isUpdate) = sqlWrapper.GetColumnInfo(type, item);
+                    var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, item);
                     if (isUpdate)
                     {
                         object value;
@@ -178,7 +178,7 @@ namespace SQLBuilder.Core.Expressions
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
                             sqlWrapper += columnName + " = ";
-                            sqlWrapper.AddDbParameter(value);
+                            sqlWrapper.AddDbParameter(value, dbType);
                             sqlWrapper += ",";
                         }
                     }

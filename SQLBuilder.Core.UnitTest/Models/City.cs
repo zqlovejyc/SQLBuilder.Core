@@ -1,4 +1,5 @@
 ﻿using SQLBuilder.Core.Attributes;
+using System.Data;
 
 namespace SQLBuilder.Core.UnitTest
 {
@@ -7,7 +8,8 @@ namespace SQLBuilder.Core.UnitTest
     {
         public int Id { get; set; }
         public int CountryId { get; set; }
-        [Column("City_Name")]
+
+        [Column("City_Name"), DataType(IsDbType = true, DbType = DbType.AnsiString)]
         public string CityName { get; set; }
     }
 

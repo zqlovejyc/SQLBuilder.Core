@@ -1,4 +1,5 @@
 ﻿using SQLBuilder.Core.Entry;
+using System.Data;
 using Xunit;
 
 namespace SQLBuilder.Core.UnitTest
@@ -31,6 +32,9 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("DELETE FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__1"].type.DbType);
         }
 
         /// <summary>

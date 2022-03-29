@@ -16,7 +16,7 @@
  */
 #endregion
 
-using Dapper;
+using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Expressions;
 using SQLBuilder.Core.Extensions;
@@ -27,6 +27,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Dapper.SqlMapper;
 
 namespace SQLBuilder.Core.Entry
 {
@@ -66,12 +67,12 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// SQL格式化参数
         /// </summary>
-        public Dictionary<string, object> Parameters => this.sqlWrapper.DbParameters;
+        public Dictionary<string, (object data, DataTypeAttribute type)> Parameters => this.sqlWrapper.DataTypedDbParameters;
 
         /// <summary>
         /// Dapper格式化参数
         /// </summary>
-        public DynamicParameters DynamicParameters => this.sqlWrapper.DbParameters.ToDynamicParameters();
+        public IDynamicParameters DynamicParameters => this.sqlWrapper.DataTypedDbParameters.ToDynamicParameters();
 
         /// <summary>
         /// SQL格式化参数
@@ -79,11 +80,11 @@ namespace SQLBuilder.Core.Entry
         public DbParameter[] DbParameters =>
             this.sqlWrapper.DatabaseType switch
             {
-                DatabaseType.SqlServer => this.sqlWrapper.DbParameters.ToSqlParameters(),
-                DatabaseType.MySql => this.sqlWrapper.DbParameters.ToMySqlParameters(),
-                DatabaseType.Sqlite => this.sqlWrapper.DbParameters.ToSqliteParameters(),
-                DatabaseType.Oracle => this.sqlWrapper.DbParameters.ToOracleParameters(),
-                DatabaseType.PostgreSql => this.sqlWrapper.DbParameters.ToNpgsqlParameters(),
+                DatabaseType.SqlServer => this.sqlWrapper.DataTypedDbParameters.ToSqlParameters(),
+                DatabaseType.MySql => this.sqlWrapper.DataTypedDbParameters.ToMySqlParameters(),
+                DatabaseType.Sqlite => this.sqlWrapper.DataTypedDbParameters.ToSqliteParameters(),
+                DatabaseType.Oracle => this.sqlWrapper.DataTypedDbParameters.ToOracleParameters(),
+                DatabaseType.PostgreSql => this.sqlWrapper.DataTypedDbParameters.ToNpgsqlParameters(),
                 _ => null
             };
         #endregion
@@ -3754,14 +3755,14 @@ namespace SQLBuilder.Core.Entry
             {
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    var (key, property) = keys[i];
+                    var (key, property, dbType) = keys[i];
                     if (key.IsNotNullOrEmpty())
                     {
                         var keyValue = typeof(T).GetProperty(property)?.GetValue(entity, null);
                         if (keyValue != null)
                         {
                             this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                            this.sqlWrapper.AddDbParameter(keyValue);
+                            this.sqlWrapper.AddDbParameter(keyValue, dbType);
                         }
                         else
                         {
@@ -3805,11 +3806,11 @@ namespace SQLBuilder.Core.Entry
             {
                 for (int i = 0; i < keys.Count; i++)
                 {
-                    var (key, property) = keys[i];
+                    var (key, property, dbType) = keys[i];
                     if (key.IsNotNullOrEmpty())
                     {
                         this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {(tableAlias + key)} = ";
-                        this.sqlWrapper.AddDbParameter(keyValue[i]);
+                        this.sqlWrapper.AddDbParameter(keyValue[i], dbType);
                     }
                 }
             }
@@ -4552,7 +4553,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
         /// <remarks>注意：Oracle需要Split(';')分开单独查询总条数和分页数据</remarks>
-        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
+        public SqlBuilderCore<T> Page(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, (object data, DataTypeAttribute type)> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();
 
@@ -4627,7 +4628,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="serverVersion">DbConnection的ServerVersion属性</param>
         /// <returns>SqlBuilderCore</returns>
         /// <remarks>注意：Oracle需要Split(';')分开单独查询总条数和分页数据</remarks>
-        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, object> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
+        public SqlBuilderCore<T> PageByWith(int pageSize, int pageIndex, string orderField, string sql = null, Dictionary<string, (object data, DataTypeAttribute type)> parameters = null, string countSyntax = "COUNT(*)", string serverVersion = null)
         {
             var sb = new StringBuilder();
 

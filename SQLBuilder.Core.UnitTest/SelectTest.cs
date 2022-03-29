@@ -3,6 +3,7 @@ using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Xunit;
 
@@ -25,7 +26,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT MAX(Id) FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(3, builder.Parameters["@p__1"]);
+            Assert.Equal(3, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT MAX(Id) FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(3, builder.Parameters["@p__1"]);
+            Assert.Equal(3, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT MAX(Id) FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(3, builder.Parameters["@p__1"]);
+            Assert.Equal(3, builder.Parameters["@p__1"].data);
         }
         #endregion
 
@@ -285,7 +286,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -303,7 +304,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -321,7 +322,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -339,7 +340,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -357,7 +358,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -397,7 +398,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id,Email", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -418,7 +419,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT [x].[Email],[y].[Name] FROM [Base_UserInfo] AS [x] INNER JOIN [Base_Student] AS [y] ON [x].[Id] = [y].[UserId] WHERE [x].[Name] = @p__1 GROUP BY [x].[Email],[y].[Name]", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -436,7 +437,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -456,7 +457,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -476,7 +477,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name = @p__1 GROUP BY Id", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
         }
         #endregion
 
@@ -608,6 +609,9 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT x.ClassId FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id AND (y.Name IS NOT NULL AND y.Name <> '') WHERE x.ClassId <> @p__1 GROUP BY x.ClassId HAVING (COUNT(x.ClassId) = @p__2 AND (x.ClassId = @p__3 OR x.ClassId = @p__4)) AND x.ClassId <= @p__5 AND x.ClassId <= @p__6", builder.Sql);
             Assert.Equal(6, builder.Parameters.Count);
+
+            Assert.True(builder.Parameters["@p__2"].type.IsDbType);
+            Assert.Equal(DbType.Int32, builder.Parameters["@p__2"].type.DbType);
         }
         #endregion
 
@@ -892,7 +896,10 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT [x].[Email],[y].[Name] FROM [Base_UserInfo] AS [x] INNER JOIN [Base_Student] AS [y] ON [x].[Id] = [y].[UserId] WHERE [x].[Name] = @p__1 GROUP BY [x].[Email],[y].[Name] ORDER BY [y].[Name]", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张强", builder.Parameters["@p__1"]);
+            Assert.Equal("张强", builder.Parameters["@p__1"].data);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.Equal(DbType.String, builder.Parameters["@p__1"].type.DbType);
         }
 
         /// <summary>
@@ -1061,7 +1068,10 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Name == entity.name);
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Name = @p__1", builder.Sql);
-            Assert.Equal("新用户", builder.Parameters["@p__1"]);
+            Assert.Equal("新用户", builder.Parameters["@p__1"].data);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.Equal(DbType.String, builder.Parameters["@p__1"].type.DbType);
         }
 
         /// <summary>
@@ -1077,7 +1087,7 @@ namespace SQLBuilder.Core.UnitTest
                                 u.Name.Like("张三"));
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE Name LIKE '%' + @p__1 + '%'", builder.Sql);
-            Assert.Equal("张三", builder.Parameters["@p__1"]);
+            Assert.Equal("张三", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1096,7 +1106,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE Name NOT LIKE '%' + @p__1 + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张三", builder.Parameters["@p__1"]);
+            Assert.Equal("张三", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1115,7 +1125,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE Name LIKE @p__1 + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张三", builder.Parameters["@p__1"]);
+            Assert.Equal("张三", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1182,6 +1192,14 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Name FROM Base_UserInfo WHERE Id NOT IN (@p__1,@p__2,@p__3)", builder.Sql);
             Assert.Equal(3, builder.Parameters.Count);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.True(builder.Parameters["@p__2"].type.IsDbType);
+            Assert.True(builder.Parameters["@p__3"].type.IsDbType);
+
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__1"].type.DbType);
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__2"].type.DbType);
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__3"].type.DbType);
         }
 
         /// <summary>
@@ -1206,6 +1224,15 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE (((((((Name = @p__1 AND (Id > @p__2 AND Name IS NOT NULL)) AND Id > @p__3) AND Id < @p__4) AND Id IN (@p__5,@p__6,@p__7)) AND Name LIKE '%' + @p__8 + '%') AND Name LIKE '%' + @p__9) AND Name LIKE @p__10 + '%') OR Id IS NULL", builder.Sql);
             Assert.Equal(10, builder.Parameters.Count);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.Equal(DbType.String, builder.Parameters["@p__1"].type.DbType);
+
+            Assert.True(builder.Parameters["@p__5"].type.IsDbType);
+            Assert.Equal(DbType.Int64, builder.Parameters["@p__5"].type.DbType);
+
+            Assert.True(builder.Parameters["@p__10"].type.IsDbType);
+            Assert.Equal(DbType.String, builder.Parameters["@p__10"].type.DbType);
         }
 
         /// <summary>
@@ -1336,7 +1363,10 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT `Id`,`Name` FROM `Base_UserInfo` WHERE (`Name` = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
+
+            Assert.True(builder.Parameters["?p__1"].type.IsDbType);
+            Assert.Equal(DbType.String, builder.Parameters["?p__1"].type.DbType);
         }
 
         /// <summary>
@@ -1357,7 +1387,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Name FROM Base_UserInfo WHERE Name LIKE '%' + @p__1 + '%' AND ((Name IS NOT NULL AND Name <> '')) AND ((Email IS NULL OR Email = ''))", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("11", builder.Parameters["@p__1"]);
+            Assert.Equal("11", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1376,6 +1406,11 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Id > @p__1 OR Email <> @p__2", builder.Sql);
             Assert.Equal(2, builder.Parameters.Count);
+
+            Assert.True(builder.Parameters["@p__2"].type.IsDbType);
+            Assert.True(builder.Parameters["@p__2"].type.IsFixedLength);
+            Assert.Equal(20, builder.Parameters["@p__2"].type.FixedLength);
+            Assert.Equal(DbType.AnsiStringFixedLength, builder.Parameters["@p__2"].type.DbType);
         }
 
         /// <summary>
@@ -1390,7 +1425,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(2, builder.Parameters["@p__1"]);
+            Assert.Equal(2, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1441,7 +1476,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Name = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("新用户", builder.Parameters["@p__1"]);
+            Assert.Equal("新用户", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1468,7 +1503,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Name = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("新用户", builder.Parameters["@p__1"]);
+            Assert.Equal("新用户", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1495,7 +1530,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(2, builder.Parameters["@p__1"]);
+            Assert.Equal(2, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1579,7 +1614,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Name FROM Base_UserInfo WHERE Name LIKE '%' + @p__1 + '%' AND ((Name IS NULL OR Name = '')) AND ((Email IS NULL OR Email = ''))", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("11", builder.Parameters["@p__1"]);
+            Assert.Equal("11", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1606,7 +1641,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Id <> @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(2, builder.Parameters["@p__1"]);
+            Assert.Equal(2, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1633,7 +1668,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(2, builder.Parameters["@p__1"]);
+            Assert.Equal(2, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1651,7 +1686,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Id <= @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(0, builder.Parameters["@p__1"]);
+            Assert.Equal(0, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1669,7 +1704,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Id < @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(0, builder.Parameters["@p__1"]);
+            Assert.Equal(0, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1721,7 +1756,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE Id > @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(0, builder.Parameters["@p__1"]);
+            Assert.Equal(0, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1738,7 +1773,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE UPPER(City_Name) = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1755,7 +1790,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE LOWER(City_Name) = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1772,7 +1807,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE LTRIM(RTRIM(City_Name)) = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1789,7 +1824,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE LTRIM(City_Name) = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1806,7 +1841,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE RTRIM(City_Name) = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -1827,7 +1862,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT `Id`,`City_Name` AS `CityName`,`Age`,`Address` FROM `Base_City3` WHERE (`City_Name` IS NOT NULL AND `City_Name` <> '') AND TRIM(`City_Name`) = TRIM(?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["?p__1"]);
+            Assert.Equal("郑州", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -1846,7 +1881,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,City_Name AS CityName,Age,Address FROM Base_City3 WHERE TRIM(City_Name) LIKE CONCAT('%',TRIM(?p__1),'%')", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["?p__1"]);
+            Assert.Equal("郑州", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -1866,7 +1901,10 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT \"Id\",\"City_Name\" AS \"CityName\",\"Age\",\"Address\" FROM \"Base_City3\" WHERE TRIM(\"City_Name\") LIKE '%' || TRIM(@p__1) || '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("郑州", builder.Parameters["@p__1"]);
+            Assert.Equal("郑州", builder.Parameters["@p__1"].data);
+
+            Assert.True(builder.Parameters["@p__1"].type.IsDbType);
+            Assert.Equal(DbType.AnsiString, builder.Parameters["@p__1"].type.DbType);
         }
 
         /// <summary>
@@ -2118,7 +2156,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM `Base_UserInfo` WHERE (`Name` = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -2137,7 +2175,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE (Name = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -2156,7 +2194,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE (Name = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -2175,7 +2213,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE (Name = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -2263,7 +2301,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_UserInfo WHERE Name LIKE '%' + @p__1 + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("test", builder.Parameters["@p__1"]);
+            Assert.Equal("test", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -2456,7 +2494,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT u.Id,a.Name FROM Base_UserInfo AS u INNER JOIN Base_Account AS a ON u.Id = a.UserId WHERE u.Email = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("123", builder.Parameters["@p__1"]);
+            Assert.Equal("123", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -2550,7 +2588,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Name,Email AS Address FROM Base_UserInfo WHERE Id = @p__1 ORDER BY Id ASC,Email ASC", query.Sql);
             Assert.Single(query.Parameters);
-            Assert.Equal(1, query.Parameters["@p__1"]);
+            Assert.Equal(1, query.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -2570,7 +2608,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Name,Email AS Address FROM Base_UserInfo WHERE Id = @p__1 ORDER BY Id DESC,Email DESC", query.Sql);
             Assert.Single(query.Parameters);
-            Assert.Equal(1, query.Parameters["@p__1"]);
+            Assert.Equal(1, query.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -2590,7 +2628,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE Id IS NOT NULL AND Name LIKE '%' + @p__1 + '%' GROUP BY Id ORDER BY Id DESC", query.Sql);
             Assert.Single(query.Parameters);
-            Assert.Equal("1", query.Parameters["@p__1"]);
+            Assert.Equal("1", query.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -2657,7 +2695,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM `Base_UserInfo` WHERE (`Name` = ?p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("", builder.Parameters["?p__1"]);
+            Assert.Equal("", builder.Parameters["?p__1"].data);
         }
 
         /// <summary>
@@ -3074,7 +3112,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM WF_UNITINFO WHERE (PANELNO <> :p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("N/A", builder.Parameters[":p__1"]);
+            Assert.Equal("N/A", builder.Parameters[":p__1"].data);
         }
 
         /// <summary>
@@ -3176,7 +3214,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_Teacher WHERE Type = @p__1 AND Name IS NOT NULL", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"]);
+            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3196,7 +3234,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT * FROM Base_Teacher WHERE Type = @p__1 AND Name IS NOT NULL", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"]);
+            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3240,7 +3278,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT x.Name AS TeacherName,y.Name AS ClassName FROM Base_Teacher AS x INNER JOIN Base_Class AS y ON x.ClassId = y.Id WHERE x.Type = @p__1 AND x.Name IS NOT NULL", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"]);
+            Assert.Equal(TeacherType.A, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3256,7 +3294,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id,Name,OtherName,[Order] AS OrderName,[Group] AS GroupName FROM [Base_Test] WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal(1, builder.Parameters["@p__1"]);
+            Assert.Equal(1, builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3289,7 +3327,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) LIKE UPPER(@p__1) + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张三", builder.Parameters["@p__1"]);
+            Assert.Equal("张三", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3308,7 +3346,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) LIKE '%' + UPPER(@p__1)", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张三", builder.Parameters["@p__1"]);
+            Assert.Equal("张三", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3327,7 +3365,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) LIKE UPPER(@p__1) + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张", builder.Parameters["@p__1"]);
+            Assert.Equal("张", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3346,7 +3384,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张", builder.Parameters["@p__1"]);
+            Assert.Equal("张", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3365,7 +3403,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张", builder.Parameters["@p__1"]);
+            Assert.Equal("张", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>
@@ -3384,7 +3422,7 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("SELECT Id FROM Base_UserInfo WHERE UPPER(Name) NOT LIKE '%' + UPPER(@p__1) + '%'", builder.Sql);
             Assert.Single(builder.Parameters);
-            Assert.Equal("张", builder.Parameters["@p__1"]);
+            Assert.Equal("张", builder.Parameters["@p__1"].data);
         }
 
         /// <summary>

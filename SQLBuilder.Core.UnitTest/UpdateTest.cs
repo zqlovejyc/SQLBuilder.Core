@@ -53,6 +53,7 @@ namespace SQLBuilder.Core.UnitTest
             Assert.True(builder.Parameters["@p__3"].type.IsDbType);
 
             Assert.Equal(DbType.AnsiStringFixedLength, builder.Parameters["@p__2"].type.DbType);
+            Assert.Equal(20, builder.Parameters["@p__2"].type.FixedLength);
             Assert.Equal(DbType.Int64, builder.Parameters["@p__3"].type.DbType);
         }
 

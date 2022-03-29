@@ -39,11 +39,6 @@ namespace SQLBuilder.Core.Repositories
 
         #region Constructor
         /// <summary>
-        /// 析构函数
-        /// </summary>
-        ~NpgsqlRepository() => base.Dispose(false);
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         public NpgsqlRepository() { }

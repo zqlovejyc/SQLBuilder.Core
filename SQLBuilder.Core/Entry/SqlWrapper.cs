@@ -127,7 +127,7 @@ namespace SQLBuilder.Core.Entry
         {
             get
             {
-                //插入已经直接设置了DataType
+                //新增已经直接设置了DataType
                 if (this.Contains("INSERT"))
                     return this.DbParameters;
 
@@ -169,7 +169,7 @@ namespace SQLBuilder.Core.Entry
                     //获取字段名
                     var field = splitSql[destIndex];
                     if (field.Contains("(") && field.Contains(")"))
-                        field = field.Substring("(", ")");
+                        field = field.Substring("(", ")", false, false);
 
                     //判断缓存中是否存在DataType
                     if (this._dataTypeDictionary.ContainsKey(field))

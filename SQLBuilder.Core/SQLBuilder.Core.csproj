@@ -8,14 +8,15 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.3.3</Version>
-		<FileVersion>2.3.3.0</FileVersion>
-		<AssemblyVersion>2.3.3.0</AssemblyVersion>
+		<Version>2.3.4</Version>
+		<FileVersion>2.3.4.0</FileVersion>
+		<AssemblyVersion>2.3.4.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2025 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.优化仓储Any方法内部sql实现；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.新增DataType特性，允许自定义表实体单个字段数据库类型；
+2.优化Dispose；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>

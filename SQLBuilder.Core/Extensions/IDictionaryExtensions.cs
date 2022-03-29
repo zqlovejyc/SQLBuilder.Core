@@ -161,7 +161,40 @@ namespace SQLBuilder.Core.Extensions
                 var parameter = command.CreateParameter();
                 parameter.ParameterName = x.Key;
                 parameter.Value = x.Value;
+
                 return parameter;
+
+            }).ToArray();
+        }
+
+        /// <summary>
+        /// An IDictionary&lt;string,object&gt; extension method that converts this object to a database parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>
+        /// <param name="command">The command.</param>        
+        /// <returns>The given data converted to a DbParameter[].</returns>
+        public static DbParameter[] ToDbParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this, DbCommand command)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            return @this.Select(x =>
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = x.Key;
+                parameter.Value = x.Value.data;
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
             }).ToArray();
         }
 
@@ -182,7 +215,41 @@ namespace SQLBuilder.Core.Extensions
                 var parameter = command.CreateParameter();
                 parameter.ParameterName = x.Key;
                 parameter.Value = x.Value;
+
                 return parameter;
+
+            }).ToArray();
+        }
+
+        /// <summary>
+        ///  An IDictionary&lt;string,object&gt; extension method that converts this object to a database parameters.
+        /// </summary>
+        /// <param name="this">The @this to act on.</param>
+        /// <param name="connection">The connection.</param>        
+        /// <returns>The given data converted to a DbParameter[].</returns>
+        public static DbParameter[] ToDbParameters(this IDictionary<string, (object data, DataTypeAttribute type)> @this, DbConnection connection)
+        {
+            if (@this == null || @this.Count == 0)
+                return null;
+
+            var command = connection.CreateCommand();
+            return @this.Select(x =>
+            {
+                var parameter = command.CreateParameter();
+                parameter.ParameterName = x.Key;
+                parameter.Value = x.Value.data;
+
+                if (x.Value.type == null)
+                    return parameter;
+
+                if (x.Value.type.IsDbType)
+                    parameter.DbType = x.Value.type.DbType;
+
+                if (x.Value.type.IsFixedLength)
+                    parameter.Size = x.Value.type.FixedLength;
+
+                return parameter;
+
             }).ToArray();
         }
         #endregion

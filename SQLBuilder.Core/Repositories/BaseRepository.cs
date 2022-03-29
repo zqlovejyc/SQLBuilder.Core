@@ -4152,39 +4152,48 @@ namespace SQLBuilder.Core.Repositories
         /// </summary>
         public virtual void Dispose()
         {
+            //显示执行释放
             Dispose(true);
 
+            //阻止GC把该对象放入终结器队列
             GC.SuppressFinalize(this);
         }
 
         /// <summary>
         /// 释放资源，关闭数据库连接
         /// </summary>
-        /// <param name="disposing"></param>
+        /// <param name="disposing">是否托管资源</param>
         public virtual void Dispose(bool disposing)
         {
-            if (_disposed || !disposing)
+            //判断是否已执行释放
+            if (_disposed)
                 return;
 
             try
             {
-                //主库
-                if (_masterConnection != null && _masterConnection.State != ConnectionState.Closed)
-                    _masterConnection.Dispose();
+                //释放托管资源
+                if (disposing)
+                {
+                    //主库
+                    if (_masterConnection != null && _masterConnection.State != ConnectionState.Closed)
+                        _masterConnection.Dispose();
 
-                //从库
-                if (_salveConnection != null && _salveConnection.State != ConnectionState.Closed)
-                    _salveConnection.Dispose();
+                    //从库
+                    if (_salveConnection != null && _salveConnection.State != ConnectionState.Closed)
+                        _salveConnection.Dispose();
 
-                Transaction = null;
+                    //记录释放诊断日志
+                    if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeExecute))
+                        _diagnosticListener.Write(DiagnosticStrings.DisposeExecute,
+                            new
+                            {
+                                masterConnection = _masterConnection,
+                                salveConnection = _salveConnection
+                            });
 
-                if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeExecute))
-                    _diagnosticListener.Write(DiagnosticStrings.DisposeExecute,
-                        new
-                        {
-                            masterConnection = _masterConnection,
-                            salveConnection = _salveConnection
-                        });
+                    //清空对象
+                    Transaction = null;
+                }
             }
             catch (Exception exception)
             {
@@ -4205,39 +4214,49 @@ namespace SQLBuilder.Core.Repositories
         /// <returns></returns>
         public virtual async ValueTask DisposeAsync()
         {
+            //显示执行释放
             await DisposeAsync(true);
 
+            //阻止GC把该对象放入终结器队列
             GC.SuppressFinalize(this);
         }
 
         /// <summary>
         /// 释放资源，关闭数据库连接
         /// </summary>
+        /// <param name="disposing">是否托管资源</param>
         /// <returns></returns>
         public virtual async ValueTask DisposeAsync(bool disposing)
         {
-            if (_disposed || !disposing)
+            //判断是否已执行释放
+            if (_disposed)
                 return;
 
             try
             {
-                //主库
-                if (_masterConnection != null && _masterConnection.State != ConnectionState.Closed)
-                    await _masterConnection.DisposeAsync();
+                //释放托管资源
+                if (disposing)
+                {
+                    //主库
+                    if (_masterConnection != null && _masterConnection.State != ConnectionState.Closed)
+                        await _masterConnection.DisposeAsync();
 
-                //从库
-                if (_salveConnection != null && _salveConnection.State != ConnectionState.Closed)
-                    await _salveConnection.DisposeAsync();
+                    //从库
+                    if (_salveConnection != null && _salveConnection.State != ConnectionState.Closed)
+                        await _salveConnection.DisposeAsync();
 
-                Transaction = null;
+                    //记录释放诊断日志
+                    if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeExecute))
+                        _diagnosticListener.Write(DiagnosticStrings.DisposeExecute,
+                            new
+                            {
+                                masterConnection = _masterConnection,
+                                salveConnection = _salveConnection
+                            });
 
-                if (_diagnosticListener.IsEnabled(DiagnosticStrings.DisposeExecute))
-                    _diagnosticListener.Write(DiagnosticStrings.DisposeExecute,
-                        new
-                        {
-                            masterConnection = _masterConnection,
-                            salveConnection = _salveConnection
-                        });
+                    //清空对象
+                    Transaction = null;
+                }
             }
             catch (Exception exception)
             {

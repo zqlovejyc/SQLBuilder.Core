@@ -60,7 +60,7 @@ namespace SQLBuilder.Core.Entry
                 var sql = this.sqlWrapper.ToString();
 
                 //添加sql日志拦截
-                return this.SqlIntercept?.Invoke(sql, this.sqlWrapper.DbParameters) ?? sql;
+                return this.SqlIntercept?.Invoke(sql, this.Parameters) ?? sql;
             }
         }
 
@@ -72,7 +72,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// Dapper格式化参数
         /// </summary>
-        public IDynamicParameters DynamicParameters => this.sqlWrapper.DataTypedDbParameters.ToDynamicParameters();
+        public IDynamicParameters DynamicParameters => this.Parameters.ToDynamicParameters();
 
         /// <summary>
         /// SQL格式化参数
@@ -80,11 +80,11 @@ namespace SQLBuilder.Core.Entry
         public DbParameter[] DbParameters =>
             this.sqlWrapper.DatabaseType switch
             {
-                DatabaseType.SqlServer => this.sqlWrapper.DataTypedDbParameters.ToSqlParameters(),
-                DatabaseType.MySql => this.sqlWrapper.DataTypedDbParameters.ToMySqlParameters(),
-                DatabaseType.Sqlite => this.sqlWrapper.DataTypedDbParameters.ToSqliteParameters(),
-                DatabaseType.Oracle => this.sqlWrapper.DataTypedDbParameters.ToOracleParameters(),
-                DatabaseType.PostgreSql => this.sqlWrapper.DataTypedDbParameters.ToNpgsqlParameters(),
+                DatabaseType.SqlServer => this.Parameters.ToSqlParameters(),
+                DatabaseType.MySql => this.Parameters.ToMySqlParameters(),
+                DatabaseType.Sqlite => this.Parameters.ToSqliteParameters(),
+                DatabaseType.Oracle => this.Parameters.ToOracleParameters(),
+                DatabaseType.PostgreSql => this.Parameters.ToNpgsqlParameters(),
                 _ => null
             };
         #endregion

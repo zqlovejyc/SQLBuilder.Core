@@ -941,7 +941,7 @@ namespace SQLBuilder.Core.Entry
             //判断在左侧
             if (parameterKeyIndex - 2 > -1)
             {
-                var isKeyWord = keyWords.Contains(splitSql[parameterKeyIndex - 1]);
+                var isKeyWord = keyWords.Any(x => x.EqualIgnoreCase(splitSql[parameterKeyIndex - 1]));
                 if (isKeyWord)
                     return parameterKeyIndex - 2;
             }
@@ -949,7 +949,7 @@ namespace SQLBuilder.Core.Entry
             //判断在右侧
             if (parameterKeyIndex + 2 <= splitSql.Count - 1)
             {
-                var isKeyWord = keyWords.Contains(splitSql[parameterKeyIndex + 1]);
+                var isKeyWord = keyWords.Any(x => x.EqualIgnoreCase(splitSql[parameterKeyIndex + 1]));
                 if (isKeyWord)
                     return parameterKeyIndex + 2;
             }

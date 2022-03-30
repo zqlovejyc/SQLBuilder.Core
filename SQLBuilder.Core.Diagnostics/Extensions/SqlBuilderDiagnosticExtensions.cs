@@ -50,25 +50,26 @@ namespace SQLBuilder.Core.Diagnostics.Extensions
             EventHandler<SqlBuilderDiagnosticErrorMessage> disposeError = null)
         {
             var enableDiagnosticListener = configuration.GetValue<bool>("SqlBuilder:EnableDiagnosticListener");
-            if (enableDiagnosticListener)
-            {
-                var sqlBuilderDiagnosticListener = @this.ApplicationServices.GetRequiredService<SqlBuilderDiagnosticListener>();
 
-                sqlBuilderDiagnosticListener.OnExecuteBefore += executeBefore;
-                sqlBuilderDiagnosticListener.OnExecuteAfter += executeAfter;
-                sqlBuilderDiagnosticListener.OnExecuteError += executeError;
-                sqlBuilderDiagnosticListener.OnExecuteDispose += executeDispose;
-                sqlBuilderDiagnosticListener.OnDisposeError += disposeError;
+            if (!enableDiagnosticListener)
+                return @this;
 
-                DiagnosticListener
-                    .AllListeners
-                    .Subscribe(new SqlBuilderObserver<DiagnosticListener>(
-                        listener =>
-                        {
-                            if (listener.Name == DiagnosticStrings.DiagnosticListenerName)
-                                listener.SubscribeWithAdapter(sqlBuilderDiagnosticListener);
-                        }));
-            }
+            var sqlBuilderDiagnosticListener = @this.ApplicationServices.GetRequiredService<SqlBuilderDiagnosticListener>();
+
+            sqlBuilderDiagnosticListener.OnExecuteBefore += executeBefore;
+            sqlBuilderDiagnosticListener.OnExecuteAfter += executeAfter;
+            sqlBuilderDiagnosticListener.OnExecuteError += executeError;
+            sqlBuilderDiagnosticListener.OnExecuteDispose += executeDispose;
+            sqlBuilderDiagnosticListener.OnDisposeError += disposeError;
+
+            DiagnosticListener
+                .AllListeners
+                .Subscribe(new SqlBuilderObserver<DiagnosticListener>(
+                    listener =>
+                    {
+                        if (listener.Name == DiagnosticStrings.DiagnosticListenerName)
+                            listener.SubscribeWithAdapter(sqlBuilderDiagnosticListener);
+                    }));
 
             return @this;
         }

@@ -258,6 +258,7 @@ namespace SQLBuilder.Core.Entry
         public static SqlWrapper operator +(SqlWrapper sqlWrapper, string sql)
         {
             sqlWrapper.Sql.Append(sql);
+
             return sqlWrapper;
         }
 
@@ -270,6 +271,7 @@ namespace SQLBuilder.Core.Entry
         public static SqlWrapper operator +(SqlWrapper sqlWrapper, object sql)
         {
             sqlWrapper.Sql.Append(sql);
+
             return sqlWrapper;
         }
         #endregion
@@ -284,6 +286,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Remove(int startIndex, int length)
         {
             this.Sql.Remove(startIndex, length);
+
             return this;
         }
 
@@ -311,6 +314,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Replace(string oldValue, string newValue)
         {
             this.Sql.Replace(oldValue, newValue);
+
             return this;
         }
 
@@ -325,6 +329,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Replace(string oldValue, string newValue, int startIndex, int count)
         {
             this.Sql.Replace(oldValue, newValue, startIndex, count);
+
             return this;
         }
         #endregion
@@ -338,6 +343,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Append(string value)
         {
             this.Sql.Append(value);
+
             return this;
         }
 
@@ -349,6 +355,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Append(object value)
         {
             this.Sql.Append(value);
+
             return this;
         }
 
@@ -361,6 +368,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper AppendFormat(string format, params object[] args)
         {
             this.Sql.AppendFormat(format, args);
+
             return this;
         }
         #endregion
@@ -375,6 +383,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Insert(int index, string value)
         {
             this.Sql.Insert(index, value);
+
             return this;
         }
         #endregion
@@ -483,6 +492,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Reset()
         {
             this.Sql.Clear();
+
             return this;
         }
 
@@ -494,6 +504,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Reset(string sql)
         {
             this.Reset().Append(sql);
+
             return this;
         }
 
@@ -505,6 +516,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper Reset(StringBuilder sql)
         {
             this.Reset().Append(sql);
+
             return this;
         }
         #endregion
@@ -542,6 +554,7 @@ namespace SQLBuilder.Core.Entry
         public SqlWrapper AddField(string field)
         {
             this.SelectFields.Add(field);
+
             return this;
         }
         #endregion

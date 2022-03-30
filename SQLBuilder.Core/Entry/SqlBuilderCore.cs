@@ -67,12 +67,14 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// SQL格式化参数
         /// </summary>
-        public Dictionary<string, (object data, DataTypeAttribute type)> Parameters => this.sqlWrapper.DataTypedDbParameters;
+        public Dictionary<string, (object data, DataTypeAttribute type)> Parameters => 
+            this.sqlWrapper.DataTypedDbParameters;
 
         /// <summary>
         /// Dapper格式化参数
         /// </summary>
-        public IDynamicParameters DynamicParameters => this.Parameters.ToDynamicParameters();
+        public IDynamicParameters DynamicParameters =>
+            this.Parameters.ToDynamicParameters();
 
         /// <summary>
         /// SQL格式化参数

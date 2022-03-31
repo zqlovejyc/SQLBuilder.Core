@@ -154,8 +154,6 @@ namespace SQLBuilder.Core.Entry
 
                 foreach (var parameter in emptyParameters)
                 {
-                    DataTypeAttribute dataType = null;
-
                     //参数索引
                     var index = splitSql.FindIndex(x => x == parameter.Key);
                     if (index <= -1)
@@ -173,10 +171,12 @@ namespace SQLBuilder.Core.Entry
 
                     //判断缓存中是否存在DataType
                     if (this._dataTypeDictionary.ContainsKey(field))
-                        dataType = this._dataTypeDictionary[field];
+                    {
+                        var dataType = this._dataTypeDictionary[field];
 
-                    //赋值数据类型
-                    this.DbParameters[parameter.Key] = (parameter.Value.data, dataType);
+                        //赋值数据类型
+                        this.DbParameters[parameter.Key] = (parameter.Value.data, dataType);
+                    }
                 }
 
                 return this.DbParameters;

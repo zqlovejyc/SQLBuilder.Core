@@ -155,7 +155,7 @@ namespace SQLBuilder.Core.Entry
                 foreach (var parameter in emptyParameters)
                 {
                     //参数索引
-                    var index = splitSql.FindIndex(x => x == parameter.Key);
+                    var index = splitSql.FindIndex(x => x.EqualIgnoreCase(parameter.Key));
                     if (index <= -1)
                         continue;
 

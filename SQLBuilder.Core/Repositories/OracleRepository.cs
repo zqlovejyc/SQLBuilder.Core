@@ -28,6 +28,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Sql = SQLBuilder.Core.Entry.SqlBuilder;
 
 namespace SQLBuilder.Core.Repositories
 {
@@ -260,6 +261,68 @@ namespace SQLBuilder.Core.Repositories
             }
         }
         #endregion
+        #endregion
+
+        #region Insert
+        /// <summary>
+        ///  插入单个实体 <para>注意：因为Oracle不支持自增列，所以我们需要使用序列(sequence)来实现自增列 </para>
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entity">要插入的实体</param>
+        /// <param name="identity">是否返回自增主键值</param>
+        /// <param name="identitySql">返回自增主键sql
+        /// <list type="bullet">
+        ///     <item>SqlServer: SELECT SCOPE_IDENTITY()</item>
+        ///     <item>MySql: SELECT LAST_INSERT_ID()</item>
+        ///     <item>Sqlite: SELECT LAST_INSERT_ROWID()</item>
+        ///     <item>PostgreSql: RETURNING $PRIMARYKEY，其中$PRIMARYKEY为主键列名占位符</item>
+        ///     <item>Oracle: SELECT $SEQUENCE.CURRVAL FROM DUAL，其中$SEQUENCE为自定义SEQUENCE名占位符</item>
+        /// </list>
+        /// </param>
+        /// <returns>若 <paramref name="identity"/>为 true，则返回自增主键值，否则返回受影响行数</returns>
+        public override long Insert<T>(T entity, bool identity, string identitySql = null) where T : class
+        {
+            long res = Insert(entity);
+
+            if (identity)
+            {
+                identitySql ??= "SELECT $SEQUENCE.CURRVAL FROM DUAL";
+
+                res = FindObject(identitySql.Trim(';').Replace("$SEQUENCE", Sql.GetPrimaryKey<T>().First().OracleSequenceName)).To<long>();
+            }
+
+            return res;
+        }
+
+        /// <summary>
+        ///  插入单个实体 <para>注意：因为Oracle不支持自增列，所以我们需要使用序列(sequence)来实现自增列 </para>
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entity">要插入的实体</param>
+        /// <param name="identity">是否返回自增主键值</param>
+        /// <param name="identitySql">返回自增主键sql
+        /// <list type="bullet">
+        ///     <item>SqlServer: SELECT SCOPE_IDENTITY()</item>
+        ///     <item>MySql: SELECT LAST_INSERT_ID()</item>
+        ///     <item>Sqlite: SELECT LAST_INSERT_ROWID()</item>
+        ///     <item>PostgreSql: RETURNING $PRIMARYKEY，其中$PRIMARYKEY为主键列名占位符</item>
+        ///     <item>Oracle: SELECT $SEQUENCE.CURRVAL FROM DUAL，其中$SEQUENCE为自定义SEQUENCE名占位符</item>
+        /// </list>
+        /// </param>
+        /// <returns>若 <paramref name="identity"/>为 true，则返回自增主键值，否则返回受影响行数</returns>
+        public override async Task<long> InsertAsync<T>(T entity, bool identity, string identitySql = null) where T : class
+        {
+            long res = await InsertAsync(entity);
+
+            if (identity)
+            {
+                identitySql ??= "SELECT $SEQUENCE.CURRVAL FROM DUAL";
+
+                res = (await FindObjectAsync(identitySql.Trim(';').Replace("$SEQUENCE", Sql.GetPrimaryKey<T>().First().OracleSequenceName))).To<long>();
+            }
+
+            return res;
+        }
         #endregion
     }
 }

@@ -17,6 +17,7 @@
 #endregion
 
 using SQLBuilder.Core.Enums;
+using SQLBuilder.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -764,7 +765,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="databaseType">数据库类型</param>
         /// <param name="isEnableFormat">是否启用对表名和列名格式化，默认：否</param>
         /// <returns></returns>
-        public static List<string> GetPrimaryKey<T>(
+        public static List<ColumnInfo> GetPrimaryKey<T>(
             DatabaseType databaseType = DatabaseType.SqlServer,
             bool isEnableFormat = false)
             where T : class =>

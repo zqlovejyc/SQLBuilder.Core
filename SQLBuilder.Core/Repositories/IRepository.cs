@@ -385,6 +385,24 @@ namespace SQLBuilder.Core.Repositories
         int Insert<T>(T entity) where T : class;
 
         /// <summary>
+        ///  插入单个实体 <para>注意：因为Oracle不支持自增列，所以我们需要使用序列(sequence)来实现自增列 </para>
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entity">要插入的实体</param>
+        /// <param name="identity">是否返回自增主键值</param>
+        /// <param name="identitySql">返回自增主键sql
+        /// <list type="bullet">
+        ///     <item>SqlServer: SELECT SCOPE_IDENTITY()</item>
+        ///     <item>MySql: SELECT LAST_INSERT_ID()</item>
+        ///     <item>Sqlite: SELECT LAST_INSERT_ROWID()</item>
+        ///     <item>PostgreSql: RETURNING $PRIMARYKEY，其中$PRIMARYKEY为主键列名占位符</item>
+        ///     <item>Oracle: SELECT $SEQUENCE.CURRVAL FROM DUAL，其中$SEQUENCE为自定义SEQUENCE名占位符</item>
+        /// </list>
+        /// </param>
+        /// <returns>若 <paramref name="identity"/>为 true，则返回自增主键值，否则返回受影响行数</returns>
+        long Insert<T>(T entity, bool identity, string identitySql = null) where T : class;
+
+        /// <summary>
         /// 插入多个实体
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
@@ -409,6 +427,24 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="entity">要插入的实体</param>
         /// <returns>返回受影响行数</returns>
         Task<int> InsertAsync<T>(T entity) where T : class;
+
+        /// <summary>
+        ///  插入单个实体 <para>注意：因为Oracle不支持自增列，所以我们需要使用序列(sequence)来实现自增列 </para>
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="entity">要插入的实体</param>
+        /// <param name="identity">是否返回自增主键值</param>
+        /// <param name="identitySql">返回自增主键sql
+        /// <list type="bullet">
+        ///     <item>SqlServer: SELECT SCOPE_IDENTITY()</item>
+        ///     <item>MySql: SELECT LAST_INSERT_ID()</item>
+        ///     <item>Sqlite: SELECT LAST_INSERT_ROWID()</item>
+        ///     <item>PostgreSql: RETURNING $PRIMARYKEY，其中$PRIMARYKEY为主键列名占位符</item>
+        ///     <item>Oracle: SELECT $SEQUENCE.CURRVAL FROM DUAL，其中$SEQUENCE为自定义SEQUENCE名占位符</item>
+        /// </list>
+        /// </param>
+        /// <returns>若 <paramref name="identity"/>为 true，则返回自增主键值，否则返回受影响行数</returns>
+        Task<long> InsertAsync<T>(T entity, bool identity, string identitySql = null) where T : class;
 
         /// <summary>
         /// 插入多个实体

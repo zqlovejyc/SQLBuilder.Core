@@ -46,5 +46,11 @@ namespace SQLBuilder.Core.Attributes
         /// 是否启用格式化，用于全局不启用格式化时，该列名为数据库关键字，此时需要单独启用格式化
         /// </summary>
         public bool Format { get; set; }
+
+        /// <summary>
+        /// Oracle sequence名称，用于Oracle自增列，可以在数据库层面设置为默认值
+        /// <para>用于 Insert 返回自增列值时查询 OracleSequenceName.currval 使用</para>
+        /// </summary>
+        public string OracleSequenceName { get; set; }
     }
 }

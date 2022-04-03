@@ -52,7 +52,7 @@ namespace SQLBuilder.Core.Expressions
                         if (tableAlias.IsNotNullOrEmpty())
                             tableAlias += ".";
 
-                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberExpr.Member).columnName;
+                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberExpr.Member).ColumnName;
 
                         sqlWrapper.AddField(fieldName);
                     }
@@ -102,15 +102,15 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, m.Member);
-                if (isInsert)
+                var columnInfo = sqlWrapper.GetColumnInfo(type, m.Member);
+                if (columnInfo.IsInsert)
                 {
                     var value = m.Expression.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlWrapper.AddDbParameter(value, dbType);
-                        if (!fields.Contains(columnName))
-                            fields.Add(columnName);
+                        sqlWrapper.AddDbParameter(value, columnInfo.DataType);
+                        if (!fields.Contains(columnInfo.ColumnName))
+                            fields.Add(columnInfo.ColumnName);
                         sqlWrapper += ",";
                     }
                 }
@@ -145,14 +145,14 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, m.Member);
-                if (isUpdate)
+                var columnInfo = sqlWrapper.GetColumnInfo(type, m.Member);
+                if (columnInfo.IsUpdate)
                 {
                     var value = m.Expression.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlWrapper += columnName + " = ";
-                        sqlWrapper.AddDbParameter(value, dbType);
+                        sqlWrapper += columnInfo.ColumnName + " = ";
+                        sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                         sqlWrapper += ",";
                     }
                 }

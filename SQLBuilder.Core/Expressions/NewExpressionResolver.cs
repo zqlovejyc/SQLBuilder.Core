@@ -46,14 +46,14 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.DeclaringType;
 
-                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(t, m);
-                if (isUpdate)
+                var columnInfo = sqlWrapper.GetColumnInfo(t, m);
+                if (columnInfo.IsUpdate)
                 {
                     var value = expression.Arguments[i]?.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlWrapper += columnName + " = ";
-                        sqlWrapper.AddDbParameter(value, dbType);
+                        sqlWrapper += columnInfo.ColumnName + " = ";
+                        sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                         sqlWrapper += ",";
                     }
                 }
@@ -85,15 +85,15 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.DeclaringType;
 
-                var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(t, m);
-                if (isInsert)
+                var columnInfo = sqlWrapper.GetColumnInfo(t, m);
+                if (columnInfo.IsInsert)
                 {
                     var value = expression.Arguments[i]?.ToObject();
                     if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        sqlWrapper.AddDbParameter(value, dbType);
-                        if (!fields.Contains(columnName))
-                            fields.Add(columnName);
+                        sqlWrapper.AddDbParameter(value, columnInfo.DataType);
+                        if (!fields.Contains(columnInfo.ColumnName))
+                            fields.Add(columnInfo.ColumnName);
                         sqlWrapper += ",";
                     }
                 }

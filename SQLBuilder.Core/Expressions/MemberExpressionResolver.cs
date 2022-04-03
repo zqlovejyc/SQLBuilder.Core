@@ -87,8 +87,8 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.DefaultType :
                         property.DeclaringType;
 
-                    var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, property);
-                    if (isInsert)
+                    var columnInfo = sqlWrapper.GetColumnInfo(type, property);
+                    if (columnInfo.IsInsert)
                     {
                         object value;
 
@@ -99,10 +99,10 @@ namespace SQLBuilder.Core.Expressions
 
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlWrapper.AddDbParameter(value, dbType);
+                            sqlWrapper.AddDbParameter(value, columnInfo.DataType);
 
-                            if (!fields.Contains(columnName))
-                                fields.Add(columnName);
+                            if (!fields.Contains(columnInfo.ColumnName))
+                                fields.Add(columnInfo.ColumnName);
 
                             sqlWrapper += ",";
                         }
@@ -165,8 +165,8 @@ namespace SQLBuilder.Core.Expressions
                         sqlWrapper.DefaultType :
                         item.DeclaringType;
 
-                    var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, item);
-                    if (isUpdate)
+                    var columnInfo = sqlWrapper.GetColumnInfo(type, item);
+                    if (columnInfo.IsUpdate)
                     {
                         object value;
 
@@ -177,8 +177,8 @@ namespace SQLBuilder.Core.Expressions
 
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
-                            sqlWrapper += columnName + " = ";
-                            sqlWrapper.AddDbParameter(value, dbType);
+                            sqlWrapper += columnInfo.ColumnName + " = ";
+                            sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                             sqlWrapper += ",";
                         }
                     }
@@ -213,7 +213,7 @@ namespace SQLBuilder.Core.Expressions
                 if (tableAlias.IsNotNullOrEmpty())
                     tableAlias += ".";
 
-                sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName);
+                sqlWrapper.AddField(tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName);
             }
             else
             {
@@ -245,7 +245,7 @@ namespace SQLBuilder.Core.Expressions
             if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
-            sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+            sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
 
             return sqlWrapper;
         }
@@ -262,7 +262,7 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression?.Member != null)
             {
-                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 sqlWrapper.AddField(columnName);
             }
 
@@ -281,7 +281,7 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression?.Member != null)
             {
-                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 sqlWrapper.AddField(columnName);
             }
 
@@ -300,7 +300,7 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression?.Member != null)
             {
-                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 sqlWrapper.AddField(columnName);
             }
 
@@ -319,7 +319,7 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression?.Member != null)
             {
-                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 sqlWrapper.AddField(columnName);
             }
 
@@ -338,7 +338,7 @@ namespace SQLBuilder.Core.Expressions
         {
             if (expression?.Member != null)
             {
-                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                var columnName = sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 sqlWrapper.AddField(columnName);
             }
 
@@ -374,7 +374,7 @@ namespace SQLBuilder.Core.Expressions
                     if (tableAlias.IsNotNullOrEmpty())
                         tableAlias += ".";
 
-                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
 
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
@@ -446,7 +446,7 @@ namespace SQLBuilder.Core.Expressions
                 tableAlias += ".";
 
             if (expression.Expression.NodeType == ExpressionType.Parameter)
-                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
 
             if (expression.Expression.NodeType == ExpressionType.Constant ||
                 expression.Expression.NodeType == ExpressionType.MemberAccess)
@@ -503,7 +503,7 @@ namespace SQLBuilder.Core.Expressions
                     if (tableAlias.IsNotNullOrEmpty())
                         tableAlias += ".";
 
-                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                    sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
 
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
@@ -548,7 +548,7 @@ namespace SQLBuilder.Core.Expressions
 
             if (expression.Expression.NodeType == ExpressionType.Parameter)
             {
-                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).columnName;
+                sqlWrapper += tableAlias + sqlWrapper.GetColumnInfo(expression.Member.DeclaringType, expression.Member).ColumnName;
                 if (orders?.Length > 0)
                     sqlWrapper += $" { (orders[0] == OrderType.Descending ? "DESC" : "ASC")}";
             }

@@ -817,7 +817,7 @@ namespace SQLBuilder.Core.Expressions
                 if (tableAlias.IsNotNullOrEmpty())
                     tableAlias += ".";
 
-                var columnName = tableAlias + sqlWrapper.GetColumnInfo(memberExpr.Member.DeclaringType, memberExpr.Member).columnName;
+                var columnName = tableAlias + sqlWrapper.GetColumnInfo(memberExpr.Member.DeclaringType, memberExpr.Member).ColumnName;
 
                 var field = string.Format(methodFormat, columnName);
 
@@ -987,15 +987,15 @@ namespace SQLBuilder.Core.Expressions
                             sqlWrapper.DefaultType :
                             p.DeclaringType;
 
-                        var (columnName, isInsert, isUpdate, dbType) = sqlWrapper.GetColumnInfo(type, p);
-                        if (isInsert)
+                        var columnInfo = sqlWrapper.GetColumnInfo(type, p);
+                        if (columnInfo.IsInsert)
                         {
                             var value = p.GetValue(item, null);
                             if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                             {
-                                sqlWrapper.AddDbParameter(value, dbType);
-                                if (!fields.Contains(columnName))
-                                    fields.Add(columnName);
+                                sqlWrapper.AddDbParameter(value, columnInfo.DataType);
+                                if (!fields.Contains(columnInfo.ColumnName))
+                                    fields.Add(columnInfo.ColumnName);
                                 sqlWrapper += ",";
                             }
                         }

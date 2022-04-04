@@ -38,12 +38,23 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>string</returns>
         public static string Substring(this string @this, string separator, bool lastIndexOf = true)
         {
-            var startIndex = (lastIndexOf ?
-                @this.LastIndexOf(separator, StringComparison.OrdinalIgnoreCase) :
-                @this.IndexOf(separator, StringComparison.OrdinalIgnoreCase)) +
-                separator.Length;
+            if (@this.IsNullOrEmpty())
+                return string.Empty;
+
+            if (separator.IsNullOrEmpty())
+                return string.Empty;
+
+            var startIndex = lastIndexOf
+                ? @this.LastIndexOf(separator, StringComparison.OrdinalIgnoreCase)
+                : @this.IndexOf(separator, StringComparison.OrdinalIgnoreCase);
+
+            if (startIndex == -1)
+                return string.Empty;
+
+            startIndex += separator.Length;
 
             var length = @this.Length - startIndex;
+
             return @this.Substring(startIndex, length);
         }
 
@@ -58,32 +69,40 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>string</returns>
         public static string Substring(this string @this, string begin, string end, bool beginIsIndexOf = true, bool endIsIndexOf = true)
         {
-            if (string.IsNullOrEmpty(@this))
-                return "";
-            if (string.IsNullOrEmpty(begin))
-                return "";
-            if (string.IsNullOrEmpty(end))
-                return "";
+            if (@this.IsNullOrEmpty())
+                return string.Empty;
+
+            if (begin.IsNullOrEmpty())
+                return string.Empty;
+
+            if (end.IsNullOrEmpty())
+                return string.Empty;
 
             int li;
+
             if (beginIsIndexOf)
                 li = @this.IndexOf(begin);
             else
                 li = @this.LastIndexOf(begin);
+
             if (li == -1)
-                return "";
+                return string.Empty;
 
             li += begin.Length;
 
             int ri;
+
             if (endIsIndexOf)
                 ri = @this.IndexOf(end, li);
             else
                 ri = @this.LastIndexOf(end);
-            if (ri == -1)
-                return "";
 
-            return @this.Substring(li, ri - li);
+            if (ri == -1)
+                return string.Empty;
+
+            var length = ri - li;
+
+            return @this.Substring(li, length);
         }
         #endregion
 

@@ -35,8 +35,9 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="this">源字符串</param>
         /// <param name="separator">分隔符</param>
         /// <param name="lastIndexOf">true：从最后一个匹配的分隔符开始截取，false：从第一个匹配的分隔符开始截取，默认：true</param>
+        /// <param name="comparisonType">字符串比较类型，默认区分大小写</param>
         /// <returns>string</returns>
-        public static string Substring(this string @this, string separator, bool lastIndexOf = true)
+        public static string Substring(this string @this, string separator, bool lastIndexOf = true, StringComparison comparisonType = StringComparison.Ordinal)
         {
             if (@this.IsNullOrEmpty())
                 return string.Empty;
@@ -46,8 +47,8 @@ namespace SQLBuilder.Core.Extensions
 
             //分隔符索引
             var startIndex = lastIndexOf
-                ? @this.LastIndexOf(separator, StringComparison.OrdinalIgnoreCase)
-                : @this.IndexOf(separator, StringComparison.OrdinalIgnoreCase);
+                ? @this.LastIndexOf(separator, comparisonType)
+                : @this.IndexOf(separator, comparisonType);
 
             if (startIndex == -1)
                 return string.Empty;
@@ -68,8 +69,9 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="end">结束字符串</param>
         /// <param name="startIsIndexOf">开始字符串是否是IndexOf，默认true，否则LastIndexOf</param>
         /// <param name="endIsIndexOf">结束字符串是否是IndexOf，默认true，否则LastIndexOf</param>
+        /// <param name="comparisonType">字符串比较类型，默认区分大小写</param>
         /// <returns>string</returns>
-        public static string Substring(this string @this, string start, string end, bool startIsIndexOf = true, bool endIsIndexOf = true)
+        public static string Substring(this string @this, string start, string end, bool startIsIndexOf = true, bool endIsIndexOf = true, StringComparison comparisonType = StringComparison.Ordinal)
         {
             if (@this.IsNullOrEmpty())
                 return string.Empty;
@@ -84,9 +86,9 @@ namespace SQLBuilder.Core.Extensions
             int startIndex;
 
             if (startIsIndexOf)
-                startIndex = @this.IndexOf(start);
+                startIndex = @this.IndexOf(start, comparisonType);
             else
-                startIndex = @this.LastIndexOf(start);
+                startIndex = @this.LastIndexOf(start, comparisonType);
 
             if (startIndex == -1)
                 return string.Empty;
@@ -97,9 +99,9 @@ namespace SQLBuilder.Core.Extensions
             int endIndex;
 
             if (endIsIndexOf)
-                endIndex = @this.IndexOf(end, startIndex);
+                endIndex = @this.IndexOf(end, startIndex, comparisonType);
             else
-                endIndex = @this.LastIndexOf(end);
+                endIndex = @this.LastIndexOf(end, comparisonType);
 
             if (endIndex == -1)
                 return string.Empty;

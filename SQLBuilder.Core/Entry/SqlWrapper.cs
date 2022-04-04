@@ -142,7 +142,7 @@ namespace SQLBuilder.Core.Entry
                                    .ToString()
                                    .Split(new[] { ' ', ',' })
                                    .Select(x => x.Contains("(") && x.Contains(")")
-                                        ? x.Substring("(", ")", false, false)
+                                        ? x.Substring("(", ")", false)
                                         : x.Replace("(", "").Replace(")", ""))
                                    .Where(x => !x.Contains("%", "||", "+"))
                                    .ToList();
@@ -168,7 +168,7 @@ namespace SQLBuilder.Core.Entry
                     //获取字段名
                     var field = splitSql[destIndex];
                     if (field.Contains("(") && field.Contains(")"))
-                        field = field.Substring("(", ")", false, false);
+                        field = field.Substring("(", ")", false);
 
                     //判断缓存中是否存在DataType
                     if (this._dataTypeDictionary.ContainsKey(field))

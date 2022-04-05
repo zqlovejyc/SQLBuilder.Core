@@ -140,7 +140,7 @@ namespace SQLBuilder.Core.Entry
                 var splitSql = this.Replace("NOT IN", "IN")
                                    .Replace("NOT LIKE", "LIKE")
                                    .ToString()
-                                   .Split(new[] { ' ', ',' })
+                                   .Split(' ', ',')
                                    .Select(x => x.Contains("(") && x.Contains(")")
                                         ? x.Substring("(", ")", false)
                                         : x.Replace("(", "").Replace(")", ""))

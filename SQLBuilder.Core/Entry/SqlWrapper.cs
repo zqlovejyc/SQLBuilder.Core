@@ -141,7 +141,7 @@ namespace SQLBuilder.Core.Entry
                                    .Replace("NOT LIKE", "LIKE")
                                    .ToString()
                                    .Split(' ', ',')
-                                   .Select(x => x.Contains("(") && x.Contains(")")
+                                   .Select(x => x.Contains(MatchType.All, "(", ")")
                                         ? x.Substring("(", ")", false)
                                         : x.Replace("(", "").Replace(")", ""))
                                    .Where(x => !x.Contains("%", "||", "+"))
@@ -167,7 +167,7 @@ namespace SQLBuilder.Core.Entry
 
                     //获取字段名
                     var field = splitSql[destIndex];
-                    if (field.Contains("(") && field.Contains(")"))
+                    if (field.Contains(MatchType.All, "(", ")"))
                         field = field.Substring("(", ")", false);
 
                     //判断缓存中是否存在DataType

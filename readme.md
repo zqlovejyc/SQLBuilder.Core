@@ -20,6 +20,7 @@
 
 - Gitee：[https://gitee.com/zqlovejyc/SQLBuilder.Core](https://gitee.com/zqlovejyc/SQLBuilder.Core)
 - GitHub：[https://github.com/zqlovejyc/SQLBuilder.Core](https://github.com/zqlovejyc/SQLBuilder.Core)
+- GitLab：[https://gitlab.com/zqlovejyc/SQLBuilder-Core](https://gitlab.com/zqlovejyc/SQLBuilder-Core)
 - NuGet：[https://www.nuget.org/packages/Zq.SQLBuilder.Core](https://www.nuget.org/packages/Zq.SQLBuilder.Core)
 - MyGet：[https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core](https://www.myget.org/feed/zq-myget/package/nuget/Zq.SQLBuilder.Core)
 

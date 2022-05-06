@@ -1086,6 +1086,29 @@ namespace SQLBuilder.Core.Extensions
         /// <summary>
         /// ToLambda
         /// </summary>
+        /// <param name="this"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static LambdaExpression ToLambda(this Expression @this, params ParameterExpression[] parameters)
+        {
+            return Expression.Lambda(@this, parameters);
+        }
+
+        /// <summary>
+        /// ToLambda
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="delegateType"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static LambdaExpression ToLambda(this Expression @this, Type delegateType, params ParameterExpression[] parameters)
+        {
+            return Expression.Lambda(delegateType, @this, parameters);
+        }
+
+        /// <summary>
+        /// ToLambda
+        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
         /// <param name="parameters"></param>
@@ -1104,7 +1127,6 @@ namespace SQLBuilder.Core.Extensions
         /// <returns></returns>
         public static object ToObject(this Expression @this)
         {
-            var type = @this.Type;
             var nodeType = @this.NodeType;
 
             if (ExpressionType.Constant == nodeType)
@@ -1131,70 +1153,7 @@ namespace SQLBuilder.Core.Extensions
                 }
             }
 
-            if (typeof(string) == type)
-                return @this.ToLambda<Func<string>>().Compile()();
-
-            if (typeof(short) == type)
-                return @this.ToLambda<Func<short>>().Compile()();
-
-            if (typeof(short?) == type)
-                return @this.ToLambda<Func<short?>>().Compile()();
-
-            if (typeof(int) == type)
-                return @this.ToLambda<Func<int>>().Compile()();
-
-            if (typeof(int?) == type)
-                return @this.ToLambda<Func<int?>>().Compile()();
-
-            if (typeof(long) == type)
-                return @this.ToLambda<Func<long>>().Compile()();
-
-            if (typeof(long?) == type)
-                return @this.ToLambda<Func<long?>>().Compile()();
-
-            if (typeof(decimal) == type)
-                return @this.ToLambda<Func<decimal>>().Compile()();
-
-            if (typeof(decimal?) == type)
-                return @this.ToLambda<Func<decimal?>>().Compile()();
-
-            if (typeof(double) == type)
-                return @this.ToLambda<Func<double>>().Compile()();
-
-            if (typeof(double?) == type)
-                return @this.ToLambda<Func<double?>>().Compile()();
-
-            if (typeof(float) == type)
-                return @this.ToLambda<Func<float>>().Compile()();
-
-            if (typeof(float?) == type)
-                return @this.ToLambda<Func<float?>>().Compile()();
-
-            if (typeof(DateTime) == type)
-                return @this.ToLambda<Func<DateTime>>().Compile()();
-
-            if (typeof(DateTime?) == type)
-                return @this.ToLambda<Func<DateTime?>>().Compile()();
-
-            if (typeof(bool) == type)
-                return @this.ToLambda<Func<bool>>().Compile()();
-
-            if (typeof(bool?) == type)
-                return @this.ToLambda<Func<bool?>>().Compile()();
-
-            if (typeof(byte) == type)
-                return @this.ToLambda<Func<byte>>().Compile()();
-
-            if (typeof(byte?) == type)
-                return @this.ToLambda<Func<byte?>>().Compile()();
-
-            if (typeof(char) == type)
-                return @this.ToLambda<Func<char>>().Compile()();
-
-            if (typeof(char?) == type)
-                return @this.ToLambda<Func<char?>>().Compile()();
-
-            return @this.ToLambda<Func<object>>().Compile()();
+            return @this.ToLambda().Compile().DynamicInvoke();
         }
 
         /// <summary>

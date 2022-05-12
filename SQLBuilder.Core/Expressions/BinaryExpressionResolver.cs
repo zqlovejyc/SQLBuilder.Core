@@ -258,78 +258,93 @@ namespace SQLBuilder.Core.Expressions
                     ExpressionType.Constant == unary.Operand.NodeType)) &&
                     expression.Right.ToObject() is bool res)
                 {
-                    if (!res)
+                    if (expression.NodeType != ExpressionType.NotEqual && !res)
                     {
                         var subString = sqlWrapper.Substring(startIndex, sqlWrapper.Length - startIndex);
 
                         //IS NOT、IS                      
-                        if (subString.Contains("IS NOT"))
+                        if (subString.Contains(" IS NOT "))
                         {
-                            var index = sqlWrapper.LastIndexOf("IS NOT");
+                            var index = sqlWrapper.LastIndexOf(" IS NOT ");
                             if (index != -1)
-                                sqlWrapper.Replace("IS NOT", "IS", index, 6);
+                                sqlWrapper.Replace(" IS NOT ", " IS ", index, 8);
                         }
-                        if (subString.Contains("IS") && subString.LastIndexOf("IS") != subString.LastIndexOf("IS NOT"))
+                        else if (subString.Contains(" IS "))
                         {
-                            var index = sqlWrapper.LastIndexOf("IS");
+                            var index = sqlWrapper.LastIndexOf(" IS ");
                             if (index != -1)
-                                sqlWrapper.Replace("IS", "IS NOT", index, 2);
+                                sqlWrapper.Replace(" IS ", " IS NOT ", index, 4);
                         }
 
                         //NOT LIKE、LIKE
-                        if (subString.Contains("NOT LIKE"))
+                        if (subString.Contains(" NOT LIKE "))
                         {
-                            var index = sqlWrapper.LastIndexOf("NOT LIKE");
+                            var index = sqlWrapper.LastIndexOf(" NOT LIKE ");
                             if (index != -1)
-                                sqlWrapper.Replace("NOT LIKE", "LIKE", index, 8);
+                                sqlWrapper.Replace(" NOT LIKE ", " LIKE ", index, 10);
                         }
-                        if (subString.Contains("LIKE") && subString.LastIndexOf("LIKE") != (subString.LastIndexOf("NOT LIKE") + 4))
+                        else if (subString.Contains(" LIKE "))
                         {
-                            var index = sqlWrapper.LastIndexOf("LIKE");
+                            var index = sqlWrapper.LastIndexOf(" LIKE ");
                             if (index != -1)
-                                sqlWrapper.Replace("LIKE", "NOT LIKE", index, 4);
+                                sqlWrapper.Replace(" LIKE ", " NOT LIKE ", index, 6);
                         }
 
                         //NOT IN、IN
-                        if (subString.Contains("NOT IN"))
+                        if (subString.Contains(" NOT IN "))
                         {
-                            var index = sqlWrapper.LastIndexOf("NOT IN");
+                            var index = sqlWrapper.LastIndexOf(" NOT IN ");
                             if (index != -1)
-                                sqlWrapper.Replace("NOT IN", "IN", index, 6);
+                                sqlWrapper.Replace(" NOT IN ", " IN ", index, 8);
                         }
-                        if (subString.Contains("IN") && subString.LastIndexOf("IN") != (subString.LastIndexOf("NOT IN") + 4))
+                        else if (subString.Contains(" IN "))
                         {
-                            var index = sqlWrapper.LastIndexOf("IN");
+                            var index = sqlWrapper.LastIndexOf(" IN ");
                             if (index != -1)
-                                sqlWrapper.Replace("IN", "NOT IN", index, 2);
+                                sqlWrapper.Replace(" IN ", " NOT IN ", index, 4);
                         }
 
                         //AND、OR
-                        if (subString.Contains("AND"))
+                        if (subString.Contains(" AND "))
                         {
-                            var index = sqlWrapper.LastIndexOf("AND");
+                            var index = sqlWrapper.LastIndexOf(" AND ");
                             if (index != -1)
-                                sqlWrapper.Replace("AND", "OR", index, 3);
+                                sqlWrapper.Replace(" AND ", " OR ", index, 5);
                         }
-                        if (subString.Contains("OR"))
+                        if (subString.Contains(" OR "))
                         {
-                            var index = sqlWrapper.LastIndexOf("OR");
+                            var index = sqlWrapper.LastIndexOf(" OR ");
                             if (index != -1)
-                                sqlWrapper.Replace("OR", "AND", index, 2);
+                                sqlWrapper.Replace(" OR ", " AND ", index, 4);
                         }
 
                         //=、<>
                         if (subString.Contains(" = "))
                         {
-                            var index = sqlWrapper.LastIndexOf(" = ");
-                            if (index != -1)
-                                sqlWrapper.Replace(" = ", " <> ", index, 3);
+                            if (subString.Contains(" = 1 "))
+                            {
+                                var index = sqlWrapper.LastIndexOf(" = 1 ");
+                                if (index != -1)
+                                    sqlWrapper.Replace(" = 1 ", " = 0 ", index, 5);
+                            }
+                            else if (subString.Contains(" = TRUE "))
+                            {
+                                var index = sqlWrapper.LastIndexOf(" = TRUE ");
+                                if (index != -1)
+                                    sqlWrapper.Replace(" = TRUE ", " = FALSE ", index, 8);
+                            }
+                            else
+                            {
+                                var index = sqlWrapper.LastIndexOf(" = ");
+                                if (index != -1)
+                                    sqlWrapper.Replace(" = ", " <> ", index, 3);
+                            }
                         }
-                        if (subString.Contains("<>"))
+                        if (subString.Contains(" <> "))
                         {
-                            var index = sqlWrapper.LastIndexOf("<>");
+                            var index = sqlWrapper.LastIndexOf(" <> ");
                             if (index != -1)
-                                sqlWrapper.Replace("<>", "=", index, 2);
+                                sqlWrapper.Replace(" <> ", " = ", index, 4);
                         }
 
                         //>、<

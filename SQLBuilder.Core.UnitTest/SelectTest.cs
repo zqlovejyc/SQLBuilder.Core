@@ -2017,7 +2017,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(x =>
                                 x.IsEffective.Value);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2032,7 +2032,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(x =>
                                 x.IsEffective == true);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2047,7 +2047,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Where(x =>
                                 x.IsEffective == false);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = 0 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2063,7 +2063,7 @@ namespace SQLBuilder.Core.UnitTest
                                 x.IsEffective == true &&
                                 x.IsOnLine);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1 AND IsOnLine = 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1  AND IsOnLine = 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2079,7 +2079,7 @@ namespace SQLBuilder.Core.UnitTest
                                 x.IsEffective == true &&
                                 x.IsOnLine == true);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1 AND IsOnLine = 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = 1  AND IsOnLine = 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2095,7 +2095,7 @@ namespace SQLBuilder.Core.UnitTest
                                 !x.IsEffective.Value &&
                                 !x.IsOnLine);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1 AND IsOnLine <> 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1  AND IsOnLine <> 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -2111,7 +2111,7 @@ namespace SQLBuilder.Core.UnitTest
                                 !x.IsEffective == true &&
                                 !x.IsOnLine == true);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1 AND IsOnLine <> 1", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1  AND IsOnLine <> 1 ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -3476,6 +3476,70 @@ namespace SQLBuilder.Core.UnitTest
             Assert.Equal("SELECT * FROM Base_Log WHERE Id = @p__1", builder.Sql);
             Assert.Equal(id, builder.Parameters["@p__1"].data);
             Assert.Equal(DbType.Guid, builder.Parameters["@p__1"].type.DbType);
+        }
+
+        /// <summary>
+        /// 查询125
+        /// </summary>
+        [Fact]
+        public void Test_Select_125()
+        {
+            var builder = SqlBuilder
+                            .Select<MyStudent>()
+                            .Where(x =>
+                                !(x.IsEffective == true) &&
+                                !(x.IsOnLine == true));
+
+            Assert.Equal("SELECT * FROM student WHERE IsEffective <> 1  AND IsOnLine <> 1 ", builder.Sql);
+            Assert.Empty(builder.Parameters);
+        }
+
+        /// <summary>
+        /// 查询126
+        /// </summary>
+        [Fact]
+        public void Test_Select_126()
+        {
+            var builder = SqlBuilder
+                            .Select<MyStudent>(databaseType: DatabaseType.PostgreSql)
+                            .Where(x =>
+                                !(x.IsEffective == true) &&
+                                !(x.IsOnLine == true));
+
+            Assert.Equal("SELECT * FROM student WHERE IsEffective <> TRUE  AND IsOnLine <> TRUE ", builder.Sql);
+            Assert.Empty(builder.Parameters);
+        }
+
+        /// <summary>
+        /// 查询127
+        /// </summary>
+        [Fact]
+        public void Test_Select_127()
+        {
+            var builder = SqlBuilder
+                            .Select<MyStudent>(databaseType: DatabaseType.PostgreSql)
+                            .Where(x =>
+                                x.IsEffective == false &&
+                                x.IsOnLine);
+
+            Assert.Equal("SELECT * FROM student WHERE IsEffective = FALSE  AND IsOnLine = TRUE ", builder.Sql);
+            Assert.Empty(builder.Parameters);
+        }
+
+        /// <summary>
+        /// 查询128
+        /// </summary>
+        [Fact]
+        public void Test_Select_128()
+        {
+            var builder = SqlBuilder
+                            .Select<MyStudent>(databaseType: DatabaseType.PostgreSql)
+                            .Where(x =>
+                                !(x.IsEffective == false) &&
+                                x.IsOnLine != false);
+
+            Assert.Equal("SELECT * FROM student WHERE IsEffective <> FALSE  AND IsOnLine = TRUE ", builder.Sql);
+            Assert.Empty(builder.Parameters);
         }
         #endregion
 

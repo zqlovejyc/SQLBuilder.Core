@@ -3506,7 +3506,7 @@ namespace SQLBuilder.Core.UnitTest
                                 !(x.IsEffective == true) &&
                                 !(x.IsOnLine == true));
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective <> TRUE  AND IsOnLine <> TRUE ", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective IS NOT TRUE  AND IsOnLine IS NOT TRUE ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -3522,7 +3522,7 @@ namespace SQLBuilder.Core.UnitTest
                                 x.IsEffective == false &&
                                 x.IsOnLine);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective = FALSE  AND IsOnLine = TRUE ", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective IS FALSE  AND IsOnLine IS TRUE ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
 
@@ -3538,7 +3538,7 @@ namespace SQLBuilder.Core.UnitTest
                                 !(x.IsEffective == false) &&
                                 x.IsOnLine != false);
 
-            Assert.Equal("SELECT * FROM student WHERE IsEffective <> FALSE  AND IsOnLine = TRUE ", builder.Sql);
+            Assert.Equal("SELECT * FROM student WHERE IsEffective IS NOT FALSE  AND IsOnLine IS TRUE ", builder.Sql);
             Assert.Empty(builder.Parameters);
         }
         #endregion

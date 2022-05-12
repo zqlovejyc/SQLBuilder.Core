@@ -379,8 +379,12 @@ namespace SQLBuilder.Core.Expressions
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
                     {
-                        if (sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
-                            sqlWrapper += " = TRUE ";
+                        if (new HashSet<DatabaseType>
+                        {
+                            DatabaseType.PostgreSql,
+                            DatabaseType.MySql
+                        }.Contains(sqlWrapper.DatabaseType))
+                            sqlWrapper += " IS TRUE ";
                         else
                             sqlWrapper += " = 1 ";
                     }
@@ -513,8 +517,12 @@ namespace SQLBuilder.Core.Expressions
                     //字段是bool类型
                     if (expression.NodeType == ExpressionType.MemberAccess && expression.Type.GetCoreType() == typeof(bool))
                     {
-                        if (sqlWrapper.DatabaseType == DatabaseType.PostgreSql)
-                            sqlWrapper += " = TRUE ";
+                        if (new HashSet<DatabaseType>
+                        {
+                            DatabaseType.PostgreSql, 
+                            DatabaseType.MySql
+                        }.Contains(sqlWrapper.DatabaseType))
+                            sqlWrapper += " IS TRUE ";
                         else
                             sqlWrapper += " = 1 ";
                     }

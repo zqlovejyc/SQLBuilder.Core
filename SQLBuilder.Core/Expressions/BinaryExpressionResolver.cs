@@ -271,9 +271,18 @@ namespace SQLBuilder.Core.Expressions
                         }
                         else if (subString.Contains(" IS "))
                         {
-                            var index = sqlWrapper.LastIndexOf(" IS ");
-                            if (index != -1)
-                                sqlWrapper.Replace(" IS ", " IS NOT ", index, 4);
+                            if (subString.Contains(" IS TRUE "))
+                            {
+                                var index = sqlWrapper.LastIndexOf(" IS TRUE ");
+                                if (index != -1)
+                                    sqlWrapper.Replace(" IS TRUE ", " IS FALSE ", index, 9);
+                            }
+                            else
+                            {
+                                var index = sqlWrapper.LastIndexOf(" IS ");
+                                if (index != -1)
+                                    sqlWrapper.Replace(" IS ", " IS NOT ", index, 4);
+                            }
                         }
 
                         //NOT LIKE、LIKE
@@ -326,12 +335,6 @@ namespace SQLBuilder.Core.Expressions
                                 var index = sqlWrapper.LastIndexOf(" = 1 ");
                                 if (index != -1)
                                     sqlWrapper.Replace(" = 1 ", " = 0 ", index, 5);
-                            }
-                            else if (subString.Contains(" = TRUE "))
-                            {
-                                var index = sqlWrapper.LastIndexOf(" = TRUE ");
-                                if (index != -1)
-                                    sqlWrapper.Replace(" = TRUE ", " = FALSE ", index, 8);
                             }
                             else
                             {

@@ -384,9 +384,9 @@ namespace SQLBuilder.Core.Expressions
                             DatabaseType.PostgreSql,
                             DatabaseType.MySql
                         }.Contains(sqlWrapper.DatabaseType))
-                            sqlWrapper += " IS TRUE ";
+                            sqlWrapper += " IS TRUE";
                         else
-                            sqlWrapper += " = 1 ";
+                            sqlWrapper += " = 1";
                     }
                 }
                 else
@@ -522,9 +522,9 @@ namespace SQLBuilder.Core.Expressions
                             DatabaseType.PostgreSql, 
                             DatabaseType.MySql
                         }.Contains(sqlWrapper.DatabaseType))
-                            sqlWrapper += " IS TRUE ";
+                            sqlWrapper += " IS TRUE";
                         else
-                            sqlWrapper += " = 1 ";
+                            sqlWrapper += " = 1";
                     }
                 }
                 else

@@ -271,11 +271,11 @@ namespace SQLBuilder.Core.Expressions
                         }
                         else if (subString.Contains(" IS "))
                         {
-                            if (subString.Contains(" IS TRUE "))
+                            if (subString.Contains(" IS TRUE"))
                             {
-                                var index = sqlWrapper.LastIndexOf(" IS TRUE ");
+                                var index = sqlWrapper.LastIndexOf(" IS TRUE");
                                 if (index != -1)
-                                    sqlWrapper.Replace(" IS TRUE ", " IS FALSE ", index, 9);
+                                    sqlWrapper.Replace(" IS TRUE", " IS FALSE", index, 8);
                             }
                             else
                             {
@@ -330,11 +330,11 @@ namespace SQLBuilder.Core.Expressions
                         //=、<>
                         if (subString.Contains(" = "))
                         {
-                            if (subString.Contains(" = 1 "))
+                            if (subString.Contains(" = 1"))
                             {
-                                var index = sqlWrapper.LastIndexOf(" = 1 ");
+                                var index = sqlWrapper.LastIndexOf(" = 1");
                                 if (index != -1)
-                                    sqlWrapper.Replace(" = 1 ", " = 0 ", index, 5);
+                                    sqlWrapper.Replace(" = 1", " = 0", index, 4);
                             }
                             else
                             {

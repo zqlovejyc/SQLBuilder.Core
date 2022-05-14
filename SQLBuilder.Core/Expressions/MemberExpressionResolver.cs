@@ -381,8 +381,8 @@ namespace SQLBuilder.Core.Expressions
                     {
                         if (new HashSet<DatabaseType>
                         {
-                            DatabaseType.PostgreSql,
-                            DatabaseType.MySql
+                            DatabaseType.MySql,
+                            DatabaseType.PostgreSql
                         }.Contains(sqlWrapper.DatabaseType))
                             sqlWrapper += " IS TRUE";
                         else
@@ -519,8 +519,8 @@ namespace SQLBuilder.Core.Expressions
                     {
                         if (new HashSet<DatabaseType>
                         {
-                            DatabaseType.PostgreSql, 
-                            DatabaseType.MySql
+                            DatabaseType.MySql,
+                            DatabaseType.PostgreSql
                         }.Contains(sqlWrapper.DatabaseType))
                             sqlWrapper += " IS TRUE";
                         else

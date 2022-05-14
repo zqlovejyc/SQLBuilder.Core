@@ -21,9 +21,9 @@
 		<PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<PackageId>Zq.SQLBuilder.Core.Diagnostics</PackageId>
-		<Version>2.3.6</Version>
-		<FileVersion>2.3.6.0</FileVersion>
-		<AssemblyVersion>2.3.6.0</AssemblyVersion>
+		<Version>2.3.7</Version>
+		<FileVersion>2.3.7.0</FileVersion>
+		<AssemblyVersion>2.3.7.0</AssemblyVersion>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
@@ -45,7 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.24" />
+		<PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.25" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">

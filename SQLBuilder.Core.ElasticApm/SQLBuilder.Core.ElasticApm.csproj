@@ -20,9 +20,9 @@
         <PackageTags>sqlbuilder;elastic;apm</PackageTags>
         <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
-		<Version>2.3.6</Version>
-		<FileVersion>2.3.6.0</FileVersion>
-		<AssemblyVersion>2.3.6.0</AssemblyVersion>
+		<Version>2.3.7</Version>
+		<FileVersion>2.3.7.0</FileVersion>
+		<AssemblyVersion>2.3.7.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
@@ -33,8 +33,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.14.1" />
-        <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.24" />
+        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.15.0" />
+        <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.25" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

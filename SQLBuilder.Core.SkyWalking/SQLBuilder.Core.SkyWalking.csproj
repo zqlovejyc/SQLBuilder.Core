@@ -21,9 +21,9 @@
         <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
-        <Version>2.3.6</Version>
-		<FileVersion>2.3.6.0</FileVersion>
-		<AssemblyVersion>2.3.6.0</AssemblyVersion>
+        <Version>2.3.7</Version>
+		<FileVersion>2.3.7.0</FileVersion>
+		<AssemblyVersion>2.3.7.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     
@@ -51,5 +51,9 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.1'">
+		<PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="2.0.0" />
+	</ItemGroup>
 
 </Project>

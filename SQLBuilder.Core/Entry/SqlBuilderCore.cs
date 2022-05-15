@@ -152,69 +152,69 @@ namespace SQLBuilder.Core.Entry
         {
             var list = new List<(Type type, string alias)>();
 
-            if (expression != null && types?.Length > 0)
-            {
-                if (expression is NewExpression newExpression && newExpression.Arguments?.Count > 0)
-                {
-                    foreach (var item in newExpression.Arguments)
-                    {
-                        if (item.NodeType == ExpressionType.MemberAccess)
-                        {
-                            if (item is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
-                                list.Add((parameterExpr.Type, parameterExpr.Name));
-                        }
-                        else if (item.NodeType == ExpressionType.Parameter)
-                        {
-                            if (item is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
-                                list.Add((parameterExpr.Type, parameterExpr.Name));
-                        }
-                    }
-                }
+            if (expression == null || types.IsNullOrEmpty())
+                return list.ToArray();
 
-                else if (expression is LambdaExpression lambdaExpression && lambdaExpression.Parameters?.Count > 0)
+            if (expression is NewExpression newExpression && newExpression.Arguments?.Count > 0)
+            {
+                foreach (var item in newExpression.Arguments)
                 {
-                    foreach (var item in lambdaExpression.Parameters)
+                    if (item.NodeType == ExpressionType.MemberAccess)
+                    {
+                        if (item is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                            list.Add((parameterExpr.Type, parameterExpr.Name));
+                    }
+                    else if (item.NodeType == ExpressionType.Parameter)
                     {
                         if (item is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
                             list.Add((parameterExpr.Type, parameterExpr.Name));
                     }
                 }
+            }
 
-                else if (expression is ParameterExpression parameterExpression)
+            else if (expression is LambdaExpression lambdaExpression && lambdaExpression.Parameters?.Count > 0)
+            {
+                foreach (var item in lambdaExpression.Parameters)
                 {
-                    if (types.Any(x => x == parameterExpression.Type))
-                        list.Add((parameterExpression.Type, parameterExpression.Name));
+                    if (item is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                        list.Add((parameterExpr.Type, parameterExpr.Name));
                 }
+            }
 
-                else if (expression is UnaryExpression unaryExpression)
+            else if (expression is ParameterExpression parameterExpression)
+            {
+                if (types.Any(x => x == parameterExpression.Type))
+                    list.Add((parameterExpression.Type, parameterExpression.Name));
+            }
+
+            else if (expression is UnaryExpression unaryExpression)
+            {
+                if (unaryExpression.Operand is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr)
                 {
-                    if (unaryExpression.Operand is MemberExpression memberExpr && memberExpr.Expression is ParameterExpression parameterExpr)
+                    if (types.Any(x => x == parameterExpr.Type))
+                        list.Add((parameterExpr.Type, parameterExpr.Name));
+                }
+            }
+
+            else if (expression is MemberExpression memberExpression)
+            {
+                if (memberExpression.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
+                    list.Add((parameterExpr.Type, parameterExpr.Name));
+            }
+
+            else if (expression is ConstantExpression constantExpression)
+            {
+                list.Add((types[0], null));
+            }
+
+            else if (expression is MemberInitExpression memberInitExpression)
+            {
+                foreach (MemberAssignment ma in memberInitExpression.Bindings)
+                {
+                    if (ma.Expression is MemberExpression memberExpr && memberExpr?.Expression is ParameterExpression parameterExpr)
                     {
                         if (types.Any(x => x == parameterExpr.Type))
                             list.Add((parameterExpr.Type, parameterExpr.Name));
-                    }
-                }
-
-                else if (expression is MemberExpression memberExpression)
-                {
-                    if (memberExpression.Expression is ParameterExpression parameterExpr && types.Any(x => x == parameterExpr.Type))
-                        list.Add((parameterExpr.Type, parameterExpr.Name));
-                }
-
-                else if (expression is ConstantExpression constantExpression)
-                {
-                    list.Add((types[0], null));
-                }
-
-                else if (expression is MemberInitExpression memberInitExpression)
-                {
-                    foreach (MemberAssignment ma in memberInitExpression.Bindings)
-                    {
-                        if (ma.Expression is MemberExpression memberExpr && memberExpr?.Expression is ParameterExpression parameterExpr)
-                        {
-                            if (types.Any(x => x == parameterExpr.Type))
-                                list.Add((parameterExpr.Type, parameterExpr.Name));
-                        }
                     }
                 }
             }
@@ -251,7 +251,7 @@ namespace SQLBuilder.Core.Entry
             if (tableAlias.IsNullOrEmpty())
                 @as = "";
 
-            if (tableNameFunc.IsNull())
+            if (tableNameFunc == null)
                 return $"SELECT {(aggregateSyntax.IsNullOrEmpty() ? "{0}" : aggregateSyntax)} FROM {tableName}{@as}{tableAlias}";
             else
                 return $"SELECT {(aggregateSyntax.IsNullOrEmpty() ? "{0}" : aggregateSyntax)} FROM {tableNameFunc(new[] { tableName, @as, tableAlias })}";
@@ -307,10 +307,11 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Select(Expression<Func<T, object>> expression = null, Func<string[], string> tableNameFunc = null)
         {
             var expr = expression?.Body;
-            if (expr?.NodeType == ExpressionType.Constant ||
-                expr?.NodeType == ExpressionType.Parameter ||
-                expr?.NodeType == ExpressionType.MemberInit ||
-                expr?.NodeType == ExpressionType.New)
+            if (expr != null &&
+                (expr.NodeType == ExpressionType.Constant ||
+                expr.NodeType == ExpressionType.Parameter ||
+                expr.NodeType == ExpressionType.MemberInit ||
+                expr.NodeType == ExpressionType.New))
                 expr = expression;
 
             return this.Select(expr, null, tableNameFunc);
@@ -525,6 +526,9 @@ namespace SQLBuilder.Core.Entry
         {
             Type type = null;
 
+            if (types.IsNullOrEmpty())
+                return type;
+
             for (int i = types.Length - 1; i >= 0; i--)
             {
                 type = types[i];
@@ -550,8 +554,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Join(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -562,8 +570,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Join(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -577,6 +589,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Join(Type type, Expression expression, string join, Func<string[], string> tableNameFunc = null)
         {
+            if (type == null || expression == null)
+                return this;
+
             this.sqlWrapper.AddJoinType(type);
 
             var alias = this.GetExpressionAlias(expression, type).Last().alias;
@@ -596,7 +611,7 @@ namespace SQLBuilder.Core.Entry
             if (tableAlias.IsNullOrEmpty())
                 @as = "";
 
-            if (tableNameFunc.IsNull())
+            if (tableNameFunc == null)
                 this.sqlWrapper.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableName}{@as}{tableAlias} ON ");
             else
                 this.sqlWrapper.Append($"{(join.IsNullOrEmpty() ? "" : $" {join}")} JOIN {tableNameFunc(new[] { tableName, @as, tableAlias })} ON ");
@@ -741,8 +756,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> InnerJoin(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " INNER JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -753,8 +772,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> InnerJoin(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " INNER JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -840,8 +863,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> LeftJoin(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " LEFT JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -852,8 +879,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> LeftJoin(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " LEFT JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -939,8 +970,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> RightJoin(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " RIGHT JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -951,8 +986,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> RightJoin(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " RIGHT JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -1038,8 +1077,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> FullJoin(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " FULL JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -1050,8 +1093,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> FullJoin(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " FULL JOIN ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -1139,11 +1186,15 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
             this.sqlWrapper += " WHERE ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -1155,6 +1206,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(string sql, ref bool hasWhere)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
@@ -1178,11 +1232,15 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
             this.sqlWrapper += " WHERE ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -1194,6 +1252,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Where(StringBuilder sql, ref bool hasWhere)
         {
+            if (sql == null)
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
@@ -1216,6 +1277,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="expression">表达式树</param>
         public SqlBuilderCore<T> Where(Expression expression)
         {
+            if (expression == null)
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
@@ -1240,6 +1304,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         public SqlBuilderCore<T> Where(Expression expression, ref bool hasWhere)
         {
+            if (expression == null)
+                return this;
+
             if (this.sqlWrapper.Length == 0)
                 this.Select(expression: null);
 
@@ -1270,7 +1337,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Where(Expression<Func<T, bool>> expression)
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1281,7 +1348,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Where(Expression<Func<T, bool>> expression, ref bool hasWhere)
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1293,7 +1360,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Where<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1306,7 +1373,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Where<T2>(Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
             where T2 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1320,7 +1387,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1335,7 +1402,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1351,7 +1418,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1368,7 +1435,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1386,7 +1453,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1405,7 +1472,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1425,7 +1492,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1446,7 +1513,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1468,7 +1535,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1491,7 +1558,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1515,7 +1582,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1540,7 +1607,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1566,7 +1633,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1593,7 +1660,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1621,7 +1688,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.Where(expression.Body);
+            return this.Where(expression?.Body);
         }
 
         /// <summary>
@@ -1650,7 +1717,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.Where(expression.Body, ref hasWhere);
+            return this.Where(expression?.Body, ref hasWhere);
         }
         #endregion
 
@@ -1662,6 +1729,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             var str = this.sqlWrapper.ToString();
 
             if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -1682,6 +1752,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(string sql, ref bool hasWhere)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " AND ";
             else
@@ -1702,6 +1775,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             var str = this.sqlWrapper.ToString();
 
             if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -1722,6 +1798,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(StringBuilder sql, ref bool hasWhere)
         {
+            if (sql == null)
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " AND ";
             else
@@ -1742,6 +1821,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(Expression expression)
         {
+            if (expression == null)
+                return this;
+
             var sql = this.sqlWrapper.ToString();
 
             if (sql.ContainsIgnoreCase("WHERE") && sql.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -1764,6 +1846,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(Expression expression, ref bool hasWhere)
         {
+            if (expression == null)
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " AND ";
             else
@@ -1786,7 +1871,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AndWhere(Expression<Func<T, bool>> expression)
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1797,7 +1882,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AndWhere(Expression<Func<T, bool>> expression, ref bool hasWhere)
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1809,7 +1894,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1822,7 +1907,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> AndWhere<T2>(Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
             where T2 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1836,7 +1921,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1851,7 +1936,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1867,7 +1952,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1884,7 +1969,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1902,7 +1987,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1921,7 +2006,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1941,7 +2026,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -1962,7 +2047,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -1984,7 +2069,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2007,7 +2092,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2031,7 +2116,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2056,7 +2141,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2082,7 +2167,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2109,7 +2194,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2137,7 +2222,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.AndWhere(expression.Body);
+            return this.AndWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2166,7 +2251,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.AndWhere(expression.Body, ref hasWhere);
+            return this.AndWhere(expression?.Body, ref hasWhere);
         }
         #endregion
 
@@ -2178,6 +2263,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             var str = this.sqlWrapper.ToString();
 
             if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -2198,6 +2286,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(string sql, ref bool hasWhere)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " OR ";
             else
@@ -2218,6 +2309,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             var str = this.sqlWrapper.ToString();
 
             if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -2238,6 +2332,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(StringBuilder sql, ref bool hasWhere)
         {
+            if (sql == null)
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " OR ";
             else
@@ -2257,6 +2354,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="expression">表达式树</param>
         public SqlBuilderCore<T> OrWhere(Expression expression)
         {
+            if (expression == null)
+                return this;
+
             var sql = this.sqlWrapper.ToString();
 
             if (sql.ContainsIgnoreCase("WHERE") && sql.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
@@ -2278,6 +2378,9 @@ namespace SQLBuilder.Core.Entry
         /// <param name="hasWhere">指定是否已包含where关键字</param>
         public SqlBuilderCore<T> OrWhere(Expression expression, ref bool hasWhere)
         {
+            if (expression == null)
+                return this;
+
             if (hasWhere)
                 this.sqlWrapper += " OR ";
             else
@@ -2300,7 +2403,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrWhere(Expression<Func<T, bool>> expression)
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2311,7 +2414,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrWhere(Expression<Func<T, bool>> expression, ref bool hasWhere)
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2323,7 +2426,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere<T2>(Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2336,7 +2439,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrWhere<T2>(Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
             where T2 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2350,7 +2453,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2365,7 +2468,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2381,7 +2484,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2398,7 +2501,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2416,7 +2519,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2435,7 +2538,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2455,7 +2558,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2476,7 +2579,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2498,7 +2601,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2521,7 +2624,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2545,7 +2648,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2570,7 +2673,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2596,7 +2699,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2623,7 +2726,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2651,7 +2754,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.OrWhere(expression.Body);
+            return this.OrWhere(expression?.Body);
         }
 
         /// <summary>
@@ -2680,7 +2783,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.OrWhere(expression.Body, ref hasWhere);
+            return this.OrWhere(expression?.Body, ref hasWhere);
         }
         #endregion
 
@@ -2897,7 +3000,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression)
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -2909,7 +3012,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, Action callback)
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -2921,7 +3024,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, ref bool hasWhere)
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2934,7 +3037,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> WhereIf(bool condition, Expression<Func<T, bool>> expression, ref bool hasWhere, Action callback)
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -2947,7 +3050,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression)
             where T2 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -2961,7 +3064,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, Action callback)
             where T2 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -2975,7 +3078,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, ref bool hasWhere)
             where T2 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -2990,7 +3093,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> WhereIf<T2>(bool condition, Expression<Func<T, T2, bool>> expression, ref bool hasWhere, Action callback)
             where T2 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3005,7 +3108,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3021,7 +3124,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3037,7 +3140,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3054,7 +3157,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3071,7 +3174,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3089,7 +3192,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3107,7 +3210,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3126,7 +3229,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3145,7 +3248,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3165,7 +3268,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3185,7 +3288,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3206,7 +3309,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3227,7 +3330,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3249,7 +3352,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3271,7 +3374,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3294,7 +3397,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3317,7 +3420,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3341,7 +3444,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3365,7 +3468,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3390,7 +3493,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3415,7 +3518,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3441,7 +3544,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3467,7 +3570,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3494,7 +3597,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3521,7 +3624,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3549,7 +3652,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3577,7 +3680,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3606,7 +3709,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
 
         /// <summary>
@@ -3635,7 +3738,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.WhereIf(condition, expression.Body);
+            return this.WhereIf(condition, expression?.Body);
         }
 
         /// <summary>
@@ -3665,7 +3768,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.WhereIf(condition, expression.Body, callback);
+            return this.WhereIf(condition, expression?.Body, callback);
         }
 
         /// <summary>
@@ -3695,7 +3798,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere);
         }
 
         /// <summary>
@@ -3726,7 +3829,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.WhereIf(condition, expression.Body, ref hasWhere, callback);
+            return this.WhereIf(condition, expression?.Body, ref hasWhere, callback);
         }
         #endregion
 
@@ -3832,8 +3935,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " GROUP BY ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -3844,8 +3951,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " GROUP BY ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -3856,8 +3967,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(Expression expression)
         {
+            if (expression == null)
+                return this;
+
             this.sqlWrapper += " GROUP BY ";
             SqlExpressionProvider.GroupBy(expression, this.sqlWrapper);
+
             return this;
         }
 
@@ -3868,7 +3983,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> GroupBy(Expression<Func<T, object>> expression)
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3880,7 +3995,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> GroupBy<T2>(Expression<Func<T, T2, object>> expression)
             where T2 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3894,7 +4009,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3910,7 +4025,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3928,7 +4043,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3948,7 +4063,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3970,7 +4085,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -3994,7 +4109,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -4020,7 +4135,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
 
         /// <summary>
@@ -4048,7 +4163,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.GroupBy(expression.Body);
+            return this.GroupBy(expression?.Body);
         }
         #endregion
 
@@ -4060,8 +4175,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Having(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " HAVING ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -4072,8 +4191,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Having(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " HAVING ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -4084,8 +4207,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> Having(Expression expression)
         {
+            if (expression == null)
+                return this;
+
             this.sqlWrapper += " HAVING ";
             SqlExpressionProvider.Having(expression, this.sqlWrapper);
+
             return this;
         }
 
@@ -4096,7 +4223,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Having(Expression<Func<T, object>> expression)
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4108,7 +4235,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> Having<T2>(Expression<Func<T, T2, object>> expression)
             where T2 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4122,7 +4249,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4138,7 +4265,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4156,7 +4283,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4176,7 +4303,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4198,7 +4325,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4222,7 +4349,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4248,7 +4375,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
 
         /// <summary>
@@ -4276,7 +4403,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.Having(expression.Body);
+            return this.Having(expression?.Body);
         }
         #endregion
 
@@ -4288,8 +4415,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += " ORDER BY ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -4300,8 +4431,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += " ORDER BY ";
             this.sqlWrapper += sql;
+
             return this;
         }
 
@@ -4313,8 +4448,12 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(Expression expression, params OrderType[] orders)
         {
+            if (expression == null)
+                return this;
+
             this.sqlWrapper += " ORDER BY ";
             SqlExpressionProvider.OrderBy(expression, this.sqlWrapper, orders);
+
             return this;
         }
 
@@ -4326,7 +4465,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> OrderBy(Expression<Func<T, object>> expression, params OrderType[] orders)
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4339,7 +4478,7 @@ namespace SQLBuilder.Core.Entry
         public SqlBuilderCore<T> OrderBy<T2>(Expression<Func<T, T2, object>> expression, params OrderType[] orders)
             where T2 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4354,7 +4493,7 @@ namespace SQLBuilder.Core.Entry
             where T2 : class
             where T3 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4371,7 +4510,7 @@ namespace SQLBuilder.Core.Entry
             where T3 : class
             where T4 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4390,7 +4529,7 @@ namespace SQLBuilder.Core.Entry
             where T4 : class
             where T5 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4411,7 +4550,7 @@ namespace SQLBuilder.Core.Entry
             where T5 : class
             where T6 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4434,7 +4573,7 @@ namespace SQLBuilder.Core.Entry
             where T6 : class
             where T7 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4459,7 +4598,7 @@ namespace SQLBuilder.Core.Entry
             where T7 : class
             where T8 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4486,7 +4625,7 @@ namespace SQLBuilder.Core.Entry
             where T8 : class
             where T9 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
 
         /// <summary>
@@ -4515,7 +4654,7 @@ namespace SQLBuilder.Core.Entry
             where T9 : class
             where T10 : class
         {
-            return this.OrderBy(expression.Body, orders);
+            return this.OrderBy(expression?.Body, orders);
         }
         #endregion
 
@@ -4538,7 +4677,7 @@ namespace SQLBuilder.Core.Entry
             else
                 orders.Add(OrderType.Descending);
 
-            return this.OrderBy(expression.Body, orders.ToArray());
+            return this.OrderBy(expression?.Body, orders.ToArray());
         }
         #endregion
 
@@ -4729,7 +4868,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             this.sqlWrapper += $"UPDATE {tableNameFunc?.Invoke(tableName) ?? tableName} SET ";
 
-            SqlExpressionProvider.Update(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Update(expression?.Body, this.sqlWrapper);
 
             return this;
         }
@@ -4752,7 +4891,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             this.sqlWrapper += $"INSERT INTO {tableNameFunc?.Invoke(tableName) ?? tableName} ({{0}}) {(this.sqlWrapper.DatabaseType == DatabaseType.Oracle ? "SELECT" : "VALUES")} ";
 
-            SqlExpressionProvider.Insert(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Insert(expression?.Body, this.sqlWrapper);
 
             return this;
         }
@@ -4773,7 +4912,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var sql = $"SELECT MAX({{0}}) FROM {tableNameFunc?.Invoke(tableName) ?? tableName}";
 
-            SqlExpressionProvider.Max(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Max(expression?.Body, this.sqlWrapper);
             this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
 
             return this;
@@ -4795,7 +4934,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var sql = $"SELECT MIN({{0}}) FROM {tableNameFunc?.Invoke(tableName) ?? tableName}";
 
-            SqlExpressionProvider.Min(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Min(expression?.Body, this.sqlWrapper);
             this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
 
             return this;
@@ -4817,7 +4956,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var sql = $"SELECT AVG({{0}}) FROM {tableNameFunc?.Invoke(tableName) ?? tableName}";
 
-            SqlExpressionProvider.Avg(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Avg(expression?.Body, this.sqlWrapper);
             this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
 
             return this;
@@ -5096,7 +5235,7 @@ namespace SQLBuilder.Core.Entry
             var tableName = this.sqlWrapper.GetTableName(typeof(T));
             var sql = $"SELECT SUM({{0}}) FROM {tableNameFunc?.Invoke(tableName) ?? tableName}";
 
-            SqlExpressionProvider.Sum(expression.Body, this.sqlWrapper);
+            SqlExpressionProvider.Sum(expression?.Body, this.sqlWrapper);
             this.sqlWrapper.AppendFormat(sql, this.sqlWrapper.SelectFieldsString);
 
             return this;
@@ -5126,6 +5265,7 @@ namespace SQLBuilder.Core.Entry
             {
                 this.sqlWrapper.Append($" LIMIT {topNumber} OFFSET 0");
             }
+
             return this;
         }
         #endregion
@@ -5150,6 +5290,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Append(string sql)
         {
+            if (sql.IsNullOrEmpty())
+                return this;
+
             this.sqlWrapper += sql;
             return this;
         }
@@ -5161,6 +5304,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> Append(StringBuilder sql)
         {
+            if (sql == null)
+                return this;
+
             this.sqlWrapper += sql;
             return this;
         }
@@ -5175,7 +5321,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AppendIf(bool condition, string sql)
         {
-            if (condition)
+            if (condition && sql.IsNotNullOrEmpty())
                 this.sqlWrapper += sql;
 
             return this;
@@ -5190,7 +5336,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AppendIf(bool condition, string sql, Action callback)
         {
-            if (condition)
+            if (condition && sql.IsNotNullOrEmpty())
             {
                 this.sqlWrapper += sql;
                 callback?.Invoke();
@@ -5207,7 +5353,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AppendIf(bool condition, StringBuilder sql)
         {
-            if (condition)
+            if (condition && sql != null)
                 this.sqlWrapper += sql;
 
             return this;
@@ -5222,7 +5368,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> AppendIf(bool condition, StringBuilder sql, Action callback)
         {
-            if (condition)
+            if (condition && sql != null)
             {
                 this.sqlWrapper += sql;
                 callback?.Invoke();

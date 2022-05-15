@@ -31,6 +31,32 @@ namespace SQLBuilder.Core.Extensions
     {
         #region Substring
         /// <summary>
+        /// 忽略大小写从分隔符开始向尾部截取字符串，不包含分隔符字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="separator">分隔符</param>
+        /// <param name="lastIndexOf">true：从最后一个匹配的分隔符开始截取，false：从第一个匹配的分隔符开始截取，默认：true</param>
+        /// <returns>string</returns>
+        public static string SubstringIgnoreCase(this string @this, string separator, bool lastIndexOf = true)
+        {
+            return @this.Substring(separator, lastIndexOf, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 忽略大小写根据开始和结束字符串截取字符串，不包含开始和结束字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="start">开始字符串</param>
+        /// <param name="end">结束字符串</param>
+        /// <param name="startIsIndexOf">开始字符串是否是IndexOf，默认true，否则LastIndexOf</param>
+        /// <param name="endIsIndexOf">结束字符串是否是IndexOf，默认true，否则LastIndexOf</param>
+        /// <returns>string</returns>
+        public static string SubstringIgnoreCase(this string @this, string start, string end, bool startIsIndexOf = true, bool endIsIndexOf = true)
+        {
+            return @this.Substring(start, end, startIsIndexOf, endIsIndexOf, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// 从分隔符开始向尾部截取字符串，不包含分隔符字符串
         /// </summary>
         /// <param name="this">源字符串</param>

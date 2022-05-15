@@ -1664,7 +1664,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString();
 
-            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1704,7 +1704,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString();
 
-            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1744,7 +1744,7 @@ namespace SQLBuilder.Core.Entry
         {
             var sql = this.sqlWrapper.ToString();
 
-            if (sql.ContainsIgnoreCase("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (sql.ContainsIgnoreCase("WHERE") && sql.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2180,7 +2180,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString();
 
-            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2220,7 +2220,7 @@ namespace SQLBuilder.Core.Entry
         {
             var str = this.sqlWrapper.ToString();
 
-            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2229,7 +2229,6 @@ namespace SQLBuilder.Core.Entry
 
             return this;
         }
-
 
         /// <summary>
         /// AndWhere
@@ -2260,7 +2259,7 @@ namespace SQLBuilder.Core.Entry
         {
             var sql = this.sqlWrapper.ToString();
 
-            if (sql.Contains("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (sql.ContainsIgnoreCase("WHERE") && sql.SubstringIgnoreCase("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";

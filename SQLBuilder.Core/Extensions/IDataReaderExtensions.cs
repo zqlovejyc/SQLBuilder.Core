@@ -244,7 +244,7 @@ namespace SQLBuilder.Core.Extensions
                             if (!p.CanWrite)
                                 continue;
 
-                            var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
+                            var field = fields.Where(o => o.EqualIgnoreCase(p.Name)).FirstOrDefault();
                             if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
                                 p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
                         }
@@ -343,7 +343,7 @@ namespace SQLBuilder.Core.Extensions
                                     if (!p.CanWrite)
                                         continue;
 
-                                    var field = fields.Where(o => o.ToLower() == p.Name.ToLower()).FirstOrDefault();
+                                    var field = fields.Where(o => o.EqualIgnoreCase(p.Name)).FirstOrDefault();
                                     if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
                                         p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
                                 }

@@ -8,16 +8,18 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.3.7</Version>
-		<FileVersion>2.3.7.0</FileVersion>
-		<AssemblyVersion>2.3.7.0</AssemblyVersion>
+		<Version>2.3.8</Version>
+		<FileVersion>2.3.8.0</FileVersion>
+		<AssemblyVersion>2.3.8.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2025 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.修复数据库类型为PostgreSql时，解析bool类型条件时，解析为1的bug;
-2.优化Mysql数据库bool类型sql解析；
-3.升级nuget包；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.优化WHERE是否包含判断；
+2.新增SubstringIgnoreCase扩展方法；
+3.优化字符串忽略大小写相等比较；
+4.优化null空值判断，修复WhereIf参数Expression&lt;T,bool&gt;为null时引发的空异常bug；
+5.升级nuget包；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>

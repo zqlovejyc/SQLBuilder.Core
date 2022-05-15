@@ -1662,9 +1662,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(string sql)
         {
-            var str = this.sqlWrapper.ToString().ToUpper();
+            var str = this.sqlWrapper.ToString();
 
-            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1702,9 +1702,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(StringBuilder sql)
         {
-            var str = this.sqlWrapper.ToString().ToUpper();
+            var str = this.sqlWrapper.ToString();
 
-            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -1742,9 +1742,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> AndWhere(Expression expression)
         {
-            var sql = this.sqlWrapper.ToString().ToUpper();
+            var sql = this.sqlWrapper.ToString();
 
-            if (sql.Contains("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (sql.ContainsIgnoreCase("WHERE") && sql.Substring("WHERE").Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " AND ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2178,9 +2178,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(string sql)
         {
-            var str = this.sqlWrapper.ToString().ToUpper();
+            var str = this.sqlWrapper.ToString();
 
-            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";
@@ -2218,9 +2218,9 @@ namespace SQLBuilder.Core.Entry
         /// <returns></returns>
         public SqlBuilderCore<T> OrWhere(StringBuilder sql)
         {
-            var str = this.sqlWrapper.ToString().ToUpper();
+            var str = this.sqlWrapper.ToString();
 
-            if (str.Contains("WHERE") && str.Substring("WHERE").Trim().IsNotNullOrEmpty())
+            if (str.ContainsIgnoreCase("WHERE") && str.Substring("WHERE", true, StringComparison.OrdinalIgnoreCase).Trim().IsNotNullOrEmpty())
                 this.sqlWrapper += " OR ";
             else
                 this.sqlWrapper += " WHERE ";

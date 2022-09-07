@@ -24,10 +24,7 @@ namespace SQLBuilder.Core.FastMember
         /// </summary>
         /// <param name="source">The sequence of objects to represent</param>
         /// <param name="members">The members that should be exposed to the reader</param>
-        public static ObjectReader Create<T>(IEnumerable<T> source, params string[] members)
-        {
-            return new ObjectReader(typeof(T), source, members);
-        }
+        public static ObjectReader Create<T>(IEnumerable<T> source, params string[] members) => new(typeof(T), source, members);
 
         /// <summary>
         /// Creates a new ObjectReader instance for reading the supplied data
@@ -37,9 +34,8 @@ namespace SQLBuilder.Core.FastMember
         /// <param name="members">The members that should be exposed to the reader</param>
         public ObjectReader(Type type, IEnumerable source, params string[] members)
         {
-            if (source == null) throw new ArgumentOutOfRangeException("source");
-
-            
+            if (source == null)
+                throw new ArgumentOutOfRangeException(nameof(source));
 
             bool allMembers = members == null || members.Length == 0;
 
@@ -102,20 +98,15 @@ namespace SQLBuilder.Core.FastMember
 
         object current;
 
-
         #pragma warning disable 1591
-        public override int Depth
-        {
-            get { return 0; }
-        }
+        public override int Depth => 0;
 
         public override DataTable GetSchemaTable()
         {
             // these are the columns used by DataTable load
-            DataTable table = new DataTable
+            DataTable table = new()
             {
-                Columns =
-                {
+                Columns = {
                     {"ColumnOrdinal", typeof(int)},
                     {"ColumnName", typeof(string)},
                     {"DataType", typeof(Type)},
@@ -135,18 +126,10 @@ namespace SQLBuilder.Core.FastMember
             }
             return table;
         }
-        public override void Close()
-        {
-            Shutdown();
-        }
+        public override void Close() => Shutdown();
 
-        public override bool HasRows
-        {
-            get
-            {
-                return active;
-            }
-        }
+        public override bool HasRows => active;
+
         private bool active = true;
         public override bool NextResult()
         {
@@ -172,16 +155,14 @@ namespace SQLBuilder.Core.FastMember
             return false;
         }
 
-        public override int RecordsAffected
-        {
-            get { return 0; }
-        }
+        public override int RecordsAffected => 0;
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
             if (disposing) Shutdown();
         }
+
         private void Shutdown()
         {
             active = false;
@@ -191,27 +172,13 @@ namespace SQLBuilder.Core.FastMember
             if (tmp != null) tmp.Dispose();
         }
 
-        public override int FieldCount
-        {
-            get { return memberNames.Length; }
-        }
-        public override bool IsClosed
-        {
-            get
-            {
-                return source == null;
-            }
-        }
+        public override int FieldCount => memberNames.Length;
 
-        public override bool GetBoolean(int i)
-        {
-            return (bool)this[i];
-        }
+        public override bool IsClosed => source == null;
 
-        public override byte GetByte(int i)
-        {
-            return (byte)this[i];
-        }
+        public override bool GetBoolean(int i) => (bool)this[i];
+
+        public override byte GetByte(int i) => (byte)this[i];
 
         public override long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
         {
@@ -224,10 +191,7 @@ namespace SQLBuilder.Core.FastMember
             return count;
         }
 
-        public override char GetChar(int i)
-        {
-            return (char)this[i];
-        }
+        public override char GetChar(int i) => (char)this[i];
 
         public override long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
         {
@@ -240,80 +204,35 @@ namespace SQLBuilder.Core.FastMember
             return count;
         }
 
-        protected override DbDataReader GetDbDataReader(int i)
-        {
-            throw new NotSupportedException();
-        }
+        protected override DbDataReader GetDbDataReader(int i) => throw new NotSupportedException();
 
-        public override string GetDataTypeName(int i)
-        {
-            return (effectiveTypes == null ? typeof(object) : effectiveTypes[i]).Name;
-        }
+        public override string GetDataTypeName(int i) => (effectiveTypes == null ? typeof(object) : effectiveTypes[i]).Name;
 
-        public override DateTime GetDateTime(int i)
-        {
-            return (DateTime)this[i];
-        }
+        public override DateTime GetDateTime(int i) => (DateTime)this[i];
 
-        public override decimal GetDecimal(int i)
-        {
-            return (decimal)this[i];
-        }
+        public override decimal GetDecimal(int i) => (decimal)this[i];
 
-        public override double GetDouble(int i)
-        {
-            return (double)this[i];
-        }
+        public override double GetDouble(int i) => (double)this[i];
 
-        public override Type GetFieldType(int i)
-        {
-            return effectiveTypes == null ? typeof(object) : effectiveTypes[i];
-        }
+        public override Type GetFieldType(int i) => effectiveTypes == null ? typeof(object) : effectiveTypes[i];
 
-        public override float GetFloat(int i)
-        {
-            return (float)this[i];
-        }
+        public override float GetFloat(int i) => (float)this[i];
 
-        public override Guid GetGuid(int i)
-        {
-            return (Guid)this[i];
-        }
+        public override Guid GetGuid(int i) => (Guid)this[i];
 
-        public override short GetInt16(int i)
-        {
-            return (short)this[i];
-        }
+        public override short GetInt16(int i) => (short)this[i];
 
-        public override int GetInt32(int i)
-        {
-            return (int)this[i];
-        }
+        public override int GetInt32(int i) => (int)this[i];
 
-        public override long GetInt64(int i)
-        {
-            return (long)this[i];
-        }
+        public override long GetInt64(int i) => (long)this[i];
 
-        public override string GetName(int i)
-        {
-            return memberNames[i];
-        }
+        public override string GetName(int i) => memberNames[i];
 
-        public override int GetOrdinal(string name)
-        {
-            return Array.IndexOf(memberNames, name);
-        }
+        public override int GetOrdinal(string name) => Array.IndexOf(memberNames, name);
 
-        public override string GetString(int i)
-        {
-            return (string)this[i];
-        }
+        public override string GetString(int i) => (string)this[i];
 
-        public override object GetValue(int i)
-        {
-            return this[i];
-        }
+        public override object GetValue(int i) => this[i];
 
         public override IEnumerator GetEnumerator() => new DbEnumerator(this);
 
@@ -329,22 +248,13 @@ namespace SQLBuilder.Core.FastMember
             return count;
         }
 
-        public override bool IsDBNull(int i)
-        {
-            return this[i] is DBNull;
-        }
+        public override bool IsDBNull(int i) => this[i] is DBNull;
 
-        public override object this[string name]
-        {
-            get { return accessor[current, name] ?? DBNull.Value; }
+        public override object this[string name] => accessor[current, name] ?? DBNull.Value;
 
-        }
         /// <summary>
         /// Gets the value of the current object in the member specified
         /// </summary>
-        public override object this[int i]
-        {
-            get { return accessor[current, memberNames[i]] ?? DBNull.Value; }
-        }
+        public override object this[int i] => accessor[current, memberNames[i]] ?? DBNull.Value;
     }
 }

@@ -11,7 +11,7 @@ namespace SQLBuilder.Core.FastMember
     /// </summary>
     public sealed class MemberSet : IEnumerable<Member>, IList<Member>
     {
-        Member[] members;
+        readonly Member[] members;
         internal MemberSet(Type type)
         {
             const BindingFlags PublicInstance = BindingFlags.Public | BindingFlags.Instance;
@@ -56,6 +56,7 @@ namespace SQLBuilder.Core.FastMember
         int IList<Member>.IndexOf(Member member) => Array.IndexOf(members, member);
 
     }
+
     /// <summary>
     /// Represents an abstracted view of an individual member defined for a type
     /// </summary>

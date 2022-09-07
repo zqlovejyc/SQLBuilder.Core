@@ -16,34 +16,32 @@ namespace SQLBuilder.Core.FastMember
     public abstract class TypeAccessor
     {
         // hash-table has better read-without-locking semantics than dictionary
-        private static readonly Hashtable publicAccessorsOnly = new Hashtable(), nonPublicAccessors = new Hashtable();
+        private static readonly Hashtable publicAccessorsOnly = new(), nonPublicAccessors = new();
 
         /// <summary>
         /// Does this type support new instances via a parameterless constructor?
         /// </summary>
-        public virtual bool CreateNewSupported { get { return false; } }
+        public virtual bool CreateNewSupported => false;
         /// <summary>
         /// Create a new instance of this type
         /// </summary>
-        public virtual object CreateNew() { throw new NotSupportedException(); }
+        public virtual object CreateNew() => throw new NotSupportedException();
 
         /// <summary>
         /// Can this type be queried for member availability?
         /// </summary>
-        public virtual bool GetMembersSupported { get { return false; } }
+        public virtual bool GetMembersSupported => false;
+
         /// <summary>
         /// Query the members available for this type
         /// </summary>
-        public virtual MemberSet GetMembers() { throw new NotSupportedException(); }
+        public virtual MemberSet GetMembers() => throw new NotSupportedException();
 
         /// <summary>
         /// Provides a type-specific accessor, allowing by-name access for all objects of that type
         /// </summary>
         /// <remarks>The accessor is cached internally; a pre-existing accessor may be returned</remarks>
-        public static TypeAccessor Create(Type type)
-        {
-            return Create(type, false);
-        }
+        public static TypeAccessor Create(Type type) => Create(type, false);
 
         /// <summary>
         /// Provides a type-specific accessor, allowing by-name access for all objects of that type
@@ -68,9 +66,10 @@ namespace SQLBuilder.Core.FastMember
                 return obj;
             }
         }
+
         sealed class DynamicAccessor : TypeAccessor
         {
-            public static readonly DynamicAccessor Singleton = new DynamicAccessor();
+            public static readonly DynamicAccessor Singleton = new();
             private DynamicAccessor() { }
             public override object this[object target, string name]
             {
@@ -83,12 +82,10 @@ namespace SQLBuilder.Core.FastMember
         private static ModuleBuilder module;
         private static int counter;
 
-        private static int GetNextCounterValue()
-        {
-            return Interlocked.Increment(ref counter);
-        }
+        private static int GetNextCounterValue() => Interlocked.Increment(ref counter);
 
         static readonly MethodInfo tryGetValue = typeof(Dictionary<string, int>).GetMethod("TryGetValue");
+
         private static void WriteMapImpl(ILGenerator il, Type type, List<MemberInfo> members, FieldBuilder mapField, bool allowNonPublicAccessors, bool isGet)
         {
             OpCode obj, index, value;
@@ -218,6 +215,7 @@ namespace SQLBuilder.Core.FastMember
             }
         }
 
+
         private static readonly MethodInfo strinqEquals = typeof(string).GetMethod("op_Equality", new Type[] { typeof(string), typeof(string) });
 
         /// <summary>
@@ -225,6 +223,8 @@ namespace SQLBuilder.Core.FastMember
         /// </summary>
         protected abstract class RuntimeTypeAccessor : TypeAccessor
         {
+            private MemberSet members;
+
             /// <summary>
             /// Returns the Type represented by this accessor
             /// </summary>
@@ -233,16 +233,14 @@ namespace SQLBuilder.Core.FastMember
             /// <summary>
             /// Can this type be queried for member availability?
             /// </summary>
-            public override bool GetMembersSupported { get { return true; } }
-            private MemberSet members;
+            public override bool GetMembersSupported => true;
+
             /// <summary>
             /// Query the members available for this type
             /// </summary>
-            public override MemberSet GetMembers()
-            {
-                return members ?? (members = new MemberSet(Type));
-            }
+            public override MemberSet GetMembers() => members ??= new MemberSet(Type);
         }
+
         sealed class DelegateAccessor : RuntimeTypeAccessor
         {
             private readonly Dictionary<string, int> map;
@@ -250,10 +248,7 @@ namespace SQLBuilder.Core.FastMember
             private readonly Action<int, object, object> setter;
             private readonly Func<object> ctor;
             private readonly Type type;
-            protected override Type Type
-            {
-                get { return type; }
-            }
+            protected override Type Type => type;
             public DelegateAccessor(Dictionary<string, int> map, Func<int, object, object> getter, Action<int, object, object> setter, Func<object> ctor, Type type)
             {
                 this.map = map;
@@ -262,27 +257,25 @@ namespace SQLBuilder.Core.FastMember
                 this.ctor = ctor;
                 this.type = type;
             }
-            public override bool CreateNewSupported { get { return ctor != null; } }
-            public override object CreateNew()
-            {
-                return ctor != null ? ctor() : base.CreateNew();
-            }
+            public override bool CreateNewSupported => ctor != null;
+            public override object CreateNew() => ctor != null ? ctor() : base.CreateNew();
             public override object this[object target, string name]
             {
                 get
                 {
                     int index;
                     if (map.TryGetValue(name, out index)) return getter(index, target);
-                    else throw new ArgumentOutOfRangeException("name");
+                    else throw new ArgumentOutOfRangeException(nameof(name));
                 }
                 set
                 {
                     int index;
                     if (map.TryGetValue(name, out index)) setter(index, target, value);
-                    else throw new ArgumentOutOfRangeException("name");
+                    else throw new ArgumentOutOfRangeException(nameof(name));
                 }
             }
         }
+
         private static bool IsFullyPublic(Type type, PropertyInfo[] props, bool allowNonPublicAccessors)
         {
             while (type.IsNestedPublic) type = type.DeclaringType;
@@ -299,6 +292,7 @@ namespace SQLBuilder.Core.FastMember
 
             return true;
         }
+
         static TypeAccessor CreateNew(Type type, bool allowNonPublicAccessors)
         {
             if (typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type))
@@ -308,8 +302,8 @@ namespace SQLBuilder.Core.FastMember
 
             PropertyInfo[] props = type.GetTypeAndInterfaceProperties(BindingFlags.Public | BindingFlags.Instance);
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            Dictionary<string, int> map = new Dictionary<string, int>();
-            List<MemberInfo> members = new List<MemberInfo>(props.Length + fields.Length);
+            Dictionary<string, int> map = new();
+            List<MemberInfo> members = new(props.Length + fields.Length);
             int i = 0;
             foreach (var prop in props)
             {
@@ -319,7 +313,13 @@ namespace SQLBuilder.Core.FastMember
                     members.Add(prop);
                 }
             }
-            foreach (var field in fields) if (!map.ContainsKey(field.Name)) { map.Add(field.Name, i++); members.Add(field); }
+
+            foreach (var field in fields)
+                if (!map.ContainsKey(field.Name))
+                { 
+                    map.Add(field.Name, i++); 
+                    members.Add(field);
+                }
 
             ConstructorInfo ctor = null;
             if (type.IsClass && !type.IsAbstract)
@@ -351,7 +351,7 @@ namespace SQLBuilder.Core.FastMember
             // note this region is synchronized; only one is being created at a time so we don't need to stress about the builders
             if (assembly == null)
             {
-                AssemblyName name = new AssemblyName("FastMember_dynamic");
+                AssemblyName name = new("FastMember_dynamic");
                 assembly = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
                 module = assembly.DefineDynamicModule(name.Name);
             }

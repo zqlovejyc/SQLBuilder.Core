@@ -6,6 +6,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using SQLBuilder.Core.Extensions;
 
 namespace SQLBuilder.Core.FastMember
 {

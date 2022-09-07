@@ -103,6 +103,7 @@ namespace SQLBuilder.Core.FastMember
         object current;
 
 
+        #pragma warning disable 1591
         public override int Depth
         {
             get { return 0; }

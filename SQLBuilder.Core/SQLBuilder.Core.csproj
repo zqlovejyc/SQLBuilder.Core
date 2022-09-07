@@ -30,7 +30,6 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
 		<LangVersion>latest</LangVersion>
-		<NoWarn>$(NoWarn);CS1591;</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

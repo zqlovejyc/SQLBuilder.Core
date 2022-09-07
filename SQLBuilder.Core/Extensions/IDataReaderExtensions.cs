@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
-using System.Reflection;
+using SQLBuilder.Core.FastMember;
 
 namespace SQLBuilder.Core.Extensions
 {
@@ -70,6 +70,10 @@ namespace SQLBuilder.Core.Extensions
             if (type.IsDictionaryType() || (type.IsDynamicOrObjectType() && firstType.IsDictionaryType()))
             {
                 var dic = first as IDictionary<string, object>;
+
+                if (dic.IsNullOrEmpty())
+                    return default;
+
                 dt.Columns.AddRange(dic.Select(o => new DataColumn(o.Key, o.Value?.GetType().GetCoreType() ?? typeof(object))).ToArray());
 
                 var dics = @this.Select(o => o as IDictionary<string, object>);
@@ -78,22 +82,24 @@ namespace SQLBuilder.Core.Extensions
             }
             else
             {
-                var props = type.IsDynamicOrObjectType()
-                    ? firstType.GetProperties()
-                    : typeof(T).GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+                var accessor = TypeAccessor.Create(firstType);
+                var members = accessor.GetMembers();
 
-                foreach (var prop in props)
-                    dt.Columns.Add(prop.Name, prop?.PropertyType.GetCoreType() ?? typeof(object));
+                if (members.IsNullOrEmpty())
+                    return default;
+
+                foreach (var member in members)
+                    dt.Columns.Add(member.Name, member.Type.GetCoreType());
 
                 foreach (var item in @this)
                 {
-                    var values = new object[props.Length];
-                    for (var i = 0; i < props.Length; i++)
+                    var values = new object[members.Count];
+                    for (var i = 0; i < members.Count; i++)
                     {
-                        if (!props[i].CanRead)
+                        if (!members[i].CanRead)
                             continue;
 
-                        values[i] = props[i].GetValue(item, null);
+                        values[i] = accessor[item, members[i].Name];
                     }
                     dt.Rows.Add(values);
                 }
@@ -249,18 +255,24 @@ namespace SQLBuilder.Core.Extensions
                 for (int i = 0; i < @this.FieldCount; i++)
                     fields.Add(@this.GetName(i));
 
+                var accessor = TypeAccessor.Create(typeof(T));
+                var members = accessor.GetMembers();
+
+                if (members.IsNullOrEmpty())
+                    yield break;
+
                 while (@this.Read())
                 {
                     var instance = Activator.CreateInstance<T>();
-                    var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-                    foreach (var p in props)
+                  
+                    foreach (var member in members)
                     {
-                        if (!p.CanWrite)
+                        if (!member.CanWrite)
                             continue;
 
-                        var field = fields.Where(o => o.EqualIgnoreCase(p.Name)).FirstOrDefault();
+                        var field = fields.FirstOrDefault(o => o.EqualIgnoreCase(member.Name));
                         if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
-                            p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
+                            accessor[instance, member.Name] = @this[field].ToSafeValue(member.Type);
                     }
                     yield return instance;
                 }
@@ -352,18 +364,24 @@ namespace SQLBuilder.Core.Extensions
                         for (int i = 0; i < @this.FieldCount; i++)
                             fields.Add(@this.GetName(i));
 
+                        var accessor = TypeAccessor.Create(typeof(T));
+                        var members = accessor.GetMembers();
+
+                        if (members.IsNullOrEmpty())
+                            return result;
+
                         while (@this.Read())
                         {
                             var instance = Activator.CreateInstance<T>();
-                            var props = instance.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
-                            foreach (var p in props)
+
+                            foreach (var member in members)
                             {
-                                if (!p.CanWrite)
+                                if (!member.CanWrite)
                                     continue;
 
-                                var field = fields.Where(o => o.EqualIgnoreCase(p.Name)).FirstOrDefault();
+                                var field = fields.FirstOrDefault(o => o.EqualIgnoreCase(member.Name));
                                 if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
-                                    p.SetValue(instance, @this[field].ToSafeValue(p.PropertyType), null);
+                                    accessor[instance, member.Name] = @this[field].ToSafeValue(member.Type);
                             }
 
                             list.Add(instance);

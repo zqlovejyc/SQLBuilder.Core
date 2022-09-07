@@ -19,10 +19,12 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.FastMember;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SQLBuilder.Core.Expressions
 {
@@ -972,25 +974,41 @@ namespace SQLBuilder.Core.Expressions
                 var i = 0;
                 var fields = new List<string>();
 
+                TypeAccessor accessor = null;
+                MemberSet members = null;
+
                 foreach (var item in collection)
                 {
+                    if (item.IsNull())
+                        continue;
+
+                    if (accessor.IsNull())
+                    {
+                        accessor = TypeAccessor.Create(item.GetType());
+                        if (accessor.IsNull())
+                            continue;
+
+                        members = accessor.GetMembers();
+                        if (members.IsNullOrEmpty())
+                            continue;
+                    }
+
                     if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                         sqlWrapper.Append("(");
 
                     if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
                         sqlWrapper.Append(" UNION ALL SELECT ");
 
-                    var properties = item?.GetType().GetProperties();
-                    foreach (var p in properties)
+                    foreach (var member in members)
                     {
-                        var type = p.DeclaringType.IsAnonymousType() ?
+                        var type = member.DeclaringType.IsAnonymousType() ?
                             sqlWrapper.DefaultType :
-                            p.DeclaringType;
+                            member.DeclaringType;
 
-                        var columnInfo = sqlWrapper.GetColumnInfo(type, p);
+                        var columnInfo = sqlWrapper.GetColumnInfo(type, member.MemberInfo);
                         if (columnInfo.IsInsert)
                         {
-                            var value = p.GetValue(item, null);
+                            var value = accessor[item, member.Name];
                             if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                             {
                                 sqlWrapper.AddDbParameter(value, columnInfo.DataType);
@@ -1100,7 +1118,7 @@ namespace SQLBuilder.Core.Expressions
                     SqlExpressionProvider.OrderBy(Expression.Constant(item), sqlWrapper);
 
                     if (i <= orders.Length - 1)
-                        sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                        sqlWrapper += $" {(orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                     else if (!item.ToString().ContainsIgnoreCase("ASC", "DESC"))
                         sqlWrapper += " ASC,";
                     else

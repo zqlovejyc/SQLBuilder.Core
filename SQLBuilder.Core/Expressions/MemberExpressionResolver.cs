@@ -19,6 +19,7 @@
 using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
+using SQLBuilder.Core.FastMember;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,19 @@ namespace SQLBuilder.Core.Expressions
             else
                 objectArray.Add(convertRes);
 
+            var objectType = objectArray[0].GetType();
+            var isDictionaryType = objectType.IsDictionaryType();
+
+            TypeAccessor accessor;
+            if (!isDictionaryType)
+                accessor = TypeAccessor.Create(objectType);
+            else
+                accessor = TypeAccessor.Create(sqlWrapper.DefaultType);
+
+            var members = accessor.GetMembers();
+            if (members.IsNullOrEmpty())
+                return sqlWrapper;
+
             for (var i = 0; i < objectArray.Count; i++)
             {
                 if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
@@ -64,38 +78,31 @@ namespace SQLBuilder.Core.Expressions
                 if (i > 0 && sqlWrapper.DatabaseType == DatabaseType.Oracle)
                     sqlWrapper.Append(" UNION ALL SELECT ");
 
-                var objectType = objectArray[i]?.GetType();
-                var isDictionaryType = objectType.IsDictionaryType();
-
-                PropertyInfo[] properties;
                 IDictionary<string, object> objectDic = null;
 
-                if (!isDictionaryType)
-                    properties = objectType?.GetProperties();
-                else
+                if (isDictionaryType)
                 {
-                    properties = sqlWrapper.DefaultType.GetProperties();
                     objectDic = objectArray[i] as IDictionary<string, object>;
                 }
 
-                foreach (var property in properties)
+                foreach (var member in members)
                 {
-                    if (isDictionaryType && !objectDic.Any(x => x.Key.EqualIgnoreCase(property.Name)))
+                    if (isDictionaryType && !objectDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
                         continue;
 
-                    var type = property.DeclaringType.IsAnonymousType() || isDictionaryType ?
+                    var type = member.DeclaringType.IsAnonymousType() || isDictionaryType ?
                         sqlWrapper.DefaultType :
-                        property.DeclaringType;
+                        member.DeclaringType;
 
-                    var columnInfo = sqlWrapper.GetColumnInfo(type, property);
+                    var columnInfo = sqlWrapper.GetColumnInfo(type, member.MemberInfo);
                     if (columnInfo.IsInsert)
                     {
                         object value;
 
                         if (isDictionaryType)
-                            value = objectDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(property.Name)).Value;
+                            value = objectDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(member.Name)).Value;
                         else
-                            value = property.GetValue(objectArray[i], null);
+                            value = accessor[objectArray[i], member.Name];
 
                         if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                         {
@@ -140,47 +147,52 @@ namespace SQLBuilder.Core.Expressions
             if (convertRes.IsNull())
                 return sqlWrapper;
 
-            var convertType = convertRes?.GetType();
+            var convertType = convertRes.GetType();
             var isDictionaryType = convertType.IsDictionaryType();
 
-            PropertyInfo[] properties;
             IDictionary<string, object> convertDic = null;
 
+            TypeAccessor accessor;
+
             if (!isDictionaryType)
-                properties = convertType?.GetProperties();
+                accessor = TypeAccessor.Create(convertType);
             else
             {
-                properties = sqlWrapper.DefaultType.GetProperties();
+                accessor = TypeAccessor.Create(sqlWrapper.DefaultType);
                 convertDic = convertRes as IDictionary<string, object>;
+
+                if (convertDic.IsNullOrEmpty())
+                    return sqlWrapper;
             }
 
-            if (properties.IsNotNullOrEmpty())
+            var members = accessor.GetMembers();
+            if (members.IsNullOrEmpty())
+                return sqlWrapper;
+
+            foreach (var member in members)
             {
-                foreach (var item in properties)
+                if (isDictionaryType && !convertDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
+                    continue;
+
+                var type = member.DeclaringType.IsAnonymousType() || isDictionaryType ?
+                    sqlWrapper.DefaultType :
+                    member.DeclaringType;
+
+                var columnInfo = sqlWrapper.GetColumnInfo(type, member.MemberInfo);
+                if (columnInfo.IsUpdate)
                 {
-                    if (isDictionaryType && !convertDic.Any(x => x.Key.EqualIgnoreCase(item.Name)))
-                        continue;
+                    object value;
 
-                    var type = item.DeclaringType.IsAnonymousType() || isDictionaryType ?
-                        sqlWrapper.DefaultType :
-                        item.DeclaringType;
+                    if (isDictionaryType)
+                        value = convertDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(member.Name)).Value;
+                    else
+                        value = accessor[convertRes, member.Name];
 
-                    var columnInfo = sqlWrapper.GetColumnInfo(type, item);
-                    if (columnInfo.IsUpdate)
+                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
                     {
-                        object value;
-
-                        if (isDictionaryType)
-                            value = convertDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(item.Name)).Value;
-                        else
-                            value = item.GetValue(convertRes, null);
-
-                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
-                        {
-                            sqlWrapper += columnInfo.ColumnName + " = ";
-                            sqlWrapper.AddDbParameter(value, columnInfo.DataType);
-                            sqlWrapper += ",";
-                        }
+                        sqlWrapper += columnInfo.ColumnName + " = ";
+                        sqlWrapper.AddDbParameter(value, columnInfo.DataType);
+                        sqlWrapper += ",";
                     }
                 }
             }

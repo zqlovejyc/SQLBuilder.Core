@@ -366,7 +366,7 @@ namespace SQLBuilder.Core.Extensions
                         for (int i = 0; i < @this.FieldCount; i++)
                             fields.Add(@this.GetName(i));
 
-                        var accessor = TypeAccessor.Create(typeof(T));
+                        var accessor = TypeAccessor.Create(type);
                         var members = accessor.GetMembers();
 
                         if (members.IsNullOrEmpty())

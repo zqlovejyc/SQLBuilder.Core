@@ -26,6 +26,7 @@ using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Models;
+using SQLBuilder.Core.FastMember;
 
 #region Refrence Alias
 //Table
@@ -711,29 +712,32 @@ namespace SQLBuilder.Core.Entry
         /// 获取列信息
         /// </summary>
         /// <param name="type">类型</param>
-        /// <param name="member">成员</param>
+        /// <param name="memberInfo">成员</param>
         /// <returns>返回表列信息元组</returns>
-        public ColumnInfo GetColumnInfo(Type type, MemberInfo member)
+        public ColumnInfo GetColumnInfo(Type type, MemberInfo memberInfo)
         {
             var format = false;
             var columnInfo = new ColumnInfo();
 
             //判断列成员信息是否为空
-            if (member == null)
+            if (memberInfo == null)
                 return columnInfo;
 
-            //反射获取属性
-            var props = type.GetProperties();
+            var accessor = TypeAccessor.Create(type);
+            var members = accessor.GetMembers();
+
+            if (members.IsNullOrEmpty())
+                return columnInfo;
 
             //判断列是否含有Column特性
-            var hasColumnAttribute = props.Any(x => x.ContainsAttribute<CusColumnAttribute>());
+            var hasColumnAttribute = members.Any(x => x.IsDefined<CusColumnAttribute>());
             if (!hasColumnAttribute)
-                hasColumnAttribute = props.Any(x => x.ContainsAttribute<SysColumnAttribute>());
+                hasColumnAttribute = members.Any(x => x.IsDefined<SysColumnAttribute>());
 
             //含有Column特性
             if (hasColumnAttribute)
             {
-                if (member.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
+                if (memberInfo.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cca)
                 {
                     columnInfo.ColumnName = cca.Name;
                     columnInfo.IsInsert = cca.Insert;
@@ -741,14 +745,14 @@ namespace SQLBuilder.Core.Entry
 
                     format = cca.Format;
                 }
-                else if (member.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
+                else if (memberInfo.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sca)
                     columnInfo.ColumnName = sca.Name;
                 else
                 {
-                    var prop = props.Where(x => x.Name == member.Name).FirstOrDefault();
-                    if (prop != null)
+                    var member = members.Where(x => x.Name == memberInfo.Name).FirstOrDefault();
+                    if (member != null)
                     {
-                        if (prop.GetFirstOrDefaultAttribute<CusColumnAttribute>() is CusColumnAttribute cus)
+                        if (member.GetAttribute<CusColumnAttribute>(true) is CusColumnAttribute cus)
                         {
                             columnInfo.ColumnName = cus.Name;
                             columnInfo.IsInsert = cus.Insert;
@@ -756,24 +760,24 @@ namespace SQLBuilder.Core.Entry
 
                             format = cus.Format;
                         }
-                        else if (prop.GetFirstOrDefaultAttribute<SysColumnAttribute>() is SysColumnAttribute sys)
+                        else if (member.GetAttribute<SysColumnAttribute>(true) is SysColumnAttribute sys)
                             columnInfo.ColumnName = sys.Name;
                     }
                 }
             }
 
             //列名
-            columnInfo.ColumnName ??= member.Name;
+            columnInfo.ColumnName ??= memberInfo.Name;
 
             //判断列是否含有key特性
-            var hasKeyAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
+            var hasKeyAttribute = members.Any(x => x.IsDefined<CusKeyAttribute>());
             if (!hasKeyAttribute)
-                hasKeyAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
+                hasKeyAttribute = members.Any(x => x.IsDefined<SysKeyAttribute>());
 
             //含有Key特性
             if (hasKeyAttribute)
             {
-                if (member.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
+                if (memberInfo.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
                 {
                     columnInfo.IsUpdate = false;
                     columnInfo.OracleSequenceName = cka.OracleSequenceName;
@@ -785,12 +789,12 @@ namespace SQLBuilder.Core.Entry
                     if (cka.Name.IsNotNullOrEmpty() && cka.Name != columnInfo.ColumnName)
                         columnInfo.ColumnName = cka.Name;
                 }
-                else if (member.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                else if (memberInfo.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
                 {
                     columnInfo.IsUpdate = false;
 
                     //判断是否自增
-                    if (member.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dga)
+                    if (memberInfo.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dga)
                     {
                         if (dga.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
                             columnInfo.IsInsert = false;
@@ -798,10 +802,10 @@ namespace SQLBuilder.Core.Entry
                 }
                 else
                 {
-                    var prop = props.Where(x => x.Name == member.Name).FirstOrDefault();
-                    if (prop != null)
+                    var member = members.Where(x => x.Name == memberInfo.Name).FirstOrDefault();
+                    if (member != null)
                     {
-                        if (prop.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cus)
+                        if (member.GetAttribute<CusKeyAttribute>(true) is CusKeyAttribute cus)
                         {
                             columnInfo.IsUpdate = false;
                             columnInfo.OracleSequenceName = cus.OracleSequenceName;
@@ -813,12 +817,12 @@ namespace SQLBuilder.Core.Entry
                             if (cus.Name.IsNotNullOrEmpty() && cus.Name != columnInfo.ColumnName)
                                 columnInfo.ColumnName = cus.Name;
                         }
-                        else if (prop.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute)
+                        else if (member.GetAttribute<SysKeyAttribute>(true) is SysKeyAttribute)
                         {
                             columnInfo.IsUpdate = false;
 
                             //判断是否自增
-                            if (prop.GetFirstOrDefaultAttribute<DatabaseGeneratedAttribute>() is DatabaseGeneratedAttribute dg)
+                            if (member.GetAttribute<DatabaseGeneratedAttribute>(true) is DatabaseGeneratedAttribute dg)
                             {
                                 if (dg.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity)
                                     columnInfo.IsInsert = false;
@@ -829,17 +833,17 @@ namespace SQLBuilder.Core.Entry
             }
 
             //判断是否含有DataType特性
-            var hasDataTypeAttribute = props.Any(x => x.ContainsAttribute<DataTypeAttribute>());
+            var hasDataTypeAttribute = members.Any(x => x.IsDefined<DataTypeAttribute>());
             if (hasDataTypeAttribute)
             {
-                if (member.GetFirstOrDefaultAttribute<DataTypeAttribute>() is DataTypeAttribute dta)
+                if (memberInfo.GetFirstOrDefaultAttribute<DataTypeAttribute>() is DataTypeAttribute dta)
                     columnInfo.DataType = dta;
                 else
                 {
-                    var prop = props.Where(x => x.Name == member.Name).FirstOrDefault();
-                    if (prop != null)
+                    var member = members.Where(x => x.Name == memberInfo.Name).FirstOrDefault();
+                    if (member != null)
                     {
-                        if (prop.GetFirstOrDefaultAttribute<DataTypeAttribute>() is DataTypeAttribute propDta)
+                        if (member.GetAttribute<DataTypeAttribute>(true) is DataTypeAttribute propDta)
                             columnInfo.DataType = propDta;
                     }
                 }
@@ -877,27 +881,32 @@ namespace SQLBuilder.Core.Entry
         public List<ColumnInfo> GetPrimaryKey(Type type)
         {
             var columnInfos = new List<ColumnInfo>();
-            var props = type.GetProperties();
 
-            var hasKeyAttribute = props.Any(x => x.ContainsAttribute<CusKeyAttribute>());
+            var accessor = TypeAccessor.Create(type);
+            var members = accessor.GetMembers();
+
+            if (members.IsNullOrEmpty())
+                return columnInfos;
+
+            var hasKeyAttribute = members.Any(x => x.IsDefined<CusKeyAttribute>());
             if (!hasKeyAttribute)
-                hasKeyAttribute = props.Any(x => x.ContainsAttribute<SysKeyAttribute>());
+                hasKeyAttribute = members.Any(x => x.IsDefined<SysKeyAttribute>());
 
             if (!hasKeyAttribute)
                 return columnInfos;
 
-            var properties = props.Where(x => x.ContainsAttribute<CusKeyAttribute>()).ToList();
+            var properties = members.Where(x => x.IsDefined<CusKeyAttribute>()).ToList();
             if (properties.Count == 0)
-                properties = props.Where(x => x.ContainsAttribute<SysKeyAttribute>()).ToList();
+                properties = members.Where(x => x.IsDefined<SysKeyAttribute>()).ToList();
 
             if (properties.Count == 0)
                 return columnInfos;
 
-            foreach (var property in properties)
+            foreach (var member in members)
             {
-                var columnInfo = new ColumnInfo { PropertyName = property.Name };
+                var columnInfo = new ColumnInfo { PropertyName = member.Name };
 
-                if (property.GetFirstOrDefaultAttribute<CusKeyAttribute>() is CusKeyAttribute cka)
+                if (member.GetAttribute<CusKeyAttribute>(true) is CusKeyAttribute cka)
                 {
                     columnInfo.ColumnName = cka.Name ?? columnInfo.PropertyName;
                     columnInfo.OracleSequenceName = cka.OracleSequenceName;
@@ -905,12 +914,12 @@ namespace SQLBuilder.Core.Entry
                     if (cka.Format)
                         _formatColumns.Add(columnInfo.ColumnName);
                 }
-                else if (property.GetFirstOrDefaultAttribute<SysKeyAttribute>() is SysKeyAttribute ska)
+                else if (member.GetAttribute<SysKeyAttribute>(true) is SysKeyAttribute ska)
                 {
                     columnInfo.ColumnName = columnInfo.PropertyName;
                 }
 
-                if (property.GetFirstOrDefaultAttribute<DataTypeAttribute>() is DataTypeAttribute dta)
+                if (member.GetAttribute<DataTypeAttribute>(true) is DataTypeAttribute dta)
                     columnInfo.DataType = dta;
 
                 columnInfo.ColumnName = this.GetColumnName(columnInfo.ColumnName);

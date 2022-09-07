@@ -117,19 +117,26 @@ namespace SQLBuilder.Core.FastMember
         /// <summary>
         /// Is the attribute specified defined on this type
         /// </summary>
-        public bool IsDefined(Type attributeType)
-        {
-            if (attributeType == null)
-                throw new ArgumentNullException(nameof(attributeType));
+        public bool IsDefined(Type attributeType) =>
+            Attribute.IsDefined(member, attributeType);
 
-            return Attribute.IsDefined(member, attributeType);
-        }
+        /// <summary>
+        /// Is the attribute specified defined on this type
+        /// </summary>
+        public bool IsDefined<T>() where T : Attribute
+            => Attribute.IsDefined(member, typeof(T));
 
         /// <summary>
         /// Getting Attribute Type
         /// </summary>
         public Attribute GetAttribute(Type attributeType, bool inherit)
             => Attribute.GetCustomAttribute(member, attributeType, inherit);
+
+        /// <summary>
+        /// Getting Attribute Type
+        /// </summary>
+        public Attribute GetAttribute<T>(bool inherit) where T : Attribute
+            => Attribute.GetCustomAttribute(member, typeof(T), inherit);
 
         /// <summary>
         /// Property Can Write

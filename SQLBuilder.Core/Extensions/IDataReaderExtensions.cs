@@ -246,7 +246,7 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>强类型实体集合</returns>
         public static IEnumerable<T> ToEntities<T>(this IDataReader @this)
         {
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 yield break;
 
             using (@this)
@@ -261,18 +261,29 @@ namespace SQLBuilder.Core.Extensions
                 if (members.IsNullOrEmpty())
                     yield break;
 
+                var memberMap = members.ToDictionary(k => k.Name, v => v, StringComparer.OrdinalIgnoreCase);
+
                 while (@this.Read())
                 {
                     if (accessor.CreateNew() is T instance)
                     {
-                        foreach (var member in members)
+                        foreach (var field in fields)
                         {
-                            if (!member.CanWrite)
+                            if (field.IsNullOrEmpty())
                                 continue;
 
-                            var field = fields.FirstOrDefault(o => o.EqualIgnoreCase(member.Name));
-                            if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
-                                accessor[instance, member.Name] = @this[field].ToSafeValue(member.Type);
+                            var fieldValue = @this[field];
+
+                            if (fieldValue.IsNull())
+                                continue;
+
+                            if (memberMap.TryGetValue(field, out var member))
+                            {
+                                if (!member.CanWrite)
+                                    continue;
+
+                                accessor[instance, member.Name] = fieldValue.ToSafeValue(member.Type);
+                            }
                         }
 
                         yield return instance;
@@ -330,7 +341,7 @@ namespace SQLBuilder.Core.Extensions
         {
             var result = new List<List<T>>();
 
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 return result;
 
             using (@this)
@@ -372,18 +383,29 @@ namespace SQLBuilder.Core.Extensions
                         if (members.IsNullOrEmpty())
                             return result;
 
+                        var memberMap = members.ToDictionary(k => k.Name, v => v, StringComparer.OrdinalIgnoreCase);
+
                         while (@this.Read())
                         {
                             if (accessor.CreateNew() is T instance)
                             {
-                                foreach (var member in members)
+                                foreach (var field in fields)
                                 {
-                                    if (!member.CanWrite)
+                                    if (field.IsNullOrEmpty())
                                         continue;
 
-                                    var field = fields.FirstOrDefault(o => o.EqualIgnoreCase(member.Name));
-                                    if (field.IsNotNullOrEmpty() && @this[field].IsNotNull())
-                                        accessor[instance, member.Name] = @this[field].ToSafeValue(member.Type);
+                                    var fieldValue = @this[field];
+
+                                    if (fieldValue.IsNull())
+                                        continue;
+
+                                    if (memberMap.TryGetValue(field, out var member))
+                                    {
+                                        if (!member.CanWrite)
+                                            continue;
+
+                                        accessor[instance, member.Name] = fieldValue.ToSafeValue(member.Type);
+                                    }
                                 }
 
                                 list.Add(instance);

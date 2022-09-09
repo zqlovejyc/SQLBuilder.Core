@@ -40,7 +40,7 @@ namespace SQLBuilder.Core.Extensions
         {
             var table = new DataTable();
 
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 return table;
 
             using (@this)
@@ -119,7 +119,7 @@ namespace SQLBuilder.Core.Extensions
         {
             var ds = new DataSet();
 
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 return ds;
 
             using (@this)
@@ -169,7 +169,7 @@ namespace SQLBuilder.Core.Extensions
         {
             var res = new List<dynamic>();
 
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 return res;
 
             using (@this)
@@ -207,7 +207,7 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>Dictionary集合</returns>
         public static IEnumerable<Dictionary<string, object>> ToDictionaries(this IDataReader @this)
         {
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 yield break;
 
             using (@this)
@@ -302,7 +302,7 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>T类型集合</returns>
         public static List<T> ToList<T>(this IDataReader @this)
         {
-            if (@this.IsNull() || @this.IsClosed)
+            if (@this.IsNull() || @this.IsClosed || @this.FieldCount == 0)
                 return default;
 
             List<T> list = null;

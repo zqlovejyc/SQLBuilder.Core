@@ -41,12 +41,12 @@ namespace SQLBuilder.Core.Expressions
         {
             for (int i = 0; i < expression.Members.Count; i++)
             {
-                var m = expression.Members[i];
-                var t = m.DeclaringType.IsAnonymousType() ?
+                var member = expression.Members[i];
+                var type = member.DeclaringType.IsAnonymousType() ?
                     sqlWrapper.DefaultType :
-                    m.DeclaringType;
+                    member.DeclaringType;
 
-                var columnInfo = sqlWrapper.GetColumnInfo(t, m);
+                var columnInfo = GetColumnInfo(type, member, sqlWrapper);
                 if (columnInfo.IsUpdate)
                 {
                     var value = expression.Arguments[i]?.ToObject();
@@ -80,12 +80,12 @@ namespace SQLBuilder.Core.Expressions
             var fields = new List<string>();
             for (int i = 0; i < expression.Members?.Count; i++)
             {
-                var m = expression.Members[i];
-                var t = m.DeclaringType.IsAnonymousType() ?
+                var member = expression.Members[i];
+                var type = member.DeclaringType.IsAnonymousType() ?
                     sqlWrapper.DefaultType :
-                    m.DeclaringType;
+                    member.DeclaringType;
 
-                var columnInfo = sqlWrapper.GetColumnInfo(t, m);
+                var columnInfo = GetColumnInfo(type, member, sqlWrapper);
                 if (columnInfo.IsInsert)
                 {
                     var value = expression.Arguments[i]?.ToObject();
@@ -343,7 +343,7 @@ namespace SQLBuilder.Core.Expressions
                 SqlExpressionProvider.OrderBy(expression.Arguments[i], sqlWrapper);
 
                 if (i <= orders.Length - 1)
-                    sqlWrapper += $" { (orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
+                    sqlWrapper += $" {(orders[i] == OrderType.Descending ? "DESC" : "ASC")},";
                 else
                     sqlWrapper += " ASC,";
             }

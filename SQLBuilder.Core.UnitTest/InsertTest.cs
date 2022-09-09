@@ -353,7 +353,7 @@ namespace SQLBuilder.Core.UnitTest
                             .Insert<UserInfo>(() =>
                                 new List<UserInfo>
                                 {
-                                    new UserInfo{ Name = "张三", Sex = 2 },
+                                    new UserInfo { Name = "张三", Sex = 2 },
                                     new UserInfo { Name = "张三", Sex = 2 }
                                 },
                                 isEnableNullValue: true);

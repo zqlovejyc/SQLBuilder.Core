@@ -20,6 +20,8 @@ using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.FastMember;
+using SQLBuilder.Core.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -77,7 +79,7 @@ namespace SQLBuilder.Core.Expressions
                             sqlWrapper.DefaultType :
                             member.DeclaringType;
 
-                        var columnInfo = sqlWrapper.GetColumnInfo(type, member.MemberInfo);
+                        var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                         if (columnInfo.IsInsert)
                         {
                             var value = accessor[item, member.Name];

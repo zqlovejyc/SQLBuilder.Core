@@ -52,7 +52,7 @@ namespace SQLBuilder.Core.Expressions
                         if (tableAlias.IsNotNullOrEmpty())
                             tableAlias += ".";
 
-                        var fieldName = tableAlias + sqlWrapper.GetColumnInfo(type, memberExpr.Member).ColumnName;
+                        var fieldName = tableAlias + GetColumnInfo(type, memberExpr.Member, sqlWrapper).ColumnName;
 
                         sqlWrapper.AddField(fieldName);
                     }
@@ -102,7 +102,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var columnInfo = sqlWrapper.GetColumnInfo(type, m.Member);
+                var columnInfo = GetColumnInfo(type, m.Member, sqlWrapper);
                 if (columnInfo.IsInsert)
                 {
                     var value = m.Expression.ToObject();
@@ -145,7 +145,7 @@ namespace SQLBuilder.Core.Expressions
                     sqlWrapper.DefaultType :
                     m.Member.DeclaringType;
 
-                var columnInfo = sqlWrapper.GetColumnInfo(type, m.Member);
+                var columnInfo = GetColumnInfo(type, m.Member, sqlWrapper);
                 if (columnInfo.IsUpdate)
                 {
                     var value = m.Expression.ToObject();

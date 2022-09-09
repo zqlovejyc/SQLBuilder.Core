@@ -1005,7 +1005,7 @@ namespace SQLBuilder.Core.Expressions
                             sqlWrapper.DefaultType :
                             member.DeclaringType;
 
-                        var columnInfo = sqlWrapper.GetColumnInfo(type, member.MemberInfo);
+                        var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                         if (columnInfo.IsInsert)
                         {
                             var value = accessor[item, member.Name];

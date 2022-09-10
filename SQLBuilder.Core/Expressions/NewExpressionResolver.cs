@@ -42,9 +42,9 @@ namespace SQLBuilder.Core.Expressions
             for (int i = 0; i < expression.Members.Count; i++)
             {
                 var member = expression.Members[i];
-                var type = member.DeclaringType.IsAnonymousType() ?
-                    sqlWrapper.DefaultType :
-                    member.DeclaringType;
+                var type = member.DeclaringType.IsAnonymousType()
+                    ? sqlWrapper.DefaultType
+                    : member.DeclaringType;
 
                 var columnInfo = GetColumnInfo(type, member, sqlWrapper);
                 if (columnInfo.IsUpdate)
@@ -81,9 +81,9 @@ namespace SQLBuilder.Core.Expressions
             for (int i = 0; i < expression.Members?.Count; i++)
             {
                 var member = expression.Members[i];
-                var type = member.DeclaringType.IsAnonymousType() ?
-                    sqlWrapper.DefaultType :
-                    member.DeclaringType;
+                var type = member.DeclaringType.IsAnonymousType()
+                    ? sqlWrapper.DefaultType
+                    : member.DeclaringType;
 
                 var columnInfo = GetColumnInfo(type, member, sqlWrapper);
                 if (columnInfo.IsInsert)

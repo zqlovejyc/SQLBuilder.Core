@@ -75,9 +75,9 @@ namespace SQLBuilder.Core.Expressions
 
                     foreach (var member in members)
                     {
-                        var type = member.DeclaringType.IsAnonymousType() ?
-                            sqlWrapper.DefaultType :
-                            member.DeclaringType;
+                        var type = member.DeclaringType.IsAnonymousType()
+                            ? sqlWrapper.DefaultType
+                            : member.DeclaringType;
 
                         var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                         if (columnInfo.IsInsert)

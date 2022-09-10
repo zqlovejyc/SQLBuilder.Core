@@ -141,9 +141,9 @@ namespace SQLBuilder.Core.Expressions
         {
             foreach (MemberAssignment ma in expression.Bindings)
             {
-                var type = ma.Member.DeclaringType.IsAnonymousType() ?
-                    sqlWrapper.DefaultType :
-                    ma.Member.DeclaringType;
+                var type = ma.Member.DeclaringType.IsAnonymousType()
+                    ? sqlWrapper.DefaultType
+                    : ma.Member.DeclaringType;
 
                 var columnInfo = GetColumnInfo(type, ma.Member, sqlWrapper);
                 if (columnInfo.IsUpdate)

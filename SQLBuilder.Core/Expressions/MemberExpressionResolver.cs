@@ -87,7 +87,7 @@ namespace SQLBuilder.Core.Expressions
 
                 foreach (var member in members)
                 {
-                    if (isDictionaryType && !objectDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
+                    if (isDictionaryType && !objectDic.ContainsKey(member.Name, true))
                         continue;
 
                     var type = member.DeclaringType.IsAnonymousType() || isDictionaryType
@@ -171,7 +171,7 @@ namespace SQLBuilder.Core.Expressions
 
             foreach (var member in members)
             {
-                if (isDictionaryType && !convertDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
+                if (isDictionaryType && !convertDic.ContainsKey(member.Name, true))
                     continue;
 
                 var type = member.DeclaringType.IsAnonymousType() || isDictionaryType

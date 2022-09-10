@@ -675,5 +675,25 @@ namespace SQLBuilder.Core.Extensions
             return @this.FirstOrDefault(o => match(o.Key)).Value;
         }
         #endregion
+
+        #region ContainsKey
+        /// <summary>
+        /// Determines whether the <see cref="IDictionary{Tkey, TValue}"/> contains an element with the specified key.
+        /// </summary>
+        /// <param name="this">The target dictionary</param>
+        /// <param name="key">The key to be checked does it exist</param>
+        /// <param name="ignoreCase">The true ignore case of the key, otherwise not ignore case.</param>
+        /// <returns></returns>
+        public static bool ContainsKey<T>(this IDictionary<string, T> @this, string key, bool ignoreCase)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (!ignoreCase)
+                return @this.ContainsKey(key);
+
+            return @this.Keys.Any(k => k.EqualIgnoreCase(key));
+        }
+        #endregion
     }
 }

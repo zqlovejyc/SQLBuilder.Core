@@ -841,7 +841,7 @@ namespace SQLBuilder.Core.Expressions
                 method = method.GetGenericMethodDefinition();
 
             //匹配到方法
-            if (methods.TryGetValue(method.Name, out Action<MethodCallExpression, SqlWrapper> handler))
+            if (methods.TryGetValue(method.Name, out var handler))
                 return handler;
 
             return null;

@@ -100,7 +100,7 @@ namespace SQLBuilder.Core.Expressions
                         object value;
 
                         if (isDictionaryType)
-                            value = objectDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(member.Name)).Value;
+                            value = objectDic.TryGetValue(member.Name, true, null);
                         else
                             value = accessor[objectArray[i], member.Name];
 

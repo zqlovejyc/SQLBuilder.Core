@@ -98,15 +98,15 @@ namespace SQLBuilder.Core.Expressions
             var fields = new List<string>();
             foreach (MemberAssignment m in expression.Bindings)
             {
-                var type = m.Member.DeclaringType.IsAnonymousType() ?
-                    sqlWrapper.DefaultType :
-                    m.Member.DeclaringType;
+                var type = m.Member.DeclaringType.IsAnonymousType()
+                    ? sqlWrapper.DefaultType
+                    : m.Member.DeclaringType;
 
                 var columnInfo = GetColumnInfo(type, m.Member, sqlWrapper);
                 if (columnInfo.IsInsert)
                 {
                     var value = m.Expression.ToObject();
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                         if (!fields.Contains(columnInfo.ColumnName))
@@ -139,17 +139,17 @@ namespace SQLBuilder.Core.Expressions
         /// <returns>SqlWrapper</returns>
         public override SqlWrapper Update(MemberInitExpression expression, SqlWrapper sqlWrapper)
         {
-            foreach (MemberAssignment m in expression.Bindings)
+            foreach (MemberAssignment ma in expression.Bindings)
             {
-                var type = m.Member.DeclaringType.IsAnonymousType() ?
+                var type = ma.Member.DeclaringType.IsAnonymousType() ?
                     sqlWrapper.DefaultType :
-                    m.Member.DeclaringType;
+                    ma.Member.DeclaringType;
 
-                var columnInfo = GetColumnInfo(type, m.Member, sqlWrapper);
+                var columnInfo = GetColumnInfo(type, ma.Member, sqlWrapper);
                 if (columnInfo.IsUpdate)
                 {
-                    var value = m.Expression.ToObject();
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    var value = ma.Expression.ToObject();
+                    if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper += columnInfo.ColumnName + " = ";
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);

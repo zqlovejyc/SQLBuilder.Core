@@ -50,7 +50,7 @@ namespace SQLBuilder.Core.Expressions
                 if (columnInfo.IsUpdate)
                 {
                     var value = expression.Arguments[i]?.ToObject();
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper += columnInfo.ColumnName + " = ";
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);
@@ -89,7 +89,7 @@ namespace SQLBuilder.Core.Expressions
                 if (columnInfo.IsInsert)
                 {
                     var value = expression.Arguments[i]?.ToObject();
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                         if (!fields.Contains(columnInfo.ColumnName))

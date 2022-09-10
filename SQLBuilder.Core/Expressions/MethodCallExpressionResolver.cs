@@ -1001,15 +1001,15 @@ namespace SQLBuilder.Core.Expressions
 
                     foreach (var member in members)
                     {
-                        var type = member.DeclaringType.IsAnonymousType() ?
-                            sqlWrapper.DefaultType :
-                            member.DeclaringType;
+                        var type = member.DeclaringType.IsAnonymousType()
+                            ? sqlWrapper.DefaultType
+                            : member.DeclaringType;
 
                         var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                         if (columnInfo.IsInsert)
                         {
                             var value = accessor[item, member.Name];
-                            if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                            if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                             {
                                 sqlWrapper.AddDbParameter(value, columnInfo.DataType);
                                 if (!fields.Contains(columnInfo.ColumnName))

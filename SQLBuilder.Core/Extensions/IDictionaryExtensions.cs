@@ -506,6 +506,25 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
+        /// This method is used to try to get a value in a dictionary if it does exists and ignore case of the key.
+        /// </summary>
+        /// <typeparam name="T">Type of the value</typeparam>
+        /// <param name="this">The collection object</param>
+        /// <param name="key">Key</param>
+        /// <param name="defaultValue">default value if key not exists</param>
+        /// <returns>The value corresponding to the dictionary key otherwise return the defaultValue</returns>
+        public static T TryGetValueIgnoreCase<T>(this IDictionary<string, object> @this, string key, T defaultValue = default)
+        {
+            if (@this.IsNull() || !@this.Keys.Any(k => k.EqualIgnoreCase(key)))
+                return defaultValue;
+
+            if (@this.FirstOrDefault(o => o.Key.EqualIgnoreCase(key)).Value is T t)
+                return t;
+
+            return defaultValue;
+        }
+
+        /// <summary>
         /// This method is used to try to get a value in a dictionary if it does exists.
         /// </summary>
         /// <typeparam name="TKey">Type of the key</typeparam>
@@ -520,6 +539,28 @@ namespace SQLBuilder.Core.Extensions
                 return defaultValue;
 
             return @this[key];
+        }
+
+        /// <summary>
+        /// This method is used to try to get a value in a dictionary if it does exists and ignore case of the key.
+        /// </summary>
+        /// <typeparam name="TKey">Type of the key</typeparam>
+        /// <typeparam name="TValue">Type of the value</typeparam>
+        /// <param name="this">The collection object</param>
+        /// <param name="key">Key</param>
+        /// <param name="defaultValue">default value if key not exists</param>
+        /// <returns>The value corresponding to the dictionary key otherwise return the defaultValue</returns>
+        public static TValue TryGetValueIgnoreCase<TKey, TValue>(this IDictionary<TKey, TValue> @this, TKey key, TValue defaultValue = default)
+        {
+            bool match(TKey k) =>
+                typeof(TKey) == typeof(string)
+                ? string.Equals(k as string, key as string, StringComparison.OrdinalIgnoreCase)
+                : Equals(k, key);
+
+            if (@this.IsNull() || !@this.Keys.Any(match))
+                return defaultValue;
+
+            return @this.FirstOrDefault(o => match(o.Key)).Value;
         }
         #endregion
 
@@ -540,9 +581,7 @@ namespace SQLBuilder.Core.Extensions
             if (@this.TryGetValue(key, out var val) && val is T retval)
                 return retval;
 
-            retval = func();
-
-            @this[key] = retval;
+            @this[key] = retval = func();
 
             return retval;
         }
@@ -564,9 +603,7 @@ namespace SQLBuilder.Core.Extensions
             if (@this.TryGetValue(key, out var val) && val is TValue retval)
                 return retval;
 
-            retval = func();
-
-            @this[key] = retval;
+            @this[key] = retval = func();
 
             return retval;
         }

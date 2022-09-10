@@ -720,7 +720,7 @@ namespace SQLBuilder.Core.Entry
             var columnInfo = new ColumnInfo();
 
             //判断列成员信息是否为空
-            if (memberInfo == null)
+            if (type.IsNull() || memberInfo.IsNull())
                 return columnInfo;
 
             var accessor = TypeAccessor.Create(type);
@@ -881,6 +881,9 @@ namespace SQLBuilder.Core.Entry
         public List<ColumnInfo> GetPrimaryKey(Type type)
         {
             var columnInfos = new List<ColumnInfo>();
+
+            if (type.IsNull())
+                return columnInfos;
 
             var accessor = TypeAccessor.Create(type);
             var members = accessor.GetMembers();

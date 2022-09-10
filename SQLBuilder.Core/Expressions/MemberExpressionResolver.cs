@@ -49,8 +49,7 @@ namespace SQLBuilder.Core.Expressions
             if (convertRes.IsNull())
                 return sqlWrapper;
 
-            if (!convertRes.GetType().IsDictionaryType() &&
-                convertRes is IEnumerable collection)
+            if (!convertRes.GetType().IsDictionaryType() && convertRes is IEnumerable collection)
                 foreach (var item in collection)
                 {
                     objectArray.Add(item);
@@ -91,9 +90,9 @@ namespace SQLBuilder.Core.Expressions
                     if (isDictionaryType && !objectDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
                         continue;
 
-                    var type = member.DeclaringType.IsAnonymousType() || isDictionaryType ?
-                        sqlWrapper.DefaultType :
-                        member.DeclaringType;
+                    var type = member.DeclaringType.IsAnonymousType() || isDictionaryType
+                        ? sqlWrapper.DefaultType
+                        : member.DeclaringType;
 
                     var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                     if (columnInfo.IsInsert)
@@ -105,7 +104,7 @@ namespace SQLBuilder.Core.Expressions
                         else
                             value = accessor[objectArray[i], member.Name];
 
-                        if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                        if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                         {
                             sqlWrapper.AddDbParameter(value, columnInfo.DataType);
 
@@ -175,9 +174,9 @@ namespace SQLBuilder.Core.Expressions
                 if (isDictionaryType && !convertDic.Any(x => x.Key.EqualIgnoreCase(member.Name)))
                     continue;
 
-                var type = member.DeclaringType.IsAnonymousType() || isDictionaryType ?
-                    sqlWrapper.DefaultType :
-                    member.DeclaringType;
+                var type = member.DeclaringType.IsAnonymousType() || isDictionaryType
+                    ? sqlWrapper.DefaultType
+                    : member.DeclaringType;
 
                 var columnInfo = GetColumnInfo(type, member.MemberInfo, sqlWrapper);
                 if (columnInfo.IsUpdate)
@@ -185,11 +184,11 @@ namespace SQLBuilder.Core.Expressions
                     object value;
 
                     if (isDictionaryType)
-                        value = convertDic.FirstOrDefault(x => x.Key.EqualIgnoreCase(member.Name)).Value;
+                        value = convertDic.TryGetValueIgnoreCase(member.Name);
                     else
                         value = accessor[convertRes, member.Name];
 
-                    if (value != null || (sqlWrapper.IsEnableNullValue && value == null))
+                    if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper += columnInfo.ColumnName + " = ";
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);

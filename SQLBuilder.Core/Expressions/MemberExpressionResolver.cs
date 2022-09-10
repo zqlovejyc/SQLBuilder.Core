@@ -184,7 +184,7 @@ namespace SQLBuilder.Core.Expressions
                     object value;
 
                     if (isDictionaryType)
-                        value = convertDic.TryGetValueIgnoreCase(member.Name);
+                        value = convertDic.TryGetValue(member.Name, true, null);
                     else
                         value = accessor[convertRes, member.Name];
 

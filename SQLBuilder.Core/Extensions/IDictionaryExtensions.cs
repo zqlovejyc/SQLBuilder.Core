@@ -733,7 +733,7 @@ namespace SQLBuilder.Core.Extensions
                         if (!member.CanWrite)
                             continue;
 
-                        accessor[instance, member.Name] = key.ToSafeValue(member.Type);
+                        accessor[instance, member.Name] = keyValue.ToSafeValue(member.Type);
                     }
                 }
 

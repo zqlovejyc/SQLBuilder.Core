@@ -570,7 +570,7 @@ namespace SQLBuilder.Core.Entry
         /// <param name="parameterKey">参数名称</param>
         public void AddDbParameter(object parameterValue, DataTypeAttribute type = null, string parameterKey = null)
         {
-            if (parameterValue == null || parameterValue == DBNull.Value)
+            if (parameterValue.IsNull())
                 this.Sql.Append("NULL");
 
             else if (parameterKey.IsNullOrEmpty())
@@ -898,18 +898,18 @@ namespace SQLBuilder.Core.Entry
             if (!hasKeyAttribute)
                 return columnInfos;
 
-            var properties = members.Where(x => x.IsDefined<CusKeyAttribute>()).ToList();
-            if (properties.Count == 0)
-                properties = members.Where(x => x.IsDefined<SysKeyAttribute>()).ToList();
+            var keyMembers = members.Where(x => x.IsDefined<CusKeyAttribute>()).ToList();
+            if (keyMembers.Count == 0)
+                keyMembers = members.Where(x => x.IsDefined<SysKeyAttribute>()).ToList();
 
-            if (properties.Count == 0)
+            if (keyMembers.Count == 0)
                 return columnInfos;
 
-            foreach (var member in members)
+            foreach (var keyMember in keyMembers)
             {
-                var columnInfo = new ColumnInfo { PropertyName = member.Name };
+                var columnInfo = new ColumnInfo { PropertyName = keyMember.Name };
 
-                if (member.GetAttribute<CusKeyAttribute>(true) is CusKeyAttribute cka)
+                if (keyMember.GetAttribute<CusKeyAttribute>(true) is CusKeyAttribute cka)
                 {
                     columnInfo.ColumnName = cka.Name ?? columnInfo.PropertyName;
                     columnInfo.OracleSequenceName = cka.OracleSequenceName;
@@ -917,12 +917,12 @@ namespace SQLBuilder.Core.Entry
                     if (cka.Format)
                         _formatColumns.Add(columnInfo.ColumnName);
                 }
-                else if (member.GetAttribute<SysKeyAttribute>(true) is SysKeyAttribute ska)
+                else if (keyMember.GetAttribute<SysKeyAttribute>(true) is SysKeyAttribute ska)
                 {
                     columnInfo.ColumnName = columnInfo.PropertyName;
                 }
 
-                if (member.GetAttribute<DataTypeAttribute>(true) is DataTypeAttribute dta)
+                if (keyMember.GetAttribute<DataTypeAttribute>(true) is DataTypeAttribute dta)
                     columnInfo.DataType = dta;
 
                 columnInfo.ColumnName = this.GetColumnName(columnInfo.ColumnName);

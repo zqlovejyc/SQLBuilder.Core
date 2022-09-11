@@ -3842,7 +3842,7 @@ namespace SQLBuilder.Core.Entry
         /// <returns>SqlBuilderCore</returns>
         public SqlBuilderCore<T> WithKey(T entity)
         {
-            if (entity == null)
+            if (entity.IsNull())
                 throw new ArgumentNullException("实体参数不能为空！");
 
             var sql = this.sqlWrapper.ToString();
@@ -3850,7 +3850,8 @@ namespace SQLBuilder.Core.Entry
             if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("此方法只能用于Select、Update、Delete方法！");
 
-            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var type = typeof(T);
+            var tableName = this.sqlWrapper.GetTableName(type);
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
 
             if (tableAlias.IsNotNullOrEmpty())
@@ -3858,74 +3859,67 @@ namespace SQLBuilder.Core.Entry
 
             var accessor = ObjectAccessor.Create(entity);
 
-            var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
-            if (keys.Count > 0 && entity != null)
-            {
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    var columnInfo = keys[i];
-                    if (columnInfo.ColumnName.IsNotNullOrEmpty())
-                    {
-                        var keyValue = accessor[columnInfo.PropertyName];
-                        if (keyValue != null)
-                        {
-                            this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {tableAlias + columnInfo.ColumnName} = ";
-                            this.sqlWrapper.AddDbParameter(keyValue, columnInfo.DataType);
-                        }
-                        else
-                        {
-                            throw new ArgumentNullException("主键值不能为空！");
-                        }
-                    }
-                }
-            }
-            else
-            {
+            var keys = this.sqlWrapper.GetPrimaryKey(type);
+
+            if (keys.Count == 0)
                 throw new ArgumentException("实体不存在Key属性！");
+
+            for (int i = 0; i < keys.Count; i++)
+            {
+                var columnInfo = keys[i];
+                var columnName = tableAlias + columnInfo.ColumnName;
+                var keyValue = accessor[columnInfo.PropertyName];
+
+                if (keyValue.IsNull())
+                    throw new ArgumentNullException("主键值不能为空！");
+
+                this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {columnName} = ";
+                this.sqlWrapper.AddDbParameter(keyValue, columnInfo.DataType);
             }
+
             return this;
         }
 
         /// <summary>
         /// 添加主键条件，主要针对更新实体和删除实体操作
+        /// <para>注意：keyValues只能是值类型或者字符串类型</para>
         /// </summary>
-        /// <param name="keyValue">主键值</param>
+        /// <param name="keyValues">主键值</param>
         /// <returns>SqlBuilderCore</returns>
-        public SqlBuilderCore<T> WithKey(params dynamic[] keyValue)
+        public SqlBuilderCore<T> WithKey(params dynamic[] keyValues)
         {
-            if (keyValue == null)
-                throw new ArgumentNullException("keyValue不能为空！");
-
-            if (!keyValue.Any(o => o.GetType().IsValueType || o.GetType() == typeof(string)))
-                throw new ArgumentException("keyValue只能为值类型或者字符串类型数据！");
+            if (keyValues.IsNullOrEmpty() || keyValues.Any(key => key is null))
+                throw new ArgumentNullException("keyValues不能为空！");
 
             var sql = this.sqlWrapper.ToString();
             if (!sql.ContainsIgnoreCase("SELECT", "UPDATE", "DELETE"))
                 throw new ArgumentException("WithKey方法只能用于Select、Update、Delete方法！");
 
-            var tableName = this.sqlWrapper.GetTableName(typeof(T));
+            var type = typeof(T);
+            var tableName = this.sqlWrapper.GetTableName(type);
             var tableAlias = this.sqlWrapper.GetTableAlias(tableName);
 
             if (tableAlias.IsNotNullOrEmpty())
                 tableAlias += ".";
 
-            var keys = this.sqlWrapper.GetPrimaryKey(typeof(T));
-            if (keys.Count > 0 && keyValue != null)
-            {
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    var columnInfo = keys[i];
-                    if (columnInfo.ColumnName.IsNotNullOrEmpty())
-                    {
-                        this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {tableAlias + columnInfo.ColumnName} = ";
-                        this.sqlWrapper.AddDbParameter(keyValue[i], columnInfo.DataType);
-                    }
-                }
-            }
-            else
-            {
+            var keys = this.sqlWrapper.GetPrimaryKey(type);
+
+            if (keys.Count == 0)
                 throw new ArgumentException("实体不存在Key属性！");
+
+            if (keys.Count != keyValues.Length)
+                throw new ArgumentException("keyValues数量与表主键数量不匹配！");
+
+            for (int i = 0; i < keys.Count; i++)
+            {
+                var columnInfo = keys[i];
+                var columnName = tableAlias + columnInfo.ColumnName;
+                var keyValue = keyValues[i];
+
+                this.sqlWrapper += $" {(sql.ContainsIgnoreCase("WHERE") || i > 0 ? "AND" : "WHERE")} {columnName} = ";
+                this.sqlWrapper.AddDbParameter(keyValue, columnInfo.DataType);
             }
+
             return this;
         }
         #endregion

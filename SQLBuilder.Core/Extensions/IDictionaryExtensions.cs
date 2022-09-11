@@ -23,6 +23,7 @@ using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SQLBuilder.Core.Attributes;
+using SQLBuilder.Core.FastMember;
 using SQLBuilder.Core.Parameters;
 using System;
 using System.Collections.Generic;
@@ -693,6 +694,53 @@ namespace SQLBuilder.Core.Extensions
                 return @this.ContainsKey(key);
 
             return @this.Keys.Any(k => k.EqualIgnoreCase(key));
+        }
+        #endregion
+
+        #region ToEntity
+        /// <summary>
+        /// IDictionary数据转为强类型实体
+        /// </summary>
+        /// <param name="this">IDictionary数据源</param>
+        /// <returns>强类型实体</returns>
+        public static T ToEntity<T>(this IDictionary<string, object> @this)
+        {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            var accessor = TypeAccessor.Create(typeof(T));
+            var members = accessor.GetMembers();
+
+            if (members.IsNullOrEmpty())
+                return default;
+
+            var memberMap = members.ToDictionary(k => k.Name, v => v, StringComparer.OrdinalIgnoreCase);
+
+            if (accessor.CreateNew() is T instance)
+            {
+                foreach (var key in @this.Keys)
+                {
+                    if (key.IsNullOrEmpty())
+                        continue;
+
+                    var keyValue = @this[key];
+
+                    if (keyValue.IsNull())
+                        continue;
+
+                    if (memberMap.TryGetValue(key, out var member))
+                    {
+                        if (!member.CanWrite)
+                            continue;
+
+                        accessor[instance, member.Name] = key.ToSafeValue(member.Type);
+                    }
+                }
+
+                return instance;
+            }
+
+            return default;
         }
         #endregion
     }

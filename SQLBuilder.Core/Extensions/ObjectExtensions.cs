@@ -23,7 +23,9 @@ using SQLBuilder.Core.Attributes;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Repositories;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Reflection;
 using System.Text;
 using SysColumnAttribute = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
@@ -352,19 +354,161 @@ namespace SQLBuilder.Core.Extensions
         /// 获取OracelDbType类型
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="stringType">string类型对应的默认OracleDbType类型</param>
+        /// <param name="defaultType">默认OracleDbType类型</param>
         /// <returns></returns>
-        public static OracleDbType GetOracleDbType(this object @this)
+        public static OracleDbType GetOracleDbType(this object @this, OracleDbType stringType = OracleDbType.Varchar2, OracleDbType defaultType = OracleDbType.Varchar2)
         {
             return @this switch
             {
-                string => OracleDbType.NVarchar2,
+                byte[] => OracleDbType.Blob,
+                char => OracleDbType.Char,
+                string => stringType,
                 DateTime => OracleDbType.Date,
-                int => OracleDbType.Int32,
-                byte => OracleDbType.Int16,
-                long => OracleDbType.Long,
+                byte or sbyte => OracleDbType.Byte,
+                int or uint => OracleDbType.Int32,
+                short or ushort => OracleDbType.Int16,
+                long or ulong => OracleDbType.Int64,
                 decimal => OracleDbType.Decimal,
                 double => OracleDbType.Double,
-                _ => OracleDbType.NVarchar2,
+                float => OracleDbType.Single,
+                _ => defaultType,
+            };
+        }
+        #endregion
+
+        #region GetDbType
+        /// <summary>
+        /// 根据系统类型获取DbType类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static DbType GetDbType(this Type @this)
+        {
+            var map = new Dictionary<Type, DbType>
+            {
+                [typeof(object)] = DbType.Object,
+                [typeof(byte)] = DbType.Byte,
+                [typeof(sbyte)] = DbType.SByte,
+                [typeof(short)] = DbType.Int16,
+                [typeof(ushort)] = DbType.UInt16,
+                [typeof(int)] = DbType.Int32,
+                [typeof(uint)] = DbType.UInt32,
+                [typeof(long)] = DbType.Int64,
+                [typeof(ulong)] = DbType.UInt64,
+                [typeof(float)] = DbType.Single,
+                [typeof(double)] = DbType.Double,
+                [typeof(decimal)] = DbType.Decimal,
+                [typeof(bool)] = DbType.Boolean,
+                [typeof(string)] = DbType.String,
+                [typeof(char)] = DbType.StringFixedLength,
+                [typeof(Guid)] = DbType.Guid,
+                [typeof(DateTime)] = DbType.DateTime,
+                [typeof(DateTimeOffset)] = DbType.DateTimeOffset,
+                [typeof(byte[])] = DbType.Binary,
+                [typeof(byte?)] = DbType.Byte,
+                [typeof(sbyte?)] = DbType.SByte,
+                [typeof(short?)] = DbType.Int16,
+                [typeof(ushort?)] = DbType.UInt16,
+                [typeof(int?)] = DbType.Int32,
+                [typeof(uint?)] = DbType.UInt32,
+                [typeof(long?)] = DbType.Int64,
+                [typeof(ulong?)] = DbType.UInt64,
+                [typeof(float?)] = DbType.Single,
+                [typeof(double?)] = DbType.Double,
+                [typeof(decimal?)] = DbType.Decimal,
+                [typeof(bool?)] = DbType.Boolean,
+                [typeof(char?)] = DbType.StringFixedLength,
+                [typeof(Guid?)] = DbType.Guid,
+                [typeof(DateTime?)] = DbType.DateTime,
+                [typeof(DateTimeOffset?)] = DbType.DateTimeOffset
+            };
+
+            return map.TryGetValue(@this);
+        }
+        #endregion
+
+        #region GetType
+        /// <summary>
+        /// 根据OracleDbType类型获取对应的系统数据类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static Type GetType(this OracleDbType @this)
+        {
+            return @this switch
+            {
+                OracleDbType.BFile => typeof(byte[]),
+                OracleDbType.BinaryDouble => typeof(double),
+                OracleDbType.BinaryFloat => typeof(float),
+                OracleDbType.Blob => typeof(byte[]),
+                OracleDbType.Boolean => typeof(bool),
+                OracleDbType.Byte => typeof(byte),
+                OracleDbType.Char => typeof(char),
+                OracleDbType.Clob => typeof(string),
+                OracleDbType.Date => typeof(DateTime),
+                OracleDbType.Decimal => typeof(decimal),
+                OracleDbType.Double => typeof(double),
+                OracleDbType.Int16 => typeof(short),
+                OracleDbType.Int32 => typeof(int),
+                OracleDbType.Int64 => typeof(long),
+                OracleDbType.IntervalDS => typeof(double),
+                OracleDbType.IntervalYM => typeof(int),
+                OracleDbType.Long => typeof(string),
+                OracleDbType.LongRaw => typeof(byte[]),
+                OracleDbType.NChar => typeof(string),
+                OracleDbType.NClob => typeof(string),
+                OracleDbType.NVarchar2 => typeof(string),
+                OracleDbType.Raw => typeof(byte[]),
+                OracleDbType.RefCursor => typeof(object),
+                OracleDbType.Single => typeof(float),
+                OracleDbType.TimeStamp => typeof(DateTime),
+                OracleDbType.TimeStampLTZ => typeof(DateTime),
+                OracleDbType.TimeStampTZ => typeof(DateTime),
+                OracleDbType.Varchar2 => typeof(string),
+                OracleDbType.XmlType => typeof(string),
+                OracleDbType.Json => typeof(string),
+                _ => default
+            };
+        }
+
+        /// <summary>
+        /// 根据DbType类型获取对应的系统数据类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static Type GetType(this DbType @this)
+        {
+            return @this switch
+            {
+                DbType.AnsiString => typeof(string),
+                DbType.AnsiStringFixedLength => typeof(string),
+                DbType.Binary => typeof(byte[]),
+                DbType.Boolean => typeof(bool),
+                DbType.Byte => typeof(byte),
+                DbType.Currency => typeof(decimal),
+                DbType.Date => typeof(DateTime),
+                DbType.DateTime => typeof(DateTime),
+                DbType.DateTime2 => typeof(DateTime),
+                DbType.DateTimeOffset => typeof(DateTimeOffset),
+                DbType.Decimal => typeof(decimal),
+                DbType.Double => typeof(double),
+                DbType.Guid => typeof(Guid),
+                DbType.Int16 => typeof(short),
+                DbType.Int32 => typeof(int),
+                DbType.Int64 => typeof(long),
+                DbType.Object => typeof(object),
+                DbType.SByte => typeof(sbyte),
+                DbType.Single => typeof(float),
+                DbType.String => typeof(string),
+                DbType.StringFixedLength => typeof(string),
+                DbType.Time => typeof(DateTime),
+                DbType.UInt16 => typeof(ushort),
+                DbType.UInt32 => typeof(uint),
+                DbType.UInt64 => typeof(ulong),
+                DbType.VarNumeric => typeof(decimal),
+                DbType.Xml => typeof(string),
+                _ => default,
             };
         }
         #endregion

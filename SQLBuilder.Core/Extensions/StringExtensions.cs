@@ -18,6 +18,7 @@
 
 using SQLBuilder.Core.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -162,7 +163,34 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>true if a null or is t>, false if not.</returns>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> @this)
         {
-            return @this == null || !@this.Any();
+            return @this is null || !@this.Any();
+        }
+
+        /// <summary>
+        /// 判断集合是否为空
+        /// </summary>
+        /// <typeparam name="T">Generic type parameter.</typeparam>
+        /// <param name="this">The collection to act on.</param>
+        /// <returns>true if a null or is t>, false if not.</returns>
+        public static bool IsNullOrEmpty<T>(this ICollection<T> @this)
+        {
+            return @this is null || @this.Count == 0;
+        }
+
+        /// <summary>
+        /// 判断集合是否为空
+        /// </summary>
+        /// <param name="this">The collection to act on.</param>
+        /// <returns>true if a null or is t>, false if not.</returns>
+        public static bool IsNullOrEmpty(this IEnumerable @this)
+        {
+            if (@this is null)
+                return true;
+
+            if (@this.GetEnumerator().MoveNext())
+                return false;
+
+            return true;
         }
         #endregion
 

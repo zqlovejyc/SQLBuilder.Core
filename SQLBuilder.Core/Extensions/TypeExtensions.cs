@@ -78,7 +78,7 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
-        /// Determines whether the current type can be assigned from base type
+        /// Determines whether the current type can be assigned from any one base type
         /// </summary>
         /// <param name="type"></param>
         /// <param name="baseTypes"></param>

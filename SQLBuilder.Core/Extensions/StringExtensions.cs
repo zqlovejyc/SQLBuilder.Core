@@ -160,7 +160,7 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is null or empty, false if not.</returns>
+        /// <returns>true if null or empty, false if not.</returns>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> @this)
         {
             return @this is null || !@this.Any();
@@ -171,7 +171,7 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is null or empty false if not.</returns>
+        /// <returns>true if null or empty false if not.</returns>
         public static bool IsNullOrEmpty<T>(this ICollection<T> @this)
         {
             return @this is null || @this.Count == 0;
@@ -181,7 +181,7 @@ namespace SQLBuilder.Core.Extensions
         /// 判断集合是否为空
         /// </summary>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is null or empty, false if not.</returns>
+        /// <returns>true if null or empty, false if not.</returns>
         public static bool IsNullOrEmpty(this IEnumerable @this)
         {
             if (@this is null)
@@ -210,7 +210,7 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is not null and not empty, false if not.</returns>
+        /// <returns>true if not null and not empty, false if not.</returns>
         public static bool IsNotNullOrEmpty<T>(this IEnumerable<T> @this)
         {
             return !@this.IsNullOrEmpty();
@@ -221,7 +221,7 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is not null and not empty, false if not.</returns>
+        /// <returns>true if not null and not empty, false if not.</returns>
         public static bool IsNotNullOrEmpty<T>(this ICollection<T> @this)
         {
             return !@this.IsNullOrEmpty();
@@ -231,7 +231,7 @@ namespace SQLBuilder.Core.Extensions
         /// 判断集合是否非空
         /// </summary>
         /// <param name="this">The collection to act on.</param>
-        /// <returns>true if is not null and not empty, false if not.</returns>
+        /// <returns>true if not null and not empty, false if not.</returns>
         public static bool IsNotNullOrEmpty(this IEnumerable @this)
         {
             return !@this.IsNullOrEmpty();

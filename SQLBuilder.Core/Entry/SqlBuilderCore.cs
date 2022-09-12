@@ -283,13 +283,13 @@ namespace SQLBuilder.Core.Entry
                 //移除默认的查询语句
                 if (len > 0)
                 {
-                    var sqlReplace = string.Format(this.Select(null, tableNameFunc, (typeof(T), null)), "*");
+                    var sqlReplace = this.Select(null, tableNameFunc, (typeof(T), null)).Format("*");
                     var sqlNew = this.sqlWrapper.Replace(sqlReplace, "").ToString();
                     this.sqlWrapper.Reset(sqlNew);
                 }
             }
 
-            sql = string.Format(sql, selectFields);
+            sql = sql.Format(selectFields);
 
             if (len == 0)
                 this.sqlWrapper.Append(sql);
@@ -4982,7 +4982,7 @@ namespace SQLBuilder.Core.Entry
                 selectFields = this.sqlWrapper.SelectFieldsString;
             }
 
-            this.sqlWrapper += string.Format(sql, selectFields);
+            this.sqlWrapper += sql.Format(selectFields);
 
             return this;
         }

@@ -439,5 +439,21 @@ namespace SQLBuilder.Core.Extensions
             return false;
         }
         #endregion
+
+        #region Format
+        /// <summary>
+        /// 格式化字符串，替换字符串中的占位符
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static string Format(this string @this, params object[] args)
+        {
+            if (@this.IsNullOrEmpty() || args.IsNullOrEmpty())
+                return @this;
+
+            return string.Format(@this, args);
+        }
+        #endregion
     }
 }

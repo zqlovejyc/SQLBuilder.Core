@@ -656,7 +656,7 @@ namespace SQLBuilder.Core.Entry
                 !name.StartsWith("[") &&
                 !name.StartsWith("`") &&
                 !name.StartsWith("\""))
-                name = string.Format(this.FormatTemplate, name);
+                name = this.FormatTemplate.Format(name);
 
             return name;
         }

@@ -2670,7 +2670,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual bool Any<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(x => "1", DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            var res = FindObject(string.Format(GetAnySql(), builder.Sql), builder.DynamicParameters);
+            var res = FindObject(GetAnySql().Format(builder.Sql), builder.DynamicParameters);
 
             return res.To<int>() == 1;
         }
@@ -2686,7 +2686,7 @@ namespace SQLBuilder.Core.Repositories
         public virtual async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate) where T : class
         {
             var builder = Sql.Select<T>(x => "1", DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            var res = await FindObjectAsync(string.Format(GetAnySql(), builder.Sql), builder.DynamicParameters);
+            var res = await FindObjectAsync(GetAnySql().Format(builder.Sql), builder.DynamicParameters);
 
             return res.To<int>() == 1;
         }

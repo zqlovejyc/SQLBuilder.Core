@@ -325,10 +325,10 @@ namespace SQLBuilder.Core.Extensions
                     };
 
                     columns.Append(columnName.IsNullOrEmpty()
-                        ? string.Format(template, propertyName)
+                        ? template.Format(propertyName)
                         : (columnName.EqualIgnoreCase(propertyName)
-                        ? string.Format(template, columnName)
-                        : $"{string.Format(template, columnName)} AS {string.Format(template, propertyName)}"));
+                        ? template.Format(columnName)
+                        : $"{template.Format(columnName)} AS {template.Format(propertyName)}"));
                 }
                 //非格式化
                 else

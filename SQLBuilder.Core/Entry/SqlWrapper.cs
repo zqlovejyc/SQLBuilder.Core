@@ -134,7 +134,7 @@ namespace SQLBuilder.Core.Entry
                     return this.DbParameters;
 
                 //判断是否需要重新替换参数数据类型
-                if (this._dataTypeDictionary.Count == 0 || !this.DbParameters.Any(x => x.Value.type == null))
+                if (this._dataTypeDictionary.IsNullOrEmpty() || !this.DbParameters.Any(x => x.Value.type == null))
                     return this.DbParameters;
 
                 //分割sql语句
@@ -899,10 +899,10 @@ namespace SQLBuilder.Core.Entry
                 return columnInfos;
 
             var keyMembers = members.Where(x => x.IsDefined<CusKeyAttribute>()).ToList();
-            if (keyMembers.Count == 0)
+            if (keyMembers.IsNullOrEmpty())
                 keyMembers = members.Where(x => x.IsDefined<SysKeyAttribute>()).ToList();
 
-            if (keyMembers.Count == 0)
+            if (keyMembers.IsNullOrEmpty())
                 return columnInfos;
 
             foreach (var keyMember in keyMembers)

@@ -3861,7 +3861,7 @@ namespace SQLBuilder.Core.Entry
 
             var keys = this.sqlWrapper.GetPrimaryKey(type);
 
-            if (keys.Count == 0)
+            if (keys.IsNullOrEmpty())
                 throw new ArgumentException("实体不存在Key属性！");
 
             for (int i = 0; i < keys.Count; i++)
@@ -3904,7 +3904,7 @@ namespace SQLBuilder.Core.Entry
 
             var keys = this.sqlWrapper.GetPrimaryKey(type);
 
-            if (keys.Count == 0)
+            if (keys.IsNullOrEmpty())
                 throw new ArgumentException("实体不存在Key属性！");
 
             if (keys.Count != keyValues.Length)

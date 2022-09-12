@@ -1,4 +1,5 @@
 ﻿using SQLBuilder.Core.Entry;
+using SQLBuilder.Core.UnitTest.Models;
 using System.Data;
 using Xunit;
 
@@ -81,6 +82,21 @@ namespace SQLBuilder.Core.UnitTest
 
             Assert.Equal("DELETE FROM Base_UserInfo WHERE Id = @p__1", builder.Sql);
             Assert.Single(builder.Parameters);
+        }
+
+        /// <summary>
+        /// 删除6
+        /// </summary>
+        [Fact]
+        public void Test_Delete_06()
+        {
+            var builder = SqlBuilder
+                            .Delete<MultiplePrimaryKeyEntity>()
+                            .WithKey(2, "test");
+
+            Assert.Equal("DELETE FROM MultipleKey WHERE Id = @p__1 AND CompanyId = @p__2", builder.Sql);
+            Assert.Equal(2, builder.Parameters["@p__1"].data);
+            Assert.Equal("test", builder.Parameters["@p__2"].data);
         }
     }
 }

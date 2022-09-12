@@ -100,7 +100,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 已选择的表字段拼接字符串
         /// </summary>
-        public string SelectFieldsString => string.Join(",", this.SelectFields);
+        public string SelectFieldsString => this.SelectFields.Join();
 
         /// <summary>
         /// 当前sql

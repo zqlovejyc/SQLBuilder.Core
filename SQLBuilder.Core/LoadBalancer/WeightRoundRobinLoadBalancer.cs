@@ -19,6 +19,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using SQLBuilder.Core.Extensions;
 
 namespace SQLBuilder.Core.LoadBalancer
 {
@@ -158,7 +159,7 @@ namespace SQLBuilder.Core.LoadBalancer
                 }
             }
 
-            key = $"{key}_{string.Join("_", weightList)}";
+            key = $"{key}_{weightList.Join("_")}";
 
             WeightRoundRobin weightRoundRobin;
 

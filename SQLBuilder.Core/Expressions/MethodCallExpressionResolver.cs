@@ -381,9 +381,9 @@ namespace SQLBuilder.Core.Expressions
         /// <param name="sqlWrapper">sql包装器</param>
         private static void Contains(MethodCallExpression expression, SqlWrapper sqlWrapper)
         {
-            if (expression.Object != null)
+            if (expression.Object.IsNotNull())
             {
-                if (typeof(IList).IsAssignableFrom(expression.Object.Type))
+                if (expression.Object.Type.AssignableTo(typeof(IList), typeof(ICollection<>)))
                 {
                     SqlExpressionProvider.Where(expression.Arguments[0], sqlWrapper);
                     sqlWrapper += " IN ";
@@ -972,7 +972,7 @@ namespace SQLBuilder.Core.Expressions
             if (expression.ToObject() is IEnumerable collection)
             {
                 var i = 0;
-                var fields = new List<string>();
+                var fields = new HashSet<string>();
 
                 TypeAccessor accessor = null;
                 MemberSet members = null;

@@ -76,6 +76,23 @@ namespace SQLBuilder.Core.Extensions
 
             return baseTypeInfo.IsAssignableFrom(typeInfo);
         }
+
+        /// <summary>
+        /// Determines whether the current type can be assigned from base type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="baseTypes"></param>
+        /// <returns></returns>
+        public static bool AssignableTo(this Type type, params Type[] baseTypes)
+        {
+            foreach (var baseType in baseTypes)
+            {
+                if (type.AssignableTo(baseType))
+                    return true;
+            }
+
+            return false;
+        }
         #endregion
 
         #region IsAssignableToGenericTypeDefinition

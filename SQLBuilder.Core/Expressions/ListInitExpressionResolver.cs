@@ -20,12 +20,9 @@ using SQLBuilder.Core.Entry;
 using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Extensions;
 using SQLBuilder.Core.FastMember;
-using SQLBuilder.Core.Models;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SQLBuilder.Core.Expressions
 {
@@ -34,6 +31,34 @@ namespace SQLBuilder.Core.Expressions
     /// </summary>
     public class ListInitExpressionResolver : BaseExpression<ListInitExpression>
     {
+        #region In
+        /// <summary>
+        /// In
+        /// </summary>
+        /// <param name="expression">表达式树</param>
+        /// <param name="sqlWrapper">sql包装器</param>
+        /// <returns>SqlWrapper</returns>
+        public override SqlWrapper In(ListInitExpression expression, SqlWrapper sqlWrapper)
+        {
+            if (expression.ToObject() is IEnumerable collection)
+            {
+                sqlWrapper += "(";
+
+                foreach (var item in collection)
+                {
+                    sqlWrapper.AddDbParameter(item);
+                    sqlWrapper += ",";
+                }
+
+                sqlWrapper.RemoveLast(',');
+
+                sqlWrapper += ")";
+            }
+
+            return sqlWrapper;
+        }
+        #endregion
+
         #region Insert
         /// <summary>
         /// Insert
@@ -46,7 +71,7 @@ namespace SQLBuilder.Core.Expressions
             if (expression.ToObject() is IEnumerable collection)
             {
                 var i = 0;
-                var fields = new List<string>();
+                var fields = new HashSet<string>();
 
                 TypeAccessor accessor = null;
                 MemberSet members = null;

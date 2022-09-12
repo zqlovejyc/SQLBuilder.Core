@@ -44,7 +44,7 @@ namespace SQLBuilder.Core.Expressions
         public override SqlWrapper Insert(MemberExpression expression, SqlWrapper sqlWrapper)
         {
             var objectArray = new List<object>();
-            var fields = new List<string>();
+            var fields = new HashSet<string>();
             var convertRes = expression.ToObject();
             if (convertRes.IsNull())
                 return sqlWrapper;

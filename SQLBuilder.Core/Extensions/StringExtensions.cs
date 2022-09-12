@@ -146,7 +146,7 @@ namespace SQLBuilder.Core.Extensions
 
         #region IsNullOrEmpty
         /// <summary>
-        /// 判断字符串是否为空
+        /// 判断字符串是否为null或者string.Empty
         /// </summary>
         /// <param name="this">待验证的字符串</param>
         /// <returns>bool</returns>
@@ -156,32 +156,32 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
-        /// 判断集合是否为空
+        /// 判断集合是否为null或者空集合
         /// </summary>
-        /// <typeparam name="T">Generic type parameter.</typeparam>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if null or empty, false if not.</returns>
+        /// <typeparam name="T">泛型参数类型</typeparam>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合为null或者空集合，false非null且非空集合</returns>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> @this)
         {
             return @this is null || !@this.Any();
         }
 
         /// <summary>
-        /// 判断集合是否为空
+        /// 判断集合是否为null或者空集合
         /// </summary>
-        /// <typeparam name="T">Generic type parameter.</typeparam>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if null or empty false if not.</returns>
+        /// <typeparam name="T">泛型参数类型</typeparam>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合为null或者空集合，false非null且非空集合</returns>
         public static bool IsNullOrEmpty<T>(this ICollection<T> @this)
         {
             return @this is null || @this.Count == 0;
         }
 
         /// <summary>
-        /// 判断集合是否为空
+        /// 判断集合是否为null或者空集合
         /// </summary>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if null or empty, false if not.</returns>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合为null或者空集合，false非null且非空集合</returns>
         public static bool IsNullOrEmpty(this IEnumerable @this)
         {
             if (@this is null)
@@ -196,7 +196,7 @@ namespace SQLBuilder.Core.Extensions
 
         #region IsNotNullOrEmpty
         /// <summary>
-        /// 判断字符串是否非空
+        /// 判断字符串是否非null且非string.Empty
         /// </summary>
         /// <param name="this">待验证的字符串</param>
         /// <returns>bool</returns>
@@ -206,32 +206,32 @@ namespace SQLBuilder.Core.Extensions
         }
 
         /// <summary>
-        /// 判断集合是否非空
+        /// 判断集合是否非null且非空集合
         /// </summary>
-        /// <typeparam name="T">Generic type parameter.</typeparam>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if not null and not empty, false if not.</returns>
+        /// <typeparam name="T">泛型参数类型</typeparam>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合非null且非空集合，false为null或者空集合</returns>
         public static bool IsNotNullOrEmpty<T>(this IEnumerable<T> @this)
         {
             return !@this.IsNullOrEmpty();
         }
 
         /// <summary>
-        /// 判断集合是否非空
+        /// 判断集合是否非null且非空集合
         /// </summary>
-        /// <typeparam name="T">Generic type parameter.</typeparam>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if not null and not empty, false if not.</returns>
+        /// <typeparam name="T">泛型参数类型</typeparam>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合非null且非空集合，false为null或者空集合</returns>
         public static bool IsNotNullOrEmpty<T>(this ICollection<T> @this)
         {
             return !@this.IsNullOrEmpty();
         }
 
         /// <summary>
-        /// 判断集合是否非空
+        /// 判断集合是否非null且非空集合
         /// </summary>
-        /// <param name="this">The collection to act on.</param>
-        /// <returns>true if not null and not empty, false if not.</returns>
+        /// <param name="this">待校验的集合对象</param>
+        /// <returns>true表示集合非null且非空集合，false为null或者空集合</returns>
         public static bool IsNotNullOrEmpty(this IEnumerable @this)
         {
             return !@this.IsNullOrEmpty();

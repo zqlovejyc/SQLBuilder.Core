@@ -77,7 +77,7 @@ namespace SQLBuilder.Core.Expressions
             if (sqlWrapper.DatabaseType != DatabaseType.Oracle)
                 sqlWrapper.Append("(");
 
-            var fields = new List<string>();
+            var fields = new HashSet<string>();
             for (int i = 0; i < expression.Members?.Count; i++)
             {
                 var member = expression.Members[i];
@@ -92,8 +92,9 @@ namespace SQLBuilder.Core.Expressions
                     if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                     {
                         sqlWrapper.AddDbParameter(value, columnInfo.DataType);
-                        if (!fields.Contains(columnInfo.ColumnName))
-                            fields.Add(columnInfo.ColumnName);
+
+                        fields.Add(columnInfo.ColumnName);
+
                         sqlWrapper += ",";
                     }
                 }

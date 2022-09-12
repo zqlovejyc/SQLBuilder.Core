@@ -108,8 +108,7 @@ namespace SQLBuilder.Core.Expressions
                         {
                             sqlWrapper.AddDbParameter(value, columnInfo.DataType);
 
-                            if (!fields.Contains(columnInfo.ColumnName))
-                                fields.Add(columnInfo.ColumnName);
+                            fields.Add(columnInfo.ColumnName);
 
                             sqlWrapper += ",";
                         }

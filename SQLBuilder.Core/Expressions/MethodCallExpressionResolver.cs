@@ -1012,8 +1012,9 @@ namespace SQLBuilder.Core.Expressions
                             if (value.IsNotNull() || (sqlWrapper.IsEnableNullValue && value.IsNull()))
                             {
                                 sqlWrapper.AddDbParameter(value, columnInfo.DataType);
-                                if (!fields.Contains(columnInfo.ColumnName))
-                                    fields.Add(columnInfo.ColumnName);
+
+                                fields.Add(columnInfo.ColumnName);
+
                                 sqlWrapper += ",";
                             }
                         }

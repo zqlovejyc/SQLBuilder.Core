@@ -251,7 +251,7 @@ namespace SQLBuilder.Core.Extensions
 
             using (@this)
             {
-                var fields = new List<string>();
+                var fields = new HashSet<string>();
                 for (int i = 0; i < @this.FieldCount; i++)
                     fields.Add(@this.GetName(i));
 
@@ -373,7 +373,7 @@ namespace SQLBuilder.Core.Extensions
                     else if (type.IsClass && !type.IsDynamicOrObjectType() && !type.IsStringType())
                     {
                         var list = new List<T>();
-                        var fields = new List<string>();
+                        var fields = new HashSet<string>();
                         for (int i = 0; i < @this.FieldCount; i++)
                             fields.Add(@this.GetName(i));
 

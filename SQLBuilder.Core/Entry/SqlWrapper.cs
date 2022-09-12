@@ -63,7 +63,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 格式化列名缓存，多用于以数据库关键字命名的列
         /// </summary>
-        private readonly List<string> _formatColumns;
+        private readonly HashSet<string> _formatColumns;
         #endregion
 
         #region Public Property
@@ -216,7 +216,7 @@ namespace SQLBuilder.Core.Entry
         /// <summary>
         /// 已Join的表实体类型
         /// </summary>
-        public List<Type> JoinTypes { get; set; }
+        public HashSet<Type> JoinTypes { get; set; }
 
         /// <summary>
         /// 是否为Having语法

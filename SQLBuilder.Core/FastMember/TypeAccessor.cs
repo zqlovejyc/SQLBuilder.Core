@@ -62,7 +62,7 @@ namespace SQLBuilder.Core.FastMember
 
             lock (lookup)
             {
-                return lookup.GetOrAdd(type, type => lookup[type] = CreateNew(type, allowNonPublicAccessors));
+                return lookup.GetOrAdd(type, type => CreateNew(type, allowNonPublicAccessors));
             }
         }
 

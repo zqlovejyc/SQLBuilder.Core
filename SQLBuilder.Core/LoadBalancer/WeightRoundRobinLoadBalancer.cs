@@ -16,6 +16,7 @@
  */
 #endregion
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,9 +130,7 @@ namespace SQLBuilder.Core.LoadBalancer
     /// </summary>
     public class WeightRoundRobinLoadBalancer : ILoadBalancer
     {
-        private static readonly object _lock = new();
-
-        private static readonly ConcurrentDictionary<string, WeightRoundRobin> _weightRoundRobins = new();
+        private static readonly ConcurrentDictionary<string, Lazy<WeightRoundRobin>> _weightRoundRobins = new();
 
         /// <summary>
         /// 获取数据集合中的一条数据
@@ -161,17 +160,8 @@ namespace SQLBuilder.Core.LoadBalancer
 
             key = $"{key}_{weightList.Join("_")}";
 
-            WeightRoundRobin weightRoundRobin;
-
-            if (_weightRoundRobins.ContainsKey(key))
-                weightRoundRobin = _weightRoundRobins[key];
-            else
-            {
-                lock (_lock)
-                {
-                    weightRoundRobin = _weightRoundRobins.GetOrAdd(key, key => new WeightRoundRobin(weightList.ToArray()));
-                }
-            }
+            var weightRoundRobin = _weightRoundRobins.GetOrAdd(key, 
+                key => new Lazy<WeightRoundRobin>(() => new WeightRoundRobin(weightList.ToArray()))).Value;
 
             //获取索引值
             var index = weightRoundRobin.Get();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
@@ -53,7 +52,7 @@ namespace SQLBuilder.Core.FastMember
         public static TypeAccessor Create(Type type, bool allowNonPublicAccessors)
         {
             if (type is null)
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
 
             var lookup = allowNonPublicAccessors ? nonPublicAccessors : publicAccessorsOnly;
 

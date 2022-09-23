@@ -26,6 +26,16 @@ namespace SQLBuilder.Core.LoadBalancer
 {
     /// <summary>
     /// 带权重负载均衡算法
+    /// <para>设 A、B、C 三个节点的权重分别为：4、2、1，演算步骤如下：</para>
+    /// <list type="number">
+    ///      <item>{ 4, 2, 1}   A   {-3, 2, 1}</item>
+    ///      <item>{ 1, 4, 2}   B   { 1,-3, 2}</item>
+    ///      <item>{ 5,-1, 3}   A   {-2,-1, 3}</item>
+    ///      <item>{ 2, 1, 4}   C   { 2, 1,-3}</item>
+    ///      <item>{ 6, 3,-2}   A   {-1, 3,-2}</item>
+    ///      <item>{ 3, 5,-1}   B   { 3,-2,-1}</item>
+    ///      <item>{ 7, 0, 0}   A   { 0, 0, 0}</item>
+    /// </list>
     /// </summary>
     public class WeightRoundRobin
     {
@@ -46,9 +56,9 @@ namespace SQLBuilder.Core.LoadBalancer
         private readonly int[] _weights;
 
         /// <summary>
-        /// 最小权重
+        /// 权重和
         /// </summary>
-        private readonly int _minWeight;
+        private readonly int _totalWeight;
         #endregion
 
         #region 构造
@@ -59,9 +69,11 @@ namespace SQLBuilder.Core.LoadBalancer
         public WeightRoundRobin(int[] weights)
         {
             _weights = weights;
-            _minWeight = weights.Min();
+            _totalWeight = weights.Sum();
             _states = new int[weights.Length];
             _times = new int[weights.Length];
+
+            Array.Copy(_weights, _states, weights.Length);
         }
         #endregion
 
@@ -70,11 +82,11 @@ namespace SQLBuilder.Core.LoadBalancer
         /// 获取最大状态
         /// </summary>
         /// <param name="states"></param>
-        /// <param name="index"></param>
         /// <returns></returns>
-        private static int GetMaxState(int[] states, out int index)
+        private static int GetMaxIndex(int[] states)
         {
-            index = 0;
+            var index = 0;
+
             var state = int.MinValue;
 
             for (var i = 0; i < states.Length; i++)
@@ -86,7 +98,7 @@ namespace SQLBuilder.Core.LoadBalancer
                 }
             }
 
-            return state;
+            return index;
         }
 
         /// <summary>
@@ -96,21 +108,14 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public int Get(out int times)
         {
-            //选择状态最大值
-            var state = GetMaxState(_states, out var index);
+            var index = GetMaxIndex(_states);
 
-            //如果所有状态都不达标，则集体加盐
-            if (state < _minWeight)
+            _states[index] -= _totalWeight;
+
+            for (var i = 0; i < _weights.Length; i++)
             {
-                for (var i = 0; i < _weights.Length; i++)
-                    _states[i] += _weights[i];
-
-                //重新选择状态最大值
-                GetMaxState(_states, out index);
+                _states[i] += _weights[i];
             }
-
-            //已选择，减状态
-            _states[index] -= _minWeight;
 
             times = ++_times[index];
 
@@ -160,7 +165,7 @@ namespace SQLBuilder.Core.LoadBalancer
 
             key = $"{key}_{weightList.Join("_")}";
 
-            var weightRoundRobin = _weightRoundRobins.GetOrAdd(key, 
+            var weightRoundRobin = _weightRoundRobins.GetOrAdd(key,
                 key => new Lazy<WeightRoundRobin>(() => new WeightRoundRobin(weightList.ToArray()))).Value;
 
             //获取索引值

@@ -24,8 +24,10 @@ using SQLBuilder.Core.Enums;
 using SQLBuilder.Core.Repositories;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using SysColumnAttribute = System.ComponentModel.DataAnnotations.Schema.ColumnAttribute;
@@ -501,6 +503,176 @@ namespace SQLBuilder.Core.Extensions
             }
 
             return sb.ToString();
+        }
+        #endregion
+
+        #region MaxIndex
+        /// <summary>
+        /// 获取最大值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MaxIndex<T>(this IEnumerable<T> @this) where T : IComparable<T> =>
+            @this.MaxIndex(out _);
+
+        /// <summary>
+        /// 获取最大值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="maxValue"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MaxIndex<T>(this IEnumerable<T> @this, out T maxValue) where T : IComparable<T>
+        {
+            if (@this.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            var index = 0;
+            maxValue = @this.ElementAt(0);
+            var length = @this.Count();
+
+            for (var i = 1; i < length; ++i)
+            {
+                var tempValue = @this.ElementAt(i);
+                if (tempValue.CompareTo(maxValue) > 0)
+                {
+                    maxValue = tempValue;
+                    index = i;
+                }
+            }
+
+            return index;
+        }
+
+        /// <summary>
+        /// 获取最大值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MaxIndex<T>(this IList<T> @this) where T : IComparable<T> =>
+            @this.MaxIndex(out _);
+
+        /// <summary>
+        /// 获取最大值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="maxValue"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MaxIndex<T>(this IList<T> @this, out T maxValue) where T : IComparable<T>
+        {
+            if (@this.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            var index = 0;
+            maxValue = @this[0];
+
+            for (var i = 1; i < @this.Count; ++i)
+            {
+                var tempValue = @this[i];
+                if (tempValue.CompareTo(maxValue) > 0)
+                {
+                    maxValue = tempValue;
+                    index = i;
+                }
+            }
+
+            return index;
+        }
+        #endregion
+
+        #region MinIndex
+        /// <summary>
+        /// 获取最小值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MinIndex<T>(this IEnumerable<T> @this) where T : IComparable<T> =>
+            @this.MinIndex(out _);
+
+        /// <summary>
+        /// 获取最小值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="minValue"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MinIndex<T>(this IEnumerable<T> @this, out T minValue) where T : IComparable<T>
+        {
+            if (@this.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            var index = 0;
+            minValue = @this.ElementAt(0);
+            var length = @this.Count();
+
+            for (var i = 1; i < length; ++i)
+            {
+                var tempValue = @this.ElementAt(i);
+                if (tempValue.CompareTo(minValue) < 0)
+                {
+                    minValue = tempValue;
+                    index = i;
+                }
+            }
+
+            return index;
+        }
+
+        /// <summary>
+        /// 获取最小值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MinIndex<T>(this IList<T> @this) where T : IComparable<T> =>
+            @this.MinIndex(out _);
+
+        /// <summary>
+        /// 获取最小值所在索引
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="minValue"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static int MinIndex<T>(this IList<T> @this, out T minValue) where T : IComparable<T>
+        {
+            if (@this.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException(nameof(@this));
+            }
+
+            var index = 0;
+            minValue = @this[0];
+
+            for (var i = 1; i < @this.Count; ++i)
+            {
+                var tempValue = @this[i];
+                if (tempValue.CompareTo(minValue) < 0)
+                {
+                    minValue = tempValue;
+                    index = i;
+                }
+            }
+
+            return index;
         }
         #endregion
     }

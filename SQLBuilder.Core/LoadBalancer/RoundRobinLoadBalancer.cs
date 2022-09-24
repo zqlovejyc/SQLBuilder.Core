@@ -16,20 +16,62 @@
  */
 #endregion
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using SQLBuilder.Core.Extensions;
 
 namespace SQLBuilder.Core.LoadBalancer
 {
+    /// <summary>
+    /// 原子计数器
+    /// </summary>
+    public sealed class AtomicCounter
+    {
+        private int _value;
+
+        /// <summary>
+        /// Gets the current value of the counter.
+        /// </summary>
+        public int Value
+        {
+            get => Volatile.Read(ref _value);
+            set => Volatile.Write(ref _value, value);
+        }
+
+        /// <summary>
+        /// Atomically increments the counter value by 1.
+        /// </summary>
+        public int Increment()
+        {
+            return Interlocked.Increment(ref _value);
+        }
+
+        /// <summary>
+        /// Atomically decrements the counter value by 1.
+        /// </summary>
+        public int Decrement()
+        {
+            return Interlocked.Decrement(ref _value);
+        }
+
+        /// <summary>
+        /// Atomically resets the counter value to 0.
+        /// </summary>
+        public void Reset()
+        {
+            Interlocked.Exchange(ref _value, 0);
+        }
+    }
+
     /// <summary>
     /// 轮询方式
     /// </summary>
     public class RoundRobinLoadBalancer : ILoadBalancer
     {
-        private static readonly object _lock = new();
-
-        private static readonly ConcurrentDictionary<string, int> _serviceIndexs = new();
+        private static readonly ConcurrentDictionary<string, Lazy<AtomicCounter>> _counters = new();
 
         /// <summary>
         /// 获取数据集合中的一条数据
@@ -41,22 +83,21 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
+            if (data.IsNullOrEmpty())
+                return default;
+
             var count = data.Count();
-            key = $"{key}_{count}";
 
-            var index = _serviceIndexs.GetOrAdd(key, 0);
-            var retval = data.ElementAt(index);
+            key = $"{key}_{data.GetHashCode()}";
 
-            lock (_lock)
-            {
-                index++;
-                if (index >= count)
-                    index = 0;
+            var counter = _counters.GetOrAdd(key, key =>
+                new Lazy<AtomicCounter>(() => new AtomicCounter())).Value;
 
-                _serviceIndexs[key] = index;
-            }
+            var offset = counter.Increment() - 1;
 
-            return retval;
+            var index = (offset & 0x7FFFFFFF) % count;
+
+            return data.ElementAt(index);
         }
     }
 }

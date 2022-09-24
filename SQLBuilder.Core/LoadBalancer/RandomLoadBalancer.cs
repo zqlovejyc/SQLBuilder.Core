@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SQLBuilder.Core.Extensions;
 
 namespace SQLBuilder.Core.LoadBalancer
 {
@@ -48,9 +49,12 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <returns></returns>
         public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
         {
+            if (data.IsNullOrEmpty())
+                return default;
+
             var count = data.Count();
 
-            return count == 0 ? default : data.ElementAt(_random.Next(count));
+            return data.ElementAt(_random.Next(count));
         }
     }
 }

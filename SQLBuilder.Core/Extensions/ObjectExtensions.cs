@@ -667,5 +667,27 @@ namespace SQLBuilder.Core.Extensions
             return index;
         }
         #endregion
+
+        #region ForEach
+        /// <summary>
+        /// 遍历集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> ForEach<T>(this IEnumerable<T> @this, Action<T> action)
+        {
+            if (action == null || @this.IsNullOrEmpty())
+                return @this;
+
+            foreach (var item in @this)
+            {
+                action(item);
+            }
+
+            return @this;
+        }
+        #endregion
     }
 }

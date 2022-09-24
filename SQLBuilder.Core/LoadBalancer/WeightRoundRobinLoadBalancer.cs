@@ -134,7 +134,7 @@ namespace SQLBuilder.Core.LoadBalancer
             var weightList = new List<int>();
 
             if (weights == null)
-                data.ToList().ForEach(x => weightList.Add(1));
+                data.ForEach(x => weightList.Add(1));
             else
             {
                 for (int i = 0; i < count; i++)

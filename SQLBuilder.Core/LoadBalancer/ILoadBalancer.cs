@@ -33,6 +33,6 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <param name="data">数据集合</param>
         /// <param name="weights">权重集合，仅当实现权重逻辑的实例才有效</param>
         /// <returns></returns>
-        T Get<T>(string key, IEnumerable<T> data, int[] weights = null);
+        T Get<T>(string key, IEnumerable<T> data, params int[] weights);
     }
 }

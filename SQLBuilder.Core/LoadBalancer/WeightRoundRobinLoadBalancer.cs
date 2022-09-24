@@ -66,7 +66,7 @@ namespace SQLBuilder.Core.LoadBalancer
         /// 实例化
         /// </summary>
         /// <param name="weights"></param>
-        public WeightRoundRobin(int[] weights)
+        public WeightRoundRobin(params int[] weights)
         {
             if (weights.IsNullOrEmpty())
                 throw new ArgumentException($"`{nameof(weights)}` cannot be null or empty.");
@@ -125,7 +125,7 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <param name="data">数据集合</param>
         /// <param name="weights">权重集合</param>
         /// <returns></returns>
-        public T Get<T>(string key, IEnumerable<T> data, int[] weights = null)
+        public T Get<T>(string key, IEnumerable<T> data, params int[] weights)
         {
             if (data.IsNullOrEmpty())
                 return default;

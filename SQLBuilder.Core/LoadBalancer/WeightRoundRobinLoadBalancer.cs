@@ -68,6 +68,9 @@ namespace SQLBuilder.Core.LoadBalancer
         /// <param name="weights"></param>
         public WeightRoundRobin(int[] weights)
         {
+            if (weights.IsNullOrEmpty())
+                throw new ArgumentException($"`{nameof(weights)}` cannot be null or empty.");
+
             _weights = weights;
             _totalWeight = weights.Sum();
             _states = new int[weights.Length];

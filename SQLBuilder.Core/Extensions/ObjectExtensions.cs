@@ -528,7 +528,7 @@ namespace SQLBuilder.Core.Extensions
         public static int MaxIndex<T>(this IEnumerable<T> @this, out T maxValue) where T : IComparable<T>
         {
             if (@this.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(@this));
+                throw new ArgumentException($"`{nameof(@this)}` cannot be null or empty.");
 
             var index = 0;
             maxValue = @this.ElementAt(0);
@@ -568,7 +568,7 @@ namespace SQLBuilder.Core.Extensions
         public static int MaxIndex<T>(this ICollection<T> @this, out T maxValue) where T : IComparable<T>
         {
             if (@this.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(@this));
+                throw new ArgumentException($"`{nameof(@this)}` cannot be null or empty.");
 
             var index = 0;
             maxValue = @this.ElementAt(0);
@@ -609,7 +609,7 @@ namespace SQLBuilder.Core.Extensions
         public static int MinIndex<T>(this IEnumerable<T> @this, out T minValue) where T : IComparable<T>
         {
             if (@this.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(@this));
+                throw new ArgumentException($"`{nameof(@this)}` cannot be null or empty.");
 
             var index = 0;
             minValue = @this.ElementAt(0);
@@ -649,7 +649,7 @@ namespace SQLBuilder.Core.Extensions
         public static int MinIndex<T>(this ICollection<T> @this, out T minValue) where T : IComparable<T>
         {
             if (@this.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(@this));
+                throw new ArgumentException($"`{nameof(@this)}` cannot be null or empty.");
 
             var index = 0;
             minValue = @this.ElementAt(0);

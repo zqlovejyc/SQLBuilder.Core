@@ -106,7 +106,8 @@ namespace SQLBuilder.Core.FastMember
             // these are the columns used by DataTable load
             DataTable table = new()
             {
-                Columns = {
+                Columns =
+                {
                     {"ColumnOrdinal", typeof(int)},
                     {"ColumnName", typeof(string)},
                     {"DataType", typeof(Type)},
@@ -244,7 +245,10 @@ namespace SQLBuilder.Core.FastMember
             var accessor = this.accessor;
 
             int count = Math.Min(values.Length, members.Length);
-            for (int i = 0; i < count; i++) values[i] = accessor[current, members[i]] ?? DBNull.Value;
+
+            for (int i = 0; i < count; i++)
+                values[i] = accessor[current, members[i]] ?? DBNull.Value;
+
             return count;
         }
 

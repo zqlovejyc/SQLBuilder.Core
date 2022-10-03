@@ -207,7 +207,6 @@ namespace SQLBuilder.Core.FastMember
             }
         }
 
-
         private static readonly MethodInfo strinqEquals = typeof(string).GetMethod("op_Equality", new Type[] { typeof(string), typeof(string) });
 
         /// <summary>
@@ -255,15 +254,17 @@ namespace SQLBuilder.Core.FastMember
             {
                 get
                 {
-                    int index;
-                    if (map.TryGetValue(name, out index)) return getter(index, target);
-                    else throw new ArgumentOutOfRangeException(nameof(name));
+                    if (map.TryGetValue(name, out var index))
+                        return getter(index, target);
+                    else
+                        throw new ArgumentOutOfRangeException(nameof(name));
                 }
                 set
                 {
-                    int index;
-                    if (map.TryGetValue(name, out index)) setter(index, target, value);
-                    else throw new ArgumentOutOfRangeException(nameof(name));
+                    if (map.TryGetValue(name, out var index))
+                        setter(index, target, value);
+                    else
+                        throw new ArgumentOutOfRangeException(nameof(name));
                 }
             }
         }
@@ -277,8 +278,11 @@ namespace SQLBuilder.Core.FastMember
             {
                 for (int i = 0; i < props.Length; i++)
                 {
-                    if (props[i].GetGetMethod(true) != null && props[i].GetGetMethod(false) == null) return false; // non-public getter
-                    if (props[i].GetSetMethod(true) != null && props[i].GetSetMethod(false) == null) return false; // non-public setter
+                    if (props[i].GetGetMethod(true) != null && props[i].GetGetMethod(false) == null)
+                        return false; // non-public getter
+
+                    if (props[i].GetSetMethod(true) != null && props[i].GetSetMethod(false) == null)
+                        return false; // non-public setter
                 }
             }
 
@@ -321,8 +325,8 @@ namespace SQLBuilder.Core.FastMember
             ILGenerator il;
             if (!IsFullyPublic(type, props, allowNonPublicAccessors))
             {
-                DynamicMethod dynGetter = new DynamicMethod(type.FullName + "_get", typeof(object), new Type[] { typeof(int), typeof(object) }, type, true),
-                              dynSetter = new DynamicMethod(type.FullName + "_set", null, new Type[] { typeof(int), typeof(object), typeof(object) }, type, true);
+                DynamicMethod dynGetter = new(type.FullName + "_get", typeof(object), new Type[] { typeof(int), typeof(object) }, type, true),
+                              dynSetter = new(type.FullName + "_set", null, new Type[] { typeof(int), typeof(object), typeof(object) }, type, true);
                 WriteMapImpl(dynGetter.GetILGenerator(), type, members, null, allowNonPublicAccessors, true);
                 WriteMapImpl(dynSetter.GetILGenerator(), type, members, null, allowNonPublicAccessors, false);
                 DynamicMethod dynCtor = null;
@@ -409,13 +413,9 @@ namespace SQLBuilder.Core.FastMember
             else if (type.IsValueType)
             {
                 if (valueAsPointer)
-                {
                     il.Emit(OpCodes.Unbox, type);
-                }
                 else
-                {
                     il.Emit(OpCodes.Unbox_Any, type);
-                }
             }
             else
             {

@@ -1,48 +1,43 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using System;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace SQLBuilder.Core.FastMember
 {
     internal static class CallSiteCache
     {
-        private static readonly Hashtable getters = new(), setters = new();
+        private static readonly ConcurrentDictionary<string, Lazy<CallSite<Func<CallSite, object, object>>>> getters = new();
+        private static readonly ConcurrentDictionary<string, Lazy<CallSite<Func<CallSite, object, object, object>>>> setters = new();
 
         internal static object GetValue(string name, object target)
         {
-            CallSite<Func<CallSite, object, object>> callSite = (CallSite<Func<CallSite, object, object>>)getters[name];
-            if (callSite == null)
-            {
-                CallSite<Func<CallSite, object, object>> newSite = CallSite<Func<CallSite, object, object>>.Create(Binder.GetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache), new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) }));
-                lock (getters)
-                {
-                    callSite = (CallSite<Func<CallSite, object, object>>)getters[name];
-                    if (callSite == null)
-                    {
-                        getters[name] = callSite = newSite;
-                    }
-                }
-            }
+            var callSite = getters.GetOrAdd(name, key =>
+                new Lazy<CallSite<Func<CallSite, object, object>>>(() =>
+                    CallSite<Func<CallSite, object, object>>.Create(
+                         Binder.GetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache),
+                         new CSharpArgumentInfo[]
+                         {
+                             CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
+                         })))).Value;
+
             return callSite.Target(callSite, target);
         }
+
         internal static void SetValue(string name, object target, object value)
         {
-            CallSite<Func<CallSite, object, object, object>> callSite = (CallSite<Func<CallSite, object, object, object>>)setters[name];
-            if (callSite == null)
-            {
-                CallSite<Func<CallSite, object, object, object>> newSite = CallSite<Func<CallSite, object, object, object>>.Create(Binder.SetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache), new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null), CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.UseCompileTimeType, null) }));
-                lock (setters)
-                {
-                    callSite = (CallSite<Func<CallSite, object, object, object>>)setters[name];
-                    if (callSite == null)
-                    {
-                        setters[name] = callSite = newSite;
-                    }
-                }
-            }
+            var callSite = setters.GetOrAdd(name, key =>
+                new Lazy<CallSite<Func<CallSite, object, object, object>>>(() =>
+                    CallSite<Func<CallSite, object, object, object>>.Create(
+                        Binder.SetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache),
+                        new CSharpArgumentInfo[]
+                        {
+                            CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),
+                            CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.UseCompileTimeType,
+                            null)
+                        })))).Value;
+
             callSite.Target(callSite, target, value);
         }
-        
     }
 }

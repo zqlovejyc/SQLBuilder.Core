@@ -32,6 +32,7 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>sqlbuilder;expression;repository;sql;orm;dapper</PackageTags>
 		<LangVersion>latest</LangVersion>
+		<NoWarn>NETSDK1138;</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

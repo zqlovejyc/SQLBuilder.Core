@@ -25,6 +25,7 @@
 		<FileVersion>2.3.9.0</FileVersion>
 		<AssemblyVersion>2.3.9.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
+		<NoWarn>NETSDK1138;</NoWarn>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

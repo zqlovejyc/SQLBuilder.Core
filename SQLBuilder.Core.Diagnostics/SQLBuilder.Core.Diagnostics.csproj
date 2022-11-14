@@ -32,6 +32,7 @@
 		<DocumentationFile>bin\Release\netstandard2.1\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net6.0\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net7.0\SQLBuilder.Core.Diagnostics.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

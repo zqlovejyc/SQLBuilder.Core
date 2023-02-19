@@ -8,20 +8,18 @@
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<Authors>张强</Authors>
-		<Version>2.3.9</Version>
-		<FileVersion>2.3.9.0</FileVersion>
-		<AssemblyVersion>2.3.9.0</AssemblyVersion>
+		<Version>2.4.0</Version>
+		<FileVersion>2.4.0.0</FileVersion>
+		<AssemblyVersion>2.4.0.0</AssemblyVersion>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2025 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.引入FastMember，替换原有的反射调用；
-2.优化GetColumnInfo、GetPrimaryKey；
-3.优化ToEntities、ToLists；
-4.新增TryGetValue、TryGetOrAdd、ContainsKey、ToEntity字典扩展方法；
-5.优化列信息获取，添加内存缓存；
-6.支持Where表达式中HashSet写法解析；
-7.升级nuget包；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.新增Separate、Join、Format、MaxIndex、MinIndex、ForEach扩展方法；
+2.优化权重轮询算法，优化权重大的节点不会霸占选择权；
+3.优化ConcurrentDictionary采用Lazy方式线程安全的创建字典元素值；
+4.适配net7.0平台；
+5.升级nuget包；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>
@@ -52,21 +50,32 @@
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.8" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
-		<PackageReference Include="MySqlConnector" Version="2.1.13" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="Npgsql" Version="6.0.6" />
-		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.70" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
+		<PackageReference Include="MySqlConnector" Version="2.2.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="Npgsql" Version="7.0.2" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.90" />
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'net5.0'">
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.14" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -18,7 +18,7 @@
         <RepositoryUrl>https://github.com/zqlovejyc/SQLBuilder.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>sqlbuilder;skywalking;apm</PackageTags>
-        <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
+        <PackageReleaseNotes>1.适配net8.0平台；</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageId>Zq.SQLBuilder.Core.SkyWalking</PackageId>
         <Version>2.4.0</Version>

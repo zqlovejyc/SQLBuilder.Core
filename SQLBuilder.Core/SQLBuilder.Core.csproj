@@ -15,11 +15,8 @@
 		<Description>Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；</Description>
 		<Copyright>Copyright © 2018-2025 , 张强 943620963@qq.com</Copyright>
 		<PackageId>Zq.SQLBuilder.Core</PackageId>
-		<PackageReleaseNotes>1.新增Separate、Join、Format、MaxIndex、MinIndex、ForEach扩展方法；
-2.优化权重轮询算法，优化权重大的节点不会霸占选择权；
-3.优化ConcurrentDictionary采用Lazy方式线程安全的创建字典元素值；
-4.适配net7.0平台；
-5.升级nuget包；</PackageReleaseNotes>
+		<PackageReleaseNotes>1.适配net8.0平台；
+2.升级nuget包；</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/zqlovejyc/SQLBuilder.Core</PackageProjectUrl>
 		<PackageLicenseUrl></PackageLicenseUrl>
 		<PackageIcon>sql.png</PackageIcon>

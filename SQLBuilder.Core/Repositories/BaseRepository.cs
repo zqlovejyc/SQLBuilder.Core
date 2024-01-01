@@ -576,6 +576,19 @@ namespace SQLBuilder.Core.Repositories
         public abstract string GetPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex);
 
         /// <summary>
+        /// 获取分页语句(是否包含下一页，不返回总条数)
+        /// </summary>
+        /// <param name="isWithSyntax">是否with语法</param>
+        /// <param name="sql">原始sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序排序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns></returns>
+        public abstract string GetNextPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex);
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <typeparam name="T">表实体泛型</typeparam>
@@ -584,9 +597,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual (IEnumerable<T> list, long total) PageQuery<T>(SqlBuilderCore<T> builder, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual (IEnumerable<T> list, long total) PageQuery<T>(SqlBuilderCore<T> builder, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(false, builder.Sql, builder.Parameters, orderField, isAscending, pageSize, pageIndex);
+                return (Query<T>(false, sqlQuery, builder.DynamicParameters), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(false, builder.Sql, builder.Parameters, orderField, isAscending, pageSize, pageIndex);
@@ -616,9 +636,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual (IEnumerable<T> list, long total) PageQuery<T>(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) PageQuery<T>(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+                return (Query<T>(isWithSyntax, sqlQuery, parameter), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
@@ -647,9 +674,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual (DataTable table, long total) PageQuery(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) PageQuery(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+                return (Query(isWithSyntax, sqlQuery, parameter), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
@@ -679,9 +713,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> PageQueryAsync<T>(SqlBuilderCore<T> builder, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual async Task<(IEnumerable<T> list, long total)> PageQueryAsync<T>(SqlBuilderCore<T> builder, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(false, builder.Sql, builder.Parameters, orderField, isAscending, pageSize, pageIndex);
+                return (await QueryAsync<T>(false, sqlQuery, builder.DynamicParameters), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(false, builder.Sql, builder.Parameters, orderField, isAscending, pageSize, pageIndex);
@@ -711,9 +752,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> PageQueryAsync<T>(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> PageQueryAsync<T>(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+                return (await QueryAsync<T>(isWithSyntax, sqlQuery, parameter), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
@@ -742,9 +790,16 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序排序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns></returns>
-        public virtual async Task<(DataTable table, long total)> PageQueryAsync(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> PageQueryAsync(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
+            if (hasNextPage)
+            {
+                var sqlQuery = GetNextPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+                return (await QueryAsync(isWithSyntax, sqlQuery, parameter), default);
+            }
+
             if (Transaction?.Connection != null)
             {
                 var sqlQuery = GetPageSql(isWithSyntax, sql, parameter, orderField, isAscending, pageSize, pageIndex);
@@ -3271,12 +3326,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual (IEnumerable<T> list, long total) FindList<T>(string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType, isEnableFormat: IsEnableFormat);
-            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3287,12 +3343,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3304,12 +3361,13 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual (IEnumerable<T> list, long total) FindList<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3320,11 +3378,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return FindList<T>(sql, null, orderField, isAscending, pageSize, pageIndex);
+            return FindList<T>(sql, null, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3336,11 +3395,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3352,11 +3412,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) FindList<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3416,11 +3477,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) FindListByWith<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3432,11 +3494,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (IEnumerable<T> list, long total) FindListByWith<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return PageQuery<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
         #endregion
 
@@ -3588,11 +3651,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType, isEnableFormat: IsEnableFormat);
-            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3604,11 +3668,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(databaseType: DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3621,11 +3686,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex) where T : class
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(Expression<Func<T, object>> selector, Expression<Func<T, bool>> predicate, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false) where T : class
         {
             var builder = Sql.Select<T>(selector, DatabaseType, isEnableFormat: IsEnableFormat).Where(predicate);
-            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(builder, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3637,10 +3703,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await FindListAsync<T>(sql, null, orderField, isAscending, pageSize, pageIndex);
+            return await FindListAsync<T>(sql, null, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3653,10 +3720,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(false, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3669,10 +3737,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3733,10 +3802,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(true, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3749,10 +3819,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回集合和总记录数</returns>
-        public virtual async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(IEnumerable<T> list, long total)> FindListByWithAsync<T>(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync<T>(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
         #endregion
         #endregion
@@ -3810,11 +3881,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) FindTable(string sql, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex);
+            return FindTable(sql, null, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3825,11 +3897,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) FindTable(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery(false, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3840,11 +3913,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) FindTable(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return PageQuery(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3899,11 +3973,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) FindTableByWith(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return PageQuery(true, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3914,11 +3989,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual (DataTable table, long total) FindTableByWith(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return PageQuery(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return PageQuery(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
         #endregion
 
@@ -3975,10 +4051,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex);
+            return await FindTableAsync(sql, null, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -3990,10 +4067,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync(false, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync(false, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -4005,10 +4083,11 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
         /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> FindTableAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync(false, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -4063,11 +4142,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync(true, sql, parameter, orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync(true, sql, parameter, orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
 
         /// <summary>
@@ -4078,11 +4158,12 @@ namespace SQLBuilder.Core.Repositories
         /// <param name="orderField">排序字段</param>
         /// <param name="isAscending">是否升序</param>
         /// <param name="pageSize">每页数量</param>
-        /// <param name="pageIndex">当前页码</param>        
+        /// <param name="pageIndex">当前页码</param>
+        /// <param name="hasNextPage">是否含有下一页，默认false，为true则只返回pageSize+1条数据，总条数total为0</param>
         /// <returns>返回DataTable和总记录数</returns>
-        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        public virtual async Task<(DataTable table, long total)> FindTableByWithAsync(string sql, DbParameter[] dbParameter, string orderField, bool isAscending, int pageSize, int pageIndex, bool hasNextPage = false)
         {
-            return await PageQueryAsync(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex);
+            return await PageQueryAsync(true, sql, dbParameter.ToDynamicParameters(), orderField, isAscending, pageSize, pageIndex, hasNextPage);
         }
         #endregion
         #endregion

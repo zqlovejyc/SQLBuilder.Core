@@ -129,7 +129,7 @@ namespace SQLBuilder.Core.Extensions
             if (endIsIndexOf)
                 endIndex = @this.IndexOf(end, startIndex, comparisonType);
             else
-                endIndex = @this.LastIndexOf(end, comparisonType);
+                endIndex = @this.LastIndexOf(end, startIndex, comparisonType);
 
             if (endIndex == -1)
                 return string.Empty;

@@ -113,6 +113,61 @@ namespace SQLBuilder.Core.Repositories
 
             return sqlQuery;
         }
+
+        /// <summary>
+        /// 获取分页语句(是否包含下一页，不返回总条数)
+        /// </summary>
+        /// <param name="isWithSyntax">是否with语法</param>
+        /// <param name="sql">原始sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序排序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns></returns>
+        public override string GetNextPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            //排序字段
+            string order;
+            if (orderField.IsNotNullOrEmpty())
+            {
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
+                    order = $"ORDER BY {orderField}";
+                else
+                    order = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+            }
+            else
+            {
+                order = "ORDER BY (SELECT 0)";
+            }
+
+            var sqlQuery = string.Empty;
+            var next = pageSize + 1;
+            var offset = pageSize * (pageIndex - 1);
+            var rowStart = pageSize * (pageIndex - 1) + 1;
+            var rowEnd = pageSize * pageIndex + 1;
+            var serverVersion = int.Parse(Connection.ServerVersion.Split('.')[0]);
+
+            //判断是否with语法
+            if (isWithSyntax)
+            {
+                if (serverVersion > 10)
+                    sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {(orderField.IsNotNullOrEmpty() ? order : "")}) SELECT * FROM T OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
+                else
+                    sqlQuery += $"{sql},R AS (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM T) SELECT * FROM R WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
+            }
+            else
+            {
+                if (serverVersion > 10)
+                    sqlQuery += $"{sql} {(orderField.IsNotNullOrEmpty() ? order : "")} OFFSET {offset} ROWS FETCH NEXT {next} ROWS ONLY;";
+                else
+                    sqlQuery += $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({order}) AS [ROWNUMBER], * FROM ({sql}) AS T) AS N WHERE [ROWNUMBER] BETWEEN {rowStart} AND {rowEnd};";
+            }
+
+            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
+
+            return sqlQuery;
+        }
         #endregion
 
         #region Insert

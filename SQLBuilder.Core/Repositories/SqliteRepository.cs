@@ -99,6 +99,43 @@ namespace SQLBuilder.Core.Repositories
 
             return sqlQuery;
         }
+
+        /// <summary>
+        /// 获取分页语句(是否包含下一页，不返回总条数)
+        /// </summary>
+        /// <param name="isWithSyntax">是否with语法</param>
+        /// <param name="sql">原始sql语句</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isAscending">是否升序排序</param>
+        /// <param name="pageSize">每页数量</param>
+        /// <param name="pageIndex">当前页码</param>
+        /// <returns></returns>
+        public override string GetNextPageSql(bool isWithSyntax, string sql, object parameter, string orderField, bool isAscending, int pageSize, int pageIndex)
+        {
+            //排序字段
+            if (orderField.IsNotNullOrEmpty())
+            {
+                if (orderField.Contains(@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)", RegexOptions.IgnoreCase))
+                    orderField = $"ORDER BY {orderField}";
+                else
+                    orderField = $"ORDER BY {orderField} {(isAscending ? "ASC" : "DESC")}";
+            }
+
+            var sqlQuery = string.Empty;
+            var limit = pageSize + 1;
+            var offset = pageSize * (pageIndex - 1);
+
+            //判断是否with语法
+            if (isWithSyntax)
+                sqlQuery += $"{sql.Remove(sql.LastIndexOf(")"), 1)} {orderField}) SELECT * FROM T LIMIT {limit} OFFSET {offset};";
+            else
+                sqlQuery += $"{sql} {orderField} LIMIT {limit} OFFSET {offset};";
+
+            sqlQuery = SqlIntercept?.Invoke(sqlQuery, parameter) ?? sqlQuery;
+
+            return sqlQuery;
+        }
         #endregion
 
         #region Insert

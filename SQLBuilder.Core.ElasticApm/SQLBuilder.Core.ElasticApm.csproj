@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net5.0;net6.0;net7.0;</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <IncludeSymbols>true</IncludeSymbols>
@@ -20,9 +20,9 @@
         <PackageTags>sqlbuilder;elastic;apm</PackageTags>
         <PackageReleaseNotes>1.升级SQLBuilder引用版本；</PackageReleaseNotes>
         <PackageId>Zq.SQLBuilder.Core.ElasticApm</PackageId>
-		<Version>2.3.9</Version>
-		<FileVersion>2.3.9.0</FileVersion>
-		<AssemblyVersion>2.3.9.0</AssemblyVersion>
+		<Version>2.4.0</Version>
+		<FileVersion>2.4.0.0</FileVersion>
+		<AssemblyVersion>2.4.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
 		<NoWarn>NETSDK1138;</NoWarn>
     </PropertyGroup>
@@ -32,12 +32,13 @@
 		<DocumentationFile>bin\Release\net5.0\SQLBuilder.Core.ElasticApm.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net6.0\SQLBuilder.Core.ElasticApm.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net7.0\SQLBuilder.Core.ElasticApm.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net8.0\SQLBuilder.Core.ElasticApm.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.17.0" />
-        <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.28" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PackageReference Include="Elastic.Apm.AspNetCore" Version="1.25.2" />
+        <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.32" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

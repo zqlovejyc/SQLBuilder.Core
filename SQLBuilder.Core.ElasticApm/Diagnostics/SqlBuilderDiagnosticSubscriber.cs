@@ -36,7 +36,7 @@ namespace SQLBuilder.Core.ElasticApm.Diagnostics
         /// <returns></returns>
         public IDisposable Subscribe(IApmAgent agent)
         {
-            if (!agent.ConfigurationReader.Enabled)
+            if (!agent.Configuration.Enabled)
                 return null;
 
             return DiagnosticListener

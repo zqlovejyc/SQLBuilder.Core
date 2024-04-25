@@ -15,7 +15,7 @@ namespace SQLBuilder.Core.FastMember
             var callSite = getters.GetOrAdd(name, key =>
                 new Lazy<CallSite<Func<CallSite, object, object>>>(() =>
                     CallSite<Func<CallSite, object, object>>.Create(
-                         Binder.GetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache),
+                         Binder.GetMember(CSharpBinderFlags.None, key, typeof(CallSiteCache),
                          new CSharpArgumentInfo[]
                          {
                              CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
@@ -29,7 +29,7 @@ namespace SQLBuilder.Core.FastMember
             var callSite = setters.GetOrAdd(name, key =>
                 new Lazy<CallSite<Func<CallSite, object, object, object>>>(() =>
                     CallSite<Func<CallSite, object, object, object>>.Create(
-                        Binder.SetMember(CSharpBinderFlags.None, name, typeof(CallSiteCache),
+                        Binder.SetMember(CSharpBinderFlags.None, key, typeof(CallSiteCache),
                         new CSharpArgumentInfo[]
                         {
                             CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),

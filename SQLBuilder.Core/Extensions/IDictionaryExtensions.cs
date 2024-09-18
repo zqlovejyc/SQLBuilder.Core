@@ -495,12 +495,12 @@ namespace SQLBuilder.Core.Extensions
         /// <param name="key">Key</param>
         /// <param name="defaultValue">default value if key not exists</param>
         /// <returns>The value corresponding to the dictionary key otherwise return the defaultValue</returns>
-        public static T TryGetValue<T>(this IDictionary<string, object> @this, string key, T defaultValue)
+        public static T TryGetValue<T>(this IDictionary<string, object> @this, string key, T defaultValue = default)
         {
             if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            if (@this.TryGetValue(key, out var keyValue) && keyValue is T retVal)
+            if (@this.TryGetValue(key, out var keyValue) && keyValue is T retVal && retVal != null)
                 return retVal;
 
             return defaultValue;
@@ -525,12 +525,12 @@ namespace SQLBuilder.Core.Extensions
 
             if (@this is Dictionary<string, object> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
             {
-                if (dict.TryGetValue(key, out var keyVal) && keyVal is T retVal)
+                if (dict.TryGetValue(key, out var keyVal) && keyVal is T retVal && retVal != null)
                     return retVal;
             }
             else
             {
-                if (@this.FirstOrDefault(o => o.Key.EqualIgnoreCase(key)).Value is T val)
+                if (@this.FirstOrDefault(o => o.Key.EqualIgnoreCase(key)).Value is T val && val != null)
                     return val;
             }
 
@@ -551,7 +551,7 @@ namespace SQLBuilder.Core.Extensions
             if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            if (@this.TryGetValue(key, out var keyValue))
+            if (@this.TryGetValue(key, out var keyValue) && keyValue != null)
                 return keyValue;
 
             return defaultValue;
@@ -577,7 +577,7 @@ namespace SQLBuilder.Core.Extensions
 
             if (@this is Dictionary<TKey, TValue> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
             {
-                if (dict.TryGetValue(key, out var keyVal))
+                if (dict.TryGetValue(key, out var keyVal) && keyVal != null)
                     return keyVal;
             }
             else
@@ -587,7 +587,10 @@ namespace SQLBuilder.Core.Extensions
                    ? string.Equals(k as string, key as string, StringComparison.OrdinalIgnoreCase)
                    : Equals(k, key);
 
-                return @this.FirstOrDefault(o => match(o.Key)).Value;
+                var keyVal = @this.FirstOrDefault(o => match(o.Key)).Value;
+
+                if (keyVal != null)
+                    return keyVal;
             }
 
             return defaultValue;
@@ -715,9 +718,7 @@ namespace SQLBuilder.Core.Extensions
                 return @this.ContainsKey(key);
 
             if (@this is Dictionary<string, T> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
-            { 
                 return dict.ContainsKey(key);
-            }
 
             return @this.Keys.Any(k => k.EqualIgnoreCase(key));
         }

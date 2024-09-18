@@ -497,11 +497,11 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>The value corresponding to the dictionary key otherwise return the defaultValue</returns>
         public static T TryGetValue<T>(this IDictionary<string, object> @this, string key, T defaultValue)
         {
-            if (@this.IsNull() || !@this.ContainsKey(key))
+            if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            if (@this[key] is T t)
-                return t;
+            if (@this.TryGetValue(key, out var keyValue) && keyValue is T retVal)
+                return retVal;
 
             return defaultValue;
         }
@@ -520,11 +520,19 @@ namespace SQLBuilder.Core.Extensions
             if (!ignoreCase)
                 return @this.TryGetValue(key, defaultValue);
 
-            if (@this.IsNull() || !@this.Keys.Any(k => k.EqualIgnoreCase(key)))
+            if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            if (@this.FirstOrDefault(o => o.Key.EqualIgnoreCase(key)).Value is T t)
-                return t;
+            if (@this is Dictionary<string, object> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
+            {
+                if (dict.TryGetValue(key, out var keyVal) && keyVal is T retVal)
+                    return retVal;
+            }
+            else
+            {
+                if (@this.FirstOrDefault(o => o.Key.EqualIgnoreCase(key)).Value is T val)
+                    return val;
+            }
 
             return defaultValue;
         }
@@ -540,10 +548,13 @@ namespace SQLBuilder.Core.Extensions
         /// <returns>The value corresponding to the dictionary key otherwise return the defaultValue</returns>
         public static TValue TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> @this, TKey key, TValue defaultValue = default)
         {
-            if (@this.IsNull() || !@this.ContainsKey(key))
+            if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            return @this[key];
+            if (@this.TryGetValue(key, out var keyValue))
+                return keyValue;
+
+            return defaultValue;
         }
 
         /// <summary>
@@ -561,15 +572,25 @@ namespace SQLBuilder.Core.Extensions
             if (!ignoreCase)
                 return @this.TryGetValue(key, defaultValue);
 
-            bool match(TKey k) =>
-                typeof(TKey) == typeof(string)
-                ? string.Equals(k as string, key as string, StringComparison.OrdinalIgnoreCase)
-                : Equals(k, key);
-
-            if (@this.IsNull() || !@this.Keys.Any(match))
+            if (key == null || @this.IsNullOrEmpty())
                 return defaultValue;
 
-            return @this.FirstOrDefault(o => match(o.Key)).Value;
+            if (@this is Dictionary<TKey, TValue> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
+            {
+                if (dict.TryGetValue(key, out var keyVal))
+                    return keyVal;
+            }
+            else
+            {
+                bool match(TKey k) =>
+                   typeof(TKey) == typeof(string)
+                   ? string.Equals(k as string, key as string, StringComparison.OrdinalIgnoreCase)
+                   : Equals(k, key);
+
+                return @this.FirstOrDefault(o => match(o.Key)).Value;
+            }
+
+            return defaultValue;
         }
         #endregion
 
@@ -692,6 +713,11 @@ namespace SQLBuilder.Core.Extensions
 
             if (!ignoreCase)
                 return @this.ContainsKey(key);
+
+            if (@this is Dictionary<string, T> dict && dict?.Comparer == StringComparer.OrdinalIgnoreCase)
+            { 
+                return dict.ContainsKey(key);
+            }
 
             return @this.Keys.Any(k => k.EqualIgnoreCase(key));
         }

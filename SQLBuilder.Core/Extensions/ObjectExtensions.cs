@@ -208,10 +208,15 @@ namespace SQLBuilder.Core.Extensions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="this"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="throwEx"></param>
         /// <returns></returns>
-        public static T To<T>(this object @this)
+        public static T To<T>(this object @this, T defaultValue = default, bool throwEx = true)
         {
-            if (@this != null)
+            if (@this == null)
+                return defaultValue;
+
+            try
             {
                 var targetType = typeof(T);
 
@@ -234,9 +239,16 @@ namespace SQLBuilder.Core.Extensions
 
                 if (@this == DBNull.Value)
                     return (T)(object)null;
-            }
 
-            return @this == null ? default : (T)@this;
+                return (T)@this;
+            }
+            catch (Exception)
+            {
+                if (throwEx)
+                    throw;
+                else
+                    return defaultValue;
+            }
         }
         #endregion
 

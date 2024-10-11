@@ -1,7 +1,7 @@
 <p></p>
 
 <p align="center">
-<img src="https://github.com/zqlovejyc/SQLBuilder.Core/blob/master/SQLBuilder.Core/Icon/sql.png?raw=true" height="80"/>
+<img src="https://gitee.com/zqlovejyc/SQLBuilder.Core/raw/master/SQLBuilder.Core/Icon/sql.png" height="80"/>
 </p>
 
 <div align="center">

@@ -1,7 +1,7 @@
 <p></p>
 
 <p align="center">
-<span style="font-size:80px;color:#1296db;font-weight:bold;">SQL</span>
+<img src="https://github.com/zqlovejyc/SQLBuilder.Core/blob/master/SQLBuilder.Core/Icon/sql.png?raw=true" height="80"/>
 </p>
 
 <div align="center">

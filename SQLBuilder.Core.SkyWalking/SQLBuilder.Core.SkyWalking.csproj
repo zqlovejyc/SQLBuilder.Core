@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;net6.0;net7.0;net8.0;net9.0;</TargetFrameworks>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -33,6 +33,7 @@
 		<DocumentationFile>bin\Release\net6.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net7.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net8.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net9.0\SQLBuilder.Core.SkyWalking.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

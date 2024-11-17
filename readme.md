@@ -12,7 +12,7 @@
 
 <div align="left">
 
-.NET Standard 2.1、.NET 6、.NET 7、.NET 8  版本SQLBuilder，Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；
+.NET Standard 2.1、.NET 6、.NET 7、.NET 8、.NET 9 版本SQLBuilder，Expression表达式转换为SQL语句，支持SqlServer、MySql、Oracle、Sqlite、PostgreSql；基于Dapper实现了不同数据库对应的数据仓储Repository；
 
 </div>
 
